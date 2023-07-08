@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<LangVersion>11</LangVersion>
+
+		<SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
+
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ArtifactsDir>$([MSBuild]::NormalizeDirectory('$(SolutionRoot)', 'artifacts'))</ArtifactsDir>
+		<ArtifactsBinDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'bin'))</ArtifactsBinDir>
+		<ArtifactsObjDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'obj'))</ArtifactsObjDir>
+		<PackageOutputPath>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'packages', '$(PlatformName)', '$(Configuration)'))</PackageOutputPath>
+		<BaseIntermediateOutputPath>$([MSBuild]::NormalizeDirectory('$(ArtifactsObjDir)', '$(MSBuildProjectName)'))</BaseIntermediateOutputPath>
+		<MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+		<BaseOutputPath>$([MSBuild]::NormalizeDirectory('$(ArtifactsBinDir)', '$(MSBuildProjectName)'))</BaseOutputPath>
+		<IntermediateOutputPath Condition="'$(PlatformName)' == 'AnyCPU'">$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+		<IntermediateOutputPath Condition="'$(PlatformName)' != 'AnyCPU'">$(BaseIntermediateOutputPath)$(PlatformName)\$(Configuration)\</IntermediateOutputPath>
+
+	</PropertyGroup>
+
+	<Target Name="_FormatSourceFiles" BeforeTargets="BeforeBuild" Inputs="@(Compile)" Outputs="@(IntermediateAssembly)">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet format" />
+	</Target>
+</Project>

@@ -1,0 +1,125 @@
+openapi: 3.0.1
+info:
+  title: GameDocumentEngine
+  version: v1
+paths:
+  /Document:
+    get:
+      operationId: getDocument
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/JsonNode"
+        404:
+          description: Not Found
+    put:
+      operationId: putDocument
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/JsonNode"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Could not parse request
+          content:
+            application/json:
+              schema:
+                type: string
+    patch:
+      operationId: patchDocument
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              format: patch
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/JsonNode"
+        400:
+          description: There was a problem applying the patch
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Target document not found
+        409:
+          description: Document was updated while request was being processed; try again later.
+components:
+  schemas:
+    JsonNode:
+      type: object
+      format: any
+    # JsonPatch:
+    #   type: array
+    #   items:
+    #     "$ref": "#/components/schemas/PatchOperation"
+    # JsonPointer:
+    #   type: object
+    #   properties:
+    #     segments:
+    #       type: array
+    #       items:
+    #         "$ref": "#/components/schemas/PointerSegment"
+    #       nullable: true
+    #       readOnly: true
+    #   additionalProperties: false
+    # OperationType:
+    #   enum:
+    #   - Unknown
+    #   - add
+    #   - remove
+    #   - replace
+    #   - move
+    #   - copy
+    #   - test
+    #   type: string
+    # PatchOperation:
+    #   type: object
+    #   properties:
+    #     op:
+    #       "$ref": "#/components/schemas/OperationType"
+    #     from:
+    #       "$ref": "#/components/schemas/JsonPointer"
+    #     path:
+    #       "$ref": "#/components/schemas/JsonPointer"
+    #     value:
+    #       "$ref": "#/components/schemas/JsonNode"
+    #   additionalProperties: false
+    # PointerSegment:
+    #   type: object
+    #   properties:
+    #     value:
+    #       type: string
+    #       nullable: true
+    #       readOnly: true
+    #   additionalProperties: false

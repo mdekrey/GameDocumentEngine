@@ -1,0 +1,4 @@
+types:
+  object:
+    formats:
+      patch: global::Json.Patch.JsonPatch
