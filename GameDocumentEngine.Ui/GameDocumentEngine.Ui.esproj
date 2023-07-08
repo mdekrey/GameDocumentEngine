@@ -1,3 +1,9 @@
 <Project Sdk="Microsoft.Build.NoTargets/3.7.0">
     <Import Project="$(RepositoryEngineeringDir)npm.targets" />
+    <Target Name="_ComputeNodeOutputs" BeforeTargets="NodeBuild" Inputs="@(Compile);@(CompileConfig)" Outputs="@(CompileOutputs)">
+		<ItemGroup>
+			<CompileOutputs Include="$(SolutionRoot)GameDocumentEngine.Server\wwwroot\index.html" />
+			<CompileOutputs Include="$(SolutionRoot)GameDocumentEngine.Server\wwwroot\index-*.js" />
+		</ItemGroup>
+	</Target>
 </Project>

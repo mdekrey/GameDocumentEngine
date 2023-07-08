@@ -49,7 +49,7 @@
         <Touch AlwaysCreate="true" ForceTouch="true" Files="$(NpmInstallRecordPath)" />
     </Target>
 
-    <Target Name="NodeBuild" BeforeTargets="Build" Inputs="@(Compile);@(CompileConfig)" Outputs="@(Compile->'$(ProjectDir)/lib/%(filename).js');@(Compile->'$(ProjectDir)/lib/%(filename).d.ts')">
+    <Target Name="NodeBuild" BeforeTargets="Build" Inputs="@(Compile);@(CompileConfig)" Outputs="@(CompileOutputs)">
         <Exec WorkingDirectory="$(ProjectDir)" Command="$(NpmBuildScript)" />
     </Target>
 

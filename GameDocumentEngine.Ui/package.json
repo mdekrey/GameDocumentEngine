@@ -4,7 +4,9 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
+		"predev": "npm run generate-api",
 		"dev": "vite build --watch --sourcemap",
+		"prebuild": "npm run generate-api",
 		"build": "tsc && vite build",
 		"lint": "npm run typecheck && npm run eslint && npm run prettier",
 		"lint:fix": "npm run typecheck && npm run eslint:fix && npm run prettier:fix",
@@ -13,11 +15,14 @@
 		"prettier": "prettier --list-different \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"typecheck": "tsc --noemit",
-		"prepare": "cd .. && husky install GameDocumentEninge.Ui/.husky"
+		"prepare": "cd .. && husky install GameDocumentEninge.Ui/.husky",
+		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c"
 	},
 	"dependencies": {
-	  "react": "^18.2.0",
-	  "react-dom": "^18.2.0"
+		"@principlestudios/openapi-codegen-typescript": "^0.6.2",
+		"@principlestudios/openapi-codegen-typescript-fetch": "^0.6.1",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
 	},
 	"devDependencies": {
 		"@types/node": "^20.4.0",
@@ -37,4 +42,4 @@
 		"typescript": "^5.1.6",
 		"vite": "^4.4.2"
 	}
-  }
+}
