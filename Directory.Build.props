@@ -6,6 +6,7 @@
 		<LangVersion>11</LangVersion>
 
 		<SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
+		<RepositoryEngineeringDir>$(SolutionRoot)eng/</RepositoryEngineeringDir>
 
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>

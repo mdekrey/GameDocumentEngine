@@ -1,0 +1,40 @@
+{
+	"name": "gamedocumentengine.ui",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite build --watch --sourcemap",
+		"build": "tsc && vite build",
+		"lint": "npm run typecheck && npm run eslint && npm run prettier",
+		"lint:fix": "npm run typecheck && npm run eslint:fix && npm run prettier:fix",
+		"eslint": "eslint \"**/*.{cjs,mjs,js,ts,tsx}\"",
+		"eslint:fix": "eslint \"**/*.{cjs,mjs,js,ts,tsx}\" --fix",
+		"prettier": "prettier --list-different \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
+		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
+		"typecheck": "tsc --noemit",
+		"prepare": "cd .. && husky install GameDocumentEninge.Ui/.husky"
+	},
+	"dependencies": {
+	  "react": "^18.2.0",
+	  "react-dom": "^18.2.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.4.0",
+		"@types/react": "^18.2.14",
+		"@types/react-dom": "^18.2.6",
+		"@typescript-eslint/eslint-plugin": "^5.61.0",
+		"@typescript-eslint/parser": "^5.61.0",
+		"@vitejs/plugin-react": "^4.0.2",
+		"eslint": "^8.8.0",
+		"eslint-config-prettier": "^8.8.0",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"husky": "^8.0.3",
+		"lint-staged": "^13.2.3",
+		"prettier": "^3.0.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"typescript": "^5.1.6",
+		"vite": "^4.4.2"
+	}
+  }
