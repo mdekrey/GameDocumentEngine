@@ -9,7 +9,7 @@ public class DocumentController : Api.DocumentControllerBase
 {
 	public static ConcurrentDictionary<string, JsonNode> tempStorage = new ConcurrentDictionary<string, JsonNode>();
 
-	protected override async Task<GetDocumentActionResult> GetDocument(string id)
+	protected override async Task<GetDocumentActionResult> GetDocument(string gameId, string typeId, string id)
 	{
 		await Task.Yield();
 		if (!tempStorage.TryGetValue(id, out var node))
@@ -17,7 +17,7 @@ public class DocumentController : Api.DocumentControllerBase
 		return GetDocumentActionResult.Ok(node);
 	}
 
-	protected override async Task<PutDocumentActionResult> PutDocument(string id, JsonNode node)
+	protected override async Task<PutDocumentActionResult> PutDocument(string gameId, string typeId, string id, JsonNode node)
 	{
 		if (!ModelState.IsValid) return PutDocumentActionResult.BadRequest("Invalid JSON");
 		await Task.Yield();
@@ -25,7 +25,7 @@ public class DocumentController : Api.DocumentControllerBase
 		return PutDocumentActionResult.Ok();
 	}
 
-	protected override async Task<PatchDocumentActionResult> PatchDocument(string id, JsonPatch patch)
+	protected override async Task<PatchDocumentActionResult> PatchDocument(string gameId, string typeId, string id, JsonPatch patch)
 	{
 		if (!ModelState.IsValid) return PatchDocumentActionResult.BadRequest("Unable to parse JSON Patch");
 		await Task.Yield();

@@ -3,55 +3,20 @@ info:
   title: GameDocumentEngine
   version: v1
 paths:
-  /Document:
+  /user:
     get:
-      operationId: getDocument
-      parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: string
+      operationId: getCurrentUser
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/JsonNode"
-        404:
-          description: Not Found
-    put:
-      operationId: putDocument
-      parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/JsonNode"
-      responses:
-        200:
-          description: Success
-        400:
-          description: Could not parse request
-          content:
-            application/json:
-              schema:
-                type: string
+                $ref: "#/components/schemas/UserDetails"
     patch:
-      operationId: patchDocument
-      parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: string
+      operationId: patchUser
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -63,7 +28,189 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/JsonNode"
+                $ref: "#/components/schemas/UserDetails"
+        400:
+          description: There was a problem applying the patch
+          content:
+            application/json:
+              schema:
+                type: string
+        409:
+          description: User was updated while request was being processed; try again later.
+  /game:
+    post:
+      operationId: createGame
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditableGameDetails"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDetailsWithId"
+  /game/{gameId}:
+    get:
+      x-dotnet-mvc-server-controller: Game
+      operationId: getGameDetails
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDetails"
+    delete:
+      x-dotnet-mvc-server-controller: Game
+      operationId: deleteGame
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+    patch:
+      x-dotnet-mvc-server-controller: Game
+      operationId: patchGame
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              format: patch
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDetails"
+        400:
+          description: There was a problem applying the patch
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Target game not found
+        409:
+          description: Game was updated while request was being processed; try again later.
+  /game/{gameId}/document/{typeId}/{id}:
+    get:
+      x-dotnet-mvc-server-controller: Document
+      operationId: getDocument
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: typeId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonNode"
+        404:
+          description: Not Found
+    put:
+      x-dotnet-mvc-server-controller: Document
+      operationId: putDocument
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: typeId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JsonNode"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Could not parse request
+          content:
+            application/json:
+              schema:
+                type: string
+    patch:
+      x-dotnet-mvc-server-controller: Document
+      operationId: patchDocument
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: typeId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              format: patch
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonNode"
         400:
           description: There was a problem applying the patch
           content:
@@ -79,47 +226,44 @@ components:
     JsonNode:
       type: object
       format: any
-    # JsonPatch:
-    #   type: array
-    #   items:
-    #     "$ref": "#/components/schemas/PatchOperation"
-    # JsonPointer:
-    #   type: object
-    #   properties:
-    #     segments:
-    #       type: array
-    #       items:
-    #         "$ref": "#/components/schemas/PointerSegment"
-    #       nullable: true
-    #       readOnly: true
-    #   additionalProperties: false
-    # OperationType:
-    #   enum:
-    #   - Unknown
-    #   - add
-    #   - remove
-    #   - replace
-    #   - move
-    #   - copy
-    #   - test
-    #   type: string
-    # PatchOperation:
-    #   type: object
-    #   properties:
-    #     op:
-    #       "$ref": "#/components/schemas/OperationType"
-    #     from:
-    #       "$ref": "#/components/schemas/JsonPointer"
-    #     path:
-    #       "$ref": "#/components/schemas/JsonPointer"
-    #     value:
-    #       "$ref": "#/components/schemas/JsonNode"
-    #   additionalProperties: false
-    # PointerSegment:
-    #   type: object
-    #   properties:
-    #     value:
-    #       type: string
-    #       nullable: true
-    #       readOnly: true
-    #   additionalProperties: false
+    EditableGameDetails:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+    GameDetails:
+      allOf:
+        - $ref: '#/components/schemas/EditableGameDetails'
+        - type: object
+          required:
+          - lastUpdated
+          - players
+          - inviteUrl
+          properties:
+            lastUpdated:
+              type: string
+              format: date-time
+            players:
+              type: array
+              items:
+                type: string
+            inviteUrl:
+              type: string
+    GameDetailsWithId:
+      allOf:
+        - $ref: '#/components/schemas/GameDetails'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+    UserDetails:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
