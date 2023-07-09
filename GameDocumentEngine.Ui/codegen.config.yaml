@@ -1,0 +1,5 @@
+types:
+  object:
+    formats:
+      patch: JsonPatchOperation[]
+      any: any

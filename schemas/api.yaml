@@ -141,7 +141,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JsonNode"
+                type: object
+                format: any
         404:
           description: Not Found
     put:
@@ -168,7 +169,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/JsonNode"
+              type: object
+              format: any
       responses:
         200:
           description: Success
@@ -210,7 +212,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JsonNode"
+                type: object
+                format: any
         400:
           description: There was a problem applying the patch
           content:
@@ -223,9 +226,6 @@ paths:
           description: Document was updated while request was being processed; try again later.
 components:
   schemas:
-    JsonNode:
-      type: object
-      format: any
     EditableGameDetails:
       type: object
       required:
