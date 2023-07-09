@@ -4,11 +4,13 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>7c12b00d-afca-4251-9c62-af5e4e497dbd</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CompressedStaticFiles" Version="2.1.0" />
 		<PackageReference Include="JsonPatch.Net" Version="2.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.8" />
 		<PackageReference Include="PrincipleStudios.OpenApiCodegen.Json.Extensions" Version="0.14.0" />
 		<PackageReference Include="PrincipleStudios.OpenApiCodegen.Server.Mvc" Version="0.14.1" />
 	</ItemGroup>

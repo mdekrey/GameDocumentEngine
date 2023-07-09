@@ -5,8 +5,19 @@ import type { StandardResponse } from '@principlestudios/openapi-codegen-typescr
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const api = toFetchApi(
 	operations,
-	(req) => {
-		return fetch(req);
+	async (req) => {
+		const result = await fetch(req);
+		if (result.status === 401) {
+			window.location.href = `/login?returnUrl=${encodeURIComponent(
+				window.location.pathname +
+					window.location.search +
+					window.location.hash,
+			)}`;
+
+			// redirecting; cannot be reached
+			throw new Error();
+		}
+		return result;
 	},
 	window.location.origin,
 );

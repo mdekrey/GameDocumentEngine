@@ -479,4 +479,5 @@ $RECYCLE.BIN/
 
 GameDocumentEngine.Server/wwwroot
 GameDocumentEngine.Ui/src/api/
+GameDocumentEngine.Server/setup.ps1
 GameDocumentEngine.Ui/.env
