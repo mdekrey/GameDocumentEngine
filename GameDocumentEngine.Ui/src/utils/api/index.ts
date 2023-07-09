@@ -8,7 +8,7 @@ export const api = toFetchApi(
 	(req) => {
 		return fetch(req);
 	},
-	new URL('/api', window.location.href).href,
+	window.location.origin,
 );
 
 function wrapApiQuery<
