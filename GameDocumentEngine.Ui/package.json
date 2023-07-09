@@ -19,8 +19,11 @@
 		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml"
 	},
 	"dependencies": {
+		"@lukemorales/query-key-factory": "^1.3.2",
 		"@principlestudios/openapi-codegen-typescript": "^0.6.2",
 		"@principlestudios/openapi-codegen-typescript-fetch": "^0.6.1",
+		"@tanstack/react-query": "^4.29.19",
+		"@tanstack/react-query-devtools": "^4.29.19",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"rfc6902": "^5.0.1"

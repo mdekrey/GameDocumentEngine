@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-cd GameDocumentEngine.UI
+cd GameDocumentEngine.Ui
 npx lint-staged

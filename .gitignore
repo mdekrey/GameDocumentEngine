@@ -479,3 +479,4 @@ $RECYCLE.BIN/
 
 GameDocumentEngine.Server/wwwroot
 GameDocumentEngine.Ui/src/api/
+GameDocumentEngine.Ui/.env
