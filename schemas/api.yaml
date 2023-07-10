@@ -14,7 +14,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserDetails"
+                $ref: "#/components/schemas/CurrentUserDetails"
     patch:
       operationId: patchUser
       requestBody:
@@ -283,6 +283,15 @@ components:
           properties:
             id:
               type: string
+    CurrentUserDetails:
+      allOf:
+      - $ref: '#/components/schemas/UserDetails'
+      - type: object
+        required:
+          - isFirstTime
+        properties:
+          isFirstTime:
+            type: boolean
     UserDetails:
       type: object
       required:

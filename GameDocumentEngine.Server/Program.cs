@@ -1,6 +1,8 @@
 using CompressedStaticFiles;
+using GameDocumentEngine.Server.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +56,15 @@ services.AddAuthorization(options =>
 	});
 });
 
+services.AddDbContext<DocumentDbContext>(o =>
+{
+	o.UseCosmos(
+		builder.Configuration["CosmosDb:ServiceUrl"] ?? throw new InvalidOperationException("CosmosDb not configured"),
+		builder.Configuration["CosmosDb:AuthKey"] ?? throw new InvalidOperationException("CosmosDb not configured"),
+		builder.Configuration["CosmosDb:DatabaseId"] ?? throw new InvalidOperationException("CosmosDb not configured")
+	);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -78,5 +89,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+	var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
+	dbContext.Database.EnsureCreated();
+}
 
 app.Run();

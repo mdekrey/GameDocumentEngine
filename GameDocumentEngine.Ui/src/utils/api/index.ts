@@ -8,11 +8,12 @@ export const api = toFetchApi(
 	async (req) => {
 		const result = await fetch(req);
 		if (result.status === 401) {
-			window.location.href = `/login?returnUrl=${encodeURIComponent(
-				window.location.pathname +
+			window.location.href = operations.login.url({
+				returnUrl:
+					window.location.pathname +
 					window.location.search +
 					window.location.hash,
-			)}`;
+			});
 
 			// redirecting; cannot be reached
 			throw new Error();
