@@ -7,7 +7,6 @@ export default defineConfig({
 	plugins: [react()],
 	build: {
 		outDir: '../GameDocumentEngine.Server/wwwroot',
-		emptyOutDir: true,
 	},
 	resolve: {
 		alias: {

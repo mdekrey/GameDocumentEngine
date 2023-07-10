@@ -1,18 +1,15 @@
 import { useState } from 'react';
-import { currentUserQuery } from './utils/api';
-import { useQuery } from '@tanstack/react-query';
+import { Layout } from '@/components/layout/layout';
 
 function App() {
-	const { data } = useQuery({ ...currentUserQuery() });
 	const [count, setCount] = useState(0);
 
 	return (
-		<>
-			<div>{data?.data.name}</div>
+		<Layout>
 			<button onClick={() => setCount((count) => count + 1)}>
 				count is {count}
 			</button>
-		</>
+		</Layout>
 	);
 }
 
