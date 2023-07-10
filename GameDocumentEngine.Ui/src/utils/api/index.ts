@@ -2,7 +2,6 @@ import { toFetchApi } from '@principlestudios/openapi-codegen-typescript-fetch';
 import operations from '@/api/operations';
 import type { StandardResponse } from '@principlestudios/openapi-codegen-typescript';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const api = toFetchApi(
 	operations,
 	async (url, req) => {

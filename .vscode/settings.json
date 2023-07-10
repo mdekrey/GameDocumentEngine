@@ -15,7 +15,7 @@
 		"typescript", // Enable .ts
 		"typescriptreact" // Enable .tsx
 	],
-	"eslint.workingDirectories": ["."],
+	"eslint.workingDirectories": ["GameDocumentEngine.Ui"],
 	"files.eol": "\n",
 	"typescript.tsdk": "GameDocumentEngine.Ui/node_modules/typescript/lib",
 	"prettier.requireConfig": true,

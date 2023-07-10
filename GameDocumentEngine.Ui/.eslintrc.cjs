@@ -8,10 +8,6 @@ module.exports = {
 		'eslint:recommended',
 		// disables eslint rules in favor of using prettier separately
 		'prettier',
-		// Recommended typescript changes, which removes some "no-undef" checks that TS handles
-		'plugin:@typescript-eslint/eslint-recommended',
-		'plugin:@typescript-eslint/recommended-requiring-type-checking',
-		'plugin:@typescript-eslint/recommended',
 		'plugin:react-hooks/recommended',
 	],
 	rules: {
@@ -22,17 +18,27 @@ module.exports = {
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
-		project: './tsconfig.node.json',
-		tsconfigRootDir: __dirname,
 	},
 	overrides: [
 		{
-			files: ['*.ts'],
+			files: ['*.{ts,tsx}'],
+			extends: [
+				// Recommended typescript changes, which removes some "no-undef" checks that TS handles
+				'plugin:@typescript-eslint/eslint-recommended',
+				'plugin:@typescript-eslint/recommended-requiring-type-checking',
+				'plugin:@typescript-eslint/recommended',
+			],
+			parserOptions: {
+				ecmaVersion: 'latest',
+				sourceType: 'module',
+				project: './tsconfig.node.json',
+				tsconfigRootDir: __dirname,
+			},
 		},
 		{
 			plugins: ['@typescript-eslint'],
 			extends: [],
-			files: ['src/**/*'],
+			files: ['src/**/*.{ts,tsx}'],
 			parserOptions: {
 				project: './tsconfig.json',
 				tsconfigRootDir: __dirname,

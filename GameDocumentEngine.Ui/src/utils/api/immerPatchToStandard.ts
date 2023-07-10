@@ -6,6 +6,6 @@ export function immerPatchToStandard(
 	return {
 		op: immerChange.op,
 		path: '/' + immerChange.path.join('/'),
-		value: immerChange.value,
+		value: immerChange.value as unknown,
 	};
 }

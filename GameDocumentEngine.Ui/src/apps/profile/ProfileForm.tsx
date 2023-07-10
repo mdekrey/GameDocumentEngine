@@ -5,9 +5,9 @@ import { api, currentUserQuery } from '@/utils/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { Patch } from 'rfc6902';
-import { useField, JotaiInput, UseFieldResult } from '@/utils/form/useField';
+import { useField, JotaiInput, InputFieldProps } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
-import { z } from 'zod';
+// import { z } from 'zod';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -24,13 +24,11 @@ function usePatchUser() {
 		onSuccess: (response) => {
 			queryClient.setQueryData(currentUserQuery().queryKey, response);
 		},
-		onError: () => {
-			queryClient.invalidateQueries(currentUserQuery().queryKey);
-		},
+		onError: () => queryClient.invalidateQueries(currentUserQuery().queryKey),
 	});
 }
 
-export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
+export function ProfileFields({ name }: { name: InputFieldProps<string> }) {
 	return (
 		<Fieldset>
 			<Field>
@@ -39,7 +37,7 @@ export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
 					<JotaiInput
 						className="px-2 py-2 border-gray-500 border w-full"
 						type="text"
-						{...name.standardProps}
+						{...name}
 					/>
 				</Field.Contents>
 			</Field>
@@ -49,6 +47,15 @@ export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
 		</Fieldset>
 	);
 }
+
+// type Temp = z.ZodTypeAny;
+// const UserDetails = z.object({
+// 	name: z.string().nonempty(),
+// });
+// type UserDetails = z.infer<typeof UserDetails>;
+// console.log(UserDetails);
+// const UserDetailsName: z.ZodString = UserDetails.shape.name;
+// type UserDetailsName = UserDetails['name'];
 
 export function ProfileForm() {
 	const userQueryResult = useQuery({ ...currentUserQuery() });
@@ -66,7 +73,7 @@ export function ProfileForm() {
 
 	return (
 		<form onSubmit={submitForm}>
-			<ProfileFields name={name} />
+			<ProfileFields name={name.standardProps} />
 		</form>
 	);
 
