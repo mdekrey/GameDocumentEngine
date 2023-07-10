@@ -5,8 +5,8 @@ import type { StandardResponse } from '@principlestudios/openapi-codegen-typescr
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const api = toFetchApi(
 	operations,
-	async (req) => {
-		const result = await fetch(req);
+	async (url, req) => {
+		const result = await fetch(url, req);
 		if (result.status === 401) {
 			window.location.href = operations.login.url({
 				returnUrl:

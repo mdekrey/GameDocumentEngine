@@ -8,15 +8,15 @@ import { Button } from './components/button/button';
 const router = createHashRouter([
 	{
 		path: 'profile',
-		element: <Profile />,
+		Component: Profile,
 	},
 	{
 		path: 'games',
-		element: <Root />,
+		Component: Root,
 	},
 	{
 		path: 'create-game',
-		element: <Root />,
+		Component: Root,
 	},
 	{
 		path: '/',

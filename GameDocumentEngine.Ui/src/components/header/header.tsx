@@ -4,9 +4,14 @@ import { useReducer } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import { HiOutlineDocumentText, HiMenu } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 
 export function Header({ children }: { children?: React.ReactNode }) {
+	const navigate = useNavigate();
 	const { data } = useQuery({ ...currentUserQuery() });
+	if (data?.data?.isFirstTime) {
+		navigate('/profile');
+	}
 	const [isMobileNavOpen, toggleIsMobileNavOpen] = useReducer((v) => !v, false);
 
 	return (
@@ -31,13 +36,13 @@ export function Header({ children }: { children?: React.ReactNode }) {
 				<ul>
 					<li>Hello, {data?.data.name}!</li>
 					<li>
-						<a href="/games">Select Game</a>
+						<a href="#/games">Select Game</a>
 					</li>
 					<li>
-						<a href="">New Game</a>
+						<a href="#/create-game">New Game</a>
 					</li>
 					<li>
-						<a href="">View Profile</a>
+						<a href="#/profile">View Profile</a>
 					</li>
 				</ul>
 
