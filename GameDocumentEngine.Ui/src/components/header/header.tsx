@@ -10,7 +10,7 @@ export function Header({ children }: { children?: React.ReactNode }) {
 	const [isMobileNavOpen, toggleIsMobileNavOpen] = useReducer((v) => !v, false);
 
 	return (
-		<div className="fixed md:static w-full md:w-64 bg-white p-6 border-b md:border-b-0 md:border-r border-gray-300">
+		<div className="w-full md:w-64 bg-white p-6 border-b md:border-b-0 md:border-r border-gray-300">
 			<div className="flex-none flex flex-row items-center w-full">
 				<HiOutlineDocumentText />
 				<strong className="capitalize ml-1 flex-1">Game Doc Engine</strong>
