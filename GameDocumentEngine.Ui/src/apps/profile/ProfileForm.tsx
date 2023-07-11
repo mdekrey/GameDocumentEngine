@@ -5,11 +5,13 @@ import { api, currentUserQuery } from '@/utils/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { Patch } from 'rfc6902';
-import { useField, UseFieldResult } from '@/utils/form/useField';
+import { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { ErrorsList } from '../../utils/form/errors/errors-list';
 import { TextInput } from '@/utils/form/text-input/text-input';
+import { useForm, useFormField } from '@/utils/form/useForm';
+import { UserDetails } from '@/api/models/UserDetails';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -56,8 +58,13 @@ const UserDetails = z.object({
 });
 
 export function ProfileForm() {
+	const userForm = useForm<z.infer<typeof UserDetails>>({
+		defaultValue: { name: '' },
+		schema: UserDetails,
+	});
+	const name = useFormField(['name'], userForm);
+
 	const userQueryResult = useQuery({ ...currentUserQuery() });
-	const name = useField('', { schema: UserDetails.shape.name });
 	const saveUser = usePatchUser();
 
 	if (!userQueryResult.isSuccess) {
@@ -72,6 +79,7 @@ export function ProfileForm() {
 	return (
 		<form onSubmit={submitForm}>
 			<ProfileFields name={name} />
+			<ErrorsList errors={userForm.errors} prefix="UserDetails" />
 		</form>
 	);
 
@@ -83,7 +91,8 @@ export function ProfileForm() {
 		const [, patches] = produceWithPatches(
 			userQueryResult.data.data,
 			(draft) => {
-				draft.name = name.getValue();
+				const currentValue = userForm.get();
+				draft.name = currentValue.name;
 			},
 		);
 		if (patches.length > 0) saveUser.mutate(patches.map(immerPatchToStandard));

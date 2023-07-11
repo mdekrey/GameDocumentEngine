@@ -1,9 +1,10 @@
-import { Atom, PrimitiveAtom, WritableAtom, atom, useStore } from 'jotai';
+import { Atom, PrimitiveAtom, atom, useStore } from 'jotai';
 import { loadable } from 'jotai/utils';
 import { useMemo } from 'react';
 import { withSignal, mapProperty } from '@principlestudios/jotai-react-signals';
-import { ZodError, ZodType, ZodTypeDef } from 'zod';
+import { ZodError, ZodType } from 'zod';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
+import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
 
 export const JotaiInput = withSignal('input', {
 	defaultValue: mapProperty('value'),
@@ -26,12 +27,6 @@ export type UseFieldResult<
 	errors?: ErrorsAtom<TValue>;
 } & ('hasErrors' extends TFlags ? { errors: ErrorsAtom<TValue> } : object);
 
-type SetStateAction<T> = (prev: T) => T;
-type StandardWritableAtom<Value> = WritableAtom<
-	Value,
-	[Value | SetStateAction<Value>],
-	void
->;
 function mapAtom<TIn, TOut>(
 	target: StandardWritableAtom<TIn>,
 	toOut: (v: TIn) => TOut,
@@ -68,7 +63,7 @@ export function useInputField<TFieldValue>(
 }
 
 type FieldOptions<TValue, TFormFieldValue> = {
-	schema: ZodType<TValue, ZodTypeDef, TValue>;
+	schema: ZodType<TValue>;
 	mapping: {
 		toForm(this: void, v: TValue): TFormFieldValue;
 		fromForm(this: void, v: TFormFieldValue): TValue;
@@ -108,6 +103,42 @@ export function useField<TValue, TFieldValue>(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	);
+	return useInternalFieldAtom(fieldValueAtom, options);
+}
+
+export function useFieldAtom<TValue, TOptions extends UnmappedOptions<TValue>>(
+	fieldValueAtom: StandardWritableAtom<TValue>,
+	options?: TOptions,
+): UseFieldResult<NotFunction<TValue>, NotFunction<TValue>, Flags<TOptions>>;
+export function useFieldAtom<
+	TValue,
+	TFieldValue,
+	TOptions extends MappedOptions<TValue, TFieldValue>,
+>(
+	fieldValueAtom: StandardWritableAtom<TValue>,
+	options: TOptions,
+): UseFieldResult<TValue, TFieldValue, Flags<TOptions>>;
+export function useFieldAtom<TValue, TFieldValue>(
+	fieldValueAtom: StandardWritableAtom<TValue>,
+	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
+): UseFieldResult<TValue, TFieldValue, never> {
+	return useInternalFieldAtom(fieldValueAtom, options);
+}
+
+export function createErrorsAtom<T>(target: Atom<T>, schema: ZodType<T>) {
+	return loadable(
+		atom(async (get) => {
+			const parseResult = await schema.safeParseAsync(get(target));
+			if (parseResult.success) return null;
+			return parseResult.error;
+		}),
+	);
+}
+
+function useInternalFieldAtom<TValue, TFieldValue>(
+	fieldValueAtom: StandardWritableAtom<TValue>,
+	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
+): UseFieldResult<TValue, TFieldValue, never> {
 	const formValueAtom = useMemo(
 		() => {
 			const mapping = 'mapping' in options ? options.mapping : null;
@@ -125,17 +156,7 @@ export function useField<TValue, TFieldValue>(
 	const errors = useMemo(
 		() => {
 			const schema = 'schema' in options ? options.schema : null;
-			return schema
-				? loadable(
-						atom(async (get) => {
-							const parseResult = await schema.safeParseAsync(
-								get(fieldValueAtom),
-							);
-							if (parseResult.success) return null;
-							return parseResult.error;
-						}),
-				  )
-				: undefined;
+			return schema ? createErrorsAtom(fieldValueAtom, schema) : undefined;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
