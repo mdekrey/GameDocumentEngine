@@ -10,7 +10,7 @@ import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { ErrorsList } from '../../utils/form/errors/errors-list';
 import { TextInput } from '@/utils/form/text-input/text-input';
-import { useForm, useFormField } from '@/utils/form/useForm';
+import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 
 function usePatchUser() {
@@ -32,11 +32,7 @@ function usePatchUser() {
 	});
 }
 
-export function ProfileFields({
-	name,
-}: {
-	name: UseFieldResult<string, string, 'hasErrors'>;
-}) {
+export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
 	return (
 		<Fieldset>
 			<Field>
@@ -58,11 +54,13 @@ const UserDetails = z.object({
 });
 
 export function ProfileForm() {
-	const userForm = useForm<z.infer<typeof UserDetails>>({
+	const userForm = useForm({
 		defaultValue: { name: '' },
 		schema: UserDetails,
+		fields: {
+			name: ['name'],
+		},
 	});
-	const name = useFormField(['name'], userForm);
 
 	const userQueryResult = useQuery({ ...currentUserQuery() });
 	const saveUser = usePatchUser();
@@ -73,28 +71,25 @@ export function ProfileForm() {
 		}
 		return 'Loading';
 	} else if (!saveUser.isLoading) {
-		name.setValue(userQueryResult.data.data.name);
+		userForm.fields.name.setValue(userQueryResult.data.data.name);
 	}
+
+	const userData = userQueryResult.data.data;
 
 	return (
 		<form onSubmit={submitForm}>
-			<ProfileFields name={name} />
+			<ProfileFields {...userForm.fields} />
 			<ErrorsList errors={userForm.errors} prefix="UserDetails" />
 		</form>
 	);
 
 	function submitForm(ev: React.FormEvent<HTMLFormElement>) {
 		ev.preventDefault();
+		const currentValue = userForm.get();
 
-		if (!userQueryResult.isSuccess) return;
-
-		const [, patches] = produceWithPatches(
-			userQueryResult.data.data,
-			(draft) => {
-				const currentValue = userForm.get();
-				draft.name = currentValue.name;
-			},
-		);
+		const [, patches] = produceWithPatches(userData, (draft) => {
+			draft.name = currentValue.name;
+		});
 		if (patches.length > 0) saveUser.mutate(patches.map(immerPatchToStandard));
 	}
 }

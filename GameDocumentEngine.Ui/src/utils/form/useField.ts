@@ -10,15 +10,12 @@ export const JotaiInput = withSignal('input', {
 	defaultValue: mapProperty('value'),
 });
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type NotFunction<T> = Exclude<T, Function>;
-
 export type UseFieldResultFlags = 'hasErrors';
 export type ErrorsAtom<TValue> = Atom<Loadable<ZodError<TValue> | null>>;
 export type UseFieldResult<
 	TValue,
-	TFieldValue,
-	TFlags extends UseFieldResultFlags,
+	TFieldValue = TValue,
+	TFlags extends UseFieldResultFlags = UseFieldResultFlags,
 > = {
 	valueAtom: PrimitiveAtom<TValue>;
 	setValue(v: TValue): void;
@@ -50,10 +47,10 @@ export type InputFieldProps<TFieldValue> = {
 	onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => void;
 };
 
-export function useInputField<TFieldValue>(
+function toInputField<TFieldValue>(
+	store: ReturnType<typeof useStore>,
 	atom: StandardWritableAtom<TFieldValue>,
 ): InputFieldProps<TFieldValue> {
-	const store = useStore();
 	return {
 		defaultValue: atom,
 		onChange: (ev) => {
@@ -62,12 +59,13 @@ export function useInputField<TFieldValue>(
 	};
 }
 
-type FieldOptions<TValue, TFormFieldValue> = {
+export type FieldMapping<TValue, TFormFieldValue> = {
+	toForm(this: void, v: TValue): TFormFieldValue;
+	fromForm(this: void, v: TFormFieldValue): TValue;
+};
+export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
-	mapping: {
-		toForm(this: void, v: TValue): TFormFieldValue;
-		fromForm(this: void, v: TFormFieldValue): TValue;
-	};
+	mapping: FieldMapping<TValue, TFormFieldValue>;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,
@@ -83,19 +81,19 @@ type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> =
 	'schema' extends keyof TOptions ? 'hasErrors' : never;
 
 export function useField<TValue, TOptions extends UnmappedOptions<TValue>>(
-	defaultValue: NotFunction<TValue>,
+	defaultValue: TValue,
 	options?: TOptions,
-): UseFieldResult<NotFunction<TValue>, NotFunction<TValue>, Flags<TOptions>>;
+): UseFieldResult<TValue, TValue, Flags<TOptions>>;
 export function useField<
 	TValue,
 	TFieldValue,
 	TOptions extends MappedOptions<TValue, TFieldValue>,
 >(
-	defaultValue: NotFunction<TValue>,
+	defaultValue: TValue,
 	options: TOptions,
 ): UseFieldResult<TValue, TFieldValue, Flags<TOptions>>;
 export function useField<TValue, TFieldValue>(
-	defaultValue: NotFunction<TValue>,
+	defaultValue: TValue,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 ): UseFieldResult<TValue, TFieldValue, never> {
 	const fieldValueAtom = useMemo(
@@ -109,7 +107,7 @@ export function useField<TValue, TFieldValue>(
 export function useFieldAtom<TValue, TOptions extends UnmappedOptions<TValue>>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options?: TOptions,
-): UseFieldResult<NotFunction<TValue>, NotFunction<TValue>, Flags<TOptions>>;
+): UseFieldResult<TValue, TValue, Flags<TOptions>>;
 export function useFieldAtom<
 	TValue,
 	TFieldValue,
@@ -139,31 +137,32 @@ function useInternalFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 ): UseFieldResult<TValue, TFieldValue, never> {
-	const formValueAtom = useMemo(
-		() => {
-			const mapping = 'mapping' in options ? options.mapping : null;
-			return mapping
-				? mapAtom<TValue, TFieldValue>(
-						fieldValueAtom,
-						mapping.toForm,
-						mapping.fromForm,
-				  )
-				: (fieldValueAtom as unknown as StandardWritableAtom<TFieldValue>);
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[fieldValueAtom],
-	);
-	const errors = useMemo(
-		() => {
-			const schema = 'schema' in options ? options.schema : null;
-			return schema ? createErrorsAtom(fieldValueAtom, schema) : undefined;
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
-	);
-
-	const standardProps = useInputField(formValueAtom);
 	const store = useStore();
+	return useMemo(
+		() => toInternalFieldAtom(store, fieldValueAtom, options),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[store, fieldValueAtom],
+	);
+}
+
+export function toInternalFieldAtom<TValue, TFieldValue>(
+	store: ReturnType<typeof useStore>,
+	fieldValueAtom: StandardWritableAtom<TValue>,
+	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
+): UseFieldResult<TValue, TFieldValue, never> {
+	const mapping = 'mapping' in options ? options.mapping : null;
+	const formValueAtom = mapping
+		? mapAtom<TValue, TFieldValue>(
+				fieldValueAtom,
+				mapping.toForm,
+				mapping.fromForm,
+		  )
+		: (fieldValueAtom as unknown as StandardWritableAtom<TFieldValue>);
+
+	const schema = 'schema' in options ? options.schema : null;
+	const errors = schema ? createErrorsAtom(fieldValueAtom, schema) : undefined;
+
+	const standardProps = toInputField(store, formValueAtom);
 
 	const result: UseFieldResult<TValue, TFieldValue, never> = {
 		valueAtom: fieldValueAtom,
