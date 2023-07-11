@@ -5,9 +5,11 @@ import { api, currentUserQuery } from '@/utils/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { Patch } from 'rfc6902';
-import { useField, JotaiInput, InputFieldProps } from '@/utils/form/useField';
+import { useField, UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
-// import { z } from 'zod';
+import { z } from 'zod';
+import { ErrorsList } from '../../utils/form/errors/errors-list';
+import { TextInput } from '@/utils/form/text-input/text-input';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -28,17 +30,18 @@ function usePatchUser() {
 	});
 }
 
-export function ProfileFields({ name }: { name: InputFieldProps<string> }) {
+export function ProfileFields({
+	name,
+}: {
+	name: UseFieldResult<string, string, 'hasErrors'>;
+}) {
 	return (
 		<Fieldset>
 			<Field>
 				<Field.Label>Name</Field.Label>
 				<Field.Contents>
-					<JotaiInput
-						className="px-2 py-2 border-gray-500 border w-full"
-						type="text"
-						{...name}
-					/>
+					<TextInput {...name.standardProps} />
+					<ErrorsList errors={name.errors} prefix="UserDetail.name" />
 				</Field.Contents>
 			</Field>
 			<div className="col-span-2 flex flex-row-reverse gap-2">
@@ -48,18 +51,13 @@ export function ProfileFields({ name }: { name: InputFieldProps<string> }) {
 	);
 }
 
-// type Temp = z.ZodTypeAny;
-// const UserDetails = z.object({
-// 	name: z.string().nonempty(),
-// });
-// type UserDetails = z.infer<typeof UserDetails>;
-// console.log(UserDetails);
-// const UserDetailsName: z.ZodString = UserDetails.shape.name;
-// type UserDetailsName = UserDetails['name'];
+const UserDetails = z.object({
+	name: z.string().min(3),
+});
 
 export function ProfileForm() {
 	const userQueryResult = useQuery({ ...currentUserQuery() });
-	const name = useField<string>('');
+	const name = useField('', { schema: UserDetails.shape.name });
 	const saveUser = usePatchUser();
 
 	if (!userQueryResult.isSuccess) {
@@ -73,7 +71,7 @@ export function ProfileForm() {
 
 	return (
 		<form onSubmit={submitForm}>
-			<ProfileFields name={name.standardProps} />
+			<ProfileFields name={name} />
 		</form>
 	);
 

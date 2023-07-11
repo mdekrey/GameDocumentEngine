@@ -24,7 +24,9 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 
 		return (
 			<label className={twMerge('contents', className)}>
-				<span className={twMerge('font-bold', labelClassName)}>Name</span>
+				<span className={twMerge('font-bold md:py-2', labelClassName)}>
+					{labelChildren}
+				</span>
 				<div
 					className={twMerge(
 						'block flex-grow md:flex-grow-0',
