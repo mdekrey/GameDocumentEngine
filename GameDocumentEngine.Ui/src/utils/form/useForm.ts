@@ -96,12 +96,17 @@ export type UseFormResult<
 	atom: StandardWritableAtom<T>;
 	schema: ZodType<T>;
 	errors: Atom<Loadable<ZodError<T> | null>>;
+	fields: FormFields<T, TFields>;
+
 	get(this: void): T;
 	subset<TPath extends Path<T>>(
 		this: void,
 		path: TPath,
 	): UseFormResult<PathValue<T, TPath>>;
-	fields: FormFields<T, TFields>;
+	handleSubmit(
+		this: void,
+		callback: (value: T) => void,
+	): React.ReactEventHandler;
 };
 
 function buildFormResult<
@@ -113,38 +118,49 @@ function buildFormResult<
 	schema: ZodType<T>,
 	fields: TFields,
 ): UseFormResult<T, TFields> {
-	const errorsAtom = createErrorsAtom(atom, schema);
+	const errors = createErrorsAtom(atom, schema);
+	const fieldsResult = Object.fromEntries(
+		Object.entries(fields).map(([field, config]) => {
+			return [
+				field,
+				typeof config === 'function'
+					? (...args: AnyArgs) => toField(config(args))
+					: toField(config),
+			];
+
+			function toField(config: FieldConfig<T>): UseFieldResult<unknown> {
+				const path = (isArray(config) ? config : config.path) as Path<T>;
+				const options: Partial<FieldOptions<T, unknown>> = {
+					schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
+				};
+				if (!isArray(config) && 'mapping' in config)
+					options.mapping = config.mapping;
+				return toInternalFieldAtom(
+					store,
+					getAtomForPath(path, atom),
+					options as never,
+				) as UseFieldResult<unknown>;
+			}
+		}),
+	) as FormFields<T, TFields>;
 	return {
 		store,
 		atom,
 		schema,
-		errors: errorsAtom,
+		errors,
+		fields: fieldsResult,
 		get: () => store.get(atom),
 		subset: (path) => toFormSubset(path, { store, atom, schema }),
-		fields: Object.fromEntries(
-			Object.entries(fields).map(([field, config]) => {
-				return [
-					field,
-					typeof config === 'function'
-						? (...args: AnyArgs) => toField(config(args))
-						: toField(config),
-				];
-
-				function toField(config: FieldConfig<T>): UseFieldResult<unknown> {
-					const path = (isArray(config) ? config : config.path) as Path<T>;
-					const options: Partial<FieldOptions<T, unknown>> = {
-						schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
-					};
-					if (!isArray(config) && 'mapping' in config)
-						options.mapping = config.mapping;
-					return toInternalFieldAtom(
-						store,
-						getAtomForPath(path, atom),
-						options as never,
-					) as UseFieldResult<unknown>;
-				}
-			}),
-		) as FormFields<T, TFields>,
+		handleSubmit: (callback) => async (event) => {
+			event.preventDefault();
+			const data = store.get(atom);
+			const errorsResult = await schema.safeParseAsync(data);
+			if (!errorsResult.success) {
+				// TODO: trigger display of errors
+				return;
+			}
+			callback(errorsResult.data);
+		},
 	};
 }
 

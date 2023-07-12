@@ -77,19 +77,16 @@ export function ProfileForm() {
 	const userData = userQueryResult.data.data;
 
 	return (
-		<form onSubmit={submitForm}>
+		<form onSubmit={userForm.handleSubmit(onSubmit)}>
 			<ProfileFields {...userForm.fields} />
 			<ErrorsList errors={userForm.errors} prefix="UserDetails" />
 		</form>
 	);
 
-	function submitForm(ev: React.FormEvent<HTMLFormElement>) {
-		ev.preventDefault();
-		const currentValue = userForm.get();
-
-		const [, patches] = produceWithPatches(userData, (draft) => {
+	function onSubmit(currentValue: z.infer<typeof UserDetails>) {
+		const patches = produceWithPatches(userData, (draft) => {
 			draft.name = currentValue.name;
-		});
+		})[1];
 		if (patches.length > 0) saveUser.mutate(patches.map(immerPatchToStandard));
 	}
 }
