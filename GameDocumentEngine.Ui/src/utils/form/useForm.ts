@@ -9,19 +9,12 @@ import {
 	FieldMapping,
 	FieldOptions,
 	UseFieldResult,
-	createErrorsAtom,
-	toInternalFieldAtom,
 	useFieldAtom,
 } from './useField';
+import { toInternalFieldAtom } from './toInternalFieldAtom';
+import { createErrorsAtom } from './createErrorsAtom';
 import { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyArgs = any[];
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isArray(array: any): array is readonly any[] {
-	return Array.isArray(array);
-}
+import { AnyArray, isArray } from './arrays';
 
 type UnmappedFieldConfig<
 	T extends Objectish,
@@ -46,15 +39,15 @@ export type FieldConfig<T extends Objectish> =
 	| MappedFieldConfig<T, Path<T>, any>;
 
 export type FieldsConfig<T extends Objectish> = {
-	[field: string]: FieldConfig<T> | ((...args: AnyArgs) => FieldConfig<T>);
+	[field: string]: FieldConfig<T> | ((...args: AnyArray) => FieldConfig<T>);
 };
 
 export type ConfiguredFormField<
 	T extends Objectish,
 	TPath extends Path<T> = Path<T>,
 	TValue = PathValue<T, TPath>,
-	TArgs extends null | AnyArgs = null,
-> = TArgs extends AnyArgs
+	TArgs extends null | AnyArray = null,
+> = TArgs extends AnyArray
 	? (...args: TArgs) => UseFieldResult<PathValue<T, TPath>, TValue>
 	: UseFieldResult<PathValue<T, TPath>, TValue>;
 
@@ -124,7 +117,7 @@ function buildFormResult<
 			return [
 				field,
 				typeof config === 'function'
-					? (...args: AnyArgs) => toField(config(args))
+					? (...args: AnyArray) => toField(config(args))
 					: toField(config),
 			];
 

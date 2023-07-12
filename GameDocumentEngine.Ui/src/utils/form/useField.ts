@@ -1,10 +1,10 @@
 import { Atom, PrimitiveAtom, atom, useStore } from 'jotai';
-import { loadable } from 'jotai/utils';
 import { useMemo } from 'react';
 import { withSignal, mapProperty } from '@principlestudios/jotai-react-signals';
 import { ZodError, ZodType } from 'zod';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
-import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
+import { StandardWritableAtom } from './StandardWritableAtom';
+import { toInternalFieldAtom } from './toInternalFieldAtom';
 
 export const JotaiInput = withSignal('input', {
 	defaultValue: mapProperty('value'),
@@ -24,30 +24,12 @@ export type UseFieldResult<
 	errors?: ErrorsAtom<TValue>;
 } & ('hasErrors' extends TFlags ? { errors: ErrorsAtom<TValue> } : object);
 
-function mapAtom<TIn, TOut>(
-	target: StandardWritableAtom<TIn>,
-	toOut: (v: TIn) => TOut,
-	fromOut: (v: TOut) => TIn,
-): StandardWritableAtom<TOut> {
-	return atom(
-		(get) => toOut(get(target)),
-		(_get, set, effect: TOut | SetStateAction<TOut>) =>
-			set(target, (prev) =>
-				fromOut(
-					typeof effect === 'function'
-						? (effect as SetStateAction<TOut>)(toOut(prev))
-						: effect,
-				),
-			),
-	);
-}
-
 export type InputFieldProps<TFieldValue> = {
 	defaultValue: StandardWritableAtom<TFieldValue>;
 	onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => void;
 };
 
-function toInputField<TFieldValue>(
+export function toInputField<TFieldValue>(
 	store: ReturnType<typeof useStore>,
 	atom: StandardWritableAtom<TFieldValue>,
 ): InputFieldProps<TFieldValue> {
@@ -123,16 +105,6 @@ export function useFieldAtom<TValue, TFieldValue>(
 	return useInternalFieldAtom(fieldValueAtom, options);
 }
 
-export function createErrorsAtom<T>(target: Atom<T>, schema: ZodType<T>) {
-	return loadable(
-		atom(async (get) => {
-			const parseResult = await schema.safeParseAsync(get(target));
-			if (parseResult.success) return null;
-			return parseResult.error;
-		}),
-	);
-}
-
 function useInternalFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
@@ -143,33 +115,4 @@ function useInternalFieldAtom<TValue, TFieldValue>(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[store, fieldValueAtom],
 	);
-}
-
-export function toInternalFieldAtom<TValue, TFieldValue>(
-	store: ReturnType<typeof useStore>,
-	fieldValueAtom: StandardWritableAtom<TValue>,
-	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
-): UseFieldResult<TValue, TFieldValue, never> {
-	const mapping = 'mapping' in options ? options.mapping : null;
-	const formValueAtom = mapping
-		? mapAtom<TValue, TFieldValue>(
-				fieldValueAtom,
-				mapping.toForm,
-				mapping.fromForm,
-		  )
-		: (fieldValueAtom as unknown as StandardWritableAtom<TFieldValue>);
-
-	const schema = 'schema' in options ? options.schema : null;
-	const errors = schema ? createErrorsAtom(fieldValueAtom, schema) : undefined;
-
-	const standardProps = toInputField(store, formValueAtom);
-
-	const result: UseFieldResult<TValue, TFieldValue, never> = {
-		valueAtom: fieldValueAtom,
-		setValue: (v: TValue) => store.set(fieldValueAtom, v),
-		getValue: () => store.get(fieldValueAtom),
-		standardProps,
-		errors,
-	};
-	return result;
 }
