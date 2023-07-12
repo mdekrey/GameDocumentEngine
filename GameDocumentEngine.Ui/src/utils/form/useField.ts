@@ -5,6 +5,9 @@ import { ZodError, ZodType } from 'zod';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
 import { StandardWritableAtom } from './StandardWritableAtom';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
+import { RegisterErrorStrategy } from './errorsStrategy';
+import { FormEvents } from './events/FormEvents';
+import { FieldEvents } from './events/FieldEvents';
 
 export const JotaiInput = withSignal('input', {
 	defaultValue: mapProperty('value'),
@@ -27,16 +30,22 @@ export type UseFieldResult<
 export type InputFieldProps<TFieldValue> = {
 	defaultValue: StandardWritableAtom<TFieldValue>;
 	onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => void;
+	onBlur: React.ReactEventHandler;
 };
 
 export function toInputField<TFieldValue>(
 	store: ReturnType<typeof useStore>,
 	atom: StandardWritableAtom<TFieldValue>,
+	fieldEvents: FieldEvents,
 ): InputFieldProps<TFieldValue> {
 	return {
 		defaultValue: atom,
 		onChange: (ev) => {
+			fieldEvents.dispatchEvent(FieldEvents.Change);
 			store.set(atom, ev.currentTarget.value);
+		},
+		onBlur: () => {
+			fieldEvents.dispatchEvent(FieldEvents.Blur);
 		},
 	};
 }
@@ -48,6 +57,8 @@ export type FieldMapping<TValue, TFormFieldValue> = {
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
 	mapping: FieldMapping<TValue, TFormFieldValue>;
+	errorStrategy: RegisterErrorStrategy;
+	formEvents: FormEvents;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,

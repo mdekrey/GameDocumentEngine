@@ -12,9 +12,15 @@ import {
 	useFieldAtom,
 } from './useField';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
-import { createErrorsAtom } from './createErrorsAtom';
+import { createTriggeredErrorsAtom } from './createErrorsAtom';
 import { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
 import { AnyArray, isArray } from './arrays';
+import {
+	ErrorsStrategy,
+	RegisterErrorStrategy,
+	errorsStrategy,
+} from './errorsStrategy';
+import { FormEvents } from './events/FormEvents';
 
 type UnmappedFieldConfig<
 	T extends Objectish,
@@ -78,6 +84,8 @@ export type FormOptions<
 > = {
 	schema: ZodType<T>;
 	defaultValue: T;
+	preSubmit?: ErrorsStrategy;
+	postSubmit?: ErrorsStrategy;
 	fields?: TFields;
 } & (TFields extends Record<never, never> ? object : { fields: TFields });
 
@@ -90,6 +98,7 @@ export type UseFormResult<
 	schema: ZodType<T>;
 	errors: Atom<Loadable<ZodError<T> | null>>;
 	fields: FormFields<T, TFields>;
+	formEvents: FormEvents;
 
 	get(this: void): T;
 	subset<TPath extends Path<T>>(
@@ -100,6 +109,7 @@ export type UseFormResult<
 		this: void,
 		callback: (value: T) => void,
 	): React.ReactEventHandler;
+	errorStrategy: RegisterErrorStrategy;
 };
 
 function buildFormResult<
@@ -110,8 +120,11 @@ function buildFormResult<
 	atom: StandardWritableAtom<T>,
 	schema: ZodType<T>,
 	fields: TFields,
+	formEvents: FormEvents,
+	errorStrategy: RegisterErrorStrategy,
 ): UseFormResult<T, TFields> {
-	const errors = createErrorsAtom(atom, schema);
+	const [errors, trigger] = createTriggeredErrorsAtom(atom, schema);
+	errorStrategy(formEvents, () => store.set(trigger));
 	const fieldsResult = Object.fromEntries(
 		Object.entries(fields).map(([field, config]) => {
 			return [
@@ -125,6 +138,7 @@ function buildFormResult<
 				const path = (isArray(config) ? config : config.path) as Path<T>;
 				const options: Partial<FieldOptions<T, unknown>> = {
 					schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
+					errorStrategy,
 				};
 				if (!isArray(config) && 'mapping' in config)
 					options.mapping = config.mapping;
@@ -142,9 +156,12 @@ function buildFormResult<
 		schema,
 		errors,
 		fields: fieldsResult,
+		formEvents,
 		get: () => store.get(atom),
-		subset: (path) => toFormSubset(path, { store, atom, schema }),
+		subset: (path) =>
+			toFormSubset(path, { store, atom, schema }, formEvents, errorStrategy),
 		handleSubmit: (callback) => async (event) => {
+			formEvents.dispatchEvent(FormEvents.Submit);
 			event.preventDefault();
 			const data = store.get(atom);
 			const errorsResult = await schema.safeParseAsync(data);
@@ -154,6 +171,7 @@ function buildFormResult<
 			}
 			callback(errorsResult.data);
 		},
+		errorStrategy,
 	};
 }
 
@@ -164,12 +182,20 @@ export function useForm<
 	const store = useStore();
 	return useMemo(
 		() => {
+			const formEvents = new FormEvents();
+			const strategy = errorsStrategy(
+				options.preSubmit ?? 'onSubmit',
+				options.postSubmit ?? 'onBlur',
+				formEvents,
+			);
 			const formAtom = atom(options.defaultValue);
 			return buildFormResult<T, TFields>(
 				store,
 				formAtom,
 				options.schema,
 				options.fields ?? ({} as unknown as TFields),
+				formEvents,
+				strategy,
 			);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -236,11 +262,20 @@ function getAtomForPath<T extends Objectish, TPath extends Path<T>>(
 function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 	steps: TPath,
 	options: Pick<UseFormResult<T>, 'store' | 'atom' | 'schema'>,
+	formEvents: FormEvents,
+	errorStrategy: RegisterErrorStrategy,
 ): UseFormResult<PathValue<T, TPath>> {
 	const schema = getZodSchemaForPath(steps, options.schema);
 	const resultAtom = getAtomForPath(steps, options.atom);
 
-	return buildFormResult(options.store, resultAtom, schema, {});
+	return buildFormResult(
+		options.store,
+		resultAtom,
+		schema,
+		{},
+		formEvents,
+		errorStrategy,
+	);
 }
 
 export function useFormField<T extends Objectish, TPath extends Path<T>>(
