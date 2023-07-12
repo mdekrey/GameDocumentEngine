@@ -54,7 +54,33 @@ paths:
       responses:
         302:
           description: Redirects to login url
+  /game-type:
+    get:
+      operationId: listGameTypes
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameTypeSummary"
   /game:
+    get:
+      operationId: listGames
+      parameters:
+        - name: page
+          schema: { type: integer }
+          required: true
+          in: query
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedGameList"
     post:
       operationId: createGame
       requestBody:
@@ -62,7 +88,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EditableGameDetails"
+              $ref: "#/components/schemas/CreateGameDetails"
       responses:
         200:
           description: Success
@@ -78,8 +104,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       responses:
         200:
           description: Success
@@ -94,8 +119,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       responses:
         200:
           description: Success
@@ -106,8 +130,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       requestBody:
         required: true
         content:
@@ -140,18 +163,15 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       - name: typeId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       - name: id
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       responses:
         200:
           description: Success
@@ -169,18 +189,15 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       - name: typeId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       - name: id
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       requestBody:
         required: true
         content:
@@ -204,18 +221,15 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       - name: typeId
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       - name: id
         in: path
         required: true
-        schema:
-          type: string
+        schema: { type: string }
       requestBody:
         required: true
         content:
@@ -249,13 +263,38 @@ components:
       name: .AspNetCore.Cookies
 
   schemas:
+    Paginated:
+      type: object
+      required:
+        - totalPageCount
+      properties:
+        totalPageCount: { type: integer }
+    PaginatedGameList:
+      allOf:
+      - $ref: '#/components/schemas/Paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/GameSummary'
+
+    CreateGameDetails:
+      type: object
+      required:
+      - name
+      - type
+      properties:
+        name: { type: string }
+        type: { type: string }
     EditableGameDetails:
       type: object
       required:
       - name
       properties:
-        name:
-          type: string
+        name: { type: string }
     GameDetails:
       allOf:
         - $ref: '#/components/schemas/EditableGameDetails'
@@ -265,15 +304,12 @@ components:
           - players
           - inviteUrl
           properties:
-            lastUpdated:
-              type: string
-              format: date-time
+            lastUpdated: { type: string, format: date-time }
             players:
               type: array
               items:
                 type: string
-            inviteUrl:
-              type: string
+            inviteUrl: { type: string }
     GameDetailsWithId:
       allOf:
         - $ref: '#/components/schemas/GameDetails'
@@ -281,8 +317,14 @@ components:
           required:
             - id
           properties:
-            id:
-              type: string
+            id: { type: string }
+    GameSummary:
+      type: object
+      required:
+        - id
+      properties:
+        id: { type: string }
+        name: { type: string }
     CurrentUserDetails:
       allOf:
       - $ref: '#/components/schemas/UserDetails'
@@ -290,16 +332,25 @@ components:
         required:
           - isFirstTime
         properties:
-          isFirstTime:
-            type: boolean
+          # TODO: There should be a better way
+          isFirstTime: { type: boolean }
     UserDetails:
       type: object
       required:
         - name
       properties:
-        name:
-          type: string
+        name: { type: string }
 
+    GameTypeSummary:
+      type: object
+      required:
+        - name
+        - description
+        - objectTypes
+      properties:
+        name: { type: string }
+        description: { type: string }
+        objectTypes: { type: array, items: { type: string } }
   responses:
     "401":
       description: User was not authenticated

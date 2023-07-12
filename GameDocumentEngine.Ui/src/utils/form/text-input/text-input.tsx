@@ -1,5 +1,5 @@
 import { twMerge } from 'tailwind-merge';
-import { JotaiInput } from '../useField';
+import { JotaiInput } from './JotaiInput';
 
 export function TextInput({
 	type = 'text',

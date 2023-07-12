@@ -1,5 +1,7 @@
 using CompressedStaticFiles;
 using GameDocumentEngine.Server.Data;
+using GameDocumentEngine.Server.Documents;
+using GameDocumentEngine.Server.GameTypes.Clocks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +48,8 @@ services
 						return System.Threading.Tasks.Task.CompletedTask;
 					};
 	});
+
+services.AddSingleton<IGameType, ClocksGameType>();
 
 services.AddAuthorization(options =>
 {

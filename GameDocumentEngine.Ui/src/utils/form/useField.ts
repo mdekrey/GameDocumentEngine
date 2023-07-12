@@ -1,6 +1,5 @@
 import { Atom, PrimitiveAtom, atom, useStore } from 'jotai';
 import { useMemo } from 'react';
-import { withSignal, mapProperty } from '@principlestudios/jotai-react-signals';
 import { ZodError, ZodType } from 'zod';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
 import { StandardWritableAtom } from './StandardWritableAtom';
@@ -8,10 +7,6 @@ import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { RegisterErrorStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
 import { FieldEvents } from './events/FieldEvents';
-
-export const JotaiInput = withSignal('input', {
-	defaultValue: mapProperty('value'),
-});
 
 export type UseFieldResultFlags = 'hasErrors';
 export type ErrorsAtom<TValue> = Atom<Loadable<ZodError<TValue> | null>>;
@@ -28,7 +23,7 @@ export type UseFieldResult<
 } & ('hasErrors' extends TFlags ? { errors: ErrorsAtom<TValue> } : object);
 
 export type InputFieldProps<TFieldValue> = {
-	defaultValue: StandardWritableAtom<TFieldValue>;
+	defaultValue: Atom<TFieldValue>;
 	onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => void;
 	onBlur: React.ReactEventHandler;
 };

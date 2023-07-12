@@ -62,7 +62,7 @@ export function ProfileForm() {
 		},
 	});
 
-	const userQueryResult = useQuery({ ...currentUserQuery() });
+	const userQueryResult = useQuery(currentUserQuery());
 	const saveUser = usePatchUser();
 
 	if (!userQueryResult.isSuccess) {

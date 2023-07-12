@@ -22,7 +22,6 @@ export function createTriggeredErrorsAtom<T>(
 	const errors = atom<Promise<MaybeErrors<T>>>(Promise.resolve(null));
 
 	const writable = atom<void, [], void>(void 0, (get, set) => {
-		console.log('trigger!');
 		set(
 			errors,
 			(async () => {

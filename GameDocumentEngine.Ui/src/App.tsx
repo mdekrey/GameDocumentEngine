@@ -4,6 +4,7 @@ import { Layout } from '@/components/layout/layout';
 import { createHashRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { Profile } from '@/apps/profile/profile';
 import { Button } from './components/button/button';
+import { CreateGame } from './apps/create-game/create-game';
 
 const router = createHashRouter([
 	{
@@ -16,7 +17,7 @@ const router = createHashRouter([
 	},
 	{
 		path: 'create-game',
-		Component: Root,
+		Component: CreateGame,
 	},
 	{
 		path: '/',

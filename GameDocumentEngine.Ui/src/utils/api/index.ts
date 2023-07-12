@@ -25,10 +25,10 @@ export const api = toFetchApi(
 function wrapApiQuery<
 	TArgs extends unknown[],
 	TReturn extends StandardResponse,
->(original: (...args: TArgs) => Promise<TReturn>) {
+>(queryKeyPrefix: unknown[], original: (...args: TArgs) => Promise<TReturn>) {
 	return (...args: TArgs) => {
 		const result = {
-			queryKey: [{ args }] as const,
+			queryKey: [...queryKeyPrefix, { args }] as const,
 			queryFn: () => original(...args),
 		};
 		return result;
@@ -40,10 +40,19 @@ export const currentUserQuery = () => ({
 	queryFn: () => api.getCurrentUser(),
 });
 
+export const gameTypesQuery = () => ({
+	queryKey: ['gameTypes'],
+	queryFn: async () => {
+		const response = await api.listGameTypes();
+		if (response.statusCode !== 200) return Promise.reject(response);
+		return response.data;
+	},
+});
+
 export const gameQuery = (
 	params: Parameters<typeof api.getGameDetails>[0]['params'],
-) => wrapApiQuery(api.getGameDetails)({ params });
+) => wrapApiQuery(['game'], api.getGameDetails)({ params });
 
 export const documentQuery = (
 	params: Parameters<typeof api.getDocument>[0]['params'],
-) => wrapApiQuery(api.getDocument)({ params });
+) => wrapApiQuery(['document'], api.getDocument)({ params });

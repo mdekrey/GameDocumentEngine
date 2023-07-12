@@ -31,7 +31,6 @@ export class FormEvents implements IFieldEvents {
 	}
 
 	dispatchEvent(event: FormEventNames) {
-		console.log('form', event);
 		this.target.dispatchEvent(new Event(event));
 	}
 }
