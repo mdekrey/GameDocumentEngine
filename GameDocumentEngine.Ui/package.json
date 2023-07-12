@@ -15,7 +15,7 @@
 		"prettier": "prettier --list-different \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"typecheck": "tsc --noemit",
-		"prepare": "cd .. && husky install GameDocumentEninge.Ui/.husky",
+		"prepare": "cd .. && husky install GameDocumentEngine.Ui/.husky",
 		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml"
 	},
 	"dependencies": {

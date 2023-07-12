@@ -1,5 +1,4 @@
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
-import { GameTypeSummary } from '@/api/models/GameTypeSummary';
 import { Button } from '@/components/button/button';
 import { api, gameTypesQuery } from '@/utils/api';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
