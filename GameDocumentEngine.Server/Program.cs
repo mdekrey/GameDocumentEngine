@@ -39,14 +39,20 @@ services
 
 		var originalOnRedirectToAuthorizationEndpoint = googleOptions.Events.OnRedirectToAuthorizationEndpoint;
 		googleOptions.Events.
-					OnRedirectToAuthorizationEndpoint = context =>
-					{
-						if (context.Request.Path.Value == "/login")
-							return originalOnRedirectToAuthorizationEndpoint(context);
+			OnRedirectToAuthorizationEndpoint = context =>
+			{
+				if (context.Request.Path.Value == "/login")
+					return originalOnRedirectToAuthorizationEndpoint(context);
 
-						context.Response.StatusCode = 401;
-						return System.Threading.Tasks.Task.CompletedTask;
-					};
+				context.Response.StatusCode = 401;
+				return Task.CompletedTask;
+			};
+		var originalOnCreatingTicket = googleOptions.Events.OnCreatingTicket;
+		googleOptions.Events.
+			OnCreatingTicket = async context =>
+			{
+				await originalOnCreatingTicket(context);
+			};
 	});
 
 services.AddSingleton<IGameType, ClocksGameType>();
@@ -60,13 +66,12 @@ services.AddAuthorization(options =>
 	});
 });
 
-services.AddDbContext<DocumentDbContext>(o =>
+services.AddHttpContextAccessor();
+services.AddTransient<AuditableInterceptor>();
+services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
-	o.UseCosmos(
-		builder.Configuration["CosmosDb:ServiceUrl"] ?? throw new InvalidOperationException("CosmosDb not configured"),
-		builder.Configuration["CosmosDb:AuthKey"] ?? throw new InvalidOperationException("CosmosDb not configured"),
-		builder.Configuration["CosmosDb:DatabaseId"] ?? throw new InvalidOperationException("CosmosDb not configured")
-	);
+	o.UseSqlServer(builder.Configuration["AzureSql:ConnectionString"] ?? throw new InvalidOperationException("AzureSql not configured"))
+		.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>());
 });
 
 var app = builder.Build();

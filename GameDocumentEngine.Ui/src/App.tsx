@@ -1,42 +1,23 @@
-import { useState } from 'react';
 import { Layout } from '@/components/layout/layout';
 
-import { createHashRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Profile } from '@/apps/profile/profile';
-import { Button } from './components/button/button';
 import { CreateGame } from './apps/create-game/create-game';
-
-const router = createHashRouter([
-	{
-		path: 'profile',
-		Component: Profile,
-	},
-	{
-		path: 'games',
-		Component: Root,
-	},
-	{
-		path: 'create-game',
-		Component: CreateGame,
-	},
-	{
-		path: '/',
-		element: <Navigate to="/games" />,
-	},
-]);
+import { ListGamesLayout } from './apps/list-games/list-games';
 
 function App() {
-	return <RouterProvider router={router} />;
-}
-
-function Root() {
-	const [count, setCount] = useState(0);
 	return (
-		<Layout>
-			<Button onClick={() => setCount((count) => count + 1)}>
-				count is {count}
-			</Button>
-		</Layout>
+		<HashRouter future={{ v7_startTransition: true }}>
+			<Layout>
+				<Routes>
+					<Route path="profile" Component={Profile} />
+					<Route path="game/:id" element={<div>Here</div>} />
+					<Route path="game" Component={ListGamesLayout} />
+					<Route path="create-game" Component={CreateGame} />
+					<Route path="/" element={<Navigate to="/games" />} />
+				</Routes>
+			</Layout>
+		</HashRouter>
 	);
 }
 

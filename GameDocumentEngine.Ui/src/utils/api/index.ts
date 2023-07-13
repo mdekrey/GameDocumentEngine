@@ -49,6 +49,16 @@ export const gameTypesQuery = () => ({
 	},
 });
 
+export const gamesQuery = {
+	queryKey: ['game'],
+	queryFn: async () => {
+		// TODO: this is currently not paginated, but neither is the server-side.
+		const response = await api.listGames();
+		if (response.statusCode !== 200) return Promise.reject(response);
+		return response.data;
+	},
+};
+
 export const gameQuery = (
 	params: Parameters<typeof api.getGameDetails>[0]['params'],
 ) => wrapApiQuery(['game'], api.getGameDetails)({ params });

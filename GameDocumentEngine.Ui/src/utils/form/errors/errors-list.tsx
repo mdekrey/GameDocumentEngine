@@ -16,7 +16,7 @@ export function ErrorsList({
 			{errorsValue.data.issues.map((issue, key) => (
 				<li key={key}>
 					<HiX class="inline-block mb-1 mr-1" />
-					{[prefix, ...issue.path].join('.')}.{issue.code}
+					{[prefix, ...issue.path, issue.code].join('.')}
 				</li>
 			))}
 		</ul>

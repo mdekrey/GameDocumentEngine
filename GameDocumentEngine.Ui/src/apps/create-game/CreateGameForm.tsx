@@ -1,6 +1,6 @@
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
-import { api, gameTypesQuery } from '@/utils/api';
+import { api, gameTypesQuery, gamesQuery } from '@/utils/api';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { Field } from '@/utils/form/field/field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
@@ -8,18 +8,21 @@ import { SelectInput } from '@/utils/form/select-input/select-input';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm, FormOptions } from '@/utils/form/useForm';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { ZodType, z } from 'zod';
 
 function useCreateGame() {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async (game: CreateGameDetails) => {
 			const response = await api.createGame({ body: game });
-			if (response.statusCode === 200) return response;
+			if (response.statusCode === 200) return response.data;
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: () => {
-			queryClient;
+		onSuccess: async (game) => {
+			await queryClient.invalidateQueries(gamesQuery.queryKey);
+			navigate(`/game/${game.id}`);
 			// TODO: invalidate game list
 			// queryClient.invalidateQueries();
 			// TODO: redirect to game landing page

@@ -69,18 +69,15 @@ paths:
   /game:
     get:
       operationId: listGames
-      parameters:
-        - name: page
-          schema: { type: integer }
-          required: true
-          in: query
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedGameList"
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameSummary'
     post:
       operationId: createGame
       requestBody:
@@ -96,6 +93,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameDetailsWithId"
+        400:
+          description: There was a validation issue creating the game.
   /game/{gameId}:
     get:
       x-dotnet-mvc-server-controller: Game
@@ -104,7 +103,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       responses:
         200:
           description: Success
@@ -112,6 +111,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameDetails"
+        404:
+          description: Target game not found
     delete:
       x-dotnet-mvc-server-controller: Game
       operationId: deleteGame
@@ -119,10 +120,12 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       responses:
         200:
           description: Success
+        404:
+          description: Target game not found
     patch:
       x-dotnet-mvc-server-controller: Game
       operationId: patchGame
@@ -130,7 +133,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       requestBody:
         required: true
         content:
@@ -163,7 +166,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       - name: typeId
         in: path
         required: true
@@ -189,7 +192,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       - name: typeId
         in: path
         required: true
@@ -221,7 +224,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       - name: typeId
         in: path
         required: true
@@ -263,24 +266,6 @@ components:
       name: .AspNetCore.Cookies
 
   schemas:
-    Paginated:
-      type: object
-      required:
-        - totalPageCount
-      properties:
-        totalPageCount: { type: integer }
-    PaginatedGameList:
-      allOf:
-      - $ref: '#/components/schemas/Paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/GameSummary'
-
     CreateGameDetails:
       type: object
       required:
@@ -317,13 +302,14 @@ components:
           required:
             - id
           properties:
-            id: { type: string }
+            id: { type: string, format: guid }
     GameSummary:
       type: object
       required:
         - id
+        - name
       properties:
-        id: { type: string }
+        id: { type: string, format: guid }
         name: { type: string }
     CurrentUserDetails:
       allOf:

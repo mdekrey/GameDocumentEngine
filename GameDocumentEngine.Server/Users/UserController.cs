@@ -15,31 +15,17 @@ public class UserController : Api.UserControllerBase
 		this.dbContext = dbContext;
 	}
 
-	async Task<UserModel?> LoadCurrentUser()
-	{
-		var id = GetCurrentUserId();
-
-		return await dbContext.Users.FirstOrDefaultAsync(user => user.GoogleNameId == id);
-	}
-
-	private string GetCurrentUserId()
-	{
-		return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
-			?? throw new InvalidOperationException("No name identifier - is this a google user?");
-	}
-
 	protected override async Task<GetCurrentUserActionResult> GetCurrentUser()
 	{
-		var user = await LoadCurrentUser();
+		var user = await dbContext.GetCurrentUser(User);
 		var isFirstTime = user == null;
 		if (user == null)
 		{
 			user = new UserModel
 			{
-				GoogleNameId = GetCurrentUserId(),
+				GoogleNameId = User.GetGoogleNameIdOrThrow(),
 				EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? throw new InvalidOperationException("No email - is this a google user?"),
 				Name = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? throw new InvalidOperationException("No name - is this a google user?"),
-				Id = Guid.NewGuid().ToString(),
 			};
 			dbContext.Users.Add(user);
 			await dbContext.SaveChangesAsync();
@@ -50,7 +36,7 @@ public class UserController : Api.UserControllerBase
 
 	protected override async Task<PatchUserActionResult> PatchUser(JsonPatch patchUserBody)
 	{
-		var user = await LoadCurrentUser();
+		var user = await dbContext.GetCurrentUser(User);
 		if (user == null)
 		{
 			return PatchUserActionResult.BadRequest("No user found");

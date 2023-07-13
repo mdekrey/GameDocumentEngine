@@ -36,7 +36,7 @@ export function Header({ children }: { children?: React.ReactNode }) {
 				<ul>
 					<li>Hello, {data?.data.name}!</li>
 					<li>
-						<a href="#/games">Select Game</a>
+						<a href="#/game">Select Game</a>
 					</li>
 					<li>
 						<a href="#/create-game">New Game</a>
