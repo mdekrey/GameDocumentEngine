@@ -1,6 +1,7 @@
 import { twMerge } from 'tailwind-merge';
+import { buttonThemes } from './buttonThemes';
 
-export function IconButton({
+export function IconButtonComponent({
 	children,
 	className,
 	type,
@@ -21,3 +22,8 @@ export function IconButton({
 		</button>
 	);
 }
+
+export const IconButton = Object.assign(
+	IconButtonComponent,
+	buttonThemes('Button', IconButtonComponent),
+);

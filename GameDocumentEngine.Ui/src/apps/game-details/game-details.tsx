@@ -1,6 +1,5 @@
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
-import { destructive } from '@/components/button/themes';
 import { api, gameQuery, gamesQuery } from '@/utils/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiOutlineTrash } from 'react-icons/hi';
@@ -36,8 +35,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 		<div className="max-w-screen-sm m-auto">
 			<h1 className="text-2xl font-bold">{gameResult.data.name}</h1>
 			<ButtonRow>
-				<Button
-					className={destructive}
+				<Button.Destructive
 					onClick={() => {
 						// TODO: confirmation dialog
 						deleteGame.mutate(gameId);
@@ -46,7 +44,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 				>
 					<HiOutlineTrash className="inline-block mr-2" />
 					Delete
-				</Button>
+				</Button.Destructive>
 			</ButtonRow>
 		</div>
 	);

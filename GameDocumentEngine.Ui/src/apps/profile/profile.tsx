@@ -13,6 +13,7 @@ import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
+import { NarrowContent } from '@/utils/containers/narrow-content';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -78,10 +79,12 @@ export function Profile() {
 	const userData = userQueryResult.data.data;
 
 	return (
-		<form onSubmit={userForm.handleSubmit(onSubmit)}>
-			<ProfileFields {...userForm.fields} />
-			<ErrorsList errors={userForm.errors} prefix="UserDetails" />
-		</form>
+		<NarrowContent>
+			<form onSubmit={userForm.handleSubmit(onSubmit)}>
+				<ProfileFields {...userForm.fields} />
+				<ErrorsList errors={userForm.errors} prefix="UserDetails" />
+			</form>
+		</NarrowContent>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof UserDetails>) {

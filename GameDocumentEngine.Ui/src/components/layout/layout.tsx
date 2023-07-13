@@ -14,7 +14,7 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(
 		return (
 			<div className="w-full h-full flex flex-col md:flex-row">
 				<Header>{slotProps.Sidebar?.children}</Header>
-				<main className="overflow-auto flex-1 p-6">{children}</main>
+				<main className="overflow-auto flex-1">{children}</main>
 			</div>
 		);
 	},

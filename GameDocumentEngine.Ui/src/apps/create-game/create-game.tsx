@@ -2,6 +2,7 @@ import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { api, gameTypesQuery, gamesQuery } from '@/utils/api';
+import { NarrowContent } from '@/utils/containers/narrow-content';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { Field } from '@/utils/form/field/field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
@@ -52,42 +53,44 @@ export function CreateGame() {
 	const createGame = useCreateGame();
 
 	return (
-		<form onSubmit={gameForm.handleSubmit(onSubmit)}>
-			<Fieldset>
-				<Field>
-					<Field.Label>Name</Field.Label>
-					<Field.Contents>
-						<TextInput {...gameForm.fields.name.standardProps} />
-						<ErrorsList
-							errors={gameForm.fields.name.errors}
-							prefix="CreateGameDetails.name"
-						/>
-					</Field.Contents>
-				</Field>
-				<Field>
-					<Field.Label>Type</Field.Label>
-					<Field.Contents>
-						{gameTypesResult.isSuccess ? (
-							<SelectInput
-								items={gameTypesResult.data}
-								valueSelector={(gt) => gt.name}
-								{...gameForm.fields.type.standardProps}
-							>
-								{(gt) => <span className="font-bold">{gt.name}</span>}
-							</SelectInput>
-						) : // TODO: loading spinner
-						null}
-						<ErrorsList
-							errors={gameForm.fields.type.errors}
-							prefix="CreateGameDetails.type"
-						/>
-					</Field.Contents>
-				</Field>
-				<ButtonRow>
-					<Button type="submit">Create Game</Button>
-				</ButtonRow>
-			</Fieldset>
-		</form>
+		<NarrowContent>
+			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
+				<Fieldset>
+					<Field>
+						<Field.Label>Name</Field.Label>
+						<Field.Contents>
+							<TextInput {...gameForm.fields.name.standardProps} />
+							<ErrorsList
+								errors={gameForm.fields.name.errors}
+								prefix="CreateGameDetails.name"
+							/>
+						</Field.Contents>
+					</Field>
+					<Field>
+						<Field.Label>Type</Field.Label>
+						<Field.Contents>
+							{gameTypesResult.isSuccess ? (
+								<SelectInput
+									items={gameTypesResult.data}
+									valueSelector={(gt) => gt.name}
+									{...gameForm.fields.type.standardProps}
+								>
+									{(gt) => <span className="font-bold">{gt.name}</span>}
+								</SelectInput>
+							) : // TODO: loading spinner
+							null}
+							<ErrorsList
+								errors={gameForm.fields.type.errors}
+								prefix="CreateGameDetails.type"
+							/>
+						</Field.Contents>
+					</Field>
+					<ButtonRow>
+						<Button type="submit">Create Game</Button>
+					</ButtonRow>
+				</Fieldset>
+			</form>
+		</NarrowContent>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {

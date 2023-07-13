@@ -1,6 +1,7 @@
 import { twMerge } from 'tailwind-merge';
+import { buttonThemes } from './buttonThemes';
 
-export function Button({
+function ButtonComponent({
 	children,
 	className,
 	type,
@@ -10,7 +11,12 @@ export function Button({
 	return (
 		<button
 			className={twMerge(
-				'px-4 py-2 bg-slate-800 text-white font-bold focus:bg-slate-700 hover:bg-slate-700 outline-blue-700 transition-colors',
+				'bg-slate-800 text-white focus:bg-slate-700 hover:bg-slate-700 outline-blue-700',
+				'px-3 py-2 rounded-md',
+				'w-full sm:w-auto',
+				'inline-flex items-center justify-center',
+				'text-sm font-semibold',
+				'transition-colors shadow-sm',
 				disabled && 'opacity-20',
 				className,
 			)}
@@ -21,3 +27,8 @@ export function Button({
 		</button>
 	);
 }
+
+export const Button = Object.assign(
+	ButtonComponent,
+	buttonThemes('Button', ButtonComponent),
+);
