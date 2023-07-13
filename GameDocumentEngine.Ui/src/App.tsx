@@ -6,6 +6,7 @@ import { CreateGame } from './apps/create-game/create-game';
 import { ListGames } from './apps/list-games/list-games';
 import { GameObjects } from './apps/game-details/game-objects';
 import { GameDetails } from './apps/game-details/game-details';
+import { GetParams } from './utils/routing/getParams';
 
 function App() {
 	return (
@@ -18,7 +19,14 @@ function App() {
 				</Layout.Sidebar>
 				<Routes>
 					<Route path="profile/" Component={Profile} />
-					<Route path="game/:id" Component={GameDetails} />
+					<Route
+						path="game/:id"
+						element={
+							<GetParams>
+								{({ id }: { id: string }) => <GameDetails gameId={id} />}
+							</GetParams>
+						}
+					/>
 					<Route path="game/" Component={ListGames} />
 					<Route path="create-game/" Component={CreateGame} />
 					<Route path="/" element={<Navigate to="/game" />} />

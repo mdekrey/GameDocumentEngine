@@ -12,6 +12,7 @@ import { ErrorsList } from '../../utils/form/errors/errors-list';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
+import { ButtonRow } from '@/components/button/button-row';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -42,9 +43,9 @@ export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
 					<ErrorsList errors={name.errors} prefix="UserDetail.name" />
 				</Field.Contents>
 			</Field>
-			<div className="col-span-2 flex flex-row-reverse gap-2">
+			<ButtonRow>
 				<Button type="submit">Save Changes</Button>
-			</div>
+			</ButtonRow>
 		</Fieldset>
 	);
 }

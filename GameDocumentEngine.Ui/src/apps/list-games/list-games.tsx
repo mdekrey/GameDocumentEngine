@@ -1,9 +1,9 @@
 import { IconButton } from '@/components/button/icon-button';
-import { destructive, save } from '@/components/button/themes';
+import { save } from '@/components/button/themes';
 import { api, gamesQuery } from '@/utils/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReducer } from 'react';
-import { HiArrowRight, HiOutlineTrash, HiX } from 'react-icons/hi';
+import { HiArrowRight, HiPlus } from 'react-icons/hi';
 import { Link, useNavigate } from 'react-router-dom';
 
 function useDeleteGame() {
@@ -21,9 +21,7 @@ function useDeleteGame() {
 }
 
 export function ListGames() {
-	const [showDelete, toggleShowDelete] = useReducer((v) => !v, false);
 	const gamesResult = useQuery(gamesQuery);
-	const deleteGame = useDeleteGame();
 	const navigate = useNavigate();
 
 	if (gamesResult.isLoading) {
@@ -36,12 +34,9 @@ export function ListGames() {
 	return (
 		<div className="max-w-screen-sm m-auto flex flex-col">
 			<span className="flex flex-row items-center gap-4 mb-4">
-				<h1 className="flex-1">All Games</h1>
-				<IconButton
-					className={!showDelete ? destructive : save}
-					onClick={toggleShowDelete}
-				>
-					{!showDelete ? <HiOutlineTrash /> : <HiX />}
+				<h1 className="text-2xl font-bold flex-1">All Games</h1>
+				<IconButton className={save} onClick={() => navigate('/create-game')}>
+					<HiPlus />
 				</IconButton>
 			</span>
 			<ul className="contents">
@@ -53,18 +48,6 @@ export function ListGames() {
 							<IconButton onClick={() => navigate(`/game/${game.id}`)}>
 								<HiArrowRight />
 							</IconButton>
-							{showDelete && (
-								<IconButton
-									className={destructive}
-									onClick={() => {
-										// TODO: confirmation dialog
-										deleteGame.mutate(game.id);
-										toggleShowDelete();
-									}}
-								>
-									<HiOutlineTrash />
-								</IconButton>
-							)}
 						</div>
 					</li>
 				))}

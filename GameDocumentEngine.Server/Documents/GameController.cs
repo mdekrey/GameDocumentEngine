@@ -37,7 +37,7 @@ public class GameController : Api.GameControllerBase
 
 	private GameDetailsWithId ToGameDetails(GameModel game) =>
 		new GameDetailsWithId(game.Name,
-			DateTimeOffset.Now, // TODO
+			game.LastModifiedDate,
 			game.Players.Select(p => p.User.Name),
 			"TODO",
 			game.Id);
@@ -65,17 +65,15 @@ public class GameController : Api.GameControllerBase
 
 	protected override async Task<GetGameDetailsActionResult> GetGameDetails(Guid gameId)
 	{
-		var gameRecord = await (from gameUser in dbContext.GameUsers
+		var gameRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).ThenInclude(g => g.Players).ThenInclude(gu => gu.User)
 								where gameUser.GameId == gameId && gameUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
 								select gameUser.Game)
-			.Include(game => game.Players)
-			.ThenInclude(gu => gu.User)
 			.SingleOrDefaultAsync();
 		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
 
 		return GetGameDetailsActionResult.Ok(new GameDetails(
 			Name: gameRecord.Name,
-			LastUpdated: DateTimeOffset.Now, //TODO
+			LastUpdated: gameRecord.LastModifiedDate,
 			gameRecord.Players.Select(p => p.User.Name),
 			"TODO"
 		));

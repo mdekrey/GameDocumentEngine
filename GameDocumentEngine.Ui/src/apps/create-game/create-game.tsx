@@ -1,5 +1,6 @@
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
+import { ButtonRow } from '@/components/button/button-row';
 import { api, gameTypesQuery, gamesQuery } from '@/utils/api';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { Field } from '@/utils/form/field/field';
@@ -82,9 +83,9 @@ export function CreateGame() {
 						/>
 					</Field.Contents>
 				</Field>
-				<div className="col-span-2 flex flex-row-reverse gap-2">
+				<ButtonRow>
 					<Button type="submit">Create Game</Button>
-				</div>
+				</ButtonRow>
 			</Fieldset>
 		</form>
 	);

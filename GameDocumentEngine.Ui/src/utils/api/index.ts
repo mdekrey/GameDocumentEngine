@@ -63,9 +63,14 @@ export const gamesQuery = {
 	},
 };
 
-export const gameQuery = (
-	params: Parameters<typeof api.getGameDetails>[0]['params'],
-) => wrapApiQuery(['game'], api.getGameDetails)({ params });
+export const gameQuery = (gameId: string) => ({
+	queryKey: ['game', gameId],
+	queryFn: async () => {
+		const response = await api.getGameDetails({ params: { gameId } });
+		if (response.statusCode !== 200) return Promise.reject(response);
+		return response.data;
+	},
+});
 
 export const documentQuery = (
 	params: Parameters<typeof api.getDocument>[0]['params'],
