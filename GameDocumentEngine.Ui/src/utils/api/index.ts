@@ -44,7 +44,11 @@ export const gameTypesQuery = () => ({
 	queryKey: ['gameTypes'],
 	queryFn: async () => {
 		const response = await api.listGameTypes();
-		if (response.statusCode !== 200) return Promise.reject(response);
+		if (response.statusCode !== 200) {
+			// return Promise.reject(response);
+			console.error(response);
+			return [];
+		}
 		return response.data;
 	},
 });
