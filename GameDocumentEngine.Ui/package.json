@@ -16,13 +16,16 @@
 		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"typecheck": "tsc --noemit",
 		"prepare": "cd .. && husky install GameDocumentEngine.Ui/.husky",
-		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml"
+		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml",
+		"generate-zod": "json-schema-to-zod -s src/documents/clocks/schema.json -t src/documents/clocks/schema.ts"
 	},
 	"dependencies": {
 		"@principlestudios/openapi-codegen-typescript": "^0.6.2",
 		"@principlestudios/openapi-codegen-typescript-fetch": "^0.6.1",
 		"@tanstack/react-query": "^4.29.19",
 		"@tanstack/react-query-devtools": "^4.29.19",
+		"glob": "^10.3.3",
+		"json-schema-to-zod": "^1.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-icons": "^4.10.1",
