@@ -1,6 +1,6 @@
 ﻿using GameDocumentEngine.Server.Documents;
 
-namespace GameDocumentEngine.Server.GameTypes.SharedObjects;
+namespace GameDocumentEngine.Server.Documents.Types.Clock;
 
 public class ClockGameObject : IGameObjectType
 {

@@ -15,7 +15,9 @@ const schemaExtension = '.json';
 
 const documentTypes = (
 	await glob(`*${schemaExtension}`, { cwd: documentSchemaDir })
-).map((file) => file.substring(0, file.length - schemaExtension.length));
+).map((file) =>
+	file.substring(0, file.length - schemaExtension.length).toLowerCase(),
+);
 
 await Promise.all(
 	documentTypes.map(async (documentType) => {

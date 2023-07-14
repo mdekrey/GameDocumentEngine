@@ -24,6 +24,10 @@
 	<ItemGroup>
 		<OpenApiSchemaCSharpServerOptions Include="Api\codegen.config.yaml" />
 		<OpenApiSchemaMvcServer Include="$(SolutionRoot)schemas\api.yaml" Link="Api\api.yaml" />
+		<EmbeddedResource Include="$(SolutionRoot)schemas\documents\*.json">
+			<LogicalName>Documents.Types.%(FileName).schema.json</LogicalName>
+			<Link>Documents/Types/%(FileName)/schema.json</Link>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
