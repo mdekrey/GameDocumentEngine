@@ -17,6 +17,8 @@ paths:
                 $ref: "#/components/schemas/CurrentUserDetails"
     patch:
       operationId: patchUser
+      security:
+        - AuthenticatedUser: []
       requestBody:
         required: true
         content:
@@ -57,6 +59,8 @@ paths:
   /game-type:
     get:
       operationId: listGameTypes
+      security:
+        - AuthenticatedUser: []
       responses:
         200:
           description: Success
@@ -69,6 +73,8 @@ paths:
   /game:
     get:
       operationId: listGames
+      security:
+        - AuthenticatedUser: []
       responses:
         200:
           description: Success
@@ -80,6 +86,8 @@ paths:
                   $ref: '#/components/schemas/GameSummary'
     post:
       operationId: createGame
+      security:
+        - AuthenticatedUser: []
       requestBody:
         required: true
         content:
@@ -99,6 +107,8 @@ paths:
     get:
       x-dotnet-mvc-server-controller: Game
       operationId: getGameDetails
+      security:
+        - AuthenticatedUser: []
       parameters:
       - name: gameId
         in: path
@@ -116,6 +126,8 @@ paths:
     delete:
       x-dotnet-mvc-server-controller: Game
       operationId: deleteGame
+      security:
+        - AuthenticatedUser: []
       parameters:
       - name: gameId
         in: path
@@ -129,6 +141,8 @@ paths:
     patch:
       x-dotnet-mvc-server-controller: Game
       operationId: patchGame
+      security:
+        - AuthenticatedUser: []
       parameters:
       - name: gameId
         in: path
@@ -158,6 +172,39 @@ paths:
           description: Target game not found
         409:
           description: Game was updated while request was being processed; try again later.
+  /game/{gameId}/document/{typeId}:
+    post:
+      x-dotnet-mvc-server-controller: Document
+      operationId: createDocument
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      - name: typeId
+        in: path
+        required: true
+        schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              format: any
+      responses:
+        200:
+          description: Success
+        400:
+          description: Could not parse request
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Game id not found
   /game/{gameId}/document/{typeId}/{id}:
     get:
       x-dotnet-mvc-server-controller: Document
@@ -187,7 +234,7 @@ paths:
           description: Not Found
     put:
       x-dotnet-mvc-server-controller: Document
-      operationId: putDocument
+      operationId: updateDocument
       parameters:
       - name: gameId
         in: path

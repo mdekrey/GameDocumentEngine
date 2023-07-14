@@ -18,7 +18,7 @@ public class JsonSchemaResolver
 		using var resourceStream = gameObjectType.GetType().Assembly.GetManifestResourceStream(resourceName);
 		if (resourceStream == null)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException("The schema file is not embedded in the GameObjectType's assembly");
 		}
 		using var textReader = new StreamReader(resourceStream);
 		var schemaText = await textReader.ReadToEndAsync();
