@@ -4,9 +4,9 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"predev": "npm run generate-api",
+		"predev": "npm run generation",
 		"dev": "vite build --watch --sourcemap --mode development --minify false",
-		"prebuild": "npm run generate-api",
+		"prebuild": "npm run generation",
 		"build": "tsc && vite build",
 		"lint": "npm run typecheck && npm run eslint && npm run prettier",
 		"lint:fix": "npm run typecheck && npm run eslint:fix && npm run prettier:fix",
@@ -16,8 +16,9 @@
 		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"typecheck": "tsc --noemit",
 		"prepare": "cd .. && husky install GameDocumentEngine.Ui/.husky",
+		"generation": "npm run generate-api && npm run generate-zod",
 		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml",
-		"generate-zod": "json-schema-to-zod -s src/documents/clocks/schema.json -t src/documents/clocks/schema.ts"
+		"generate-zod": "ts-node --esm --project tsconfig.node.json scripts/schemas-to-zod"
 	},
 	"dependencies": {
 		"@principlestudios/openapi-codegen-typescript": "^0.6.2",
@@ -29,7 +30,8 @@
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-icons": "^4.10.1",
-		"rfc6902": "^5.0.1"
+		"rfc6902": "^5.0.1",
+		"ts-node": "^10.9.1"
 	},
 	"devDependencies": {
 		"@principlestudios/jotai-react-signals": "^0.4.1",

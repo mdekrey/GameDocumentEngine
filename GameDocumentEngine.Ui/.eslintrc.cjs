@@ -21,7 +21,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: ['*.{ts,tsx}'],
+			files: ['**/*.{ts,tsx}'],
 			extends: [
 				// Recommended typescript changes, which removes some "no-undef" checks that TS handles
 				'plugin:@typescript-eslint/eslint-recommended',

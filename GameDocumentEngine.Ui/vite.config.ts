@@ -9,7 +9,7 @@ export default defineConfig({
 	build: {
 		outDir: '../GameDocumentEngine.Server/wwwroot',
 		rollupOptions: {
-			input: ['./index.html', ...globSync('./src/documents/*/document.ts')],
+			input: ['./index.html', ...globSync('./src/documents/*/index.ts')],
 		},
 		manifest: true,
 	},
