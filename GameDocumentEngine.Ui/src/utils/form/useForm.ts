@@ -177,7 +177,7 @@ function buildFormResult<
 
 export function useForm<
 	T extends Objectish,
-	TFields extends FieldsConfig<T> = Record<never, never>,
+	const TFields extends FieldsConfig<T> = Record<never, never>,
 >(options: FormOptions<T, TFields>): UseFormResult<T, TFields> {
 	const store = useStore();
 	return useMemo(
