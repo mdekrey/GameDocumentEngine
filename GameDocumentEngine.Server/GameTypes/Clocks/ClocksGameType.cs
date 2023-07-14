@@ -1,5 +1,4 @@
 ﻿using GameDocumentEngine.Server.Documents;
-using GameDocumentEngine.Server.GameTypes.SharedObjects;
 
 namespace GameDocumentEngine.Server.GameTypes.Clocks;
 
@@ -7,7 +6,7 @@ public class ClocksGameType : IGameType
 {
 	private static readonly IReadOnlyList<IGameObjectType> objectTypes = new IGameObjectType[]
 	{
-		new ClockGameObject(),
+		new Documents.Types.Clock.ClockGameObject(),
 	};
 
 	public string Name => "Clocks";

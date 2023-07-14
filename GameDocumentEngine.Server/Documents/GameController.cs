@@ -9,10 +9,10 @@ namespace GameDocumentEngine.Server.Documents;
 
 public class GameController : Api.GameControllerBase
 {
-	private readonly IEnumerable<IGameType> gameTypes;
+	private readonly GameTypes gameTypes;
 	private readonly DocumentDbContext dbContext;
 
-	public GameController(IEnumerable<IGameType> gameTypes, Data.DocumentDbContext dbContext)
+	public GameController(GameTypes gameTypes, Data.DocumentDbContext dbContext)
 	{
 		this.gameTypes = gameTypes;
 		this.dbContext = dbContext;
@@ -20,7 +20,7 @@ public class GameController : Api.GameControllerBase
 
 	protected override async Task<CreateGameActionResult> CreateGame(CreateGameDetails createGameBody)
 	{
-		if (!ModelState.IsValid || !gameTypes.Any(gt => gt.Name == createGameBody.Type))
+		if (!ModelState.IsValid || !gameTypes.All.TryGetValue(createGameBody.Type, out _))
 			return CreateGameActionResult.BadRequest();
 
 		var user = await dbContext.GetCurrentUserOrThrow(User);

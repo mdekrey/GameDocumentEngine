@@ -55,6 +55,7 @@ services
 			};
 	});
 
+services.AddSingleton<GameTypes>();
 services.AddSingleton<IGameType, ClocksGameType>();
 
 services.AddAuthorization(options =>
