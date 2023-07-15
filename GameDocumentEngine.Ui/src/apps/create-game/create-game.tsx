@@ -1,7 +1,7 @@
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
-import { api, gameTypesQuery, gamesQuery } from '@/utils/api';
+import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { Field } from '@/utils/form/field/field';
@@ -16,20 +16,7 @@ import { ZodType, z } from 'zod';
 function useCreateGame() {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-	return useMutation({
-		mutationFn: async (game: CreateGameDetails) => {
-			const response = await api.createGame({ body: game });
-			if (response.statusCode === 200) return response.data;
-			else throw new Error('Could not save changes');
-		},
-		onSuccess: async (game) => {
-			await queryClient.invalidateQueries(gamesQuery.queryKey);
-			navigate(`/game/${game.id}`);
-			// TODO: invalidate game list
-			// queryClient.invalidateQueries();
-			// TODO: redirect to game landing page
-		},
-	});
+	return useMutation(queries.createGame(queryClient, navigate));
 }
 
 const CreateGameDetails = z.object({
@@ -49,7 +36,7 @@ const createGameForm = {
 export function CreateGame() {
 	const gameForm = useForm(createGameForm);
 
-	const gameTypesResult = useQuery(gameTypesQuery());
+	const gameTypesResult = useQuery(queries.listGameTypes());
 	const createGame = useCreateGame();
 
 	return (

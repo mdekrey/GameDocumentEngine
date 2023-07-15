@@ -1,4 +1,4 @@
-import { currentUserQuery } from '@/utils/api';
+import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
 import { useReducer } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 
 export function Header({ children }: { children?: React.ReactNode }) {
 	const navigate = useNavigate();
-	const { data } = useQuery({ ...currentUserQuery() });
-	if (data?.data?.isFirstTime) {
+	const userQuery = useQuery(queries.getCurrentUser);
+	if (userQuery.data?.isFirstTime) {
 		navigate('/profile');
 	}
 	const [isMobileNavOpen, toggleIsMobileNavOpen] = useReducer((v) => !v, false);
@@ -33,18 +33,22 @@ export function Header({ children }: { children?: React.ReactNode }) {
 			<nav className={twMerge(isMobileNavOpen ? 'block' : 'hidden md:block')}>
 				<hr className="my-3" />
 
-				<ul>
-					<li>Hello, {data?.data.name}!</li>
-					<li>
-						<a href="#/game">Select Game</a>
-					</li>
-					<li>
-						<a href="#/create-game">New Game</a>
-					</li>
-					<li>
-						<a href="#/profile">View Profile</a>
-					</li>
-				</ul>
+				{userQuery.isSuccess ? (
+					<ul>
+						<li>Hello, {userQuery.data?.name}!</li>
+						<li>
+							<a href="#/game">Select Game</a>
+						</li>
+						<li>
+							<a href="#/create-game">New Game</a>
+						</li>
+						<li>
+							<a href="#/profile">View Profile</a>
+						</li>
+					</ul>
+				) : (
+					<span>TODO Loading...</span>
+				)}
 
 				{children && (
 					<>

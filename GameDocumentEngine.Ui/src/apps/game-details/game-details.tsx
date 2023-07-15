@@ -1,6 +1,6 @@
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
-import { api, gameQuery, gamesQuery } from '@/utils/api';
+import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
@@ -10,20 +10,11 @@ import { useNavigate } from 'react-router-dom';
 
 function useDeleteGame() {
 	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async (id: string) => {
-			const response = await api.deleteGame({ params: { gameId: id } });
-			if (response.statusCode === 200) return response;
-			else throw new Error('Could not save changes');
-		},
-		onSuccess: async () => {
-			await queryClient.invalidateQueries(gamesQuery.queryKey);
-		},
-	});
+	return useMutation(queries.deleteGame(queryClient));
 }
 
 export function GameDetails({ gameId }: { gameId: string }) {
-	const gameResult = useQuery(gameQuery(gameId));
+	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const deleteGame = useDeleteGame();
 	const navigate = useNavigate();
 	const launchModal = useModal();
