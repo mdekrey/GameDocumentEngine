@@ -172,7 +172,26 @@ paths:
           description: Target game not found
         409:
           description: Game was updated while request was being processed; try again later.
-  /game/{gameId}/document/{typeId}:
+  /game/{gameId}/document:
+    get:
+      x-dotnet-mvc-server-controller: Document
+      operationId: listDocuments
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentSummary"
     post:
       x-dotnet-mvc-server-controller: Document
       operationId: createDocument
@@ -183,20 +202,19 @@ paths:
         in: path
         required: true
         schema: { type: string, format: guid }
-      - name: typeId
-        in: path
-        required: true
-        schema: { type: string }
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              format: any
+              $ref: "#/components/schemas/CreateDocumentDetails"
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentDetailsWithId"
         400:
           description: Could not parse request
           content:
@@ -205,7 +223,7 @@ paths:
                 type: string
         404:
           description: Game id not found
-  /game/{gameId}/document/{typeId}/{id}:
+  /game/{gameId}/document/{id}:
     get:
       x-dotnet-mvc-server-controller: Document
       operationId: getDocument
@@ -214,56 +232,38 @@ paths:
         in: path
         required: true
         schema: { type: string, format: guid }
-      - name: typeId
-        in: path
-        required: true
-        schema: { type: string }
       - name: id
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                format: any
+                $ref: "#/components/schemas/DocumentDetails"
         404:
           description: Not Found
-    put:
+    delete:
       x-dotnet-mvc-server-controller: Document
-      operationId: updateDocument
+      operationId: deleteDocument
+      security:
+        - AuthenticatedUser: []
       parameters:
       - name: gameId
         in: path
         required: true
         schema: { type: string, format: guid }
-      - name: typeId
-        in: path
-        required: true
-        schema: { type: string }
       - name: id
         in: path
         required: true
-        schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              format: any
+        schema: { type: string, format: guid }
       responses:
         200:
           description: Success
-        400:
-          description: Could not parse request
-          content:
-            application/json:
-              schema:
-                type: string
+        404:
+          description: Target document not found
     patch:
       x-dotnet-mvc-server-controller: Document
       operationId: patchDocument
@@ -272,29 +272,23 @@ paths:
         in: path
         required: true
         schema: { type: string, format: guid }
-      - name: typeId
-        in: path
-        required: true
-        schema: { type: string }
       - name: id
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: guid }
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              format: patch
+              $ref: "#/components/schemas/EditableDocumentDetails"
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                format: any
+                $ref: "#/components/schemas/DocumentDetails"
         400:
           description: There was a problem applying the patch
           content:
@@ -358,6 +352,60 @@ components:
       properties:
         id: { type: string, format: guid }
         name: { type: string }
+
+    BaseDocumentDetails:
+      type: object
+      required:
+      - name
+      - details
+      properties:
+        name: { type: string }
+        details: { type: object, format: any }
+    EditableDocumentDetails:
+      type: object
+      required:
+      - name
+      - details
+      properties:
+        name: { type: string }
+        details: { type: object, format: patch }
+    CreateDocumentDetails:
+      allOf:
+        - $ref: '#/components/schemas/BaseDocumentDetails'
+        - type: object
+          required:
+          - type
+          properties:
+            type: { type: string }
+    DocumentDetails:
+      allOf:
+        - $ref: '#/components/schemas/BaseDocumentDetails'
+        - type: object
+          required:
+          - lastUpdated
+          # TODO: show player permissions
+          properties:
+            lastUpdated: { type: string, format: date-time }
+    DocumentDetailsWithId:
+      allOf:
+        - $ref: '#/components/schemas/DocumentDetails'
+        - type: object
+          required:
+            - id
+          properties:
+            id: { type: string, format: guid }
+    DocumentSummary:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id: { type: string, format: guid }
+        name: { type: string }
+        type: { type: string }
+        # TODO: some way to provide a summary object
+
     CurrentUserDetails:
       allOf:
       - $ref: '#/components/schemas/UserDetails'

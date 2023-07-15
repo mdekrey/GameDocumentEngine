@@ -81,6 +81,7 @@ public class GameController : Api.GameControllerBase
 
 	protected override Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
 	{
+		// TODO
 		throw new NotImplementedException();
 	}
 }

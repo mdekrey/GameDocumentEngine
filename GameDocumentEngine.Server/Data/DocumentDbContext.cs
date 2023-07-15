@@ -11,6 +11,8 @@ public class DocumentDbContext : DbContext
 	public DbSet<Users.UserModel> Users { get; set; }
 	public DbSet<Documents.GameModel> Games { get; set; }
 	public DbSet<Documents.GameUserModel> GameUsers { get; set; }
+	public DbSet<Documents.DocumentModel> Documents { get; set; }
+	public DbSet<Documents.DocumentUserModel> DocumentUsers { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -33,6 +35,21 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(gu => new { gu.UserId, gu.GameId });
 			entity.HasIndex(gu => gu.GameId);
+		});
+
+		modelBuilder.Entity<Documents.DocumentModel>(entity =>
+		{
+			entity.HasKey(d => d.Id);
+			entity.HasIndex(d => new { d.GameId, d.Id });
+			entity.HasMany(du => du.Players).WithOne(u => u.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId });
+		});
+
+		modelBuilder.Entity<Documents.DocumentUserModel>(entity =>
+		{
+			entity.HasKey(du => new { du.UserId, du.DocumentId });
+			entity.HasIndex(d => new { d.DocumentId });
+			entity.HasOne(du => du.GameUser).WithMany().HasForeignKey(gu => new { gu.GameId, gu.DocumentId });
+			entity.HasOne(du => du.User).WithMany().HasForeignKey(du => du.UserId);
 		});
 	}
 }
