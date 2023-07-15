@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameDocumentEngine.Server",
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "GameDocumentEngine.Ui", "GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj", "{652B3025-46FB-44F1-89FC-2924749D4716}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDocumentEngine.Server.Tests", "GameDocumentEngine.Server.Tests\GameDocumentEngine.Server.Tests.csproj", "{9FEE6A72-6B3D-4145-88C1-889521E6DE58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{652B3025-46FB-44F1-89FC-2924749D4716}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{652B3025-46FB-44F1-89FC-2924749D4716}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{652B3025-46FB-44F1-89FC-2924749D4716}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FEE6A72-6B3D-4145-88C1-889521E6DE58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FEE6A72-6B3D-4145-88C1-889521E6DE58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FEE6A72-6B3D-4145-88C1-889521E6DE58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FEE6A72-6B3D-4145-88C1-889521E6DE58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
