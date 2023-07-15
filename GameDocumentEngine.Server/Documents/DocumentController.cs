@@ -2,6 +2,7 @@
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
+using Json.Schema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -69,7 +70,14 @@ public class DocumentController : Api.DocumentControllerBase
 			return CreateDocumentActionResult.BadRequest("Unknown document type for game");
 
 		var schema = await schemaResolver.GetOrLoadSchema(docType);
-		// TODO: validate body against schema
+		var results = schema.Evaluate(createDocumentBody, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
+		if (!results.IsValid)
+		{
+			return CreateDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', results.Errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
+		}
+
+		// TODO: save document
+
 		return CreateDocumentActionResult.Ok();
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Json.Schema;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace GameDocumentEngine.Server.Documents.Types;
 
@@ -12,17 +13,26 @@ public class JsonSchemaResolver
 		this.cache = cache;
 	}
 
-	public async Task<object> GetOrLoadSchema(IGameObjectType gameObjectType)
+	public async Task<JsonSchema> GetOrLoadSchema(IGameObjectType gameObjectType)
 	{
-		var resourceName = gameObjectType.SchemaManifestResourceName();
-		using var resourceStream = gameObjectType.GetType().Assembly.GetManifestResourceStream(resourceName);
-		if (resourceStream == null)
+		var key = new SchemaCacheKey(gameObjectType.Name);
+		return await cache.GetOrCreateAsync<JsonSchema>(key, async (entry) =>
 		{
-			throw new NotImplementedException("The schema file is not embedded in the GameObjectType's assembly");
-		}
-		using var textReader = new StreamReader(resourceStream);
-		var schemaText = await textReader.ReadToEndAsync();
+			var resourceName = gameObjectType.SchemaManifestResourceName();
+			using var resourceStream = gameObjectType.GetType().Assembly.GetManifestResourceStream(resourceName);
+			if (resourceStream == null)
+			{
+				throw new NotImplementedException("The schema file is not embedded in the GameObjectType's assembly");
+			}
+			using var textReader = new StreamReader(resourceStream);
+			var schemaText = await textReader.ReadToEndAsync();
+			var schema = JsonSchema.FromText(schemaText);
+			if (schema == null)
+			{
+				throw new InvalidOperationException("Could not parse schema");
+			}
 
-		return new SchemaCacheKey(gameObjectType.Name);
+			return schema;
+		}) ?? throw new InvalidOperationException("Unable to load schema from cache");
 	}
 }
