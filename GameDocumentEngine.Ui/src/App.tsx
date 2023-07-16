@@ -8,18 +8,24 @@ import { GameObjects } from './apps/game-details/game-objects';
 import { GameDetails } from './apps/game-details/game-details';
 import { GetParams } from './utils/routing/getParams';
 import { CreateDocument } from './apps/documents/create-document/create-document';
+import { DocumentDetails } from './apps/documents/details/doc-details';
 
-function withGameId<T extends { gameId: string }>(
-	Component: React.ComponentType<T>,
-): React.ComponentType<Omit<T, 'gameId'>> {
-	return (props: Omit<T, 'gameId'>) => (
-		<GetParams>
-			{({ gameId }: { gameId: string }) => (
-				<Component {...({ ...props, gameId } as T)} />
-			)}
-		</GetParams>
-	);
+function withParamsValue<const T extends string>(prop: T) {
+	return <TProps extends { [P in T]: string }>(
+		Component: React.ComponentType<TProps>,
+	): React.ComponentType<Omit<TProps, T>> => {
+		return (props: Omit<TProps, T>) => (
+			<GetParams>
+				{(params: { [P in T]: string }) => (
+					<Component {...({ ...props, [prop]: params[prop] } as TProps)} />
+				)}
+			</GetParams>
+		);
+	};
 }
+
+const withGameId = withParamsValue('gameId');
+const withDocumentId = withParamsValue('documentId');
 
 function App() {
 	return (
@@ -36,6 +42,10 @@ function App() {
 					<Route
 						path="game/:gameId/create-document"
 						Component={withGameId(CreateDocument)}
+					/>
+					<Route
+						path="game/:gameId/document/:documentId"
+						Component={withDocumentId(withGameId(DocumentDetails))}
 					/>
 					<Route path="game/" Component={ListGames} />
 					<Route path="create-game/" Component={CreateGame} />

@@ -2,7 +2,7 @@ import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
 import { HiPlus } from 'react-icons/hi';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
@@ -26,7 +26,9 @@ export function GameObjects({ gameId }: { gameId: string }) {
 			<ul>
 				{docsResult.data.map((s) => (
 					<li key={s.id}>
-						{s.type} - {s.name}
+						<Link to={`/game/${gameId}/document/${s.id}`}>
+							{s.type} - {s.name}
+						</Link>
 					</li>
 				))}
 			</ul>
