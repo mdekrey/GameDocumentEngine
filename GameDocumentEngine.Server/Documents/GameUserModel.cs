@@ -15,6 +15,8 @@ public class GameUserModel : IAuditable
 
 	// TODO: some kind of permissioning here
 
+	public ICollection<DocumentUserModel> Documents { get; private set; } = new List<DocumentUserModel>();
+
 
 	public DateTimeOffset CreatedDate { get; private set; }
 	public string? CreatedBy { get; private set; }

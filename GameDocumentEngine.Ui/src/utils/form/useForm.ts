@@ -107,7 +107,7 @@ export type UseFormResult<
 	): UseFormResult<PathValue<T, TPath>>;
 	handleSubmit(
 		this: void,
-		callback: (value: T) => void,
+		callback: (value: T) => void | Promise<void>,
 	): React.ReactEventHandler;
 	errorStrategy: RegisterErrorStrategy;
 };
@@ -169,7 +169,7 @@ function buildFormResult<
 				// TODO: trigger display of errors
 				return;
 			}
-			callback(errorsResult.data);
+			await callback(errorsResult.data);
 		},
 		errorStrategy,
 	};

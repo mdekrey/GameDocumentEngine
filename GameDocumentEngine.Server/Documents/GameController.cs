@@ -32,15 +32,25 @@ public class GameController : Api.GameControllerBase
 		};
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
-		return CreateGameActionResult.Ok(ToGameDetails(game));
+		return CreateGameActionResult.Ok(await ToGameDetails(game));
 	}
 
-	private GameDetailsWithId ToGameDetails(GameModel game) =>
-		new GameDetailsWithId(game.Name,
-			game.LastModifiedDate,
-			game.Players.Select(p => p.User.Name),
-			"TODO",
-			game.Id);
+	private async Task<GameDetailsWithId> ToGameDetails(GameModel game) =>
+		new GameDetailsWithId(Name: game.Name,
+			LastUpdated: game.LastModifiedDate,
+			Players: game.Players.Select(p => p.User.Name),
+			InviteUrl: "TODO",
+			Id: game.Id,
+			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType) ? await ToGameTypeDetails(gameType, gameTypes) : throw new NotSupportedException("Unknown game type")
+		);
+
+	public static async Task<GameTypeDetails> ToGameTypeDetails(IGameType gameType, GameTypes gameTypes)
+	{
+		return new GameTypeDetails(
+			Name: gameType.Name,
+			ObjectTypes: await Task.WhenAll(gameType.ObjectTypes.Select(async obj => new GameObjectTypeDetails(Name: obj.Name, Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameObjectType => gameTypes.ResolveGameObjectScripts(gameObjectType)))).SelectMany(a => a).Distinct())))
+		);
+	}
 
 	protected override async Task<ListGamesActionResult> ListGames()
 	{
@@ -71,12 +81,7 @@ public class GameController : Api.GameControllerBase
 			.SingleOrDefaultAsync();
 		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
 
-		return GetGameDetailsActionResult.Ok(new GameDetails(
-			Name: gameRecord.Name,
-			LastUpdated: gameRecord.LastModifiedDate,
-			gameRecord.Players.Select(p => p.User.Name),
-			"TODO"
-		));
+		return GetGameDetailsActionResult.Ok(await ToGameDetails(gameRecord));
 	}
 
 	protected override Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)

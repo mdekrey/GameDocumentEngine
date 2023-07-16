@@ -59,6 +59,7 @@ services
 services.AddMemoryCache();
 services.AddTransient<JsonSchemaResolver>();
 services.AddSingleton<GameTypes>();
+services.AddSingleton<GameObjectManifestManager>();
 services.AddSingleton<IGameType, ClocksGameType>();
 
 services.AddAuthorization(options =>

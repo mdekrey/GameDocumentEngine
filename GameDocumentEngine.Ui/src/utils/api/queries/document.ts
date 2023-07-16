@@ -8,7 +8,7 @@ export const listDocuments = (gameId: string) => ({
 	queryKey: ['game', gameId, 'document'],
 	queryFn: async () => {
 		// TODO: this is currently not paginated, but neither is the server-side.
-		const response = await api.listGames();
+		const response = await api.listDocuments({ params: { gameId } });
 		if (response.statusCode !== 200) return Promise.reject(response);
 		return response.data;
 	},
@@ -25,14 +25,15 @@ export const getDocument = (gameId: string, documentId: string) => {
 export function createDocument(
 	queryClient: QueryClient,
 	navigate: NavigateFunction,
+	gameId: string,
 ): UseMutationOptions<
 	DocumentDetailsWithId,
 	unknown,
-	{ gameId: string; document: CreateDocumentDetails },
+	{ document: CreateDocumentDetails },
 	unknown
 > {
 	return {
-		mutationFn: async ({ gameId, document }) => {
+		mutationFn: async ({ document }) => {
 			const response = await api.createDocument({
 				params: { gameId },
 				body: document,
@@ -40,7 +41,7 @@ export function createDocument(
 			if (response.statusCode === 200) return response.data;
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: async ({ id }, { gameId }) => {
+		onSuccess: async ({ id }) => {
 			await queryClient.invalidateQueries(listDocuments(gameId).queryKey);
 			navigate(`/game/${gameId}/document/${id}`);
 			// TODO: invalidate game list

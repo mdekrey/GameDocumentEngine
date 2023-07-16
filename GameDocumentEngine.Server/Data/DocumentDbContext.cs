@@ -36,6 +36,7 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(gu => new { gu.UserId, gu.GameId });
 			entity.HasIndex(gu => gu.GameId);
+			entity.HasMany(gu => gu.Documents).WithOne(du => du.GameUser).HasForeignKey(du => new { du.UserId, du.GameId }).HasPrincipalKey(gu => new { gu.UserId, gu.GameId });
 		});
 
 		modelBuilder.Entity<Documents.DocumentModel>(entity =>
@@ -51,7 +52,6 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(du => new { du.UserId, du.DocumentId });
 			entity.HasIndex(d => new { d.DocumentId });
-			entity.HasOne(du => du.GameUser).WithMany().HasForeignKey(gu => new { gu.GameId, gu.DocumentId });
 		});
 	}
 }

@@ -1,10 +1,18 @@
+export type IGameObjectType = {
+	template: Record<string, unknown>;
+	component: React.ComponentType;
+};
+
 declare global {
 	interface Window {
-		widgets: Record<string, unknown>;
+		widgets: Record<string, IGameObjectType>;
 	}
 }
 
-export function defineDocument(name: string, component: React.ComponentType) {
+export function defineDocument(
+	name: string,
+	objectTypeDefinition: IGameObjectType,
+) {
 	window.widgets ??= {};
-	window.widgets[name] = component;
+	window.widgets[name] = objectTypeDefinition;
 }

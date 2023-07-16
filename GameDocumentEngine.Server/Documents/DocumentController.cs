@@ -52,7 +52,7 @@ public class DocumentController : Api.DocumentControllerBase
 			Details = createDocumentBody.Details,
 			Name = createDocumentBody.Name,
 			Type = createDocumentBody.Type,
-			Players = { new DocumentUserModel { User = gameUserRecord.User } },
+			Players = { new DocumentUserModel { GameId = gameUserRecord.GameId, User = gameUserRecord.User } },
 		};
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();

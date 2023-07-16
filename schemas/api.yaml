@@ -120,7 +120,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameDetails"
+                $ref: "#/components/schemas/GameDetailsWithId"
         404:
           description: Target game not found
     delete:
@@ -161,7 +161,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameDetails"
+                $ref: "#/components/schemas/GameDetailsWithId"
         400:
           description: There was a problem applying the patch
           content:
@@ -329,6 +329,7 @@ components:
           - lastUpdated
           - players
           - inviteUrl
+          - typeInfo
           properties:
             lastUpdated: { type: string, format: date-time }
             players:
@@ -336,6 +337,8 @@ components:
               items:
                 type: string
             inviteUrl: { type: string }
+            typeInfo:
+              $ref: '#/components/schemas/GameTypeDetails'
     GameDetailsWithId:
       allOf:
         - $ref: '#/components/schemas/GameDetails'
@@ -432,6 +435,25 @@ components:
         name: { type: string }
         description: { type: string }
         objectTypes: { type: array, items: { type: string } }
+    GameTypeDetails:
+      type: object
+      required:
+        - name
+        - objectTypes
+      properties:
+        name: { type: string }
+        objectTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/GameObjectTypeDetails'
+    GameObjectTypeDetails:
+      type: object
+      required:
+        - name
+        - scripts
+      properties:
+        name: { type: string }
+        scripts: { type: array, items: { type: string } }
   responses:
     "401":
       description: User was not authenticated
