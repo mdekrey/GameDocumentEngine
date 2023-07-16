@@ -11,9 +11,7 @@ export function getGameType(
 		queryKey: ['gameType', gameType],
 		queryFn: async () => {
 			const response = await api.getGameType({ params: { gameType } });
-			if (response.statusCode !== 200) {
-				throw response;
-			}
+			if (response.statusCode !== 200) return Promise.reject(response);
 			return response.data;
 		},
 	};

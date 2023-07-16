@@ -9,9 +9,7 @@ export const listGameTypes = () => ({
 	queryFn: async () => {
 		const response = await api.listGameTypes();
 		if (response.statusCode !== 200) {
-			// return Promise.reject(response);
-			console.error(response);
-			return [];
+			return Promise.reject(response);
 		}
 		return response.data;
 	},
@@ -40,9 +38,6 @@ export function createGame(
 		onSuccess: async (game) => {
 			await queryClient.invalidateQueries(listGames.queryKey);
 			navigate(`/game/${game.id}`);
-			// TODO: invalidate game list
-			// queryClient.invalidateQueries();
-			// TODO: redirect to game landing page
 		},
 	};
 }
@@ -52,6 +47,7 @@ export const getGameDetails = (gameId: string) => ({
 	queryFn: async () => {
 		const response = await api.getGameDetails({ params: { gameId } });
 		if (response.statusCode !== 200) return Promise.reject(response);
+		// TODO: use details here of game type and store in game-types cache
 		return response.data;
 	},
 });

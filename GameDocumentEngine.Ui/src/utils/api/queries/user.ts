@@ -7,8 +7,8 @@ export const getCurrentUser = {
 	queryKey: ['currentUser'],
 	queryFn: async () => {
 		const response = await api.getCurrentUser();
-		if (response.statusCode === 200) return response.data;
-		throw response;
+		if (response.statusCode !== 200) return Promise.reject(response);
+		return response.data;
 	},
 };
 
