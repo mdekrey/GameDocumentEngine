@@ -89,4 +89,11 @@ public class GameController : Api.GameControllerBase
 		// TODO
 		throw new NotImplementedException();
 	}
+
+	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
+	{
+		return gameTypes.All.TryGetValue(gameType, out var r)
+			? GetGameTypeActionResult.Ok(await ToGameTypeDetails(r, gameTypes))
+			: GetGameTypeActionResult.NotFound();
+	}
 }

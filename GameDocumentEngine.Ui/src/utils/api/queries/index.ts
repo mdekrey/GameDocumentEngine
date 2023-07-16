@@ -14,6 +14,7 @@ import {
 	deleteDocument,
 	patchDocument,
 } from './document';
+import { getGameType } from './game-types';
 
 export const queries = {
 	getCurrentUser,
@@ -25,6 +26,7 @@ export const queries = {
 	getGameDetails,
 	deleteGame,
 	patchGame: null,
+	getGameType,
 	listDocuments,
 	createDocument,
 	getDocument,

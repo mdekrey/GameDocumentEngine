@@ -103,6 +103,26 @@ paths:
                 $ref: "#/components/schemas/GameDetailsWithId"
         400:
           description: There was a validation issue creating the game.
+  /game-type/{gameType}:
+    get:
+      x-dotnet-mvc-server-controller: Game
+      operationId: getGameType
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameType
+        in: path
+        required: true
+        schema: { type: string }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameTypeDetails"
+        404:
+          description: Target game type not found
   /game/{gameId}:
     get:
       x-dotnet-mvc-server-controller: Game
