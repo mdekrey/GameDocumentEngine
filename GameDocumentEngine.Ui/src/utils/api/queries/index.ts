@@ -7,7 +7,13 @@ import {
 	listGameTypes,
 	listGames,
 } from './games';
-import { getDocument } from './document';
+import {
+	getDocument,
+	listDocuments,
+	createDocument,
+	deleteDocument,
+	patchDocument,
+} from './document';
 
 export const queries = {
 	getCurrentUser,
@@ -19,9 +25,9 @@ export const queries = {
 	getGameDetails,
 	deleteGame,
 	patchGame: null,
-	listDocuments: null,
-	createDocument: null,
+	listDocuments,
+	createDocument,
 	getDocument,
-	deleteDocument: null,
-	patchDocument: null,
+	deleteDocument,
+	patchDocument,
 } satisfies { [K in keyof typeof operations]: unknown };

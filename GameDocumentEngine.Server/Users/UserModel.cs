@@ -11,4 +11,5 @@ public class UserModel
 	public string GoogleNameId { get; set; }
 	public string EmailAddress { get; set; }
 	public ICollection<Documents.GameUserModel> Games { get; } = new List<Documents.GameUserModel>();
+	public ICollection<Documents.DocumentUserModel> Documents { get; } = new List<Documents.DocumentUserModel>();
 }
