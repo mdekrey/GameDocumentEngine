@@ -4,14 +4,9 @@ import { useReducer } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import { HiOutlineDocumentText, HiMenu } from 'react-icons/hi';
-import { useNavigate } from 'react-router-dom';
 
 export function Header({ children }: { children?: React.ReactNode }) {
-	const navigate = useNavigate();
 	const userQuery = useQuery(queries.getCurrentUser);
-	if (userQuery.data?.isFirstTime) {
-		navigate('/profile');
-	}
 	const [isMobileNavOpen, toggleIsMobileNavOpen] = useReducer((v) => !v, false);
 
 	return (

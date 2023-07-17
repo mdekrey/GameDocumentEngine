@@ -14,7 +14,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CurrentUserDetails"
+                $ref: "#/components/schemas/UserDetails"
+        404:
+          description: User not found
     patch:
       operationId: patchUser
       security:
@@ -418,20 +420,13 @@ components:
         type: { type: string }
         # TODO: some way to provide a summary object
 
-    CurrentUserDetails:
-      allOf:
-      - $ref: '#/components/schemas/UserDetails'
-      - type: object
-        required:
-          - isFirstTime
-        properties:
-          # TODO: There should be a better way
-          isFirstTime: { type: boolean }
     UserDetails:
       type: object
       required:
+        - id
         - name
       properties:
+        id: { type: string, format: guid }
         name: { type: string }
 
     GameTypeSummary:

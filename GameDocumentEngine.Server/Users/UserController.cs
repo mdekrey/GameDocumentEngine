@@ -18,20 +18,12 @@ public class UserController : Api.UserControllerBase
 	protected override async Task<GetCurrentUserActionResult> GetCurrentUser()
 	{
 		var user = await dbContext.GetCurrentUser(User);
-		var isFirstTime = user == null;
 		if (user == null)
 		{
-			user = new UserModel
-			{
-				GoogleNameId = User.GetGoogleNameIdOrThrow(),
-				EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? throw new InvalidOperationException("No email - is this a google user?"),
-				Name = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? throw new InvalidOperationException("No name - is this a google user?"),
-			};
-			dbContext.Users.Add(user);
-			await dbContext.SaveChangesAsync();
+			return GetCurrentUserActionResult.NotFound();
 		}
 
-		return GetCurrentUserActionResult.Ok(new Api.CurrentUserDetails(user.Name, isFirstTime));
+		return GetCurrentUserActionResult.Ok(ToUserDetails(user));
 	}
 
 	protected override async Task<PatchUserActionResult> PatchUser(JsonPatch patchUserBody)
@@ -45,10 +37,11 @@ public class UserController : Api.UserControllerBase
 		user.Name = updated.Name;
 		await dbContext.SaveChangesAsync();
 
-		return PatchUserActionResult.Ok(new Api.UserDetails(user.Name));
+		return PatchUserActionResult.Ok(ToUserDetails(user));
 	}
 
-	private Api.UserDetails ToUserDetails(UserModel current) => new Api.UserDetails(
-		Name: current.Name
+	private Api.UserDetails ToUserDetails(UserModel user) => new Api.UserDetails(
+		Id: user.Id,
+		Name: user.Name
 	);
 }

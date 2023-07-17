@@ -9,11 +9,15 @@ public static class UserExtensions
 		user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
 			?? throw new InvalidOperationException("No name identifier - is this a google user?");
 
+	public static Guid? GetCurrentUserId(this ClaimsPrincipal user)
+	{
+		var id = user.FindFirstValue(ClaimTypes.UserData);
+		return Guid.TryParse(id, out var userId) ? userId : null;
+	}
+
 	public static async Task<UserModel?> GetCurrentUser(this Data.DocumentDbContext dbContext, ClaimsPrincipal user)
 	{
-		var id = user.GetGoogleNameIdOrThrow();
-
-		return await dbContext.Users.FirstOrDefaultAsync(user => user.GoogleNameId == id);
+		return GetCurrentUserId(user) is Guid userId ? await dbContext.Users.FindAsync(userId) : null;
 	}
 
 	public static async Task<UserModel> GetCurrentUserOrThrow(this Data.DocumentDbContext dbContext, ClaimsPrincipal user) =>

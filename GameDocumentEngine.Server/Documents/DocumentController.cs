@@ -26,7 +26,7 @@ public class DocumentController : Api.DocumentControllerBase
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
 	{
 		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).Include(gu => gu.User)
-									where gameUser.GameId == gameId && gameUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
+									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser)
 			.SingleOrDefaultAsync();
 		if (gameUserRecord == null) return CreateDocumentActionResult.NotFound();
@@ -64,7 +64,7 @@ public class DocumentController : Api.DocumentControllerBase
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
 	{
 		var games = await (from gameUser in dbContext.DocumentUsers
-						   where gameUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
+						   where gameUser.UserId == User.GetCurrentUserId()
 						   select new DocumentSummary(gameUser.Document.Id, gameUser.Document.Name, gameUser.Document.Type)).ToArrayAsync();
 		return ListDocumentsActionResult.Ok(games);
 	}
@@ -73,7 +73,7 @@ public class DocumentController : Api.DocumentControllerBase
 	{
 		var gameUserRecord = await (from documentUser in dbContext.DocumentUsers
 										.Include(du => du.GameUser).Include(du => du.Document).Include(du => du.User)
-									where documentUser.DocumentId == id && documentUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
+									where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
 									select documentUser)
 			.SingleOrDefaultAsync();
 		if (gameUserRecord == null) return DeleteDocumentActionResult.NotFound();
@@ -87,7 +87,7 @@ public class DocumentController : Api.DocumentControllerBase
 	protected override async Task<GetDocumentActionResult> GetDocument(Guid gameId, Guid id)
 	{
 		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers.Include(du => du.GameUser).Include(du => du.Document)
-										where documentUser.DocumentId == id && documentUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow() && documentUser.GameId == gameId
+										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId() && documentUser.GameId == gameId
 										select documentUser)
 			.SingleOrDefaultAsync();
 		if (documentUserRecord == null) return GetDocumentActionResult.NotFound();
@@ -101,7 +101,7 @@ public class DocumentController : Api.DocumentControllerBase
 		if (!ModelState.IsValid) return PatchDocumentActionResult.BadRequest("Unable to parse JSON Patch");
 
 		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers.Include(du => du.GameUser).ThenInclude(gu => gu.Game).Include(du => du.Document)
-										where documentUser.DocumentId == id && documentUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow() && documentUser.GameId == gameId
+										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId() && documentUser.GameId == gameId
 										select documentUser)
 			.SingleOrDefaultAsync();
 		if (documentUserRecord == null) return PatchDocumentActionResult.NotFound();

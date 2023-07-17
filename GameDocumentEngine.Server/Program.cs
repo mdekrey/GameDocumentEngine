@@ -3,9 +3,11 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.GameTypes.Clocks;
+using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,7 @@ var services = builder.Services;
 services.AddHealthChecks();
 services.AddControllers();
 services.AddCompressedStaticFiles();
+services.AddSignalR();
 
 services
 	.AddAuthentication(options =>
@@ -52,6 +55,25 @@ services
 		googleOptions.Events.
 			OnCreatingTicket = async context =>
 			{
+				if (context.Principal == null) return; // Shouldn't happen
+				var db = context.HttpContext.RequestServices.GetRequiredService<DocumentDbContext>();
+				var googleNameId = context.Principal.GetGoogleNameIdOrThrow();
+				var user = await db.Users.FirstOrDefaultAsync(u => u.GoogleNameId == googleNameId);
+				if (user == null)
+				{
+					user = new UserModel
+					{
+						GoogleNameId = googleNameId,
+						EmailAddress = context.Principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? throw new InvalidOperationException("No email - is this a google user?"),
+						Name = context.Principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? throw new InvalidOperationException("No name - is this a google user?"),
+					};
+					db.Users.Add(user);
+					await db.SaveChangesAsync();
+				}
+
+				var identity = new ClaimsIdentity(context.Principal.Identity);
+				identity.AddClaim(new Claim(ClaimTypes.UserData, user.Id.ToString()));
+				context.Principal = new ClaimsPrincipal(identity);
 				await originalOnCreatingTicket(context);
 			};
 	});
@@ -103,6 +125,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<GameDocumentsHub>("/hub");
 
 using (var scope = app.Services.CreateScope())
 {

@@ -21,6 +21,7 @@
 		"generate-zod": "ts-node --esm --project tsconfig.node.json scripts/schemas-to-zod"
 	},
 	"dependencies": {
+		"@microsoft/signalr": "^7.0.9",
 		"@principlestudios/openapi-codegen-typescript": "^0.6.2",
 		"@principlestudios/openapi-codegen-typescript-fetch": "^0.6.1",
 		"@tanstack/react-query": "^4.29.19",

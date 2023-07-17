@@ -55,7 +55,7 @@ public class GameController : Api.GameControllerBase
 	protected override async Task<ListGamesActionResult> ListGames()
 	{
 		var games = await (from gameUser in dbContext.GameUsers
-						   where gameUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
+						   where gameUser.UserId == User.GetCurrentUserId()
 						   select gameUser.Game).ToArrayAsync();
 		return ListGamesActionResult.Ok(games.Select(g => new GameSummary(g.Id, g.Name)));
 	}
@@ -63,7 +63,7 @@ public class GameController : Api.GameControllerBase
 	protected override async Task<DeleteGameActionResult> DeleteGame(Guid gameId)
 	{
 		var gameRecord = await (from gameUser in dbContext.GameUsers
-								where gameUser.GameId == gameId && gameUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
+								where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 								select gameUser.Game).SingleOrDefaultAsync();
 		if (gameRecord == null) return DeleteGameActionResult.NotFound();
 		// TODO - check permissions
@@ -76,7 +76,7 @@ public class GameController : Api.GameControllerBase
 	protected override async Task<GetGameDetailsActionResult> GetGameDetails(Guid gameId)
 	{
 		var gameRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).ThenInclude(g => g.Players).ThenInclude(gu => gu.User)
-								where gameUser.GameId == gameId && gameUser.User.GoogleNameId == User.GetGoogleNameIdOrThrow()
+								where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 								select gameUser.Game)
 			.SingleOrDefaultAsync();
 		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
