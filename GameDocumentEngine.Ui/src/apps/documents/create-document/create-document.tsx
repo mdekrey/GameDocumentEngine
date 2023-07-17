@@ -2,10 +2,6 @@ import { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
-import {
-	GameTypeScripts,
-	getGameTypeScripts,
-} from '@/utils/api/queries/game-types';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { Field } from '@/utils/form/field/field';
@@ -13,23 +9,10 @@ import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { SelectInput } from '@/utils/form/select-input/select-input';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm, FormOptions } from '@/utils/form/useForm';
-import {
-	UseQueryResult,
-	useMutation,
-	useQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ZodType, z } from 'zod';
-
-function useGameType(gameId: string): UseQueryResult<GameTypeScripts, unknown> {
-	const queryClient = useQueryClient();
-	const game = useQuery(queries.getGameDetails(gameId));
-	return useQuery({
-		...getGameTypeScripts(game.data?.typeInfo.name ?? 'none', queryClient),
-		enabled: game.isSuccess,
-	});
-}
+import { useGameType } from '../useGameType';
 
 function useCreateDocument(gameId: string) {
 	const queryClient = useQueryClient();

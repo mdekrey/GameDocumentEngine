@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DocumentDetailsWithId"
+                $ref: "#/components/schemas/DocumentDetails"
         400:
           description: Could not parse request
           content:
@@ -300,8 +300,7 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/EditableDocumentDetails"
+            schema: { type: object, format: patch }
       responses:
         200:
           description: Success
@@ -379,27 +378,25 @@ components:
     BaseDocumentDetails:
       type: object
       required:
+      - id
       - name
+      - type
       - details
       properties:
+        id: { type: string, format: guid }
         name: { type: string }
+        type: { type: string }
         details: { type: object, format: any }
-    EditableDocumentDetails:
+    CreateDocumentDetails:
       type: object
       required:
       - name
+      - type
       - details
       properties:
         name: { type: string }
-        details: { type: object, format: patch }
-    CreateDocumentDetails:
-      allOf:
-        - $ref: '#/components/schemas/BaseDocumentDetails'
-        - type: object
-          required:
-          - type
-          properties:
-            type: { type: string }
+        type: { type: string }
+        details: { type: object, format: any }
     DocumentDetails:
       allOf:
         - $ref: '#/components/schemas/BaseDocumentDetails'
@@ -409,14 +406,6 @@ components:
           # TODO: show player permissions
           properties:
             lastUpdated: { type: string, format: date-time }
-    DocumentDetailsWithId:
-      allOf:
-        - $ref: '#/components/schemas/DocumentDetails'
-        - type: object
-          required:
-            - id
-          properties:
-            id: { type: string, format: guid }
     DocumentSummary:
       type: object
       required:

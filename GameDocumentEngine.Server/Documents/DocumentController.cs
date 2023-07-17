@@ -3,8 +3,10 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Users;
+using Json.Patch;
 using Json.Schema;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Controllers;
 
@@ -57,12 +59,7 @@ public class DocumentController : Api.DocumentControllerBase
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();
 
-		return CreateDocumentActionResult.Ok(new DocumentDetailsWithId(
-			Id: document.Id,
-			Details: createDocumentBody.Details,
-			Name: document.Name,
-			LastUpdated: document.LastModifiedDate
-		));
+		return CreateDocumentActionResult.Ok(ToDocumentDetails(document));
 	}
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
@@ -100,7 +97,7 @@ public class DocumentController : Api.DocumentControllerBase
 		return GetDocumentActionResult.Ok(ToDocumentDetails(documentUserRecord.Document));
 	}
 
-	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, EditableDocumentDetails patchDocumentBody)
+	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, JsonPatch patchDocumentBody)
 	{
 		if (!ModelState.IsValid) return PatchDocumentActionResult.BadRequest("Unable to parse JSON Patch");
 
@@ -110,12 +107,20 @@ public class DocumentController : Api.DocumentControllerBase
 			.SingleOrDefaultAsync();
 		if (documentUserRecord == null) return PatchDocumentActionResult.NotFound();
 
-		var result = patchDocumentBody.Details.Apply(documentUserRecord.Document.Details);
+		var editable = new JsonObject(
+			new[]
+			{
+				KeyValuePair.Create<string, JsonNode?>("name", documentUserRecord.Document.Name),
+				KeyValuePair.Create<string, JsonNode?>("details", documentUserRecord.Document.Details),
+			}
+		);
+		var result = patchDocumentBody.Apply(editable);
 		if (!result.IsSuccess)
 			return PatchDocumentActionResult.BadRequest(result.Error ?? "Unknown error");
 		// TODO: check permissions
 
-		documentUserRecord.Document.Details = result.Result ?? documentUserRecord.Document.Details;
+		documentUserRecord.Document.Name = result.Result?["name"]?.GetValue<string?>() ?? documentUserRecord.Document.Name;
+		documentUserRecord.Document.Details = result.Result?["details"] ?? documentUserRecord.Document.Details;
 
 		var gameType = allGameTypes.All.TryGetValue(documentUserRecord.GameUser.Game.Type, out var resultGameType) ? resultGameType : throw new NotSupportedException($"Unknown game type: {documentUserRecord.GameUser.Game.Type}");
 		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == documentUserRecord.Document.Type);
@@ -141,7 +146,9 @@ public class DocumentController : Api.DocumentControllerBase
 	{
 		// TODO: trim document based on permissions?
 		return new DocumentDetails(
+					Id: document.Id,
 					Name: document.Name,
+					Type: document.Type,
 					Details: document.Details,
 					LastUpdated: document.LastModifiedDate
 				);
