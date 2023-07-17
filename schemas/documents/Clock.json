@@ -1,15 +1,18 @@
 {
+	"$schema": "http://json-schema.org/draft-04/schema",
 	"title": "Clock",
 	"type": "object",
 	"required": ["current", "max"],
 	"properties": {
 		"current": {
 			"type": "integer",
-			"description": "The current value of the clock."
+			"description": "The current value of the clock.",
+			"minimum": 0
 		},
 		"max": {
 			"type": "integer",
-			"description": "The maximum value of the clock."
+			"description": "The maximum value of the clock.",
+			"minimum": 1
 		}
 	}
 }

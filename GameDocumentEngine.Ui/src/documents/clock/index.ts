@@ -1,5 +1,5 @@
 import { defineDocument } from '../defineDocument';
-import { Clock } from './widget';
+import { Clock } from './clock-widget';
 import clockSchema from './schema';
 import { z } from 'zod';
 

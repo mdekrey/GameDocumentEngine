@@ -71,7 +71,5 @@ export function DocumentDetails({
 		>(docData, (draft) => void recipe(draft))[1];
 
 		updateDocument.mutate(patches.map(immerPatchToStandard));
-
-		console.log({ patches });
 	}
 }
