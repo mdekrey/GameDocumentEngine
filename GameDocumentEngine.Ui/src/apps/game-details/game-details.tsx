@@ -2,11 +2,11 @@ import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
-import { ModalAlertLayout } from '@/utils/modal/alert-layout';
-import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
+import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiOutlineTrash } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
+import { DeleteGameModal } from './delete-game-modal';
 
 function useDeleteGame() {
 	const queryClient = useQueryClient();
@@ -50,28 +50,4 @@ export function GameDetails({ gameId }: { gameId: string }) {
 			navigate('..');
 		}
 	}
-}
-
-function DeleteGameModal({
-	resolve,
-	reject,
-	additional: { name },
-}: ModalContentsProps<boolean, { name: string }>) {
-	return (
-		<ModalAlertLayout>
-			<ModalAlertLayout.Title>Delete game</ModalAlertLayout.Title>
-			<p className="text-sm text-gray-500">
-				Are you sure you want to delete the game called "{name}"? All of your
-				game data will be permanently removed. This action cannot be undone.
-			</p>
-			<ModalAlertLayout.Buttons>
-				<Button.Destructive onClick={() => resolve(true)}>
-					Delete
-				</Button.Destructive>
-				<Button.Secondary onClick={() => reject('Cancel')}>
-					Cancel
-				</Button.Secondary>
-			</ModalAlertLayout.Buttons>
-		</ModalAlertLayout>
-	);
 }

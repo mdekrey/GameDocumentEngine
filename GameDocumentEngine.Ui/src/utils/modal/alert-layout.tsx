@@ -28,7 +28,9 @@ export const ModalAlertLayout = withSlots<
 						<h3 className="text-base font-semibold leading-6 text-gray-900">
 							{slotProps.Title?.children}
 						</h3>
-						<div className="mt-2">{children}</div>
+						<div className="flex flex-col items-stretch gap-2 mt-2">
+							{children}
+						</div>
 					</div>
 				</div>
 			</div>
