@@ -47,7 +47,6 @@ public class DocumentController : Api.DocumentControllerBase
 			return CreateDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
 		}
 
-		// TODO: save document
 		var document = new DocumentModel
 		{
 			GameId = gameId,
