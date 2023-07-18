@@ -43,8 +43,7 @@ public class UserController : Api.UserControllerBase
 		user.Name = updated.Name;
 		await dbContext.SaveChangesAsync();
 
-		messageIdProvider.Defer(() => hubContext.Clients.SendUserUpdated(messageIdProvider, user.Id));
-
+		messageIdProvider.Defer((messageId) => hubContext.Clients.SendUserUpdated(messageId, user.Id));
 
 		return PatchUserActionResult.Ok(ToUserDetails(user));
 	}

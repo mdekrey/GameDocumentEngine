@@ -11,6 +11,14 @@ export const getCurrentUser = {
 		return response.data;
 	},
 };
+export async function invalidateCurrentUser(
+	queryClient: QueryClient,
+	{ userId }: { userId: string },
+) {
+	const currentUserQueryKey = getCurrentUser.queryKey;
+	if (queryClient.getQueryData<UserDetails>(currentUserQueryKey)?.id === userId)
+		await queryClient.invalidateQueries(currentUserQueryKey);
+}
 
 export function patchUser(
 	queryClient: QueryClient,

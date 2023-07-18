@@ -3,8 +3,7 @@ import { createRealtimeApiConnection } from './realtime.signalr';
 import type { HubConnection } from '@microsoft/signalr';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { isMessageIdReceived } from './recent-queries';
-import { queries } from './queries';
-import { UserDetails } from '@/api/models/UserDetails';
+import { invalidateCurrentUser } from './queries/user';
 
 type RealtimeApiConnection = {
 	connection: HubConnection;
@@ -61,23 +60,22 @@ function useNewRealtimeApiConnection() {
 	);
 }
 
+function apiOn<T extends object>(
+	api: RealtimeApiConnection,
+	queryClient: QueryClient,
+	methodName: string,
+	callback: (queryClient: QueryClient, req: T) => void | Promise<void>,
+) {
+	api.connection.on(methodName, (req: T & { messageId: string }) => {
+		if (!isMessageIdReceived(req.messageId)) void callback(queryClient, req);
+	});
+}
+
 function createRealtimeApi(
 	api: RealtimeApiConnection,
 	queryClient: QueryClient,
 ): RealtimeApi {
-	api.connection.on(
-		'UserUpdated',
-		(req: { messageId: string; userId: string }) => {
-			if (!isMessageIdReceived(req.messageId)) {
-				const currentUserQueryKey = queries.getCurrentUser.queryKey;
-				if (
-					queryClient.getQueryData<UserDetails>(currentUserQueryKey)?.id ===
-					req.userId
-				)
-					void queryClient.invalidateQueries(currentUserQueryKey);
-			}
-		},
-	);
+	apiOn(api, queryClient, 'UserUpdated', invalidateCurrentUser);
 
 	return {
 		connectionPromise: api.connectionPromise,

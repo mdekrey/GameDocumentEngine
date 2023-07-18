@@ -42,8 +42,8 @@ public class GameDocumentsHub : Hub
 
 public static class MessageFactories
 {
-	public static Task SendUserUpdated(this IHubClients clients, MessageIdProvider messageIdProvider, Guid userId) =>
-		clients.Group(GroupNames.User(userId)).SendAsync("UserUpdated", new { userId, messageIdProvider.MessageId });
+	public static Task SendUserUpdated(this IHubClients clients, Guid messageId, Guid userId) =>
+		clients.Group(GroupNames.User(userId)).SendAsync("UserUpdated", new { userId, messageId });
 }
 
 public static class GroupNames

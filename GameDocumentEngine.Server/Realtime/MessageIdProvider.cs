@@ -2,26 +2,32 @@
 
 public class MessageIdProvider
 {
-	private readonly List<Func<Task>> deferredActions = new List<Func<Task>>();
+	private readonly List<Func<Guid, Task>> deferredActions = new List<Func<Guid, Task>>();
+	private readonly Guid messageId;
 
 	public MessageIdProvider()
 	{
-		MessageId = Guid.NewGuid();
+		messageId = Guid.NewGuid();
 	}
 
-	public Guid MessageId { get; }
-
-	internal void Defer(Func<Task> deferredAction)
+	internal void Defer(Func<Guid, Task> deferredAction)
 	{
 		deferredActions.Add(deferredAction);
 	}
 
-	public async Task ExecuteDeferred()
+	private async Task ExecuteDeferred()
 	{
+		if (deferredActions.Count == 0) return;
 		await Task.Delay(50);
 		foreach (var entry in deferredActions)
 		{
-			await entry();
+			await entry(messageId);
 		}
+	}
+
+	internal void AddToResponse(HttpResponse response)
+	{
+		response.Headers.Add("x-message-id", messageId.ToString());
+		response.OnCompleted(ExecuteDeferred);
 	}
 }

@@ -130,8 +130,7 @@ app.UseAuthorization();
 app.Use((doContinue) => async (context) =>
 {
 	var messageIdProvider = context.RequestServices.GetRequiredService<MessageIdProvider>();
-	context.Response.Headers.Add("x-message-id", messageIdProvider.MessageId.ToString());
-	context.Response.OnCompleted(messageIdProvider.ExecuteDeferred);
+	messageIdProvider.AddToResponse(context.Response);
 	await doContinue(context);
 });
 
