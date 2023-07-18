@@ -2,13 +2,15 @@
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
+using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
 using Json.Schema;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Nodes;
 
-namespace GameDocumentEngine.Server.Controllers;
+namespace GameDocumentEngine.Server.Documents;
 
 public class DocumentController : Api.DocumentControllerBase
 {
@@ -152,4 +154,29 @@ public class DocumentController : Api.DocumentControllerBase
 					LastUpdated: document.LastModifiedDate
 				);
 	}
+}
+
+class DocumentModelToDocumentDetails : EntityChangeNotifications<DocumentModel, Api.DocumentDetails>
+{
+	// TODO: don't send to all clients
+	// TODO: mask parts of document data based on permissions
+
+	protected override Task SendAddedMessage(IHubClients clients, DocumentModel result, object message) =>
+		clients.All.SendAsync("DocumentAdded", message);
+
+	protected override Task SendDeletedMessage(IHubClients clients, DocumentModel original, object message) =>
+		clients.All.SendAsync("DocumentDeleted", message);
+
+	protected override Task SendModifiedMessage(IHubClients clients, DocumentModel original, object message) =>
+		clients.All.SendAsync("DocumentChanged", message);
+
+	protected override DocumentDetails ToApi(DocumentModel document) => new DocumentDetails(
+			Id: document.Id,
+			Name: document.Name,
+			Type: document.Type,
+			Details: document.Details,
+			LastUpdated: document.LastModifiedDate
+		);
+
+	protected override object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
 }

@@ -13,10 +13,10 @@ export const getCurrentUser = {
 };
 export async function invalidateCurrentUser(
 	queryClient: QueryClient,
-	{ userId }: { userId: string },
+	{ key }: { key: string },
 ) {
 	const currentUserQueryKey = getCurrentUser.queryKey;
-	if (queryClient.getQueryData<UserDetails>(currentUserQueryKey)?.id === userId)
+	if (queryClient.getQueryData<UserDetails>(currentUserQueryKey)?.id === key)
 		await queryClient.invalidateQueries(currentUserQueryKey);
 }
 

@@ -1,4 +1,6 @@
-﻿namespace GameDocumentEngine.Server.Realtime;
+﻿using Azure;
+
+namespace GameDocumentEngine.Server.Realtime;
 
 public class MessageIdProvider
 {
@@ -15,6 +17,13 @@ public class MessageIdProvider
 		deferredActions.Add(deferredAction);
 	}
 
+	private Func<Task> ExecuteStarting(HttpResponse response) => () =>
+	{
+		if (deferredActions.Count == 0) return Task.CompletedTask;
+		response.Headers.Add("x-message-id", messageId.ToString());
+		return Task.CompletedTask;
+	};
+
 	private async Task ExecuteDeferred()
 	{
 		if (deferredActions.Count == 0) return;
@@ -27,7 +36,7 @@ public class MessageIdProvider
 
 	internal void AddToResponse(HttpResponse response)
 	{
-		response.Headers.Add("x-message-id", messageId.ToString());
+		response.OnStarting(ExecuteStarting(response));
 		response.OnCompleted(ExecuteDeferred);
 	}
 }

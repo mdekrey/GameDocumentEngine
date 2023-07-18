@@ -96,10 +96,14 @@ services.AddAuthorization(options =>
 
 services.AddHttpContextAccessor();
 services.AddTransient<AuditableInterceptor>();
+services.AddTransient<HubNotifyingInterceptor>();
+services.AddSingleton<IEntityChangeNotifications, UserModelToUserDetails>();
+services.AddSingleton<IEntityChangeNotifications, DocumentModelToDocumentDetails>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
 	o.UseSqlServer(builder.Configuration["AzureSql:ConnectionString"] ?? throw new InvalidOperationException("AzureSql not configured"))
-		.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>());
+		.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
+		.AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });
 
 services.AddScoped<MessageIdProvider>();
