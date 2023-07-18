@@ -3,6 +3,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.GameTypes.Clocks;
+using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -101,6 +102,8 @@ services.AddDbContext<DocumentDbContext>((provider, o) =>
 		.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>());
 });
 
+services.AddScoped<MessageIdProvider>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -123,6 +126,14 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use((doContinue) => async (context) =>
+{
+	var messageIdProvider = context.RequestServices.GetRequiredService<MessageIdProvider>();
+	context.Response.Headers.Add("x-message-id", messageIdProvider.MessageId.ToString());
+	context.Response.OnCompleted(messageIdProvider.ExecuteDeferred);
+	await doContinue(context);
+});
 
 app.MapControllers();
 app.MapHub<GameDocumentsHub>("/hub");

@@ -1,5 +1,7 @@
 ﻿using GameDocumentEngine.Server.Data;
+using GameDocumentEngine.Server.Realtime;
 using Json.Patch;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
@@ -9,10 +11,14 @@ namespace GameDocumentEngine.Server.Users;
 public class UserController : Api.UserControllerBase
 {
 	private readonly DocumentDbContext dbContext;
+	private readonly IHubContext<GameDocumentsHub> hubContext;
+	private readonly MessageIdProvider messageIdProvider;
 
-	public UserController(Data.DocumentDbContext dbContext)
+	public UserController(Data.DocumentDbContext dbContext, IHubContext<Realtime.GameDocumentsHub> hubContext, MessageIdProvider messageIdProvider)
 	{
 		this.dbContext = dbContext;
+		this.hubContext = hubContext;
+		this.messageIdProvider = messageIdProvider;
 	}
 
 	protected override async Task<GetCurrentUserActionResult> GetCurrentUser()
@@ -36,6 +42,9 @@ public class UserController : Api.UserControllerBase
 		var updated = patchUserBody.Apply(ToUserDetails(user))!;
 		user.Name = updated.Name;
 		await dbContext.SaveChangesAsync();
+
+		messageIdProvider.Defer(() => hubContext.Clients.SendUserUpdated(messageIdProvider, user.Id));
+
 
 		return PatchUserActionResult.Ok(ToUserDetails(user));
 	}

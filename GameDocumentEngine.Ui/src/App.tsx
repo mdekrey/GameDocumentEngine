@@ -9,6 +9,7 @@ import { GameDetails } from './apps/game-details/game-details';
 import { GetParams } from './utils/routing/getParams';
 import { CreateDocument } from './apps/documents/create-document/create-document';
 import { DocumentDetails } from './apps/documents/details/doc-details';
+import { RealtimeApiProvider } from './utils/api/realtime';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -29,30 +30,35 @@ const withDocumentId = withParamsValue('documentId');
 
 function App() {
 	return (
-		<HashRouter future={{ v7_startTransition: true }}>
-			<Layout>
-				<Layout.Sidebar>
+		<RealtimeApiProvider>
+			<HashRouter future={{ v7_startTransition: true }}>
+				<Layout>
+					<Layout.Sidebar>
+						<Routes>
+							<Route
+								path="game/:gameId/*"
+								Component={withGameId(GameObjects)}
+							/>
+						</Routes>
+					</Layout.Sidebar>
 					<Routes>
-						<Route path="game/:gameId/*" Component={withGameId(GameObjects)} />
+						<Route path="profile/" Component={Profile} />
+						<Route path="game/:gameId" Component={withGameId(GameDetails)} />
+						<Route
+							path="game/:gameId/create-document"
+							Component={withGameId(CreateDocument)}
+						/>
+						<Route
+							path="game/:gameId/document/:documentId"
+							Component={withDocumentId(withGameId(DocumentDetails))}
+						/>
+						<Route path="game/" Component={ListGames} />
+						<Route path="create-game/" Component={CreateGame} />
+						<Route path="/" element={<Navigate to="/game" />} />
 					</Routes>
-				</Layout.Sidebar>
-				<Routes>
-					<Route path="profile/" Component={Profile} />
-					<Route path="game/:gameId" Component={withGameId(GameDetails)} />
-					<Route
-						path="game/:gameId/create-document"
-						Component={withGameId(CreateDocument)}
-					/>
-					<Route
-						path="game/:gameId/document/:documentId"
-						Component={withDocumentId(withGameId(DocumentDetails))}
-					/>
-					<Route path="game/" Component={ListGames} />
-					<Route path="create-game/" Component={CreateGame} />
-					<Route path="/" element={<Navigate to="/game" />} />
-				</Routes>
-			</Layout>
-		</HashRouter>
+				</Layout>
+			</HashRouter>
+		</RealtimeApiProvider>
 	);
 }
 
