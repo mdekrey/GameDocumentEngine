@@ -1,5 +1,5 @@
 import { QueryClient, UseMutationOptions } from '@tanstack/react-query';
-import type { Patch } from 'rfc6902';
+import { applyPatch, type Patch } from 'rfc6902';
 import { api } from '../fetch-api';
 import { UserDetails } from '@/api/models/UserDetails';
 
@@ -13,11 +13,19 @@ export const getCurrentUser = {
 };
 export async function invalidateCurrentUser(
 	queryClient: QueryClient,
-	{ key }: { key: string },
+	{ key, patch }: { key: string; patch: Patch },
 ) {
 	const currentUserQueryKey = getCurrentUser.queryKey;
-	if (queryClient.getQueryData<UserDetails>(currentUserQueryKey)?.id === key)
-		await queryClient.invalidateQueries(currentUserQueryKey);
+	const data = queryClient.getQueryData<UserDetails>(currentUserQueryKey);
+	if (data?.id === key) {
+		const result = JSON.parse(JSON.stringify(data)) as UserDetails;
+		const errors = applyPatch(result, patch);
+		if (errors.some((v) => !!v)) {
+			await queryClient.invalidateQueries(currentUserQueryKey);
+		} else {
+			queryClient.setQueryData(currentUserQueryKey, result);
+		}
+	}
 }
 
 export function patchUser(
