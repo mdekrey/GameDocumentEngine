@@ -166,12 +166,12 @@ function buildFormResult<
 			const data = store.get(atom);
 			const errorsResult = await schema.safeParseAsync(data);
 			if (!errorsResult.success) {
-				// TODO: trigger display of errors
 				return;
 			}
 			await callback(errorsResult.data);
 		},
 		errorStrategy,
+		// TODO: allow manual trigger to display errors
 	};
 }
 

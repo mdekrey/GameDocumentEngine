@@ -28,7 +28,6 @@ export function DocumentDetails({
 	const document = useQuery(queries.getDocument(gameId, documentId));
 	const gameType = useGameType(gameId);
 
-	// TODO: display component of game type with loaded document
 	if (document.isLoading || gameType.isLoading) {
 		return <>Loading...</>;
 	} else if (document.isError || gameType.isError) {
@@ -59,7 +58,6 @@ export function DocumentDetails({
 			deleteDocument.mutate();
 			navigate(`/game/${gameId}`);
 		}
-		// TODO: confirmation
 	}
 
 	function handleUpdate(

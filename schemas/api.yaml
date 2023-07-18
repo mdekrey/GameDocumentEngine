@@ -74,6 +74,7 @@ paths:
                   $ref: "#/components/schemas/GameTypeSummary"
   /game:
     get:
+      # TODO: pagination
       operationId: listGames
       security:
         - AuthenticatedUser: []
@@ -196,6 +197,7 @@ paths:
           description: Game was updated while request was being processed; try again later.
   /game/{gameId}/document:
     get:
+      # TODO: pagination
       x-dotnet-mvc-server-controller: Document
       operationId: listDocuments
       security:

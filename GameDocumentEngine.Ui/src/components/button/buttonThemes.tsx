@@ -5,7 +5,7 @@ function mergeButton<TProps extends { className?: string | undefined }>(
 	name: string,
 	themeClassName: string,
 ) {
-	// TODO: why does this need to be cast?
+	// TODO: Research: why does this need to be cast?
 	const Component = component as React.ComponentType<
 		{ className: string } & Omit<TProps, 'className'>
 	>;
