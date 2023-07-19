@@ -59,7 +59,7 @@ namespace GameDocumentEngine.Server.Migrations
 
                     b.HasIndex("GameId", "Id");
 
-                    b.ToTable("Documents");
+                    b.ToTable("Documents", (string)null);
                 });
 
             modelBuilder.Entity("GameDocumentEngine.Server.Documents.DocumentUserModel", b =>
@@ -93,7 +93,7 @@ namespace GameDocumentEngine.Server.Migrations
 
                     b.HasIndex("UserId", "GameId");
 
-                    b.ToTable("DocumentUsers");
+                    b.ToTable("DocumentUsers", (string)null);
                 });
 
             modelBuilder.Entity("GameDocumentEngine.Server.Documents.GameModel", b =>
@@ -124,7 +124,7 @@ namespace GameDocumentEngine.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("GameDocumentEngine.Server.Documents.GameUserModel", b =>
@@ -155,7 +155,7 @@ namespace GameDocumentEngine.Server.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("GameUsers");
+                    b.ToTable("GameUsers", (string)null);
                 });
 
             modelBuilder.Entity("GameDocumentEngine.Server.Users.UserModel", b =>
@@ -180,7 +180,7 @@ namespace GameDocumentEngine.Server.Migrations
 
                     b.HasIndex("GoogleNameId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("GameDocumentEngine.Server.Documents.DocumentModel", b =>

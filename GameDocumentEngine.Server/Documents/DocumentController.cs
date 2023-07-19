@@ -75,7 +75,7 @@ public class DocumentController : Api.DocumentControllerBase
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
 	{
 		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers
-										.Include(du => du.GameUser).Include(du => du.Document).ThenInclude(d => d.Players).Include(du => du.User)
+										.Include(du => du.GameUser).Include(du => du.Document).Include(du => du.User)
 										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
 										select documentUser)
 			.SingleOrDefaultAsync();
