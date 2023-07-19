@@ -1,6 +1,6 @@
 import { toFetchApi } from '@principlestudios/openapi-codegen-typescript-fetch';
 import operations from '@/api/operations';
-import { addMessageId } from './recent-queries';
+// import { addMessageId } from './recent-queries';
 
 export const api = toFetchApi(
 	operations,
@@ -8,7 +8,7 @@ export const api = toFetchApi(
 		const result = await fetch(url, req);
 		const messageId = result.headers.get('x-message-id');
 		if (messageId) {
-			addMessageId(messageId);
+			// addMessageId(messageId);
 		}
 
 		if (result.status === 401) {

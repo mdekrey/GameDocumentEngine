@@ -27,7 +27,6 @@ public class MessageIdProvider
 	private async Task ExecuteDeferred()
 	{
 		if (deferredActions.Count == 0) return;
-		await Task.Delay(50);
 		foreach (var entry in deferredActions)
 		{
 			await entry(messageId);

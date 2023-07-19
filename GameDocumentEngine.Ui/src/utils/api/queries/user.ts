@@ -38,9 +38,9 @@ export function patchUser(
 				);
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: (response) => {
-			queryClient.setQueryData(getCurrentUser.queryKey, response);
-		},
+		// onSuccess: (response) => {
+		// 	queryClient.setQueryData(getCurrentUser.queryKey, response);
+		// },
 		onError: () => queryClient.invalidateQueries(getCurrentUser.queryKey),
 	};
 }

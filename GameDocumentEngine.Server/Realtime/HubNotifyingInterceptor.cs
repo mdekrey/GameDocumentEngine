@@ -47,7 +47,7 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 		}
 
 		var key = ToKey(result);
-		var value = ToApi(result);
+		var value = await ToApi(result);
 		messageIdProvider.Defer((messageId) => SendAddedMessage(clients, result, new { messageId, key, value }));
 	}
 
@@ -79,8 +79,8 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 			throw new InvalidOperationException("Could not cast result entity");
 		}
 
-		var originalNode = JsonSerializer.SerializeToNode(ToApi(original));
-		var resultNode = JsonSerializer.SerializeToNode(ToApi(result));
+		var originalNode = JsonSerializer.SerializeToNode(await ToApi(original));
+		var resultNode = JsonSerializer.SerializeToNode(await ToApi(result));
 
 		var patch = PatchExtensions.CreatePatch(originalNode, resultNode);
 		var key = ToKey(original);

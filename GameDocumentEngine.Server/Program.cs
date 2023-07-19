@@ -17,7 +17,9 @@ var services = builder.Services;
 services.AddHealthChecks();
 services.AddControllers();
 services.AddCompressedStaticFiles();
-services.AddSignalR();
+var signalr = services.AddSignalR();
+if (builder.Configuration["Azure:SignalR:ConnectionString"] != null)
+	signalr.AddAzureSignalR();
 
 services
 	.AddAuthentication(options =>
@@ -104,7 +106,7 @@ services.AddSingleton<IEntityChangeNotifications, GameModelChangeNotification>()
 services.AddSingleton<IEntityChangeNotifications, GameUserModelChangeNotification>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
-	o.UseSqlServer(builder.Configuration["AzureSql:ConnectionString"] ?? throw new InvalidOperationException("AzureSql not configured"))
+	o.UseSqlServer(builder.Configuration["Sql:ConnectionString"] ?? throw new InvalidOperationException("Sql not configured"))
 		.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
 		.AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });

@@ -12,6 +12,7 @@
 		<PackageReference Include="JsonPatch.Net" Version="2.1.0" />
 		<PackageReference Include="JsonSchema.Net" Version="4.1.6" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.9" />
+		<PackageReference Include="Microsoft.Azure.SignalR" Version="1.21.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -41,10 +42,7 @@
 
 
 	<Target Name="GetEFProjectMetadata">
-		<MSBuild Condition=" '$(TargetFramework)' == '' "
-						 Projects="$(MSBuildProjectFile)"
-						 Targets="GetEFProjectMetadata"
-						 Properties="TargetFramework=$(TargetFrameworks.Split(';')[0]);EFProjectMetadataFile=$(EFProjectMetadataFile)" />
+		<MSBuild Condition=" '$(TargetFramework)' == '' " Projects="$(MSBuildProjectFile)" Targets="GetEFProjectMetadata" Properties="TargetFramework=$(TargetFrameworks.Split(';')[0]);EFProjectMetadataFile=$(EFProjectMetadataFile)" />
 		<ItemGroup Condition=" '$(TargetFramework)' != '' ">
 			<EFProjectMetadata Include="AssemblyName: $(AssemblyName)" />
 			<EFProjectMetadata Include="Language: $(Language)" />
@@ -61,8 +59,6 @@
 			<EFProjectMetadata Include="TargetFramework: $(TargetFramework)" />
 			<EFProjectMetadata Include="TargetPlatformIdentifier: $(TargetPlatformIdentifier)" />
 		</ItemGroup>
-		<WriteLinesToFile Condition=" '$(TargetFramework)' != '' "
-		                  File="$(EFProjectMetadataFile)"
-		                  Lines="@(EFProjectMetadata)" />
+		<WriteLinesToFile Condition=" '$(TargetFramework)' != '' " File="$(EFProjectMetadataFile)" Lines="@(EFProjectMetadata)" />
 	</Target>
 </Project>
