@@ -1,15 +1,14 @@
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useModal } from '@/utils/modal/modal-service';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 
 function useDeleteGame() {
-	const queryClient = useQueryClient();
-	return useMutation(queries.deleteGame(queryClient));
+	return useMutation(queries.deleteGame);
 }
 
 export function GameDetails({ gameId }: { gameId: string }) {

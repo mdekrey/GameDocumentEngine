@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Atom, atom, useStore } from 'jotai';
-import { useMemo } from 'react';
+import React, { MutableRefObject, useMemo } from 'react';
 import { ZodError, ZodType, ZodTypeAny } from 'zod';
 import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
 import { Path, PathValue } from './path';
@@ -99,9 +99,10 @@ export type UseFormResult<
 	errors: Atom<Loadable<ZodError<T> | null>>;
 	fields: FormFields<T, TFields>;
 	formEvents: FormEvents;
+	defaultValue: React.MutableRefObject<T>;
 
 	get(this: void): T;
-	set(this: void, value: T): void;
+	set(this: void, value: T | ((prevValue: T) => T)): void;
 	subset<TPath extends Path<T>>(
 		this: void,
 		path: TPath,
@@ -123,6 +124,7 @@ function buildFormResult<
 	fields: TFields,
 	formEvents: FormEvents,
 	errorStrategy: RegisterErrorStrategy,
+	defaultValue: MutableRefObject<T>,
 ): UseFormResult<T, TFields> {
 	const [errors, trigger] = createTriggeredErrorsAtom(atom, schema);
 	errorStrategy(formEvents, () => store.set(trigger));
@@ -152,6 +154,7 @@ function buildFormResult<
 		}),
 	) as FormFields<T, TFields>;
 	return {
+		defaultValue,
 		store,
 		atom,
 		schema,
@@ -161,7 +164,12 @@ function buildFormResult<
 		get: () => store.get(atom),
 		set: (value: T) => store.set(atom, value),
 		subset: (path) =>
-			toFormSubset(path, { store, atom, schema }, formEvents, errorStrategy),
+			toFormSubset(
+				path,
+				{ store, atom, schema, defaultValue },
+				formEvents,
+				errorStrategy,
+			),
 		handleSubmit: (callback) => async (event) => {
 			formEvents.dispatchEvent(FormEvents.Submit);
 			event.preventDefault();
@@ -198,6 +206,14 @@ export function useForm<
 				options.fields ?? ({} as unknown as TFields),
 				formEvents,
 				strategy,
+				{
+					get current(): T {
+						return formAtom.init;
+					},
+					set current(value) {
+						formAtom.init = value;
+					},
+				},
 			);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -261,14 +277,35 @@ function getAtomForPath<T extends Objectish, TPath extends Path<T>>(
 	return resultAtom;
 }
 
+function getRefForPath<T extends Objectish, TPath extends Path<T>>(
+	steps: TPath,
+	source: React.MutableRefObject<T>,
+): React.MutableRefObject<PathValue<T, TPath>> {
+	const getPathValue = () =>
+		(steps as ReadonlyArray<string | number>).reduce(
+			(prev, next) => (prev as never)[next],
+			source.current as unknown,
+		) as PathValue<T, TPath>;
+	return {
+		get current() {
+			return getPathValue();
+		},
+		set current(value) {
+			const patches: Patch[] = [{ op: 'replace', path: [...steps], value }];
+			applyPatches(getPathValue(), patches);
+		},
+	};
+}
+
 function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 	steps: TPath,
-	options: Pick<UseFormResult<T>, 'store' | 'atom' | 'schema'>,
+	options: Pick<UseFormResult<T>, 'store' | 'atom' | 'schema' | 'defaultValue'>,
 	formEvents: FormEvents,
 	errorStrategy: RegisterErrorStrategy,
 ): UseFormResult<PathValue<T, TPath>> {
 	const schema = getZodSchemaForPath(steps, options.schema);
 	const resultAtom = getAtomForPath(steps, options.atom);
+	const resultDefaultValue = getRefForPath(steps, options.defaultValue);
 
 	return buildFormResult(
 		options.store,
@@ -277,6 +314,7 @@ function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 		{},
 		formEvents,
 		errorStrategy,
+		resultDefaultValue,
 	);
 }
 

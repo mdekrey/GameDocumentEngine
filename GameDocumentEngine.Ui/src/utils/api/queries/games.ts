@@ -4,6 +4,8 @@ import { NavigateFunction } from 'react-router-dom';
 import { GameDetails } from '@/api/models/GameDetails';
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Patch } from 'rfc6902';
+import { EntityChangedProps } from '../EntityChangedProps';
+import { applyEventToQuery } from './applyEventToQuery';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -25,8 +27,11 @@ export const listGames = {
 	},
 };
 
+export async function invalidateGameList(queryClient: QueryClient) {
+	await queryClient.invalidateQueries(listGames.queryKey);
+}
+
 export function createGame(
-	queryClient: QueryClient,
 	navigate: NavigateFunction,
 ): UseMutationOptions<GameDetails, unknown, CreateGameDetails, unknown> {
 	return {
@@ -35,8 +40,7 @@ export function createGame(
 			if (response.statusCode === 200) return response.data;
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: async (game) => {
-			await queryClient.invalidateQueries(listGames.queryKey);
+		onSuccess: (game) => {
 			navigate(`/game/${game.id}`);
 		},
 	};
@@ -51,6 +55,16 @@ export const getGameDetails = (gameId: string) => ({
 		return response.data;
 	},
 });
+
+export async function invalidateGame(
+	queryClient: QueryClient,
+	event: EntityChangedProps<string, GameDetails>,
+) {
+	const queryKey = getGameDetails(event.key).queryKey;
+	await applyEventToQuery(queryClient, queryKey, event);
+	// TODO: conditionally invalidate list of games
+	await queryClient.invalidateQueries(listGames.queryKey);
+}
 
 export function patchGame(
 	queryClient: QueryClient,
@@ -69,26 +83,21 @@ export function patchGame(
 				);
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: (response) => {
-			queryClient.setQueryData(getGameDetails(gameId).queryKey, response);
-		},
 		onError: async () => {
 			await queryClient.invalidateQueries(getGameDetails(gameId).queryKey);
 		},
 	};
 }
 
-export function deleteGame(
-	queryClient: QueryClient,
-): UseMutationOptions<undefined, unknown, string, unknown> {
-	return {
-		mutationFn: async (id: string) => {
-			const response = await api.deleteGame({ params: { gameId: id } });
-			if (response.statusCode === 200) return response.data;
-			else throw new Error('Could not save changes');
-		},
-		onSuccess: async () => {
-			await queryClient.invalidateQueries(listGames.queryKey);
-		},
-	};
-}
+export const deleteGame: UseMutationOptions<
+	undefined,
+	unknown,
+	string,
+	unknown
+> = {
+	mutationFn: async (id: string) => {
+		const response = await api.deleteGame({ params: { gameId: id } });
+		if (response.statusCode === 200) return response.data;
+		else throw new Error('Could not save changes');
+	},
+};

@@ -4,8 +4,8 @@ import type { HubConnection } from '@microsoft/signalr';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { isMessageIdReceived } from './recent-queries';
 import { invalidateCurrentUser } from './queries/user';
-import { EntityChangedProps } from './EntityChangedProps';
 import { invalidateDocument } from './queries/document';
+import { invalidateGame, invalidateGameList } from './queries/games';
 
 type RealtimeApiConnection = {
 	connection: HubConnection;
@@ -69,7 +69,7 @@ function useNewRealtimeApiConnection() {
 	);
 }
 
-function apiOn<T extends EntityChangedProps>(
+function apiOn<T>(
 	api: RealtimeApiConnection,
 	queryClient: QueryClient,
 	methodName: string,
@@ -88,6 +88,9 @@ function createRealtimeApi(
 	queryClient: QueryClient,
 ): RealtimeApi {
 	apiOn(api, queryClient, 'UserUpdated', invalidateCurrentUser);
+	apiOn(api, queryClient, 'GameChanged', invalidateGame);
+	apiOn(api, queryClient, 'GameDeleted', invalidateGame);
+	apiOn(api, queryClient, 'GameListChanged', invalidateGameList);
 	apiOn(api, queryClient, 'DocumentAdded', invalidateDocument);
 	apiOn(api, queryClient, 'DocumentChanged', invalidateDocument);
 	apiOn(api, queryClient, 'DocumentDeleted', invalidateDocument);

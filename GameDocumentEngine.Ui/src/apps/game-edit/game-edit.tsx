@@ -13,6 +13,7 @@ import { useForm } from '@/utils/form/useForm';
 import { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { NarrowContent } from '@/utils/containers/narrow-content';
+import { updateFormDefault } from '@/utils/form/update-form-default';
 
 function usePatchGame(gameId: string) {
 	const queryClient = useQueryClient();
@@ -57,11 +58,9 @@ export function GameEdit({ gameId }: { gameId: string }) {
 			return 'Failed to load';
 		}
 		return 'Loading';
-	} else if (!saveGame.isLoading) {
-		gameForm.set(gameQueryResult.data);
 	}
-
 	const gameData = gameQueryResult.data;
+	updateFormDefault(gameForm, gameData);
 
 	return (
 		<NarrowContent>

@@ -13,7 +13,7 @@ import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { NarrowContent } from '@/utils/containers/narrow-content';
-import { useEffect } from 'react';
+import { updateFormDefault } from '@/utils/form/update-form-default';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -53,12 +53,6 @@ export function Profile() {
 	const userQueryResult = useQuery(queries.getCurrentUser);
 	const saveUser = usePatchUser();
 
-	useEffect(() => {
-		if (userQueryResult.isSuccess) {
-			userForm.set(userQueryResult.data);
-		}
-	}, [userForm, userQueryResult.isSuccess, userQueryResult.data]);
-
 	if (!userQueryResult.isSuccess) {
 		if (userQueryResult.isLoadingError) {
 			return 'Failed to load';
@@ -66,6 +60,7 @@ export function Profile() {
 		return 'Loading';
 	}
 	const userData = userQueryResult.data;
+	updateFormDefault(userForm, userData);
 
 	return (
 		<NarrowContent>

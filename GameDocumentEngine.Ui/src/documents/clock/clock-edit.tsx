@@ -9,6 +9,7 @@ import { Button } from '@/components/button/button';
 import { FieldMapping } from '@/utils/form/useField';
 import { Clock, ClockDocument } from './clock-types';
 import { applyPatch, createPatch } from 'rfc6902';
+import { updateFormDefault } from '@/utils/form/update-form-default';
 
 const integerMapping: FieldMapping<number, string> = {
 	toForm: (v: number) => v.toFixed(0),
@@ -31,6 +32,7 @@ export function ClockEdit({
 			max: { path: ['details', 'max'], mapping: integerMapping },
 		},
 	});
+	updateFormDefault(form, clock);
 
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>
