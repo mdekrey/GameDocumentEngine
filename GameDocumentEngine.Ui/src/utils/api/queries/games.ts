@@ -3,6 +3,7 @@ import { api } from '../fetch-api';
 import { NavigateFunction } from 'react-router-dom';
 import { GameDetails } from '@/api/models/GameDetails';
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
+import { Patch } from 'rfc6902';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -50,6 +51,32 @@ export const getGameDetails = (gameId: string) => ({
 		return response.data;
 	},
 });
+
+export function patchGame(
+	queryClient: QueryClient,
+	gameId: string,
+): UseMutationOptions<GameDetails, unknown, Patch, unknown> {
+	return {
+		mutationFn: async (changes: Patch) => {
+			const response = await api.patchGame({
+				params: { gameId },
+				body: changes,
+			});
+			if (response.statusCode === 200) return response.data;
+			else if (response.statusCode === 409)
+				throw new Error(
+					'Other changes were being applied at the same time. Try again later.',
+				);
+			else throw new Error('Could not save changes');
+		},
+		onSuccess: (response) => {
+			queryClient.setQueryData(getGameDetails(gameId).queryKey, response);
+		},
+		onError: async () => {
+			await queryClient.invalidateQueries(getGameDetails(gameId).queryKey);
+		},
+	};
+}
 
 export function deleteGame(
 	queryClient: QueryClient,

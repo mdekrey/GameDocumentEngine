@@ -101,6 +101,7 @@ export type UseFormResult<
 	formEvents: FormEvents;
 
 	get(this: void): T;
+	set(this: void, value: T): void;
 	subset<TPath extends Path<T>>(
 		this: void,
 		path: TPath,
@@ -158,6 +159,7 @@ function buildFormResult<
 		fields: fieldsResult,
 		formEvents,
 		get: () => store.get(atom),
+		set: (value: T) => store.set(atom, value),
 		subset: (path) =>
 			toFormSubset(path, { store, atom, schema }, formEvents, errorStrategy),
 		handleSubmit: (callback) => async (event) => {

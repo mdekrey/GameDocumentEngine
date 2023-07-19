@@ -1,6 +1,7 @@
 import { DocumentDetails } from '@/api/models/DocumentDetails';
 import { UseQueryResult } from '@tanstack/react-query';
 import { Draft } from 'immer';
+import type { IconType } from 'react-icons';
 import { z } from 'zod';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
@@ -25,6 +26,7 @@ export type GameObjectWidgetProps<T = unknown> = {
 };
 
 export type IGameObjectType<T = unknown> = {
+	icon: IconType;
 	template: T;
 	component: React.ComponentType<GameObjectWidgetProps<T>>;
 };

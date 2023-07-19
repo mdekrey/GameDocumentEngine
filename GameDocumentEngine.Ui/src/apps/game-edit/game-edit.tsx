@@ -10,23 +10,23 @@ import { z } from 'zod';
 import { ErrorsList } from '../../utils/form/errors/errors-list';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm } from '@/utils/form/useForm';
-import { UserDetails } from '@/api/models/UserDetails';
+import { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 
-function usePatchUser() {
+function usePatchGame(gameId: string) {
 	const queryClient = useQueryClient();
-	return useMutation(queries.patchUser(queryClient));
+	return useMutation(queries.patchGame(queryClient, gameId));
 }
 
-export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
+export function GameEditFields({ name }: { name: UseFieldResult<string> }) {
 	return (
 		<Fieldset>
 			<Field>
 				<Field.Label>Name</Field.Label>
 				<Field.Contents>
 					<TextInput {...name.standardProps} />
-					<ErrorsList errors={name.errors} prefix="UserDetail.name" />
+					<ErrorsList errors={name.errors} prefix="GameEdit.name" />
 				</Field.Contents>
 			</Field>
 			<ButtonRow>
@@ -36,46 +36,46 @@ export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
 	);
 }
 
-const UserDetails = z.object({
+const GameDetails = z.object({
 	name: z.string().min(3),
 });
 
-export function Profile() {
-	const userForm = useForm({
+export function GameEdit({ gameId }: { gameId: string }) {
+	const gameForm = useForm({
 		defaultValue: { name: '' },
-		schema: UserDetails,
+		schema: GameDetails,
 		fields: {
 			name: ['name'],
 		},
 	});
 
-	const userQueryResult = useQuery(queries.getCurrentUser);
-	const saveUser = usePatchUser();
+	const gameQueryResult = useQuery(queries.getGameDetails(gameId));
+	const saveGame = usePatchGame(gameId);
 
-	if (!userQueryResult.isSuccess) {
-		if (userQueryResult.isLoadingError) {
+	if (!gameQueryResult.isSuccess) {
+		if (gameQueryResult.isLoadingError) {
 			return 'Failed to load';
 		}
 		return 'Loading';
-	} else if (!saveUser.isLoading) {
-		userForm.set(userQueryResult.data);
+	} else if (!saveGame.isLoading) {
+		gameForm.set(gameQueryResult.data);
 	}
 
-	const userData = userQueryResult.data;
+	const gameData = gameQueryResult.data;
 
 	return (
 		<NarrowContent>
-			<form onSubmit={userForm.handleSubmit(onSubmit)}>
-				<ProfileFields {...userForm.fields} />
-				<ErrorsList errors={userForm.errors} prefix="UserDetails" />
+			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
+				<GameEditFields {...gameForm.fields} />
+				<ErrorsList errors={gameForm.errors} prefix="GameDetails" />
 			</form>
 		</NarrowContent>
 	);
 
-	function onSubmit(currentValue: z.infer<typeof UserDetails>) {
-		const patches = produceWithPatches(userData, (draft) => {
+	function onSubmit(currentValue: z.infer<typeof GameDetails>) {
+		const patches = produceWithPatches(gameData, (draft) => {
 			draft.name = currentValue.name;
 		})[1];
-		if (patches.length > 0) saveUser.mutate(patches.map(immerPatchToStandard));
+		if (patches.length > 0) saveGame.mutate(patches.map(immerPatchToStandard));
 	}
 }

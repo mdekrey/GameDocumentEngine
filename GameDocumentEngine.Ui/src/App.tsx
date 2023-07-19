@@ -10,6 +10,7 @@ import { GetParams } from './utils/routing/getParams';
 import { CreateDocument } from './apps/documents/create-document/create-document';
 import { DocumentDetails } from './apps/documents/details/doc-details';
 import { RealtimeApiProvider } from './utils/api/realtime';
+import { GameEdit } from './apps/game-edit/game-edit';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -44,6 +45,7 @@ function App() {
 					<Routes>
 						<Route path="profile/" Component={Profile} />
 						<Route path="game/:gameId" Component={withGameId(GameDetails)} />
+						<Route path="game/:gameId/edit" Component={withGameId(GameEdit)} />
 						<Route
 							path="game/:gameId/create-document"
 							Component={withGameId(CreateDocument)}

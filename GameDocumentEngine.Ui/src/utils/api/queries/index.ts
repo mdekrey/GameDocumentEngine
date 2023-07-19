@@ -3,6 +3,7 @@ import operations from '@/api/operations';
 import {
 	createGame,
 	deleteGame,
+	patchGame,
 	getGameDetails,
 	listGameTypes,
 	listGames,
@@ -25,7 +26,7 @@ export const queries = {
 	createGame,
 	getGameDetails,
 	deleteGame,
-	patchGame: null,
+	patchGame,
 	getGameType,
 	listDocuments,
 	createDocument,

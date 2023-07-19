@@ -85,6 +85,8 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 		var patch = PatchExtensions.CreatePatch(originalNode, resultNode);
 		var key = ToKey(original);
 
+		// TODO - check to see if patch is larger than value; if so, just send value
+
 		messageIdProvider.Defer((messageId) => SendModifiedMessage(clients, original, new { messageId, key, patch }));
 	}
 

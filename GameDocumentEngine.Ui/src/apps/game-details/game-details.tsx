@@ -1,12 +1,11 @@
-import { Button } from '@/components/button/button';
-import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { HiOutlineTrash } from 'react-icons/hi';
+import { HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
+import { IconButton } from '@/components/button/icon-button';
 
 function useDeleteGame() {
 	const queryClient = useQueryClient();
@@ -30,13 +29,15 @@ export function GameDetails({ gameId }: { gameId: string }) {
 
 	return (
 		<NarrowContent>
-			<h1 className="text-2xl font-bold">{gameDetails.name}</h1>
-			<ButtonRow>
-				<Button.Destructive onClick={() => void onDeleteGame()}>
-					<HiOutlineTrash className="inline-block mr-2" />
-					Delete
-				</Button.Destructive>
-			</ButtonRow>
+			<div className="flex flex-row gap-3">
+				<h1 className="text-2xl font-bold flex-1">{gameDetails.name}</h1>
+				<IconButton onClick={() => navigate(`/game/${gameId}/edit`)}>
+					<HiOutlineCog />
+				</IconButton>
+				<IconButton.Destructive onClick={() => void onDeleteGame()}>
+					<HiOutlineTrash />
+				</IconButton.Destructive>
+			</div>
 		</NarrowContent>
 	);
 

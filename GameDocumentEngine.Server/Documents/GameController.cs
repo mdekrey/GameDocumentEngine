@@ -3,10 +3,12 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
+using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Security.Claims;
+using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -70,10 +72,30 @@ public class GameController : Api.GameControllerBase
 		return GetGameDetailsActionResult.Ok(await GameModelChangeNotification.ToGameDetails(gameRecord, gameTypes));
 	}
 
-	protected override Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
+	protected override async Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
 	{
-		// TODO: Implement patch game
-		throw new NotImplementedException();
+		if (!ModelState.IsValid) return PatchGameActionResult.BadRequest("Unable to parse JSON Patch");
+
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).ThenInclude(g => g.Players).ThenInclude(gu => gu.User)
+									where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
+									select gameUser)
+			.SingleOrDefaultAsync();
+		if (gameUserRecord == null) return PatchGameActionResult.NotFound();
+		// TODO: check permissions
+
+		var editable = new JsonObject(
+			new[]
+			{
+				KeyValuePair.Create<string, JsonNode?>("name", gameUserRecord.Game.Name),
+			}
+		);
+		var result = patchGameBody.Apply(editable);
+		if (!result.IsSuccess)
+			return PatchGameActionResult.BadRequest(result.Error ?? "Unknown error");
+		gameUserRecord.Game.Name = result.Result?["name"]?.GetValue<string?>() ?? gameUserRecord.Game.Name;
+		await dbContext.SaveChangesAsync();
+
+		return PatchGameActionResult.Ok(await GameModelChangeNotification.ToGameDetails(gameUserRecord.Game, gameTypes));
 	}
 
 	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
