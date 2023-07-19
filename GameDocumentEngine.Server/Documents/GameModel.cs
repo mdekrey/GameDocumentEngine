@@ -11,6 +11,7 @@ public class GameModel : IAuditable
 	public string Type { get; set; }
 
 	public ICollection<GameUserModel> Players { get; } = new List<GameUserModel>();
+	public ICollection<DocumentModel> Documents { get; } = new List<DocumentModel>();
 
 	public DateTimeOffset CreatedDate { get; private set; }
 	public string? CreatedBy { get; private set; }

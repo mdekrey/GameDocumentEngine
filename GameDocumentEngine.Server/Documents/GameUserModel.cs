@@ -13,7 +13,7 @@ public class GameUserModel : IAuditable
 	public GameModel Game { get; set; }
 	public UserModel User { get; set; }
 
-	// TODO: some kind of permissioning here
+	public string Role { get; set; }
 
 	public ICollection<DocumentUserModel> Documents { get; private set; } = new List<DocumentUserModel>();
 

@@ -49,7 +49,7 @@ public class UserController : Api.UserControllerBase
 	);
 }
 
-class UserModelToUserDetails : EntityChangeNotifications<UserModel, Api.UserDetails>
+class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.UserDetails>
 {
 	protected override bool HasAddedMessage => false;
 	protected override Task SendAddedMessage(IHubClients clients, UserModel result, object message) => Task.CompletedTask;
@@ -64,10 +64,10 @@ class UserModelToUserDetails : EntityChangeNotifications<UserModel, Api.UserDeta
 		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserUpdated", message);
 	}
 
-	protected override UserDetails ToApi(UserModel entity) => new Api.UserDetails(
+	protected override Task<UserDetails> ToApi(UserModel entity) => Task.FromResult(new Api.UserDetails(
 		Id: entity.Id,
 		Name: entity.Name
-	);
+	));
 
 	protected override object ToKey(UserModel entity) => entity.Id;
 }

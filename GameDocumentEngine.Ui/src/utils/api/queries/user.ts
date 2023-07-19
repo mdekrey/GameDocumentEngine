@@ -1,7 +1,9 @@
 import { QueryClient, UseMutationOptions } from '@tanstack/react-query';
-import { applyPatch, type Patch } from 'rfc6902';
+import { type Patch } from 'rfc6902';
 import { api } from '../fetch-api';
 import { UserDetails } from '@/api/models/UserDetails';
+import { type EntityChangedProps } from '../EntityChangedProps';
+import { applyEventToQuery } from './applyEventToQuery';
 
 export const getCurrentUser = {
 	queryKey: ['currentUser'],
@@ -11,20 +13,15 @@ export const getCurrentUser = {
 		return response.data;
 	},
 };
+
 export async function invalidateCurrentUser(
 	queryClient: QueryClient,
-	{ key, patch }: { key: string; patch: Patch },
+	event: EntityChangedProps<string, UserDetails>,
 ) {
 	const currentUserQueryKey = getCurrentUser.queryKey;
 	const data = queryClient.getQueryData<UserDetails>(currentUserQueryKey);
-	if (data?.id === key) {
-		const result = JSON.parse(JSON.stringify(data)) as UserDetails;
-		const errors = applyPatch(result, patch);
-		if (errors.some((v) => !!v)) {
-			await queryClient.invalidateQueries(currentUserQueryKey);
-		} else {
-			queryClient.setQueryData(currentUserQueryKey, result);
-		}
+	if (data?.id === event.key) {
+		await applyEventToQuery(queryClient, currentUserQueryKey, event);
 	}
 }
 

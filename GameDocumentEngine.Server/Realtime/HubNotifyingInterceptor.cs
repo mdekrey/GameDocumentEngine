@@ -89,7 +89,7 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 	}
 
 	protected abstract object ToKey(TEntity entity);
-	protected abstract TApi ToApi(TEntity entity);
+	protected abstract Task<TApi> ToApi(TEntity entity);
 	protected virtual bool HasModifiedMessage => true;
 	protected virtual bool HasAddedMessage => true;
 	protected virtual bool HasDeletedMessage => true;

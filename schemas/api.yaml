@@ -103,7 +103,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameDetailsWithId"
+                $ref: "#/components/schemas/GameDetails"
         400:
           description: There was a validation issue creating the game.
   /game-type/{gameType}:
@@ -143,7 +143,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameDetailsWithId"
+                $ref: "#/components/schemas/GameDetails"
         404:
           description: Target game not found
     delete:
@@ -184,7 +184,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameDetailsWithId"
+                $ref: "#/components/schemas/GameDetails"
         400:
           description: There was a problem applying the patch
           content:
@@ -353,23 +353,18 @@ components:
           - players
           - inviteUrl
           - typeInfo
+          - id
           properties:
+            id: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
             players:
+              # TODO: make this a dictionary for player info
               type: array
               items:
                 type: string
             inviteUrl: { type: string }
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
-    GameDetailsWithId:
-      allOf:
-        - $ref: '#/components/schemas/GameDetails'
-        - type: object
-          required:
-            - id
-          properties:
-            id: { type: string, format: guid }
     GameSummary:
       type: object
       required:

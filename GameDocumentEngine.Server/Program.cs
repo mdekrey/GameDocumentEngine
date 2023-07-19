@@ -97,8 +97,11 @@ services.AddAuthorization(options =>
 services.AddHttpContextAccessor();
 services.AddTransient<AuditableInterceptor>();
 services.AddTransient<HubNotifyingInterceptor>();
-services.AddSingleton<IEntityChangeNotifications, UserModelToUserDetails>();
-services.AddSingleton<IEntityChangeNotifications, DocumentModelToDocumentDetails>();
+services.AddSingleton<IEntityChangeNotifications, UserModelChangeNotifications>();
+services.AddSingleton<IEntityChangeNotifications, DocumentModelChangeNotifications>();
+services.AddSingleton<IEntityChangeNotifications, DocumentUserModelChangeNotifications>();
+services.AddSingleton<IEntityChangeNotifications, GameModelChangeNotification>();
+services.AddSingleton<IEntityChangeNotifications, GameUserModelChangeNotification>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
 	o.UseSqlServer(builder.Configuration["AzureSql:ConnectionString"] ?? throw new InvalidOperationException("AzureSql not configured"))

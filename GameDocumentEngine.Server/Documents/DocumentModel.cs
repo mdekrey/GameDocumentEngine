@@ -18,6 +18,7 @@ public class DocumentModel : IAuditable
 	public JsonNode Details { get; set; }
 
 	public ICollection<DocumentUserModel> Players { get; } = new List<DocumentUserModel>();
+	public GameModel Game { get; set; }
 
 	public DateTimeOffset CreatedDate { get; private set; }
 	public string? CreatedBy { get; private set; }

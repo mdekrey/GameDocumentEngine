@@ -8,6 +8,7 @@ using Json.Patch;
 using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -73,15 +74,16 @@ public class DocumentController : Api.DocumentControllerBase
 
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
 	{
-		var gameUserRecord = await (from documentUser in dbContext.DocumentUsers
-										.Include(du => du.GameUser).Include(du => du.Document).Include(du => du.User)
-									where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
-									select documentUser)
+		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers
+										.Include(du => du.GameUser).Include(du => du.Document).ThenInclude(d => d.Players).Include(du => du.User)
+										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
+										select documentUser)
 			.SingleOrDefaultAsync();
-		if (gameUserRecord == null) return DeleteDocumentActionResult.NotFound();
+		if (documentUserRecord == null) return DeleteDocumentActionResult.NotFound();
 		// TODO - check permissions
 
-		dbContext.Remove(gameUserRecord.Document);
+		dbContext.RemoveRange(documentUserRecord.Document.Players);
+		dbContext.Remove(documentUserRecord.Document);
 		await dbContext.SaveChangesAsync();
 		return DeleteDocumentActionResult.Ok();
 	}
@@ -156,7 +158,7 @@ public class DocumentController : Api.DocumentControllerBase
 	}
 }
 
-class DocumentModelToDocumentDetails : EntityChangeNotifications<DocumentModel, Api.DocumentDetails>
+class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel, Api.DocumentDetails>
 {
 	// TODO: don't send to all clients
 	// TODO: mask parts of document data based on permissions
@@ -170,13 +172,28 @@ class DocumentModelToDocumentDetails : EntityChangeNotifications<DocumentModel, 
 	protected override Task SendModifiedMessage(IHubClients clients, DocumentModel original, object message) =>
 		clients.All.SendAsync("DocumentChanged", message);
 
-	protected override DocumentDetails ToApi(DocumentModel document) => new DocumentDetails(
+	protected override Task<DocumentDetails> ToApi(DocumentModel document) => Task.FromResult(new DocumentDetails(
 			Id: document.Id,
 			Name: document.Name,
 			Type: document.Type,
 			Details: document.Details,
 			LastUpdated: document.LastModifiedDate
-		);
+		));
 
 	protected override object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
+}
+
+class DocumentUserModelChangeNotifications : IEntityChangeNotifications<DocumentUserModel>
+{
+	public ValueTask SendChangeNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	{
+		var target = changedEntity.Entity as DocumentUserModel;
+		if (target == null)
+			return ValueTask.CompletedTask;
+
+		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.UserDirect(target.UserId)).SendAsync("DocumentListChanged", new { messageId, key = target.GameId }));
+		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.Game(target.GameId)).SendAsync("DocumentUsersChanged", new { messageId, key = new { target.GameId, Id = target.DocumentId } }));
+
+		return ValueTask.CompletedTask;
+	}
 }

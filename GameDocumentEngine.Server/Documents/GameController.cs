@@ -1,8 +1,11 @@
 ﻿using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
+using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Security.Claims;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -28,28 +31,11 @@ public class GameController : Api.GameControllerBase
 		{
 			Name = createGameBody.Name,
 			Type = createGameBody.Type,
-			Players = { new GameUserModel { User = user } },
+			Players = { new GameUserModel { User = user, Role = "owner" } },
 		};
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
-		return CreateGameActionResult.Ok(await ToGameDetails(game));
-	}
-
-	private async Task<GameDetailsWithId> ToGameDetails(GameModel game) =>
-		new GameDetailsWithId(Name: game.Name,
-			LastUpdated: game.LastModifiedDate,
-			Players: game.Players.Select(p => p.User.Name),
-			InviteUrl: "TODO",
-			Id: game.Id,
-			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType) ? await ToGameTypeDetails(gameType, gameTypes) : throw new NotSupportedException("Unknown game type")
-		);
-
-	public static async Task<GameTypeDetails> ToGameTypeDetails(IGameType gameType, GameTypes gameTypes)
-	{
-		return new GameTypeDetails(
-			Name: gameType.Name,
-			ObjectTypes: await Task.WhenAll(gameType.ObjectTypes.Select(async obj => new GameObjectTypeDetails(Name: obj.Name, Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameObjectType => gameTypes.ResolveGameObjectScripts(gameObjectType)))).SelectMany(a => a).Distinct())))
-		);
+		return CreateGameActionResult.Ok(await GameModelChangeNotification.ToGameDetails(game, gameTypes));
 	}
 
 	protected override async Task<ListGamesActionResult> ListGames()
@@ -81,7 +67,7 @@ public class GameController : Api.GameControllerBase
 			.SingleOrDefaultAsync();
 		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
 
-		return GetGameDetailsActionResult.Ok(await ToGameDetails(gameRecord));
+		return GetGameDetailsActionResult.Ok(await GameModelChangeNotification.ToGameDetails(gameRecord, gameTypes));
 	}
 
 	protected override Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
@@ -93,7 +79,70 @@ public class GameController : Api.GameControllerBase
 	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
 	{
 		return gameTypes.All.TryGetValue(gameType, out var r)
-			? GetGameTypeActionResult.Ok(await ToGameTypeDetails(r, gameTypes))
+			? GetGameTypeActionResult.Ok(await GameModelChangeNotification.ToGameTypeDetails(r, gameTypes))
 			: GetGameTypeActionResult.NotFound();
+	}
+}
+
+class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.GameDetails>
+{
+	private readonly GameTypes gameTypes;
+
+	public GameModelChangeNotification(GameTypes gameTypes)
+	{
+		this.gameTypes = gameTypes;
+	}
+
+	protected override bool HasAddedMessage => false;
+	protected override Task SendAddedMessage(IHubClients clients, GameModel result, object message) =>
+		Task.CompletedTask;
+
+	protected override Task SendDeletedMessage(IHubClients clients, GameModel original, object message) =>
+		clients.Group(GroupNames.Game(original.Id)).SendAsync("GameDeleted", message);
+
+	protected override Task SendModifiedMessage(IHubClients clients, GameModel original, object message) =>
+		clients.Group(GroupNames.Game(original.Id)).SendAsync("GameChanged", message);
+
+	protected override Task<GameDetails> ToApi(GameModel game) =>
+		ToGameDetails(game, gameTypes);
+
+	public static async Task<GameDetails> ToGameDetails(GameModel game, GameTypes gameTypes) =>
+		new GameDetails(Name: game.Name,
+			LastUpdated: game.LastModifiedDate,
+			Players: game.Players.Select(p => p.User.Name),
+			InviteUrl: "TODO",
+			Id: game.Id,
+			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType)
+				? await ToGameTypeDetails(gameType, gameTypes)
+			: throw new NotSupportedException("Unknown game type")
+		);
+
+	public static async Task<GameTypeDetails> ToGameTypeDetails(IGameType gameType, GameTypes gameTypes)
+	{
+		return new GameTypeDetails(
+			Name: gameType.Name,
+			ObjectTypes: await Task.WhenAll(
+				gameType.ObjectTypes.Select(async obj => new GameObjectTypeDetails(
+							Name: obj.Name,
+							Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameTypes.ResolveGameObjectScripts))).SelectMany(a => a).Distinct()
+				)))
+		);
+	}
+
+	protected override object ToKey(GameModel entity) => entity.Id;
+}
+
+class GameUserModelChangeNotification : IEntityChangeNotifications<GameUserModel>
+{
+	public ValueTask SendChangeNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	{
+		var target = changedEntity.Entity as GameUserModel;
+		if (target == null)
+			return ValueTask.CompletedTask;
+
+		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.UserDirect(target.UserId)).SendAsync("GameListChanged", new { messageId }));
+		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.Game(target.GameId)).SendAsync("GameChanged", new { messageId, key = target.GameId }));
+
+		return ValueTask.CompletedTask;
 	}
 }

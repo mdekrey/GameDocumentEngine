@@ -1,7 +1,7 @@
 import { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 import { NavigateFunction } from 'react-router-dom';
-import { GameDetailsWithId } from '@/api/models/GameDetailsWithId';
+import { GameDetails } from '@/api/models/GameDetails';
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 
 export const listGameTypes = () => ({
@@ -27,7 +27,7 @@ export const listGames = {
 export function createGame(
 	queryClient: QueryClient,
 	navigate: NavigateFunction,
-): UseMutationOptions<GameDetailsWithId, unknown, CreateGameDetails, unknown> {
+): UseMutationOptions<GameDetails, unknown, CreateGameDetails, unknown> {
 	return {
 		mutationFn: async (game: CreateGameDetails) => {
 			const response = await api.createGame({ body: game });

@@ -23,6 +23,7 @@ public class DocumentDbContext : DbContext
 			entity.HasKey(u => u.Id);
 			entity.HasIndex(u => u.GoogleNameId);
 			entity.HasMany(u => u.Games).WithOne(u => u.User).HasForeignKey(u => u.UserId);
+
 			entity.HasMany(u => u.Documents).WithOne(du => du.User).HasForeignKey(du => du.UserId).OnDelete(DeleteBehavior.NoAction);
 		});
 
@@ -30,6 +31,16 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(g => g.Id);
 			entity.HasMany(g => g.Players).WithOne(u => u.Game).HasForeignKey(u => u.GameId);
+			entity.HasMany(g => g.Documents).WithOne(d => d.Game).HasForeignKey(du => du.GameId);
+		});
+
+		modelBuilder.Entity<Documents.DocumentModel>(entity =>
+		{
+			entity.HasKey(d => d.Id);
+			entity.HasIndex(d => new { d.GameId, d.Id });
+			entity.HasMany(du => du.Players).WithOne(u => u.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId }).OnDelete(DeleteBehavior.NoAction);
+
+			entity.Property(d => d.Details).HasConversion(JsonValueConverter.Instance);
 		});
 
 		modelBuilder.Entity<Documents.GameUserModel>(entity =>
@@ -37,15 +48,6 @@ public class DocumentDbContext : DbContext
 			entity.HasKey(gu => new { gu.UserId, gu.GameId });
 			entity.HasIndex(gu => gu.GameId);
 			entity.HasMany(gu => gu.Documents).WithOne(du => du.GameUser).HasForeignKey(du => new { du.UserId, du.GameId }).HasPrincipalKey(gu => new { gu.UserId, gu.GameId });
-		});
-
-		modelBuilder.Entity<Documents.DocumentModel>(entity =>
-		{
-			entity.HasKey(d => d.Id);
-			entity.HasIndex(d => new { d.GameId, d.Id });
-			entity.HasMany(du => du.Players).WithOne(u => u.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId });
-
-			entity.Property(d => d.Details).HasConversion(JsonValueConverter.Instance);
 		});
 
 		modelBuilder.Entity<Documents.DocumentUserModel>(entity =>

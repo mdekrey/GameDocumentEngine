@@ -4,6 +4,8 @@ import { api } from '../fetch-api';
 import { NavigateFunction } from 'react-router-dom';
 import { DocumentDetails } from '@/api/models/DocumentDetails';
 import { Patch } from 'rfc6902';
+import { EntityChangedProps } from '../EntityChangedProps';
+import { applyEventToQuery } from './applyEventToQuery';
 
 export const listDocuments = (gameId: string) => ({
 	queryKey: ['game', gameId, 'document'],
@@ -28,6 +30,16 @@ export const getDocument = (gameId: string, documentId: string) => {
 	};
 	return result;
 };
+
+export async function invalidateDocument(
+	queryClient: QueryClient,
+	event: EntityChangedProps<{ gameId: string; id: string }, DocumentDetails>,
+) {
+	const queryKey = getDocument(event.key.gameId, event.key.id).queryKey;
+	await applyEventToQuery(queryClient, queryKey, event);
+	// TODO: conditionally invalidate list of documents
+	await queryClient.invalidateQueries(listDocuments(event.key.gameId).queryKey);
+}
 
 export function createDocument(
 	queryClient: QueryClient,
