@@ -9,8 +9,8 @@ export async function applyEventToQuery<T>(
 ) {
 	if ('patch' in event) {
 		await applyPatchToQuery(queryClient, queryKey, event.patch);
-	} else if ('initialData' in event) {
-		queryClient.setQueryData(queryKey, event.initialData);
+	} else if ('value' in event) {
+		queryClient.setQueryData(queryKey, event.value);
 	} else {
 		await queryClient.invalidateQueries(queryKey);
 	}

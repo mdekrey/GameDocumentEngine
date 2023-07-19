@@ -47,8 +47,8 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 		}
 
 		var key = ToKey(result);
-		var initialValue = ToApi(result);
-		messageIdProvider.Defer((messageId) => SendAddedMessage(clients, result, new { messageId, key, initialValue }));
+		var value = ToApi(result);
+		messageIdProvider.Defer((messageId) => SendAddedMessage(clients, result, new { messageId, key, value }));
 	}
 
 	protected virtual async ValueTask SendDeletedNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
@@ -122,6 +122,8 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 
 		foreach (var changedEntity in context.ChangeTracker.Entries())
 		{
+			if (changedEntity.State == Microsoft.EntityFrameworkCore.EntityState.Unchanged) continue;
+
 			var notifications = entityChangeNotifiers.FirstOrDefault(c => c.CanHandle(changedEntity));
 			if (notifications != null)
 				await notifications.SendChangeNotification(messageIdProvider, hubContext.Clients, changedEntity);

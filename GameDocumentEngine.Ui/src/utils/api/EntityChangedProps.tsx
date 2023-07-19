@@ -4,7 +4,7 @@ export type EntityChangedProps<TKey = unknown, TEntity = unknown> = {
 	messageId: string;
 	key: TKey;
 } & {
-	add: { initialValue: TEntity };
+	add: { value: TEntity };
 	update: { patch: Patch };
 	delete: object;
 }['add' | 'update' | 'delete'];

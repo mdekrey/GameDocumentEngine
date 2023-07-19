@@ -34,7 +34,7 @@ public class GameDocumentsHub : Hub
 	}
 
 	public record SubscribeGameParams(Guid GameId);
-	public record SubscribeDocumentParams(Guid GameId, Guid Id);
+	public record SubscribeDocumentParams(Guid GameId, Guid DocumentId);
 
 	public async Task SubscribeToGame(SubscribeGameParams args)
 	{
@@ -72,7 +72,7 @@ public class GameDocumentsHub : Hub
 		using var scope = scopeFactory.CreateScope();
 		var db = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
 		var documentUser = await db.DocumentUsers.Include(du => du.Document).Include(du => du.GameUser).ThenInclude(gu => gu.Game)
-			.SingleOrDefaultAsync(gu => gu.DocumentId == args.Id && gu.GameId == args.GameId && gu.UserId == gu.UserId);
+			.SingleOrDefaultAsync(gu => gu.DocumentId == args.DocumentId && gu.GameId == args.GameId && gu.UserId == gu.UserId);
 		if (documentUser == null) return;
 		var gameType = gameTypes.All[documentUser.GameUser.Game.Type];
 		var documentType = gameType.ObjectTypes.First(docType => docType.Name == documentUser.Document.Type);
@@ -80,9 +80,9 @@ public class GameDocumentsHub : Hub
 		await Task.WhenAll(
 			documentType.PermissionLevels.Select(level =>
 			{
-				return level == documentType.CreatorPermissionLevel
+				return (Task)(level == documentType.CreatorPermissionLevel
 					? Groups.AddToGroupAsync(Context.ConnectionId, GroupNames.Document(args.GameId, documentUser.DocumentId, filterLevel: level))
-					: Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupNames.Document(args.GameId, documentUser.DocumentId, filterLevel: level));
+					: Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupNames.Document(args.GameId, documentUser.DocumentId, filterLevel: level)));
 			})
 		);
 	}
