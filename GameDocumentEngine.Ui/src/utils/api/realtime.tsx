@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo } from 'react';
 import { createRealtimeApiConnection } from './realtime.signalr';
 import type { HubConnection } from '@microsoft/signalr';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { isMessageIdReceived } from './recent-queries';
 import { invalidateCurrentUser } from './queries/user';
 import { invalidateDocument } from './queries/document';
 import { invalidateGame, invalidateGameList } from './queries/games';
@@ -72,7 +71,7 @@ function apiOn<T>(
 	return () => api.connection.off(methodName, callbackWithCheck);
 
 	function callbackWithCheck(req: T & { messageId: string }) {
-		if (!isMessageIdReceived(req.messageId)) void callback(queryClient, req);
+		void callback(queryClient, req);
 	}
 }
 

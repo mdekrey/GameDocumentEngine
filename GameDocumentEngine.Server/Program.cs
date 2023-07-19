@@ -111,8 +111,6 @@ services.AddDbContext<DocumentDbContext>((provider, o) =>
 		.AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });
 
-services.AddScoped<MessageIdProvider>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -135,13 +133,6 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.Use((doContinue) => async (context) =>
-{
-	var messageIdProvider = context.RequestServices.GetRequiredService<MessageIdProvider>();
-	messageIdProvider.AddToResponse(context.Response);
-	await doContinue(context);
-});
 
 app.MapControllers();
 app.MapHub<GameDocumentsHub>("/hub");
