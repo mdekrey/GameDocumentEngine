@@ -52,15 +52,16 @@ public class UserController : Api.UserControllerBase
 class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.UserDetails>
 {
 	protected override bool HasAddedMessage => false;
-	protected override Task SendAddedMessage(IHubClients clients, UserModel result, object message) => Task.CompletedTask;
+	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel result, object message) => Task.CompletedTask;
 
-	protected override Task SendDeletedMessage(IHubClients clients, UserModel original, object message)
+	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message)
 	{
 		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserDeleted", message);
 	}
 
-	protected override Task SendModifiedMessage(IHubClients clients, UserModel original, object message)
+	protected override Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message)
 	{
+		// TODO: when name changes, send message to all games they're in
 		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserUpdated", message);
 	}
 

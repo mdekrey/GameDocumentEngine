@@ -12,7 +12,7 @@ namespace GameDocumentEngine.Server.Realtime;
 interface IEntityChangeNotifications
 {
 	bool CanHandle(EntityEntry changedEntity);
-	ValueTask SendChangeNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity);
+	ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity);
 }
 
 interface IEntityChangeNotifications<T> : IEntityChangeNotifications where T : class
@@ -22,22 +22,22 @@ interface IEntityChangeNotifications<T> : IEntityChangeNotifications where T : c
 
 abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotifications<TEntity> where TEntity : class
 {
-	public virtual ValueTask SendChangeNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	public virtual ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		switch (changedEntity.State)
 		{
 			case Microsoft.EntityFrameworkCore.EntityState.Added when HasAddedMessage:
-				return SendAddedNotification(messageIdProvider, clients, changedEntity);
+				return SendAddedNotification(context, clients, changedEntity);
 			case Microsoft.EntityFrameworkCore.EntityState.Deleted when HasDeletedMessage:
-				return SendDeletedNotification(messageIdProvider, clients, changedEntity);
+				return SendDeletedNotification(context, clients, changedEntity);
 			case Microsoft.EntityFrameworkCore.EntityState.Modified when HasModifiedMessage:
-				return SendModifiedNotification(messageIdProvider, clients, changedEntity);
+				return SendModifiedNotification(context, clients, changedEntity);
 			default:
 				return ValueTask.CompletedTask;
 		}
 	}
 
-	protected virtual async ValueTask SendAddedNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	protected virtual async ValueTask SendAddedNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		var result = changedEntity.Entity as TEntity;
 		if (result == null)
@@ -48,10 +48,10 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 
 		var key = ToKey(result);
 		var value = await ToApi(result);
-		messageIdProvider.Defer((messageId) => SendAddedMessage(clients, result, new { messageId, key, value }));
+		await SendAddedMessage(context, clients, result, new { key, value });
 	}
 
-	protected virtual async ValueTask SendDeletedNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	protected virtual async ValueTask SendDeletedNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		var original = changedEntity.OriginalValues.Clone().ToObject() as TEntity;
 		if (original == null)
@@ -61,10 +61,10 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 		}
 
 		var key = ToKey(original);
-		messageIdProvider.Defer((messageId) => SendDeletedMessage(clients, original, new { messageId, key }));
+		await SendDeletedMessage(context, clients, original, new { key });
 	}
 
-	protected virtual async ValueTask SendModifiedNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	protected virtual async ValueTask SendModifiedNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		var original = changedEntity.OriginalValues.Clone().ToObject() as TEntity;
 		if (original == null)
@@ -87,7 +87,7 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 
 		// TODO - check to see if patch is larger than value; if so, just send value
 
-		messageIdProvider.Defer((messageId) => SendModifiedMessage(clients, original, new { messageId, key, patch }));
+		await SendModifiedMessage(context, clients, original, new { key, patch });
 	}
 
 	protected abstract object ToKey(TEntity entity);
@@ -95,21 +95,19 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 	protected virtual bool HasModifiedMessage => true;
 	protected virtual bool HasAddedMessage => true;
 	protected virtual bool HasDeletedMessage => true;
-	protected abstract Task SendAddedMessage(IHubClients clients, TEntity result, object message);
-	protected abstract Task SendDeletedMessage(IHubClients clients, TEntity original, object message);
-	protected abstract Task SendModifiedMessage(IHubClients clients, TEntity original, object message);
+	protected abstract Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, TEntity result, object message);
+	protected abstract Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, TEntity original, object message);
+	protected abstract Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, TEntity original, object message);
 }
 
 class HubNotifyingInterceptor : ISaveChangesInterceptor
 {
 	private readonly IHubContext<GameDocumentsHub> hubContext;
-	private readonly MessageIdProvider messageIdProvider;
 	private readonly IEnumerable<IEntityChangeNotifications> entityChangeNotifiers;
 
-	public HubNotifyingInterceptor(IHubContext<GameDocumentsHub> hubContext, MessageIdProvider messageIdProvider, IEnumerable<IEntityChangeNotifications> entityChangeNotifiers)
+	public HubNotifyingInterceptor(IHubContext<GameDocumentsHub> hubContext, IEnumerable<IEntityChangeNotifications> entityChangeNotifiers)
 	{
 		this.hubContext = hubContext;
-		this.messageIdProvider = messageIdProvider;
 		this.entityChangeNotifiers = entityChangeNotifiers;
 	}
 
@@ -119,8 +117,7 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 		InterceptionResult<int> result,
 		CancellationToken cancellationToken = default)
 	{
-		var context = eventData.Context;
-		if (context == null) return result;
+		if (eventData.Context is not Data.DocumentDbContext context) return result;
 
 		foreach (var changedEntity in context.ChangeTracker.Entries())
 		{
@@ -128,7 +125,7 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 
 			var notifications = entityChangeNotifiers.FirstOrDefault(c => c.CanHandle(changedEntity));
 			if (notifications != null)
-				await notifications.SendChangeNotification(messageIdProvider, hubContext.Clients, changedEntity);
+				await notifications.SendChangeNotification(context, hubContext.Clients, changedEntity);
 		}
 
 		return result;

@@ -17,13 +17,6 @@ export type RealtimeApi = {
 	connectionPromise: Promise<HubConnection>;
 	cancellation: AbortSignal;
 	// TODO: allow messages to be sent by client, or allow registering/unregistering of listeners
-
-	subscribeToGame(gameId: string): Promise<void>;
-	refreshDocumentSubscription(
-		gameId: string,
-		documentId: string,
-	): Promise<void>;
-	unsubscribeFromGame(gameId: string): Promise<void>;
 };
 
 const realtimeApiContext = createContext<undefined | RealtimeApi>(undefined);
@@ -98,21 +91,5 @@ function createRealtimeApi(
 	return {
 		connectionPromise: api.connectionPromise,
 		cancellation: api.cancellation,
-
-		async subscribeToGame(gameId: string) {
-			const connection = await api.connectionPromise;
-			await connection.send('SubscribeToGame', { gameId });
-		},
-		async refreshDocumentSubscription(gameId: string, documentId: string) {
-			const connection = await api.connectionPromise;
-			await connection.send('RefreshDocumentSubscription', {
-				gameId,
-				documentId,
-			});
-		},
-		async unsubscribeFromGame(gameId: string) {
-			const connection = await api.connectionPromise;
-			await connection.send('UnsubscribeFromGame', { gameId });
-		},
 	};
 }

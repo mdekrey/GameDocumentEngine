@@ -75,7 +75,7 @@ public class DocumentController : Api.DocumentControllerBase
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
 	{
 		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers
-										.Include(du => du.GameUser).Include(du => du.Document).Include(du => du.User)
+										.Include(du => du.GameUser).Include(du => du.Document).ThenInclude(d => d.Players).Include(du => du.User)
 										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
 										select documentUser)
 			.SingleOrDefaultAsync();
@@ -163,14 +163,17 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 	// TODO: don't send to all clients
 	// TODO: mask parts of document data based on permissions
 
-	protected override Task SendAddedMessage(IHubClients clients, DocumentModel result, object message) =>
-		clients.All.SendAsync("DocumentAdded", message);
+	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel result, object message) =>
+		Task.CompletedTask;
 
-	protected override Task SendDeletedMessage(IHubClients clients, DocumentModel original, object message) =>
-		clients.All.SendAsync("DocumentDeleted", message);
+	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel original, object message) =>
+		Task.CompletedTask;
 
-	protected override Task SendModifiedMessage(IHubClients clients, DocumentModel original, object message) =>
-		clients.All.SendAsync("DocumentChanged", message);
+	protected override async Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel original, object message)
+	{
+		var players = await context.DocumentUsers.Where(du => du.DocumentId == original.Id).ToArrayAsync();
+		await clients.Groups(players.Select(p => p.UserId).Select(GroupNames.UserDirect)).SendAsync("DocumentChanged", message);
+	}
 
 	protected override Task<DocumentDetails> ToApi(DocumentModel document) => Task.FromResult(new DocumentDetails(
 			Id: document.Id,
@@ -185,15 +188,27 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 
 class DocumentUserModelChangeNotifications : IEntityChangeNotifications<DocumentUserModel>
 {
-	public ValueTask SendChangeNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	public async ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		var target = changedEntity.Entity as DocumentUserModel;
 		if (target == null)
-			return ValueTask.CompletedTask;
+			return;
+		var players = await context.DocumentUsers.Where(du => du.DocumentId == target.DocumentId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
 
-		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.UserDirect(target.UserId)).SendAsync("DocumentListChanged", new { messageId, key = target.GameId }));
-		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.Game(target.GameId)).SendAsync("DocumentUsersChanged", new { messageId, key = new { target.GameId, Id = target.DocumentId } }));
+		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
+		var currentUser = GroupNames.UserDirect(target.UserId);
+		var otherUsers = players.Select(GroupNames.UserDirect);
+		var key = new { target.GameId, Id = target.DocumentId };
+		if (changedEntity.State == EntityState.Deleted)
+			await clients.Group(currentUser).SendAsync("DocumentDeleted", new { key });
+		else if (changedEntity.State == EntityState.Added)
+			await clients.Group(currentUser).SendAsync("DocumentAdded", new { key });
+		else if (changedEntity.State == EntityState.Modified)
+			await clients.Group(currentUser).SendAsync("DocumentChanged", new { key });
 
-		return ValueTask.CompletedTask;
+		await clients.Groups(otherUsers).SendAsync("DocumentUsersChanged", new { key });
+
+		return;
 	}
+
 }

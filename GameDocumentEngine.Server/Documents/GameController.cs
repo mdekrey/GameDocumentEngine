@@ -116,14 +116,17 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 	}
 
 	protected override bool HasAddedMessage => false;
-	protected override Task SendAddedMessage(IHubClients clients, GameModel result, object message) =>
+	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel result, object message) =>
 		Task.CompletedTask;
 
-	protected override Task SendDeletedMessage(IHubClients clients, GameModel original, object message) =>
-		clients.Group(GroupNames.Game(original.Id)).SendAsync("GameDeleted", message);
+	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel original, object message) =>
+		Task.CompletedTask;
 
-	protected override Task SendModifiedMessage(IHubClients clients, GameModel original, object message) =>
-		clients.Group(GroupNames.Game(original.Id)).SendAsync("GameChanged", message);
+	protected override async Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel original, object message)
+	{
+		var players = await context.GameUsers.Where(du => du.GameId == original.Id).Select(target => target.UserId).ToArrayAsync();
+		await clients.Groups(players.Select(GroupNames.UserDirect)).SendAsync("GameChanged", message);
+	}
 
 	protected override Task<GameDetails> ToApi(GameModel game) =>
 		ToGameDetails(game, gameTypes);
@@ -156,15 +159,25 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 
 class GameUserModelChangeNotification : IEntityChangeNotifications<GameUserModel>
 {
-	public ValueTask SendChangeNotification(MessageIdProvider messageIdProvider, IHubClients clients, EntityEntry changedEntity)
+	public async ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		var target = changedEntity.Entity as GameUserModel;
 		if (target == null)
-			return ValueTask.CompletedTask;
+			return;
+		var players = await context.GameUsers.Where(du => du.GameId == target.GameId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
 
-		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.UserDirect(target.UserId)).SendAsync("GameListChanged", new { messageId }));
-		messageIdProvider.Defer((messageId) => clients.Group(GroupNames.Game(target.GameId)).SendAsync("GameChanged", new { messageId, key = target.GameId }));
+		// treat removing the `target` as deleting the game, adding the 'target' as creating the game, and broadcast changes to others on the game
+		var currentUser = GroupNames.UserDirect(target.UserId);
+		var otherUsers = players.Select(GroupNames.UserDirect);
+		var key = target.GameId;
+		if (changedEntity.State == EntityState.Deleted)
+			await clients.Group(currentUser).SendAsync("GameDeleted", new { key });
+		else if (changedEntity.State == EntityState.Added)
+			await clients.Group(currentUser).SendAsync("GameAdded", new { key });
+		else if (changedEntity.State == EntityState.Modified)
+			await clients.Group(currentUser).SendAsync("GameChanged", new { key });
 
-		return ValueTask.CompletedTask;
+		await clients.Groups(otherUsers).SendAsync("GameUsersChanged", new { key });
+
 	}
 }

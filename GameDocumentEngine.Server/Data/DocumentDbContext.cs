@@ -31,7 +31,6 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(g => g.Id);
 			entity.HasMany(g => g.Players).WithOne(u => u.Game).HasForeignKey(u => u.GameId);
-			entity.Navigation(g => g.Players).AutoInclude();
 
 			entity.HasMany(g => g.Documents).WithOne(d => d.Game).HasForeignKey(du => du.GameId);
 		});
@@ -41,7 +40,6 @@ public class DocumentDbContext : DbContext
 			entity.HasKey(d => d.Id);
 			entity.HasIndex(d => new { d.GameId, d.Id });
 			entity.HasMany(d => d.Players).WithOne(du => du.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId }).OnDelete(DeleteBehavior.NoAction);
-			entity.Navigation(d => d.Players).AutoInclude();
 
 			entity.Property(d => d.Details).HasConversion(JsonValueConverter.Instance);
 		});
