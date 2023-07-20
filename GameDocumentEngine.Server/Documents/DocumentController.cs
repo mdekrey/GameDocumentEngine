@@ -149,6 +149,7 @@ public class DocumentController : Api.DocumentControllerBase
 	{
 		// TODO: trim document based on permissions?
 		return new DocumentDetails(
+					GameId: document.GameId,
 					Id: document.Id,
 					Name: document.Name,
 					Type: document.Type,
@@ -176,6 +177,7 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 	}
 
 	protected override Task<DocumentDetails> ToApi(DocumentModel document) => Task.FromResult(new DocumentDetails(
+			GameId: document.GameId,
 			Id: document.Id,
 			Name: document.Name,
 			Type: document.Type,

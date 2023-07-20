@@ -7,6 +7,9 @@ import { HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
 import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
 import { Clock, ClockDocument } from './clock-types';
+import { useQuery } from '@tanstack/react-query';
+import { queries } from '@/utils/api/queries';
+import { useMemo } from 'react';
 
 export function Clock({
 	document,
@@ -43,7 +46,11 @@ export function Clock({
 
 	function onEdit() {
 		void launchModal({
-			additional: { clock: clockData, onUpdateClock: onUpdateDocument },
+			additional: {
+				gameId: clockData.gameId,
+				documentId: clockData.id,
+				onUpdateClock: onUpdateDocument,
+			},
 			ModalContents: EditModal,
 		});
 	}
@@ -51,21 +58,35 @@ export function Clock({
 
 function EditModal({
 	resolve,
-	additional: { clock, onUpdateClock },
+	additional: { gameId, documentId, onUpdateClock },
 }: ModalContentsProps<
 	boolean,
 	{
-		clock: ClockDocument;
+		gameId: string;
+		documentId: string;
 		onUpdateClock: Updater<Clock>;
 	}
 >) {
+	const documentQuery = useQuery(queries.getDocument(gameId, documentId));
+
+	const clockData = useMemo(
+		(): ClockDocument | null =>
+			documentQuery.isSuccess
+				? {
+						name: documentQuery.data.name,
+						details: documentQuery.data.details as ClockDocument['details'],
+				  }
+				: null,
+		[documentQuery.isSuccess, documentQuery.data],
+	);
+	if (!clockData) {
+		return <div className="p-6">Loading...</div>;
+	}
+
 	return (
 		<div className="p-6">
 			<ClockEdit
-				clock={{
-					name: clock.name,
-					details: clock.details,
-				}}
+				clock={clockData}
 				onUpdateClock={(updater) => {
 					onUpdateClock(updater);
 					resolve(false);

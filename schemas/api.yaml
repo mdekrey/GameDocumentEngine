@@ -377,11 +377,13 @@ components:
     BaseDocumentDetails:
       type: object
       required:
+      - gameId
       - id
       - name
       - type
       - details
       properties:
+        gameId: { type: string, format: guid }
         id: { type: string, format: guid }
         name: { type: string }
         type: { type: string }

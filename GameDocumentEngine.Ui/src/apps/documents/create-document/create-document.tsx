@@ -9,15 +9,14 @@ import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { SelectInput } from '@/utils/form/select-input/select-input';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm, FormOptions } from '@/utils/form/useForm';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ZodType, z } from 'zod';
 import { useGameType } from '../useGameType';
 
 function useCreateDocument(gameId: string) {
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-	return useMutation(queries.createDocument(queryClient, navigate, gameId));
+	return useMutation(queries.createDocument(navigate, gameId));
 }
 
 const CreateDocumentDetails = z.object({

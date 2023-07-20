@@ -8,7 +8,7 @@ import { EntityChangedProps } from '../EntityChangedProps';
 import { applyEventToQuery } from './applyEventToQuery';
 
 export const listDocuments = (gameId: string) => ({
-	queryKey: ['game', gameId, 'document'],
+	queryKey: ['game', gameId, 'document', 'list'],
 	queryFn: async () => {
 		// TODO: this is currently not paginated, but neither is the server-side.
 		const response = await api.listDocuments({ params: { gameId } });
@@ -42,7 +42,6 @@ export async function invalidateDocument(
 }
 
 export function createDocument(
-	queryClient: QueryClient,
 	navigate: NavigateFunction,
 	gameId: string,
 ): UseMutationOptions<
@@ -60,16 +59,8 @@ export function createDocument(
 			if (response.statusCode === 200) return response.data;
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: async (document) => {
-			queryClient.setQueryData(
-				getDocument(gameId, document.id).queryKey,
-				document,
-			);
-			await queryClient.invalidateQueries(listDocuments(gameId).queryKey);
+		onSuccess: (document) => {
 			navigate(`/game/${gameId}/document/${document.id}`);
-			// TODO: invalidate game list
-			// queryClient.invalidateQueries();
-			// TODO: redirect to game landing page
 		},
 	};
 }
@@ -87,7 +78,7 @@ export function deleteDocument(
 			if (response.statusCode === 200) return undefined;
 			else throw new Error('Could not save changes');
 		},
-		onSuccess: async () => {
+		onError: async () => {
 			await queryClient.invalidateQueries(listDocuments(gameId).queryKey);
 			await queryClient.invalidateQueries(
 				getDocument(gameId, documentId).queryKey,
@@ -113,12 +104,6 @@ export function patchDocument(
 					'Other changes were being applied at the same time. Try again later.',
 				);
 			else throw new Error('Could not save changes');
-		},
-		onSuccess: (response) => {
-			queryClient.setQueryData(
-				getDocument(gameId, documentId).queryKey,
-				response,
-			);
 		},
 		onError: async () => {
 			await queryClient.invalidateQueries(
