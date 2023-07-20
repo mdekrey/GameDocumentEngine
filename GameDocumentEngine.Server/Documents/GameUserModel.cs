@@ -13,6 +13,7 @@ public class GameUserModel : IAuditable
 	public GameModel Game { get; set; }
 	public UserModel User { get; set; }
 
+	// Role name from global game roles
 	public string Role { get; set; }
 
 	public ICollection<DocumentUserModel> Documents { get; private set; } = new List<DocumentUserModel>();

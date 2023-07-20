@@ -15,7 +15,8 @@ public class DocumentUserModel : IAuditable
 	public UserModel User { get; set; }
 	public GameUserModel GameUser { get; set; }
 
-	// TODO: some kind of permissioning here
+	// Role name from game document type
+	public string Role { get; set; }
 
 
 	public DateTimeOffset CreatedDate { get; private set; }

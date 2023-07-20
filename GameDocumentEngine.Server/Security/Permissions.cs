@@ -3,7 +3,12 @@ using System.Text.RegularExpressions;
 
 namespace GameDocumentEngine.Server.Security;
 
-public record PermissionList(ImmutableArray<string> Permissions);
+public record PermissionList(ImmutableArray<string> Permissions)
+{
+	public static readonly PermissionList Empty = new PermissionList(ImmutableArray<string>.Empty);
+
+	public static PermissionList From(params string[] permissions) => new PermissionList(permissions.ToImmutableArray());
+}
 
 public static class Permissions
 {

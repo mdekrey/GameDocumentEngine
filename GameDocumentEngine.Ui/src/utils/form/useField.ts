@@ -6,19 +6,21 @@ import { StandardWritableAtom } from './StandardWritableAtom';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { RegisterErrorStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
-import { FieldEvents } from './events/FieldEvents';
 
-export type UseFieldResultFlags = 'hasErrors';
+export type DefaultUseFieldResultFlags = 'hasErrors';
+export type UseFieldResultFlags = 'hasErrors' | 'isCheckbox';
 export type ErrorsAtom<TValue> = Atom<Loadable<ZodError<TValue> | null>>;
 export type UseFieldResult<
 	TValue,
 	TFieldValue = TValue,
-	TFlags extends UseFieldResultFlags = UseFieldResultFlags,
+	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
 	valueAtom: PrimitiveAtom<TValue>;
 	setValue(v: TValue): void;
 	getValue(): TValue;
-	standardProps: InputFieldProps<TFieldValue>;
+	standardProps: 'isCheckbox' extends TFlags
+		? CheckboxFieldProps<TFieldValue>
+		: InputFieldProps<TFieldValue>;
 	errors?: ErrorsAtom<TValue>;
 } & ('hasErrors' extends TFlags ? { errors: ErrorsAtom<TValue> } : object);
 
@@ -27,23 +29,11 @@ export type InputFieldProps<TFieldValue> = {
 	onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => void;
 	onBlur: React.ReactEventHandler;
 };
-
-export function toInputField<TFieldValue>(
-	store: ReturnType<typeof useStore>,
-	atom: StandardWritableAtom<TFieldValue>,
-	fieldEvents: FieldEvents,
-): InputFieldProps<TFieldValue> {
-	return {
-		defaultValue: atom,
-		onChange: (ev) => {
-			fieldEvents.dispatchEvent(FieldEvents.Change);
-			store.set(atom, ev.currentTarget.value);
-		},
-		onBlur: () => {
-			fieldEvents.dispatchEvent(FieldEvents.Blur);
-		},
-	};
-}
+export type CheckboxFieldProps<TFieldValue> = {
+	defaultChecked: Atom<TFieldValue>;
+	onChange: (ev: React.ChangeEvent<{ checked: TFieldValue }>) => void;
+	onBlur: React.ReactEventHandler;
+};
 
 export type FieldMapping<TValue, TFormFieldValue> = {
 	toForm(this: void, v: TValue): TFormFieldValue;
@@ -54,6 +44,7 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 	mapping: FieldMapping<TValue, TFormFieldValue>;
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
+	isCheckbox: boolean;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,
@@ -66,7 +57,8 @@ type MappedOptions<TValue, TFieldValue> = Partial<
 };
 
 type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> =
-	'schema' extends keyof TOptions ? 'hasErrors' : never;
+	| ('schema' extends keyof TOptions ? 'hasErrors' : never)
+	| ({ isCheckbox: true } extends TOptions ? 'isCheckbox' : never);
 
 export function useField<TValue, TOptions extends UnmappedOptions<TValue>>(
 	defaultValue: TValue,
@@ -83,7 +75,8 @@ export function useField<
 export function useField<TValue, TFieldValue>(
 	defaultValue: TValue,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
-): UseFieldResult<TValue, TFieldValue, never> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): UseFieldResult<TValue, TFieldValue, any> {
 	const fieldValueAtom = useMemo(
 		() => atom<TValue>(defaultValue),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,14 +100,16 @@ export function useFieldAtom<
 export function useFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
-): UseFieldResult<TValue, TFieldValue, never> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): UseFieldResult<TValue, TFieldValue, any> {
 	return useInternalFieldAtom(fieldValueAtom, options);
 }
 
 function useInternalFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
-): UseFieldResult<TValue, TFieldValue, never> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): UseFieldResult<TValue, TFieldValue, any> {
 	const store = useStore();
 	return useMemo(
 		() => toInternalFieldAtom(store, fieldValueAtom, options),

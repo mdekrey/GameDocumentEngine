@@ -1,6 +1,7 @@
 ﻿using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Realtime;
+using GameDocumentEngine.Server.Security;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
 using Json.Schema;
@@ -33,7 +34,7 @@ public class GameController : Api.GameControllerBase
 		{
 			Name = createGameBody.Name,
 			Type = createGameBody.Type,
-			Players = { new GameUserModel { User = user, Role = "owner" } },
+			Players = { new GameUserModel { User = user, Role = GameSecurity.DefaultGameRole } },
 		};
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
@@ -54,7 +55,8 @@ public class GameController : Api.GameControllerBase
 									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return DeleteGameActionResult.NotFound();
-		// TODO - check permissions
+		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.DeleteGame(gameId)))
+			return DeleteGameActionResult.Forbidden();
 
 		dbContext.RemoveRange(gameUserRecord.Game.Players);
 		dbContext.Remove(gameUserRecord.Game);
@@ -82,7 +84,9 @@ public class GameController : Api.GameControllerBase
 									select gameUser)
 			.SingleOrDefaultAsync();
 		if (gameUserRecord == null) return PatchGameActionResult.NotFound();
-		// TODO: check permissions
+		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.UpdateGame(gameId)))
+			return PatchGameActionResult.Forbidden();
+		// TODO: change permissions, with permissions
 
 		var editable = new JsonObject(
 			new[]
@@ -173,7 +177,6 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 		new GameDetails(Name: game.Name,
 			LastUpdated: game.LastModifiedDate,
 			Players: game.Players.ToDictionary(p => p.User.Id.ToString(), p => p.User.Name),
-			InviteUrl: "TODO",
 			Id: game.Id,
 			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType)
 				? await ToGameTypeDetails(gameType, gameTypes)
@@ -184,10 +187,13 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 	{
 		return new GameTypeDetails(
 			Name: gameType.Name,
+			UserRoles: GameSecurity.GameRoles,
 			ObjectTypes: await Task.WhenAll(
 				gameType.ObjectTypes.Select(async obj => new GameObjectTypeDetails(
-							Name: obj.Name,
-							Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameTypes.ResolveGameObjectScripts))).SelectMany(a => a).Distinct()
+					Name: obj.Name,
+					Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameTypes.ResolveGameObjectScripts))).SelectMany(a => a).Distinct(),
+					// Game types could have different roles eventually; for now, we use a hard-coded set
+					UserRoles: obj.PermissionLevels
 				)))
 		);
 	}

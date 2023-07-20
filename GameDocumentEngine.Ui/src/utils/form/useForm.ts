@@ -9,6 +9,7 @@ import {
 	FieldMapping,
 	FieldOptions,
 	UseFieldResult,
+	UseFieldResultFlags,
 	useFieldAtom,
 } from './useField';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
@@ -27,6 +28,7 @@ type UnmappedFieldConfig<
 	TPath extends Path<T> = Path<T>,
 > = {
 	path: TPath;
+	isCheckbox?: boolean;
 	mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;
 };
 type MappedFieldConfig<
@@ -35,6 +37,7 @@ type MappedFieldConfig<
 	TValue = PathValue<T, TPath>,
 > = {
 	path: TPath;
+	isCheckbox?: boolean;
 	mapping: FieldMapping<PathValue<T, TPath>, TValue>;
 };
 
@@ -50,22 +53,48 @@ export type FieldsConfig<T extends Objectish> = {
 
 export type ConfiguredFormField<
 	T extends Objectish,
-	TPath extends Path<T> = Path<T>,
-	TValue = PathValue<T, TPath>,
-	TArgs extends null | AnyArray = null,
+	TPath extends Path<T>,
+	TValue,
+	TArgs extends null | AnyArray,
+	TFlags extends UseFieldResultFlags,
 > = TArgs extends AnyArray
-	? (...args: TArgs) => UseFieldResult<PathValue<T, TPath>, TValue>
-	: UseFieldResult<PathValue<T, TPath>, TValue>;
+	? (...args: TArgs) => UseFieldResult<PathValue<T, TPath>, TValue, TFlags>
+	: UseFieldResult<PathValue<T, TPath>, TValue, TFlags>;
+
+type FlagsForFormFieldConfig<
+	T extends Objectish,
+	TFieldConfig extends FieldConfig<T>,
+> =
+	| 'hasErrors'
+	| (TFieldConfig extends { isCheckbox: true } ? 'isCheckbox' : never);
 
 type FormFieldReturnType<
 	T extends Objectish,
 	TFieldConfig extends FieldConfig<T>,
 > = TFieldConfig extends Path<T>
-	? ConfiguredFormField<T, TFieldConfig, PathValue<T, TFieldConfig>, null>
+	? ConfiguredFormField<
+			T,
+			TFieldConfig,
+			PathValue<T, TFieldConfig>,
+			null,
+			FlagsForFormFieldConfig<T, TFieldConfig>
+	  >
 	: TFieldConfig extends UnmappedFieldConfig<T, infer TPath>
-	? ConfiguredFormField<T, TPath, PathValue<T, TPath>, null>
+	? ConfiguredFormField<
+			T,
+			TPath,
+			PathValue<T, TPath>,
+			null,
+			FlagsForFormFieldConfig<T, TFieldConfig>
+	  >
 	: TFieldConfig extends MappedFieldConfig<T, infer TPath, infer TValue>
-	? ConfiguredFormField<T, TPath, TValue, null>
+	? ConfiguredFormField<
+			T,
+			TPath,
+			TValue,
+			null,
+			FlagsForFormFieldConfig<T, TFieldConfig>
+	  >
 	: never;
 
 export type FormFields<T extends Objectish, TFields extends FieldsConfig<T>> = {
@@ -137,7 +166,10 @@ function buildFormResult<
 					: toField(config),
 			];
 
-			function toField(config: FieldConfig<T>): UseFieldResult<unknown> {
+			function toField(
+				config: FieldConfig<T>,
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			): UseFieldResult<unknown, unknown, any> {
 				const path = (isArray(config) ? config : config.path) as Path<T>;
 				const options: Partial<FieldOptions<T, unknown>> = {
 					schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
@@ -145,11 +177,13 @@ function buildFormResult<
 				};
 				if (!isArray(config) && 'mapping' in config)
 					options.mapping = config.mapping;
+				if ('isCheckbox' in config) options.isCheckbox = config.isCheckbox;
 				return toInternalFieldAtom(
 					store,
 					getAtomForPath(path, atom),
 					options as never,
-				) as UseFieldResult<unknown>;
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				) as UseFieldResult<unknown, unknown, any>;
 			}
 		}),
 	) as FormFields<T, TFields>;

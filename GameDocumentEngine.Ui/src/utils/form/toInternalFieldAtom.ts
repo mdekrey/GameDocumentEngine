@@ -5,7 +5,12 @@ import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
-import { FieldOptions, UseFieldResult, toInputField } from './useField';
+import {
+	CheckboxFieldProps,
+	FieldOptions,
+	InputFieldProps,
+	UseFieldResult,
+} from './useField';
 import { FieldEvents } from './events/FieldEvents';
 import { RegisterErrorStrategy } from './errorsStrategy';
 import { ZodType } from 'zod';
@@ -14,7 +19,8 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 	store: ReturnType<typeof useStore>,
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
-): UseFieldResult<TValue, TFieldValue, never> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): UseFieldResult<TValue, TFieldValue, any> {
 	const fieldEvents = new FieldEvents(options.formEvents);
 	const mapping = 'mapping' in options ? options.mapping : undefined;
 	const formValueAtom = mapping
@@ -32,16 +38,17 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const standardProps = toInputField(store, formValueAtom, fieldEvents);
+	const standardProps = options.isCheckbox
+		? toInputCheckboxField(store, formValueAtom, fieldEvents)
+		: toInputTextField(store, formValueAtom, fieldEvents);
 
-	const result: UseFieldResult<TValue, TFieldValue, never> = {
+	return {
 		valueAtom: fieldValueAtom,
 		setValue: (v: TValue) => store.set(fieldValueAtom, v),
 		getValue: () => store.get(fieldValueAtom),
 		standardProps,
 		errors,
-	};
-	return result;
+	} as never;
 
 	function createErrorStrategyAtom(
 		schema: ZodType<TValue>,
@@ -51,4 +58,38 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		strategy(fieldEvents, () => store.set(trigger));
 		return result;
 	}
+}
+
+export function toInputTextField<TFieldValue>(
+	store: ReturnType<typeof useStore>,
+	atom: StandardWritableAtom<TFieldValue>,
+	fieldEvents: FieldEvents,
+): InputFieldProps<TFieldValue> {
+	return {
+		defaultValue: atom,
+		onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => {
+			fieldEvents.dispatchEvent(FieldEvents.Change);
+			store.set(atom, ev.currentTarget.value);
+		},
+		onBlur: () => {
+			fieldEvents.dispatchEvent(FieldEvents.Blur);
+		},
+	};
+}
+
+export function toInputCheckboxField<TFieldValue>(
+	store: ReturnType<typeof useStore>,
+	atom: StandardWritableAtom<TFieldValue>,
+	fieldEvents: FieldEvents,
+): CheckboxFieldProps<TFieldValue> {
+	return {
+		defaultChecked: atom,
+		onChange: (ev: React.ChangeEvent<{ checked: TFieldValue }>) => {
+			fieldEvents.dispatchEvent(FieldEvents.Change);
+			store.set(atom, ev.currentTarget.checked);
+		},
+		onBlur: () => {
+			fieldEvents.dispatchEvent(FieldEvents.Blur);
+		},
+	};
 }

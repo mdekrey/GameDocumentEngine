@@ -16,6 +16,7 @@ import {
 	patchDocument,
 } from './document';
 import { getGameType } from './game-types';
+import { listInvitations, createInvitation, cancelInvitation } from './invites';
 
 export const queries = {
 	getCurrentUser,
@@ -33,4 +34,8 @@ export const queries = {
 	getDocument,
 	deleteDocument,
 	patchDocument,
+	listInvitations,
+	createInvitation,
+	claimInvitation: null,
+	cancelInvitation,
 } satisfies { [K in keyof typeof operations]: unknown };

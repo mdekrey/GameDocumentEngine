@@ -15,6 +15,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetails"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: User not found
     patch:
@@ -41,6 +45,8 @@ paths:
             application/json:
               schema:
                 type: string
+        401:
+          $ref: "#/components/responses/401"
         409:
           description: User was updated while request was being processed; try again later.
   /login:
@@ -72,6 +78,8 @@ paths:
                 type: object
                 additionalProperties:
                   $ref: "#/components/schemas/GameTypeSummary"
+        401:
+          $ref: "#/components/responses/401"
   /game:
     get:
       # TODO: pagination
@@ -87,6 +95,8 @@ paths:
                 type: object
                 additionalProperties:
                   $ref: '#/components/schemas/GameSummary'
+        401:
+          $ref: "#/components/responses/401"
     post:
       operationId: createGame
       security:
@@ -106,6 +116,8 @@ paths:
                 $ref: "#/components/schemas/GameDetails"
         400:
           description: There was a validation issue creating the game.
+        401:
+          $ref: "#/components/responses/401"
   /game-type/{gameType}:
     get:
       x-dotnet-mvc-server-controller: Game
@@ -144,6 +156,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameDetails"
+        401:
+          $ref: "#/components/responses/401"
         404:
           description: Target game not found
     delete:
@@ -159,6 +173,10 @@ paths:
       responses:
         200:
           description: Success
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: Target game not found
     patch:
@@ -191,6 +209,10 @@ paths:
             application/json:
               schema:
                 type: string
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: Target game not found
         409:
@@ -216,6 +238,8 @@ paths:
                 type: object
                 additionalProperties:
                   $ref: "#/components/schemas/DocumentSummary"
+        401:
+          $ref: "#/components/responses/401"
     post:
       x-dotnet-mvc-server-controller: Document
       operationId: createDocument
@@ -245,6 +269,10 @@ paths:
             application/json:
               schema:
                 type: string
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: Game id not found
   /game/{gameId}/document/{id}:
@@ -286,6 +314,10 @@ paths:
       responses:
         200:
           description: Success
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: Target document not found
     patch:
@@ -318,10 +350,125 @@ paths:
             application/json:
               schema:
                 type: string
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: Target document not found
         409:
           description: Document was updated while request was being processed; try again later.
+
+  /game/{gameId}/invitations:
+    get:
+      # TODO: pagination
+      x-dotnet-mvc-server-controller: Invitations
+      operationId: listInvitations
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/GameInvite"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Game not found
+    post:
+      x-dotnet-mvc-server-controller: Invitations
+      operationId: createInvitation
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+                - uses
+              properties:
+                role: { type: string }
+                uses: { type: integer }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameInvite"
+        400:
+          description: Requested role/uses not valid
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Game not found
+
+  /invitations/{linkId}:
+    get:
+      x-dotnet-mvc-server-controller: Invitations
+      operationId: claimInvitation
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: linkId
+        in: path
+        required: true
+        schema: { type: string }
+      responses:
+        302:
+          description: Redirect to Game
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Invite link invalid
+    delete:
+      x-dotnet-mvc-server-controller: Invitations
+      operationId: cancelInvitation
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: linkId
+        in: path
+        required: true
+        schema: { type: string }
+      responses:
+        204:
+          description: Invite link deleted
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Invite link invalid
+
 components:
   securitySchemes:
     AuthenticatedUser:
@@ -351,7 +498,6 @@ components:
           required:
           - lastUpdated
           - players
-          - inviteUrl
           - typeInfo
           - id
           properties:
@@ -361,7 +507,6 @@ components:
               type: object
               additionalProperties:
                 type: string
-            inviteUrl: { type: string }
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
     GameSummary:
@@ -372,6 +517,24 @@ components:
       properties:
         id: { type: string, format: guid }
         name: { type: string }
+
+    GameInvite:
+      type: object
+      required:
+        - id
+        - gameId
+        - link
+        - role
+        - usesRemaining
+        - expiration
+      properties:
+        id: { type: string }
+        gameId: { type: string, format: guid }
+        role: { type: string }
+        usesRemaining:
+          type: integer
+          description: "-1 with unlimited uses"
+        expiration: { type: string, format: date-time }
 
     BaseDocumentDetails:
       type: object
@@ -442,8 +605,10 @@ components:
       required:
         - name
         - objectTypes
+        - userRoles
       properties:
         name: { type: string }
+        userRoles: { type: array, items: { type: string } }
         objectTypes:
           type: array
           items:
@@ -453,9 +618,13 @@ components:
       required:
         - name
         - scripts
+        - userRoles
       properties:
         name: { type: string }
         scripts: { type: array, items: { type: string } }
+        userRoles: { type: array, items: { type: string } }
   responses:
     "401":
       description: User was not authenticated
+    "403":
+      description: User did not have permissions
