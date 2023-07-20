@@ -8,7 +8,6 @@ import { useGameType } from '../documents/useGameType';
 export function GameObjects({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
 	const docsResult = useQuery(queries.listDocuments(gameId));
-	// TODO: do something with game deatils
 	const gameDetails = useQuery(queries.getGameDetails(gameId));
 	const gameType = useGameType(gameId);
 

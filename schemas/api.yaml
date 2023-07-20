@@ -416,7 +416,7 @@ components:
         id: { type: string, format: guid }
         name: { type: string }
         type: { type: string }
-        # TODO: some way to provide a summary object
+        # TODO: summary of document details?
 
     UserDetails:
       type: object

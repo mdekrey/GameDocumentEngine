@@ -55,7 +55,6 @@ export const getGameDetails = (gameId: string) => ({
 	queryFn: async () => {
 		const response = await api.getGameDetails({ params: { gameId } });
 		if (response.statusCode !== 200) return Promise.reject(response);
-		// TODO: use details here of game type and store in game-types cache
 		return response.data;
 	},
 });

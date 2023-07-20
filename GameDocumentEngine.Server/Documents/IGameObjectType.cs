@@ -7,8 +7,4 @@ public interface IGameObjectType
 	IReadOnlyList<string> PermissionLevels { get; }
 	string DefaultPermissionLevel { get; }
 	string CreatorPermissionLevel { get; }
-
-
-	// TODO: Schema
-	// TODO: Widgets/editor
 }

@@ -5,7 +5,7 @@ import clockSchema from './schema';
 import { z } from 'zod';
 
 defineDocument('Clock', {
-	// TODO: figure out why this is giving a warning
+	// TODO: Research: why this is giving a warning
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	icon: HiOutlineClock,
 	template: {

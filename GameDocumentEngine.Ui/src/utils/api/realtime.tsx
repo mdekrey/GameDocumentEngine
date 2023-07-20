@@ -15,7 +15,8 @@ type RealtimeApiConnection = {
 export type RealtimeApi = {
 	connectionPromise: Promise<HubConnection>;
 	cancellation: AbortSignal;
-	// TODO: allow messages to be sent by client, or allow registering/unregistering of listeners
+
+	// allow messages to be sent by client
 };
 
 const realtimeApiContext = createContext<undefined | RealtimeApi>(undefined);

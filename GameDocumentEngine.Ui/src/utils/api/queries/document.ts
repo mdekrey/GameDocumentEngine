@@ -14,7 +14,6 @@ import {
 export const listDocuments = (gameId: string) => ({
 	queryKey: ['game', gameId, 'document', 'list'],
 	queryFn: async () => {
-		// TODO: this is currently not paginated, but neither is the server-side.
 		const response = await api.listDocuments({ params: { gameId } });
 		if (response.statusCode !== 200) return Promise.reject(response);
 		return response.data;
