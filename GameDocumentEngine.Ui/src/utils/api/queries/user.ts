@@ -18,10 +18,9 @@ export async function invalidateCurrentUser(
 	queryClient: QueryClient,
 	event: EntityChangedProps<string, UserDetails>,
 ) {
-	const currentUserQueryKey = getCurrentUser.queryKey;
-	const data = queryClient.getQueryData<UserDetails>(currentUserQueryKey);
+	const data = queryClient.getQueryData<UserDetails>(getCurrentUser.queryKey);
 	if (data?.id === event.key) {
-		await applyEventToQuery(queryClient, currentUserQueryKey, event);
+		await applyEventToQuery(queryClient, getCurrentUser, event);
 	}
 }
 

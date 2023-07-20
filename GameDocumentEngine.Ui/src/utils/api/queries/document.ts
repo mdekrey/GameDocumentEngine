@@ -5,7 +5,11 @@ import { NavigateFunction } from 'react-router-dom';
 import { DocumentDetails } from '@/api/models/DocumentDetails';
 import { Patch } from 'rfc6902';
 import { EntityChangedProps } from '../EntityChangedProps';
-import { applyEventToQuery } from './applyEventToQuery';
+import {
+	applyChangeToQuery,
+	applyEventToQuery,
+	applyPatchToQuery,
+} from './applyEventToQuery';
 
 export const listDocuments = (gameId: string) => ({
 	queryKey: ['game', gameId, 'document', 'list'],
@@ -34,11 +38,28 @@ export const getDocument = (gameId: string, documentId: string) => {
 export async function invalidateDocument(
 	queryClient: QueryClient,
 	event: EntityChangedProps<{ gameId: string; id: string }, DocumentDetails>,
+	method: 'DocumentAdded' | 'DocumentChanged' | 'DocumentDeleted',
 ) {
-	const queryKey = getDocument(event.key.gameId, event.key.id).queryKey;
-	await applyEventToQuery(queryClient, queryKey, event);
-	// TODO: conditionally invalidate list of documents
-	await queryClient.invalidateQueries(listDocuments(event.key.gameId).queryKey);
+	const query = getDocument(event.key.gameId, event.key.id);
+	const resultData = await applyEventToQuery(queryClient, query, event);
+
+	const listQuery = listDocuments(event.key.gameId);
+
+	if (method === 'DocumentDeleted') {
+		await applyPatchToQuery(queryClient, listQuery, [
+			{ path: `/${event.key.id}`, op: 'remove' },
+		]);
+	} else if (resultData) {
+		await applyChangeToQuery(queryClient, listQuery, (list) => {
+			list[event.key.id] = {
+				id: event.key.id,
+				name: resultData.name,
+				type: resultData.type,
+			};
+		});
+	} else {
+		await queryClient.invalidateQueries(listQuery);
+	}
 }
 
 export function createDocument(

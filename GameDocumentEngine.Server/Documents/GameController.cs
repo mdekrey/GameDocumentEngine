@@ -45,18 +45,19 @@ public class GameController : Api.GameControllerBase
 		var games = await (from gameUser in dbContext.GameUsers
 						   where gameUser.UserId == User.GetCurrentUserId()
 						   select gameUser.Game).ToArrayAsync();
-		return ListGamesActionResult.Ok(games.Select(g => new GameSummary(g.Id, g.Name)));
+		return ListGamesActionResult.Ok(games.ToDictionary(g => g.Id.ToString(), g => new GameSummary(g.Id, g.Name)));
 	}
 
 	protected override async Task<DeleteGameActionResult> DeleteGame(Guid gameId)
 	{
-		var gameRecord = await (from gameUser in dbContext.GameUsers
-								where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
-								select gameUser.Game).SingleOrDefaultAsync();
-		if (gameRecord == null) return DeleteGameActionResult.NotFound();
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(du => du.Game).ThenInclude(d => d.Players)
+									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
+									select gameUser).SingleOrDefaultAsync();
+		if (gameUserRecord == null) return DeleteGameActionResult.NotFound();
 		// TODO - check permissions
 
-		dbContext.Remove(gameRecord);
+		dbContext.RemoveRange(gameUserRecord.Game.Players);
+		dbContext.Remove(gameUserRecord.Game);
 		await dbContext.SaveChangesAsync();
 		return DeleteGameActionResult.Ok();
 	}
@@ -115,6 +116,43 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 		this.gameTypes = gameTypes;
 	}
 
+	public override bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is GameModel or GameUserModel;
+
+	public override ValueTask SendNotification(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	{
+		if (changedEntity.Entity is GameUserModel)
+			return SendNotificationUserModel(context, clients, changedEntity);
+		return base.SendNotification(context, clients, changedEntity);
+	}
+
+	private async ValueTask SendNotificationUserModel(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	{
+		var target = changedEntity.Entity as GameUserModel;
+		if (target == null)
+			return;
+		var players = await context.GameUsers.Where(du => du.GameId == target.GameId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
+
+		// treat removing the `target` as deleting the game, adding the 'target' as creating the game, and broadcast changes to others on the game
+		var currentUser = GroupNames.UserDirect(target.UserId);
+		var otherUsers = players.Select(GroupNames.UserDirect);
+		var key = target.GameId;
+		if (changedEntity.State == EntityState.Deleted)
+			await clients.Group(currentUser).SendAsync("GameDeleted", new { key });
+		else if (changedEntity.State == EntityState.Added)
+			await clients.Group(currentUser).SendAsync("GameAdded", new { key, value = await GetValue() });
+		else if (changedEntity.State == EntityState.Modified)
+			await clients.Group(currentUser).SendAsync("GameChanged", new { key, value = await GetValue() });
+
+		await clients.Groups(otherUsers).SendAsync("GameUsersChanged", new { key });
+
+		async Task<Api.GameDetails> GetValue() =>
+			await ToApi(
+				target.Game
+				?? await context.Games.FindAsync(key)
+				?? throw new InvalidOperationException("Could not find doc")
+			);
+	}
+
 	protected override bool HasAddedMessage => false;
 	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel result, object message) =>
 		Task.CompletedTask;
@@ -134,7 +172,7 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 	public static async Task<GameDetails> ToGameDetails(GameModel game, GameTypes gameTypes) =>
 		new GameDetails(Name: game.Name,
 			LastUpdated: game.LastModifiedDate,
-			Players: game.Players.Select(p => p.User.Name),
+			Players: game.Players.ToDictionary(p => p.User.Id.ToString(), p => p.User.Name),
 			InviteUrl: "TODO",
 			Id: game.Id,
 			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType)
@@ -155,29 +193,4 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 	}
 
 	protected override object ToKey(GameModel entity) => entity.Id;
-}
-
-class GameUserModelChangeNotification : IEntityChangeNotifications<GameUserModel>
-{
-	public async ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
-	{
-		var target = changedEntity.Entity as GameUserModel;
-		if (target == null)
-			return;
-		var players = await context.GameUsers.Where(du => du.GameId == target.GameId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
-
-		// treat removing the `target` as deleting the game, adding the 'target' as creating the game, and broadcast changes to others on the game
-		var currentUser = GroupNames.UserDirect(target.UserId);
-		var otherUsers = players.Select(GroupNames.UserDirect);
-		var key = target.GameId;
-		if (changedEntity.State == EntityState.Deleted)
-			await clients.Group(currentUser).SendAsync("GameDeleted", new { key });
-		else if (changedEntity.State == EntityState.Added)
-			await clients.Group(currentUser).SendAsync("GameAdded", new { key });
-		else if (changedEntity.State == EntityState.Modified)
-			await clients.Group(currentUser).SendAsync("GameChanged", new { key });
-
-		await clients.Groups(otherUsers).SendAsync("GameUsersChanged", new { key });
-
-	}
 }

@@ -25,7 +25,7 @@ export function ListGames() {
 				</IconButton.Save>
 			</span>
 			<ul className="contents">
-				{gamesResult.data.map((game) => (
+				{Object.values(gamesResult.data).map((game) => (
 					<li key={game.id} className="flex flex-row items-center gap-4">
 						<Link to={`/game/${game.id}`}>{game.name}</Link>
 						<hr className="flex-1" />

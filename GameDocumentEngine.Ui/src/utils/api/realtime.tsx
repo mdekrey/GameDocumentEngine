@@ -4,7 +4,7 @@ import type { HubConnection } from '@microsoft/signalr';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { invalidateCurrentUser } from './queries/user';
 import { invalidateDocument } from './queries/document';
-import { invalidateGame, invalidateGameList } from './queries/games';
+import { invalidateGame } from './queries/games';
 
 type RealtimeApiConnection = {
 	connection: HubConnection;
@@ -61,17 +61,21 @@ function useNewRealtimeApiConnection() {
 	);
 }
 
-function apiOn<T>(
+function apiOn<TMethodName extends string, TEvent>(
 	api: RealtimeApiConnection,
 	queryClient: QueryClient,
-	methodName: string,
-	callback: (queryClient: QueryClient, req: T) => void | Promise<void>,
+	methodName: TMethodName,
+	callback: (
+		queryClient: QueryClient,
+		req: TEvent,
+		methodName: TMethodName,
+	) => void | Promise<void>,
 ) {
-	api.connection.on(methodName, callbackWithCheck);
-	return () => api.connection.off(methodName, callbackWithCheck);
+	api.connection.on(methodName, doCallbackIgnorePromises);
+	return () => api.connection.off(methodName, doCallbackIgnorePromises);
 
-	function callbackWithCheck(req: T & { messageId: string }) {
-		void callback(queryClient, req);
+	function doCallbackIgnorePromises(req: TEvent) {
+		void callback(queryClient, req, methodName);
 	}
 }
 
@@ -80,9 +84,9 @@ function createRealtimeApi(
 	queryClient: QueryClient,
 ): RealtimeApi {
 	apiOn(api, queryClient, 'UserUpdated', invalidateCurrentUser);
+	apiOn(api, queryClient, 'GameAdded', invalidateGame);
 	apiOn(api, queryClient, 'GameChanged', invalidateGame);
 	apiOn(api, queryClient, 'GameDeleted', invalidateGame);
-	apiOn(api, queryClient, 'GameListChanged', invalidateGameList);
 	apiOn(api, queryClient, 'DocumentAdded', invalidateDocument);
 	apiOn(api, queryClient, 'DocumentChanged', invalidateDocument);
 	apiOn(api, queryClient, 'DocumentDeleted', invalidateDocument);

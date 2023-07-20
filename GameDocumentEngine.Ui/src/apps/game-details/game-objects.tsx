@@ -31,7 +31,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 				</IconButton.Save>
 			</div>
 			<ul>
-				{docsResult.data.map((s) => {
+				{Object.values(docsResult.data).map((s) => {
 					const Icon = gameType.data.objectTypes[s.type].typeInfo.icon;
 					return (
 						<li key={s.id}>

@@ -5,7 +5,11 @@ import { GameDetails } from '@/api/models/GameDetails';
 import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Patch } from 'rfc6902';
 import { EntityChangedProps } from '../EntityChangedProps';
-import { applyEventToQuery } from './applyEventToQuery';
+import {
+	applyChangeToQuery,
+	applyEventToQuery,
+	applyPatchToQuery,
+} from './applyEventToQuery';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -19,7 +23,7 @@ export const listGameTypes = () => ({
 });
 
 export const listGames = {
-	queryKey: ['game'],
+	queryKey: ['game', 'list'],
 	queryFn: async () => {
 		const response = await api.listGames();
 		if (response.statusCode !== 200) return Promise.reject(response);
@@ -59,11 +63,25 @@ export const getGameDetails = (gameId: string) => ({
 export async function invalidateGame(
 	queryClient: QueryClient,
 	event: EntityChangedProps<string, GameDetails>,
+	method: 'GameChanged' | 'GameDeleted' | 'GameAdded',
 ) {
-	const queryKey = getGameDetails(event.key).queryKey;
-	await applyEventToQuery(queryClient, queryKey, event);
-	// TODO: conditionally invalidate list of games
-	await queryClient.invalidateQueries(listGames.queryKey);
+	const query = getGameDetails(event.key);
+	const resultData = await applyEventToQuery(queryClient, query, event);
+
+	if (method === 'GameDeleted') {
+		await applyPatchToQuery(queryClient, listGames, [
+			{ path: `/${event.key}`, op: 'remove' },
+		]);
+	} else if (resultData) {
+		await applyChangeToQuery(queryClient, listGames, (list) => {
+			list[event.key] = {
+				id: resultData.id,
+				name: resultData.name,
+			};
+		});
+	} else {
+		await queryClient.invalidateQueries(listGames.queryKey);
+	}
 }
 
 export function patchGame(

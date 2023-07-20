@@ -57,11 +57,11 @@ export function CreateGame() {
 						<Field.Contents>
 							{gameTypesResult.isSuccess ? (
 								<SelectInput
-									items={gameTypesResult.data}
-									valueSelector={(gt) => gt.name}
+									items={Object.entries(gameTypesResult.data)}
+									valueSelector={(gt) => gt[0]}
 									{...gameForm.fields.type.standardProps}
 								>
-									{(gt) => <span className="font-bold">{gt.name}</span>}
+									{(gt) => <span className="font-bold">{gt[1].name}</span>}
 								</SelectInput>
 							) : // TODO: loading spinner
 							null}

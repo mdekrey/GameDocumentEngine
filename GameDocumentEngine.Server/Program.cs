@@ -101,9 +101,7 @@ services.AddTransient<AuditableInterceptor>();
 services.AddTransient<HubNotifyingInterceptor>();
 services.AddSingleton<IEntityChangeNotifications, UserModelChangeNotifications>();
 services.AddSingleton<IEntityChangeNotifications, DocumentModelChangeNotifications>();
-services.AddSingleton<IEntityChangeNotifications, DocumentUserModelChangeNotifications>();
 services.AddSingleton<IEntityChangeNotifications, GameModelChangeNotification>();
-services.AddSingleton<IEntityChangeNotifications, GameUserModelChangeNotification>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
 	o.UseSqlServer(builder.Configuration["Sql:ConnectionString"] ?? throw new InvalidOperationException("Sql not configured"))

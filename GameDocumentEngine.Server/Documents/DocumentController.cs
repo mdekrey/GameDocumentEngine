@@ -66,16 +66,16 @@ public class DocumentController : Api.DocumentControllerBase
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
 	{
-		var games = await (from gameUser in dbContext.DocumentUsers
-						   where gameUser.UserId == User.GetCurrentUserId()
-						   select new DocumentSummary(gameUser.Document.Id, gameUser.Document.Name, gameUser.Document.Type)).ToArrayAsync();
-		return ListDocumentsActionResult.Ok(games);
+		var documents = await (from gameUser in dbContext.DocumentUsers
+							   where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
+							   select new DocumentSummary(gameUser.Document.Id, gameUser.Document.Name, gameUser.Document.Type)).ToArrayAsync();
+		return ListDocumentsActionResult.Ok(documents.ToDictionary(d => d.Id.ToString()));
 	}
 
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
 	{
 		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers
-										.Include(du => du.GameUser).Include(du => du.Document).ThenInclude(d => d.Players).Include(du => du.User)
+										.Include(du => du.GameUser).Include(du => du.Document).ThenInclude(d => d.Players)
 										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
 										select documentUser)
 			.SingleOrDefaultAsync();
@@ -161,8 +161,44 @@ public class DocumentController : Api.DocumentControllerBase
 
 class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel, Api.DocumentDetails>
 {
-	// TODO: don't send to all clients
 	// TODO: mask parts of document data based on permissions
+
+	public override bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is DocumentModel or DocumentUserModel;
+
+	public override ValueTask SendNotification(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	{
+		if (changedEntity.Entity is DocumentUserModel)
+			return SendNotificationUserModel(context, clients, changedEntity);
+		return base.SendNotification(context, clients, changedEntity);
+	}
+
+	private async ValueTask SendNotificationUserModel(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	{
+		var target = changedEntity.Entity as DocumentUserModel;
+		if (target == null)
+			return;
+		var players = await context.DocumentUsers.Where(du => du.DocumentId == target.DocumentId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
+
+		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
+		var currentUser = GroupNames.UserDirect(target.UserId);
+		var otherUsers = players.Select(GroupNames.UserDirect);
+		var key = new { target.GameId, Id = target.DocumentId };
+		if (changedEntity.State == EntityState.Deleted)
+			await clients.Group(currentUser).SendAsync("DocumentDeleted", new { key });
+		else if (changedEntity.State == EntityState.Added)
+			await clients.Group(currentUser).SendAsync("DocumentAdded", new { key, value = await GetValue() });
+		else if (changedEntity.State == EntityState.Modified)
+			await clients.Group(currentUser).SendAsync("DocumentChanged", new { key, value = await GetValue() });
+
+		await clients.Groups(otherUsers).SendAsync("DocumentUsersChanged", new { key });
+
+		async Task<Api.DocumentDetails> GetValue() =>
+			await ToApi(
+				target.Document
+				?? await context.Documents.FindAsync(key.Id)
+				?? throw new InvalidOperationException("Could not find doc")
+			);
+	}
 
 	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel result, object message) =>
 		Task.CompletedTask;
@@ -186,31 +222,4 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 		));
 
 	protected override object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
-}
-
-class DocumentUserModelChangeNotifications : IEntityChangeNotifications<DocumentUserModel>
-{
-	public async ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
-	{
-		var target = changedEntity.Entity as DocumentUserModel;
-		if (target == null)
-			return;
-		var players = await context.DocumentUsers.Where(du => du.DocumentId == target.DocumentId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
-
-		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
-		var currentUser = GroupNames.UserDirect(target.UserId);
-		var otherUsers = players.Select(GroupNames.UserDirect);
-		var key = new { target.GameId, Id = target.DocumentId };
-		if (changedEntity.State == EntityState.Deleted)
-			await clients.Group(currentUser).SendAsync("DocumentDeleted", new { key });
-		else if (changedEntity.State == EntityState.Added)
-			await clients.Group(currentUser).SendAsync("DocumentAdded", new { key });
-		else if (changedEntity.State == EntityState.Modified)
-			await clients.Group(currentUser).SendAsync("DocumentChanged", new { key });
-
-		await clients.Groups(otherUsers).SendAsync("DocumentUsersChanged", new { key });
-
-		return;
-	}
-
 }

@@ -42,9 +42,5 @@ public static class GroupNames
 	// groups basically match UI cache keys
 	// user
 	public static string User(Guid userId) => $"user:{userId}";
-	// game
-	public static string Game(Guid gameId) => $"game:{gameId}";
-	// document
-	public static string Document(Guid gameId, Guid documentId, string filterLevel = "owner") => $"game:{gameId}:document:{documentId}:{filterLevel}";
 
 }

@@ -12,18 +12,16 @@ namespace GameDocumentEngine.Server.Realtime;
 interface IEntityChangeNotifications
 {
 	bool CanHandle(EntityEntry changedEntity);
-	ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity);
+	ValueTask SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity);
 }
 
-interface IEntityChangeNotifications<T> : IEntityChangeNotifications where T : class
+abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotifications where TEntity : class
 {
-	bool IEntityChangeNotifications.CanHandle(EntityEntry changedEntity) => changedEntity.Entity is T;
-}
+	public virtual bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is TEntity;
 
-abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotifications<TEntity> where TEntity : class
-{
-	public virtual ValueTask SendChangeNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	public virtual ValueTask SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
+		if (changedEntity.Entity is not TEntity) return ValueTask.CompletedTask;
 		switch (changedEntity.State)
 		{
 			case Microsoft.EntityFrameworkCore.EntityState.Added when HasAddedMessage:
@@ -125,7 +123,7 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 
 			var notifications = entityChangeNotifiers.FirstOrDefault(c => c.CanHandle(changedEntity));
 			if (notifications != null)
-				await notifications.SendChangeNotification(context, hubContext.Clients, changedEntity);
+				await notifications.SendNotification(context, hubContext.Clients, changedEntity);
 		}
 
 		return result;

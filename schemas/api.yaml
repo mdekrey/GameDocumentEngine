@@ -69,8 +69,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
+                type: object
+                additionalProperties:
                   $ref: "#/components/schemas/GameTypeSummary"
   /game:
     get:
@@ -84,8 +84,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
+                type: object
+                additionalProperties:
                   $ref: '#/components/schemas/GameSummary'
     post:
       operationId: createGame
@@ -213,8 +213,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
+                type: object
+                additionalProperties:
                   $ref: "#/components/schemas/DocumentSummary"
     post:
       x-dotnet-mvc-server-controller: Document
@@ -358,9 +358,8 @@ components:
             id: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
             players:
-              # TODO: make this a dictionary for player info
-              type: array
-              items:
+              type: object
+              additionalProperties:
                 type: string
             inviteUrl: { type: string }
             typeInfo:

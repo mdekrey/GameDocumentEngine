@@ -13,7 +13,7 @@ public class GameTypesController : Api.GameTypeControllerBase
 
 	protected override Task<ListGameTypesActionResult> ListGameTypes()
 	{
-		return Task.FromResult(ListGameTypesActionResult.Ok(this.gameTypes.All.Values.Select(gt => new GameTypeSummary(
+		return Task.FromResult(ListGameTypesActionResult.Ok(this.gameTypes.All.Values.ToDictionary(gt => gt.Name, gt => new GameTypeSummary(
 			Name: gt.Name,
 			Description: gt.Description,
 			ObjectTypes: gt.ObjectTypes.Select(o => o.Name)
