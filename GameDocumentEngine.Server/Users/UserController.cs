@@ -1,8 +1,10 @@
 ﻿using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
+using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Realtime;
 using Json.Patch;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Generic;
 
 namespace GameDocumentEngine.Server.Users;
 
@@ -48,28 +50,50 @@ public class UserController : Api.UserControllerBase
 class UserModelApiMapper : IApiMapper<UserModel, Api.UserDetails>
 {
 	public Task<UserDetails> ToApi(DocumentDbContext dbContext, UserModel entity) =>
-		Task.FromResult(new Api.UserDetails(
-			Id: entity.Id,
-			Name: entity.Name
-		));
+		Task.FromResult(ToApi(entity));
+
+	public Task<UserDetails> ToApiBeforeChanges(DocumentDbContext dbContext, UserModel entity) =>
+		Task.FromResult(ToApi(dbContext.Entry(entity).OriginalValues.Clone().ToObject() as UserModel
+				?? throw new InvalidOperationException("Could not create original")));
+
+	private static UserDetails ToApi(UserModel entity)
+	{
+		return new Api.UserDetails(
+					Id: entity.Id,
+					Name: entity.Name
+				);
+	}
 
 	public object ToKey(UserModel entity) => entity.Id;
 }
 
 class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.UserDetails>
 {
-	public UserModelChangeNotifications(IApiMapper<UserModel, UserDetails> apiMapper) : base(apiMapper)
+	public UserModelChangeNotifications(IApiMapper<UserModel, UserDetails> apiMapper, IApiChangeNotification<UserDetails> changeNotification) : base(apiMapper, changeNotification)
 	{
 	}
 
-	protected override bool HasAddedMessage => false;
-	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel result, object message) => Task.CompletedTask;
-
-	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message) => Task.CompletedTask;
-
-	protected override Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message)
+	protected override Task<IEnumerable<Guid>> GetUsersFor(DocumentDbContext context, UserModel entity)
 	{
-		// TODO: when name changes, send message to all games they're in
-		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserUpdated", message);
+		return Task.FromResult((IEnumerable<Guid>)new[] { entity.Id });
+	}
+}
+
+class UserApiChangeNotification : IApiChangeNotification<UserDetails>
+{
+	private readonly IHubContext<GameDocumentsHub> hubContext;
+
+	public UserApiChangeNotification(IHubContext<GameDocumentsHub> hubContext)
+	{
+		this.hubContext = hubContext;
+	}
+
+	public ValueTask SendAddedNotification(object apiKey, UserDetails newApiObject, Guid userId) => ValueTask.CompletedTask;
+
+	public ValueTask SendDeletedNotification(object apiKey, Guid userId) => ValueTask.CompletedTask;
+
+	public async ValueTask SendModifiedNotification(object apiKey, UserDetails oldApiObject, UserDetails newApiObject, Guid userId)
+	{
+		await hubContext.User(userId).SendWithPatch("User", apiKey, oldApiObject, newApiObject);
 	}
 }

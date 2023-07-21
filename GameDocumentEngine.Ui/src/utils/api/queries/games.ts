@@ -62,12 +62,11 @@ export const getGameDetails = (gameId: string) => ({
 export async function invalidateGame(
 	queryClient: QueryClient,
 	event: EntityChangedProps<string, GameDetails>,
-	method: 'GameChanged' | 'GameDeleted' | 'GameAdded',
 ) {
 	const query = getGameDetails(event.key);
 	const resultData = await applyEventToQuery(queryClient, query, event);
 
-	if (method === 'GameDeleted') {
+	if ('removed' in event && event.removed) {
 		await applyPatchToQuery(queryClient, listGames, [
 			{ path: `/${event.key}`, op: 'remove' },
 		]);

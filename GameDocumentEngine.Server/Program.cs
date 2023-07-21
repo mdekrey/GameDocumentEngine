@@ -99,16 +99,19 @@ services.AddAuthorization(options =>
 });
 
 services.AddTransient<IApiMapper<UserModel, UserDetails>, UserModelApiMapper>();
-services.AddTransient<IApiMapper<GameModel, GameDetails>, GameModelApiMapper>();
-services.AddTransient<IApiMapper<DocumentModel, DocumentDetails>, DocumentModelApiMapper>();
+services.AddTransient<IPermissionedApiMapper<GameModel, GameDetails>, GameModelApiMapper>();
+services.AddTransient<IPermissionedApiMapper<DocumentModel, DocumentDetails>, DocumentModelApiMapper>();
 services.AddTransient<IApiMapper<IGameType, GameTypeDetails>, GameTypeApiMapper>();
+services.AddTransient<IApiChangeNotification<DocumentDetails>, DocumentApiChangeNotification>();
+services.AddTransient<IApiChangeNotification<UserDetails>, UserApiChangeNotification>();
+services.AddTransient<IApiChangeNotification<GameDetails>, GameApiChangeNotification>();
 
 services.AddHttpContextAccessor();
 services.AddTransient<AuditableInterceptor>();
 services.AddTransient<HubNotifyingInterceptor>();
 services.AddTransient<IEntityChangeNotifications, UserModelChangeNotifications>();
 services.AddTransient<IEntityChangeNotifications, DocumentModelChangeNotifications>();
-services.AddTransient<IEntityChangeNotifications, GameModelChangeNotification>();
+services.AddTransient<IEntityChangeNotifications, GameModelChangeNotifications>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
 	o.UseSqlServer(builder.Configuration["Sql:ConnectionString"] ?? throw new InvalidOperationException("Sql not configured"))

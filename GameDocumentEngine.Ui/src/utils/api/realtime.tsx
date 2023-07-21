@@ -84,13 +84,9 @@ function createRealtimeApi(
 	api: RealtimeApiConnection,
 	queryClient: QueryClient,
 ): RealtimeApi {
-	apiOn(api, queryClient, 'UserUpdated', invalidateCurrentUser);
-	apiOn(api, queryClient, 'GameAdded', invalidateGame);
-	apiOn(api, queryClient, 'GameChanged', invalidateGame);
-	apiOn(api, queryClient, 'GameDeleted', invalidateGame);
-	apiOn(api, queryClient, 'DocumentAdded', invalidateDocument);
-	apiOn(api, queryClient, 'DocumentChanged', invalidateDocument);
-	apiOn(api, queryClient, 'DocumentDeleted', invalidateDocument);
+	apiOn(api, queryClient, 'User', invalidateCurrentUser);
+	apiOn(api, queryClient, 'Game', invalidateGame);
+	apiOn(api, queryClient, 'Document', invalidateDocument);
 
 	return {
 		connectionPromise: api.connectionPromise,

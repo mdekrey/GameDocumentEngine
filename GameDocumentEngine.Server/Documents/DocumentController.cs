@@ -3,6 +3,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Realtime;
+using GameDocumentEngine.Server.Security;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
 using Json.Schema;
@@ -19,13 +20,13 @@ public class DocumentController : Api.DocumentControllerBase
 	private readonly Documents.GameTypes allGameTypes;
 	private readonly DocumentDbContext dbContext;
 	private readonly JsonSchemaResolver schemaResolver;
-	private readonly IApiMapper<DocumentModel, DocumentDetails> documentMapper;
+	private readonly IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper;
 
 	public DocumentController(
 		Documents.GameTypes allGameTypes,
 		DocumentDbContext dbContext,
 		JsonSchemaResolver schemaResolver,
-		IApiMapper<DocumentModel, DocumentDetails> documentMapper)
+		IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper)
 	{
 		this.allGameTypes = allGameTypes;
 		this.dbContext = dbContext;
@@ -73,7 +74,7 @@ public class DocumentController : Api.DocumentControllerBase
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();
 
-		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document));
+		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document, PermissionSet.Stub));
 	}
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
@@ -109,7 +110,7 @@ public class DocumentController : Api.DocumentControllerBase
 		if (documentUserRecord == null) return GetDocumentActionResult.NotFound();
 		// TODO: check permissions
 
-		return GetDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document));
+		return GetDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document, PermissionSet.Stub));
 	}
 
 	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, JsonPatch patchDocumentBody)
@@ -154,84 +155,82 @@ public class DocumentController : Api.DocumentControllerBase
 
 		await dbContext.SaveChangesAsync();
 
-		return PatchDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document));
+		return PatchDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document, PermissionSet.Stub));
 	}
 
-	// TODO: trim document based on permissions?
-	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document) =>
-		documentMapper.ToApi(dbContext, document);
+	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document, PermissionSet permissionSet) =>
+		documentMapper.ToApi(dbContext, document, permissionSet);
 }
 
-class DocumentModelApiMapper : IApiMapper<DocumentModel, Api.DocumentDetails>
+class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.DocumentDetails>
 {
-	public Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel document) =>
-		Task.FromResult(new DocumentDetails(
+	public Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel document, PermissionSet permissionSet) =>
+		Task.FromResult(ToApi(document, permissionSet));
+
+	public Task<DocumentDetails> ToApiBeforeChanges(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet)
+	{
+		return Task.FromResult(ToApi(
+			dbContext.Entry(entity).OriginalValues.Clone().ToObject() as DocumentModel
+				?? throw new InvalidOperationException("Could not create original"),
+			permissionSet
+		));
+	}
+
+	private DocumentDetails ToApi(DocumentModel document, PermissionSet permissionSet) =>
+		// TODO: mask parts of document data based on permissions
+		new DocumentDetails(
 			GameId: document.GameId,
 			Id: document.Id,
 			Name: document.Name,
 			Type: document.Type,
 			Details: document.Details,
 			LastUpdated: document.LastModifiedDate
-		));
+		);
 
 	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
 }
 
-class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel, Api.DocumentDetails>
+class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<DocumentModel, DocumentUserModel, Api.DocumentDetails>
 {
-	public DocumentModelChangeNotifications(IApiMapper<DocumentModel, DocumentDetails> apiMapper) : base(apiMapper)
+	public DocumentModelChangeNotifications(
+		IPermissionedApiMapper<DocumentModel, DocumentDetails> apiMapper,
+		IApiChangeNotification<DocumentDetails> changeNotification)
+		: base(apiMapper, changeNotification, du => du.UserId, du => du.Document)
 	{
 	}
 
-	// TODO: mask parts of document data based on permissions
-
-	public override bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is DocumentModel or DocumentUserModel;
-
-	public override ValueTask SendNotification(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
 	{
-		if (changedEntity.Entity is DocumentUserModel)
-			return SendNotificationUserModel(context, clients, changedEntity);
-		return base.SendNotification(context, clients, changedEntity);
+		var documentUsers = await context.LoadEntityEntriesAsync<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
+		var gameUsers = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.GameId);
+
+		var gameUserPermissions = gameUsers.AtState(changeState)
+			.Select(gameUser => new PermissionSet(gameUser.UserId, gameUser.ToPermissions()));
+
+		return documentUsers.AtState(changeState)
+			// TODO: load document permissions
+			// TODO: merge with game permissions
+			.Select(gameUser => new PermissionSet(gameUser.UserId, PermissionList.Empty));
+	}
+}
+
+class DocumentApiChangeNotification : IApiChangeNotification<Api.DocumentDetails>
+{
+	private readonly IHubContext<GameDocumentsHub> hubContext;
+
+	public DocumentApiChangeNotification(IHubContext<GameDocumentsHub> hubContext)
+	{
+		this.hubContext = hubContext;
 	}
 
-	private async ValueTask SendNotificationUserModel(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	public async ValueTask SendAddedNotification(object apiKey, DocumentDetails newApiObject, Guid userId) =>
+		await hubContext.User(userId).SendValue("Document", apiKey, newApiObject);
+
+	public async ValueTask SendDeletedNotification(object apiKey, Guid userId) =>
+		await hubContext.User(userId).SendDeleted("Document", apiKey);
+
+	public async ValueTask SendModifiedNotification(object apiKey, DocumentDetails oldApiObject, DocumentDetails newApiObject, Guid userId)
 	{
-		var target = changedEntity.Entity as DocumentUserModel;
-		if (target == null)
-			return;
-		var players = await context.DocumentUsers.Where(du => du.DocumentId == target.DocumentId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
-
-		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
-		var currentUser = GroupNames.UserDirect(target.UserId);
-		var otherUsers = players.Select(GroupNames.UserDirect);
-		var key = new { target.GameId, Id = target.DocumentId };
-		if (changedEntity.State == EntityState.Deleted)
-			await clients.Group(currentUser).SendAsync("DocumentDeleted", new { key });
-		else if (changedEntity.State == EntityState.Added)
-			await clients.Group(currentUser).SendAsync("DocumentAdded", new { key, value = await GetValue() });
-		else if (changedEntity.State == EntityState.Modified)
-			await clients.Group(currentUser).SendAsync("DocumentChanged", new { key, value = await GetValue() });
-
-		await clients.Groups(otherUsers).SendAsync("DocumentUsersChanged", new { key });
-
-		async Task<Api.DocumentDetails> GetValue() =>
-			await apiMapper.ToApi(
-				context,
-				target.Document
-					?? await context.Documents.FindAsync(key.Id)
-					?? throw new InvalidOperationException("Could not find doc")
-			);
-	}
-
-	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel result, object message) =>
-		Task.CompletedTask;
-
-	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel original, object message) =>
-		Task.CompletedTask;
-
-	protected override async Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, DocumentModel original, object message)
-	{
-		var players = await context.DocumentUsers.Where(du => du.DocumentId == original.Id).ToArrayAsync();
-		await clients.Groups(players.Select(p => p.UserId).Select(GroupNames.UserDirect)).SendAsync("DocumentChanged", message);
+		await hubContext.User(userId).SendWithPatch("Document", apiKey, oldApiObject, newApiObject);
 	}
 }

@@ -8,6 +8,7 @@ using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
@@ -18,13 +19,13 @@ public class GameController : Api.GameControllerBase
 {
 	private readonly GameTypes gameTypes;
 	private readonly DocumentDbContext dbContext;
-	private readonly IApiMapper<GameModel, GameDetails> gameMapper;
+	private readonly IPermissionedApiMapper<GameModel, GameDetails> gameMapper;
 	private readonly IApiMapper<IGameType, GameTypeDetails> gameTypeMapper;
 
 	public GameController(
 		GameTypes gameTypes,
 		Data.DocumentDbContext dbContext,
-		IApiMapper<GameModel, Api.GameDetails> gameMapper,
+		IPermissionedApiMapper<GameModel, Api.GameDetails> gameMapper,
 		IApiMapper<IGameType, Api.GameTypeDetails> gameTypeMapper)
 	{
 		this.gameTypes = gameTypes;
@@ -47,7 +48,7 @@ public class GameController : Api.GameControllerBase
 		};
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
-		return CreateGameActionResult.Ok(await gameMapper.ToApi(dbContext, game));
+		return CreateGameActionResult.Ok(await gameMapper.ToApi(dbContext, game, PermissionSet.Stub));
 	}
 
 	protected override async Task<ListGamesActionResult> ListGames()
@@ -81,7 +82,7 @@ public class GameController : Api.GameControllerBase
 			.SingleOrDefaultAsync();
 		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
 
-		return GetGameDetailsActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord));
+		return GetGameDetailsActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, PermissionSet.Stub));
 	}
 
 	protected override async Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
@@ -109,7 +110,7 @@ public class GameController : Api.GameControllerBase
 		gameUserRecord.Game.Name = result.Result?["name"]?.GetValue<string?>() ?? gameUserRecord.Game.Name;
 		await dbContext.SaveChangesAsync();
 
-		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameUserRecord.Game));
+		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameUserRecord.Game, PermissionSet.Stub));
 	}
 
 	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
@@ -120,7 +121,7 @@ public class GameController : Api.GameControllerBase
 	}
 }
 
-class GameModelApiMapper : IApiMapper<GameModel, Api.GameDetails>
+class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 {
 	private readonly GameTypes gameTypes;
 	private readonly IApiMapper<IGameType, GameTypeDetails> gameTypeMapper;
@@ -131,21 +132,66 @@ class GameModelApiMapper : IApiMapper<GameModel, Api.GameDetails>
 		this.gameTypeMapper = gameTypeMapper;
 	}
 
-	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel game)
+	// TODO: Consider not including user info in the Game, which is what causes this complexity
+	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel game, PermissionSet permissionSet)
 	{
-		var users = await dbContext.Entry(game).Collection(g => g.Players).Query().Select(gu => gu.User).ToArrayAsync();
+		var users = await Task.WhenAll((await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == game.Id))
+			.AtStateEntries(DbContextChangeUsage.AfterChange)
+			.Select(e => LoadCurrentUserModel(dbContext, e.Entity)));
 
+		var typeInfo = gameTypes.All.TryGetValue(game.Type, out var gameType)
+			? await gameTypeMapper.ToApi(dbContext, gameType)
+			: throw new NotSupportedException("Unknown game type");
+
+		return ToApi(game, users, typeInfo);
+	}
+
+	public async Task<GameDetails> ToApiBeforeChanges(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet)
+	{
+		var gameEntry = dbContext.Entry(entity);
+		var originalGame = OriginalModel(gameEntry);
+		var users = await Task.WhenAll((await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == originalGame.Id))
+			.AtStateEntries(DbContextChangeUsage.BeforeChange)
+			.Select(e => LoadOriginalUserModel(dbContext, e.Entity)));
+
+		var typeInfo = gameTypes.All.TryGetValue(originalGame.Type, out var gameType)
+			? await gameTypeMapper.ToApi(dbContext, gameType)
+			: throw new NotSupportedException("Unknown game type");
+
+		return ToApi(originalGame, users, typeInfo);
+	}
+
+	private async Task<UserModel> LoadCurrentUserModel(DocumentDbContext dbContext, GameUserModel gameUser)
+	{
+		return await dbContext.Users.FindAsync(gameUser.UserId)
+			?? throw new InvalidOperationException("Could not find the user by id");
+	}
+
+	private async Task<UserModel> LoadOriginalUserModel(DocumentDbContext dbContext, GameUserModel gameUser)
+	{
+		var user = await LoadCurrentUserModel(dbContext, gameUser);
+		return OriginalModel(dbContext.Entry(user));
+	}
+
+	private T OriginalModel<T>(EntityEntry<T> entityEntry)
+		where T : class
+	{
+		return entityEntry.OriginalValues.Clone().ToObject() as T
+			?? throw new InvalidOperationException("Could not create original");
+	}
+
+	private static GameDetails ToApi(GameModel game, UserModel[] users, GameTypeDetails typeInfo)
+	{
 		return new GameDetails(Name: game.Name,
-			LastUpdated: game.LastModifiedDate,
-			Players: users.ToDictionary(p => p.Id.ToString(), p => p.Name),
-			Id: game.Id,
-			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType)
-				? await gameTypeMapper.ToApi(dbContext, gameType)
-			: throw new NotSupportedException("Unknown game type")
-		);
+					LastUpdated: game.LastModifiedDate,
+					Players: users.ToDictionary(p => p.Id.ToString(), p => p.Name),
+					Id: game.Id,
+					TypeInfo: typeInfo
+				);
 	}
 
 	public object ToKey(GameModel entity) => entity.Id;
+
 }
 
 class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
@@ -172,65 +218,50 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 		);
 	}
 
+	public Task<GameTypeDetails> ToApiBeforeChanges(DocumentDbContext dbContext, IGameType gameType) =>
+		ToApi(dbContext, gameType);
+
 	public object ToKey(IGameType entity) => entity.Name;
 }
 
-
-class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.GameDetails>
+class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameModel, GameUserModel, Api.GameDetails>
 {
-
-	public GameModelChangeNotification(IApiMapper<GameModel, Api.GameDetails> apiMapper) : base(apiMapper)
+	public GameModelChangeNotifications(
+		IPermissionedApiMapper<GameModel, GameDetails> apiMapper,
+		IApiChangeNotification<GameDetails> changeNotification)
+		: base(apiMapper, changeNotification, du => du.UserId, du => du.Game)
 	{
 	}
 
-	public override bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is GameModel or GameUserModel;
-
-	public override ValueTask SendNotification(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, GameModel entity, DbContextChangeUsage changeState)
 	{
-		if (changedEntity.Entity is GameUserModel)
-			return SendNotificationUserModel(context, clients, changedEntity);
-		return base.SendNotification(context, clients, changedEntity);
+		var players = context.Entry(entity).Collection(d => d.Players);
+		await players.LoadAsync();
+
+		var gameUsers = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.Id);
+
+		return gameUsers.AtState(changeState)
+			.Select(gameUser => new PermissionSet(gameUser.UserId, gameUser.ToPermissions()));
+	}
+}
+
+class GameApiChangeNotification : IApiChangeNotification<Api.GameDetails>
+{
+	private readonly IHubContext<GameDocumentsHub> hubContext;
+
+	public GameApiChangeNotification(IHubContext<GameDocumentsHub> hubContext)
+	{
+		this.hubContext = hubContext;
 	}
 
-	private async ValueTask SendNotificationUserModel(DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	public async ValueTask SendAddedNotification(object apiKey, GameDetails newApiObject, Guid userId) =>
+		await hubContext.User(userId).SendValue("Game", apiKey, newApiObject);
+
+	public async ValueTask SendDeletedNotification(object apiKey, Guid userId) =>
+		await hubContext.User(userId).SendDeleted("Game", apiKey);
+
+	public async ValueTask SendModifiedNotification(object apiKey, GameDetails oldApiObject, GameDetails newApiObject, Guid userId)
 	{
-		var target = changedEntity.Entity as GameUserModel;
-		if (target == null)
-			return;
-		var players = await context.GameUsers.Where(du => du.GameId == target.GameId).Where(u => u.UserId != target.UserId).Select(target => target.UserId).ToArrayAsync();
-
-		// treat removing the `target` as deleting the game, adding the 'target' as creating the game, and broadcast changes to others on the game
-		var currentUser = GroupNames.UserDirect(target.UserId);
-		var otherUsers = players.Select(GroupNames.UserDirect);
-		var key = target.GameId;
-		if (changedEntity.State == EntityState.Deleted)
-			await clients.Group(currentUser).SendAsync("GameDeleted", new { key });
-		else if (changedEntity.State == EntityState.Added)
-			await clients.Group(currentUser).SendAsync("GameAdded", new { key, value = await GetValue() });
-		else if (changedEntity.State == EntityState.Modified)
-			await clients.Group(currentUser).SendAsync("GameChanged", new { key, value = await GetValue() });
-
-		await clients.Groups(otherUsers).SendAsync("GameUsersChanged", new { key });
-
-		async Task<Api.GameDetails> GetValue() =>
-			await apiMapper.ToApi(
-				context,
-				target.Game
-					?? await context.Games.FindAsync(key)
-					?? throw new InvalidOperationException("Could not find doc")
-			);
-	}
-
-	protected override bool HasAddedMessage => false;
-	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel result, object message) =>
-		Task.CompletedTask;
-
-	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel original, object message) =>
-		Task.CompletedTask;
-
-	protected override async Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, GameModel original, object message)
-	{
-		var players = await context.GameUsers.Where(du => du.GameId == original.Id).Select(target => target.UserId).ToArrayAsync();
-		await clients.Groups(players.Select(GroupNames.UserDirect)).SendAsync("GameChanged", message);
+		await hubContext.User(userId).SendWithPatch("Game", apiKey, oldApiObject, newApiObject);
 	}
 }

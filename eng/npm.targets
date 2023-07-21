@@ -13,7 +13,6 @@
 
     <ItemGroup>
         <Compile Include="src/**" />
-        <CompileConfig Include="tsconfig.build.json" />
         <CompileConfig Include="package.json" />
         <CompileConfig Include="package-lock.json" />
 

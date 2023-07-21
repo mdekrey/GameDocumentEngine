@@ -37,14 +37,13 @@ export const getDocument = (gameId: string, documentId: string) => {
 export async function invalidateDocument(
 	queryClient: QueryClient,
 	event: EntityChangedProps<{ gameId: string; id: string }, DocumentDetails>,
-	method: 'DocumentAdded' | 'DocumentChanged' | 'DocumentDeleted',
 ) {
 	const query = getDocument(event.key.gameId, event.key.id);
 	const resultData = await applyEventToQuery(queryClient, query, event);
 
 	const listQuery = listDocuments(event.key.gameId);
 
-	if (method === 'DocumentDeleted') {
+	if ('removed' in event && event.removed) {
 		await applyPatchToQuery(queryClient, listQuery, [
 			{ path: `/${event.key.id}`, op: 'remove' },
 		]);

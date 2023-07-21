@@ -7,7 +7,10 @@ public record PermissionList(ImmutableArray<string> Permissions)
 {
 	public static readonly PermissionList Empty = new PermissionList(ImmutableArray<string>.Empty);
 
-	public static PermissionList From(params string[] permissions) => new PermissionList(permissions.ToImmutableArray());
+	public static PermissionList From(params string[] permissions) =>
+		new PermissionList(permissions.ToImmutableArray());
+	public PermissionList Add(PermissionList other) =>
+		new PermissionList(Permissions.Concat(other.Permissions).ToImmutableArray());
 }
 
 public static class Permissions

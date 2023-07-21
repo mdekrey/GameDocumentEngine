@@ -6,5 +6,5 @@ export type EntityChangedProps<TKey = unknown, TEntity = unknown> = {
 } & {
 	add: { value: TEntity };
 	update: { patch: Patch };
-	delete: object;
+	delete: { removed: true };
 }['add' | 'update' | 'delete'];
