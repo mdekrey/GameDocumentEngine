@@ -3,19 +3,18 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Realtime;
 using Json.Patch;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using System.Text.Json;
 
 namespace GameDocumentEngine.Server.Users;
 
 public class UserController : Api.UserControllerBase
 {
 	private readonly DocumentDbContext dbContext;
+	private readonly IApiMapper<UserModel, UserDetails> apiMapper;
 
-	public UserController(Data.DocumentDbContext dbContext)
+	public UserController(Data.DocumentDbContext dbContext, IApiMapper<UserModel, Api.UserDetails> apiMapper)
 	{
 		this.dbContext = dbContext;
+		this.apiMapper = apiMapper;
 	}
 
 	protected override async Task<GetCurrentUserActionResult> GetCurrentUser()
@@ -26,7 +25,7 @@ public class UserController : Api.UserControllerBase
 			return GetCurrentUserActionResult.NotFound();
 		}
 
-		return GetCurrentUserActionResult.Ok(ToUserDetails(user));
+		return GetCurrentUserActionResult.Ok(await ToUserDetails(user));
 	}
 
 	protected override async Task<PatchUserActionResult> PatchUser(JsonPatch patchUserBody)
@@ -36,21 +35,33 @@ public class UserController : Api.UserControllerBase
 		{
 			return PatchUserActionResult.BadRequest("No user found");
 		}
-		var updated = patchUserBody.Apply(ToUserDetails(user))!;
+		var updated = patchUserBody.Apply(await ToUserDetails(user))!;
 		user.Name = updated.Name;
 		await dbContext.SaveChangesAsync();
 
-		return PatchUserActionResult.Ok(ToUserDetails(user));
+		return PatchUserActionResult.Ok(await ToUserDetails(user));
 	}
 
-	private Api.UserDetails ToUserDetails(UserModel user) => new Api.UserDetails(
-		Id: user.Id,
-		Name: user.Name
-	);
+	private Task<Api.UserDetails> ToUserDetails(UserModel user) => apiMapper.ToApi(dbContext, user);
+}
+
+class UserModelApiMapper : IApiMapper<UserModel, Api.UserDetails>
+{
+	public Task<UserDetails> ToApi(DocumentDbContext dbContext, UserModel entity) =>
+		Task.FromResult(new Api.UserDetails(
+			Id: entity.Id,
+			Name: entity.Name
+		));
+
+	public object ToKey(UserModel entity) => entity.Id;
 }
 
 class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.UserDetails>
 {
+	public UserModelChangeNotifications(IApiMapper<UserModel, UserDetails> apiMapper) : base(apiMapper)
+	{
+	}
+
 	protected override bool HasAddedMessage => false;
 	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel result, object message) => Task.CompletedTask;
 
@@ -61,11 +72,4 @@ class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.Us
 		// TODO: when name changes, send message to all games they're in
 		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserUpdated", message);
 	}
-
-	protected override Task<UserDetails> ToApi(Data.DocumentDbContext context, UserModel entity) => Task.FromResult(new Api.UserDetails(
-		Id: entity.Id,
-		Name: entity.Name
-	));
-
-	protected override object ToKey(UserModel entity) => entity.Id;
 }

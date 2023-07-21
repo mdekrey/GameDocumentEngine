@@ -9,6 +9,7 @@ using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Reflection.Metadata;
 using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -18,12 +19,18 @@ public class DocumentController : Api.DocumentControllerBase
 	private readonly Documents.GameTypes allGameTypes;
 	private readonly DocumentDbContext dbContext;
 	private readonly JsonSchemaResolver schemaResolver;
+	private readonly IApiMapper<DocumentModel, DocumentDetails> documentMapper;
 
-	public DocumentController(Documents.GameTypes allGameTypes, DocumentDbContext dbContext, JsonSchemaResolver schemaResolver)
+	public DocumentController(
+		Documents.GameTypes allGameTypes,
+		DocumentDbContext dbContext,
+		JsonSchemaResolver schemaResolver,
+		IApiMapper<DocumentModel, DocumentDetails> documentMapper)
 	{
 		this.allGameTypes = allGameTypes;
 		this.dbContext = dbContext;
 		this.schemaResolver = schemaResolver;
+		this.documentMapper = documentMapper;
 	}
 
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
@@ -66,7 +73,7 @@ public class DocumentController : Api.DocumentControllerBase
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();
 
-		return CreateDocumentActionResult.Ok(ToDocumentDetails(document));
+		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document));
 	}
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
@@ -102,7 +109,7 @@ public class DocumentController : Api.DocumentControllerBase
 		if (documentUserRecord == null) return GetDocumentActionResult.NotFound();
 		// TODO: check permissions
 
-		return GetDocumentActionResult.Ok(ToDocumentDetails(documentUserRecord.Document));
+		return GetDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document));
 	}
 
 	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, JsonPatch patchDocumentBody)
@@ -147,25 +154,35 @@ public class DocumentController : Api.DocumentControllerBase
 
 		await dbContext.SaveChangesAsync();
 
-		return PatchDocumentActionResult.Ok(ToDocumentDetails(documentUserRecord.Document));
+		return PatchDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document));
 	}
 
-	private static DocumentDetails ToDocumentDetails(DocumentModel document)
-	{
-		// TODO: trim document based on permissions?
-		return new DocumentDetails(
-					GameId: document.GameId,
-					Id: document.Id,
-					Name: document.Name,
-					Type: document.Type,
-					Details: document.Details,
-					LastUpdated: document.LastModifiedDate
-				);
-	}
+	// TODO: trim document based on permissions?
+	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document) =>
+		documentMapper.ToApi(dbContext, document);
+}
+
+class DocumentModelApiMapper : IApiMapper<DocumentModel, Api.DocumentDetails>
+{
+	public Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel document) =>
+		Task.FromResult(new DocumentDetails(
+			GameId: document.GameId,
+			Id: document.Id,
+			Name: document.Name,
+			Type: document.Type,
+			Details: document.Details,
+			LastUpdated: document.LastModifiedDate
+		));
+
+	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
 }
 
 class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel, Api.DocumentDetails>
 {
+	public DocumentModelChangeNotifications(IApiMapper<DocumentModel, DocumentDetails> apiMapper) : base(apiMapper)
+	{
+	}
+
 	// TODO: mask parts of document data based on permissions
 
 	public override bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is DocumentModel or DocumentUserModel;
@@ -198,10 +215,11 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 		await clients.Groups(otherUsers).SendAsync("DocumentUsersChanged", new { key });
 
 		async Task<Api.DocumentDetails> GetValue() =>
-			await ToApi(context,
+			await apiMapper.ToApi(
+				context,
 				target.Document
-				?? await context.Documents.FindAsync(key.Id)
-				?? throw new InvalidOperationException("Could not find doc")
+					?? await context.Documents.FindAsync(key.Id)
+					?? throw new InvalidOperationException("Could not find doc")
 			);
 	}
 
@@ -216,15 +234,4 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 		var players = await context.DocumentUsers.Where(du => du.DocumentId == original.Id).ToArrayAsync();
 		await clients.Groups(players.Select(p => p.UserId).Select(GroupNames.UserDirect)).SendAsync("DocumentChanged", message);
 	}
-
-	protected override Task<DocumentDetails> ToApi(Data.DocumentDbContext context, DocumentModel document) => Task.FromResult(new DocumentDetails(
-			GameId: document.GameId,
-			Id: document.Id,
-			Name: document.Name,
-			Type: document.Type,
-			Details: document.Details,
-			LastUpdated: document.LastModifiedDate
-		));
-
-	protected override object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
 }

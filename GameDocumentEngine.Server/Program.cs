@@ -1,4 +1,5 @@
 using CompressedStaticFiles;
+using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
@@ -8,6 +9,7 @@ using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -95,6 +97,11 @@ services.AddAuthorization(options =>
 		builder.RequireAuthenticatedUser();
 	});
 });
+
+services.AddTransient<IApiMapper<UserModel, UserDetails>, UserModelApiMapper>();
+services.AddTransient<IApiMapper<GameModel, GameDetails>, GameModelApiMapper>();
+services.AddTransient<IApiMapper<DocumentModel, DocumentDetails>, DocumentModelApiMapper>();
+services.AddTransient<IApiMapper<IGameType, GameTypeDetails>, GameTypeApiMapper>();
 
 services.AddHttpContextAccessor();
 services.AddTransient<AuditableInterceptor>();
