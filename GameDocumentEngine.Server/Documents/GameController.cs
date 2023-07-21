@@ -38,7 +38,7 @@ public class GameController : Api.GameControllerBase
 		};
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
-		return CreateGameActionResult.Ok(await GameModelChangeNotification.ToGameDetails(game, gameTypes));
+		return CreateGameActionResult.Ok(await GameModelChangeNotification.ToGameDetails(dbContext, game, gameTypes));
 	}
 
 	protected override async Task<ListGamesActionResult> ListGames()
@@ -72,7 +72,7 @@ public class GameController : Api.GameControllerBase
 			.SingleOrDefaultAsync();
 		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
 
-		return GetGameDetailsActionResult.Ok(await GameModelChangeNotification.ToGameDetails(gameRecord, gameTypes));
+		return GetGameDetailsActionResult.Ok(await GameModelChangeNotification.ToGameDetails(dbContext, gameRecord, gameTypes));
 	}
 
 	protected override async Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
@@ -100,7 +100,7 @@ public class GameController : Api.GameControllerBase
 		gameUserRecord.Game.Name = result.Result?["name"]?.GetValue<string?>() ?? gameUserRecord.Game.Name;
 		await dbContext.SaveChangesAsync();
 
-		return PatchGameActionResult.Ok(await GameModelChangeNotification.ToGameDetails(gameUserRecord.Game, gameTypes));
+		return PatchGameActionResult.Ok(await GameModelChangeNotification.ToGameDetails(dbContext, gameUserRecord.Game, gameTypes));
 	}
 
 	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
@@ -150,7 +150,7 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 		await clients.Groups(otherUsers).SendAsync("GameUsersChanged", new { key });
 
 		async Task<Api.GameDetails> GetValue() =>
-			await ToApi(
+			await ToApi(context,
 				target.Game
 				?? await context.Games.FindAsync(key)
 				?? throw new InvalidOperationException("Could not find doc")
@@ -170,18 +170,22 @@ class GameModelChangeNotification : EntityChangeNotifications<GameModel, Api.Gam
 		await clients.Groups(players.Select(GroupNames.UserDirect)).SendAsync("GameChanged", message);
 	}
 
-	protected override Task<GameDetails> ToApi(GameModel game) =>
-		ToGameDetails(game, gameTypes);
+	protected override Task<GameDetails> ToApi(Data.DocumentDbContext context, GameModel game) =>
+		ToGameDetails(context, game, gameTypes);
 
-	public static async Task<GameDetails> ToGameDetails(GameModel game, GameTypes gameTypes) =>
-		new GameDetails(Name: game.Name,
+	public static async Task<GameDetails> ToGameDetails(Data.DocumentDbContext context, GameModel game, GameTypes gameTypes)
+	{
+		var users = await context.Entry(game).Collection(g => g.Players).Query().Select(gu => gu.User).ToArrayAsync();
+
+		return new GameDetails(Name: game.Name,
 			LastUpdated: game.LastModifiedDate,
-			Players: game.Players.ToDictionary(p => p.User.Id.ToString(), p => p.User.Name),
+			Players: users.ToDictionary(p => p.Id.ToString(), p => p.Name),
 			Id: game.Id,
 			TypeInfo: gameTypes.All.TryGetValue(game.Type, out var gameType)
 				? await ToGameTypeDetails(gameType, gameTypes)
 			: throw new NotSupportedException("Unknown game type")
 		);
+	}
 
 	public static async Task<GameTypeDetails> ToGameTypeDetails(IGameType gameType, GameTypes gameTypes)
 	{

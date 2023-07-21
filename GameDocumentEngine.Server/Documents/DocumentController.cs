@@ -56,7 +56,12 @@ public class DocumentController : Api.DocumentControllerBase
 			Details = createDocumentBody.Details,
 			Name = createDocumentBody.Name,
 			Type = createDocumentBody.Type,
-			Players = { new DocumentUserModel { GameId = gameUserRecord.GameId, User = gameUserRecord.User } },
+			Players = { new DocumentUserModel
+			{
+				GameId = gameUserRecord.GameId,
+				User = gameUserRecord.User,
+				Role = docType.CreatorPermissionLevel
+			} },
 		};
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();
@@ -193,7 +198,7 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 		await clients.Groups(otherUsers).SendAsync("DocumentUsersChanged", new { key });
 
 		async Task<Api.DocumentDetails> GetValue() =>
-			await ToApi(
+			await ToApi(context,
 				target.Document
 				?? await context.Documents.FindAsync(key.Id)
 				?? throw new InvalidOperationException("Could not find doc")
@@ -212,7 +217,7 @@ class DocumentModelChangeNotifications : EntityChangeNotifications<DocumentModel
 		await clients.Groups(players.Select(p => p.UserId).Select(GroupNames.UserDirect)).SendAsync("DocumentChanged", message);
 	}
 
-	protected override Task<DocumentDetails> ToApi(DocumentModel document) => Task.FromResult(new DocumentDetails(
+	protected override Task<DocumentDetails> ToApi(Data.DocumentDbContext context, DocumentModel document) => Task.FromResult(new DocumentDetails(
 			GameId: document.GameId,
 			Id: document.Id,
 			Name: document.Name,

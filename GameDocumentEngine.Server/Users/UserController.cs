@@ -65,7 +65,7 @@ class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.Us
 		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserUpdated", message);
 	}
 
-	protected override Task<UserDetails> ToApi(UserModel entity) => Task.FromResult(new Api.UserDetails(
+	protected override Task<UserDetails> ToApi(Data.DocumentDbContext context, UserModel entity) => Task.FromResult(new Api.UserDetails(
 		Id: entity.Id,
 		Name: entity.Name
 	));
