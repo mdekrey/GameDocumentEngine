@@ -54,10 +54,7 @@ class UserModelChangeNotifications : EntityChangeNotifications<UserModel, Api.Us
 	protected override bool HasAddedMessage => false;
 	protected override Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel result, object message) => Task.CompletedTask;
 
-	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message)
-	{
-		return clients.Group(GroupNames.User(original.Id)).SendAsync("UserDeleted", message);
-	}
+	protected override Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message) => Task.CompletedTask;
 
 	protected override Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, UserModel original, object message)
 	{

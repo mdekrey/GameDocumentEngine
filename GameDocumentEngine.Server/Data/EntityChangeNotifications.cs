@@ -1,19 +1,9 @@
-﻿using GameDocumentEngine.Server.Users;
-using Json.Patch;
+﻿using Json.Patch;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
-namespace GameDocumentEngine.Server.Realtime;
-
-interface IEntityChangeNotifications
-{
-	bool CanHandle(EntityEntry changedEntity);
-	ValueTask SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity);
-}
+namespace GameDocumentEngine.Server.Data;
 
 abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotifications where TEntity : class
 {
@@ -96,36 +86,4 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 	protected abstract Task SendAddedMessage(Data.DocumentDbContext context, IHubClients clients, TEntity result, object message);
 	protected abstract Task SendDeletedMessage(Data.DocumentDbContext context, IHubClients clients, TEntity original, object message);
 	protected abstract Task SendModifiedMessage(Data.DocumentDbContext context, IHubClients clients, TEntity original, object message);
-}
-
-class HubNotifyingInterceptor : ISaveChangesInterceptor
-{
-	private readonly IHubContext<GameDocumentsHub> hubContext;
-	private readonly IEnumerable<IEntityChangeNotifications> entityChangeNotifiers;
-
-	public HubNotifyingInterceptor(IHubContext<GameDocumentsHub> hubContext, IEnumerable<IEntityChangeNotifications> entityChangeNotifiers)
-	{
-		this.hubContext = hubContext;
-		this.entityChangeNotifiers = entityChangeNotifiers;
-	}
-
-
-	public async ValueTask<InterceptionResult<int>> SavingChangesAsync(
-		DbContextEventData eventData,
-		InterceptionResult<int> result,
-		CancellationToken cancellationToken = default)
-	{
-		if (eventData.Context is not Data.DocumentDbContext context) return result;
-
-		foreach (var changedEntity in context.ChangeTracker.Entries())
-		{
-			if (changedEntity.State == Microsoft.EntityFrameworkCore.EntityState.Unchanged) continue;
-
-			var notifications = entityChangeNotifiers.FirstOrDefault(c => c.CanHandle(changedEntity));
-			if (notifications != null)
-				await notifications.SendNotification(context, hubContext.Clients, changedEntity);
-		}
-
-		return result;
-	}
 }
