@@ -278,7 +278,6 @@ paths:
         404:
           description: Target game not found
   /game/{gameId}/user/{userId}:
-    # TODO: change permissions on game
     delete:
       x-dotnet-mvc-server-controller: Game
       operationId: removeUserFromGame
