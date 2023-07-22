@@ -6,10 +6,12 @@ namespace GameDocumentEngine.Server.Documents;
 public static class GameSecurity
 {
 	public static string AnyGamePermission(Guid gameId) => $"game:{gameId}:**";
+	public static string ViewGame(Guid gameId) => $"game:{gameId}:read";
 	public static string DeleteGame(Guid gameId) => $"game:{gameId}:delete";
 	public static string UpdateGame(Guid gameId) => $"game:{gameId}:update";
 	public static string CreateDocument(Guid gameId) => $"game:{gameId}:documents:create";
 	public static string ListInvitations(Guid gameId) => $"game:{gameId}:invitations:list";
+	public static string UpdateGameUserAccess(Guid gameId) => $"game:{gameId}:change-permissions";
 	public static string CreateInvitation(Guid gameId, string role) => $"game:{gameId}:invitations:create:role-{role}";
 	public static string CancelInvitation(Guid gameId) => $"game:{gameId}:invitations:cancel";
 

@@ -21,17 +21,26 @@ public class GameController : Api.GameControllerBase
 	private readonly DocumentDbContext dbContext;
 	private readonly IPermissionedApiMapper<GameModel, GameDetails> gameMapper;
 	private readonly IApiMapper<IGameType, GameTypeDetails> gameTypeMapper;
+	private readonly GamePermissionSetResolver permissionSetResolver;
 
 	public GameController(
 		GameTypes gameTypes,
 		Data.DocumentDbContext dbContext,
 		IPermissionedApiMapper<GameModel, Api.GameDetails> gameMapper,
-		IApiMapper<IGameType, Api.GameTypeDetails> gameTypeMapper)
+		IApiMapper<IGameType, Api.GameTypeDetails> gameTypeMapper,
+		GamePermissionSetResolver permissionSetResolver)
 	{
 		this.gameTypes = gameTypes;
 		this.dbContext = dbContext;
 		this.gameMapper = gameMapper;
 		this.gameTypeMapper = gameTypeMapper;
+		this.permissionSetResolver = permissionSetResolver;
+	}
+
+	protected async Task<bool?> HasPermission(Guid gameId, string permission)
+	{
+		var permissionSet = await permissionSetResolver.GetPermissions(User.GetUserIdOrThrow(), gameId);
+		return permissionSet?.Permissions.HasPermission(permission);
 	}
 
 	protected override async Task<CreateGameActionResult> CreateGame(CreateGameDetails createGameBody)
@@ -61,27 +70,27 @@ public class GameController : Api.GameControllerBase
 
 	protected override async Task<DeleteGameActionResult> DeleteGame(Guid gameId)
 	{
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(du => du.Game).ThenInclude(d => d.Players)
-									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
-									select gameUser).SingleOrDefaultAsync();
-		if (gameUserRecord == null) return DeleteGameActionResult.NotFound();
-		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.DeleteGame(gameId)))
-			return DeleteGameActionResult.Forbidden();
+		switch (await HasPermission(gameId, GameSecurity.DeleteGame(gameId)))
+		{
+			case null: return DeleteGameActionResult.NotFound();
+			case false: return DeleteGameActionResult.Forbidden();
+		}
+		var game = await dbContext.Games.Include(g => g.Players).FirstAsync(g => g.Id == gameId);
 
-		dbContext.RemoveRange(gameUserRecord.Game.Players);
-		dbContext.Remove(gameUserRecord.Game);
+		dbContext.RemoveRange(game.Players);
+		dbContext.Remove(game);
 		await dbContext.SaveChangesAsync();
 		return DeleteGameActionResult.Ok();
 	}
 
 	protected override async Task<GetGameDetailsActionResult> GetGameDetails(Guid gameId)
 	{
-		var gameRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).ThenInclude(g => g.Players).ThenInclude(gu => gu.User)
-								where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
-								select gameUser.Game)
-			.SingleOrDefaultAsync();
-		if (gameRecord == null) return GetGameDetailsActionResult.NotFound();
-
+		switch (await HasPermission(gameId, GameSecurity.ViewGame(gameId)))
+		{
+			case null: return GetGameDetailsActionResult.NotFound();
+			case false: return GetGameDetailsActionResult.Forbidden();
+		}
+		var gameRecord = await dbContext.Games.FirstAsync(g => g.Id == gameId);
 		return GetGameDetailsActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, PermissionSet.Stub));
 	}
 
@@ -89,28 +98,28 @@ public class GameController : Api.GameControllerBase
 	{
 		if (!ModelState.IsValid) return PatchGameActionResult.BadRequest("Unable to parse JSON Patch");
 
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).ThenInclude(g => g.Players).ThenInclude(gu => gu.User)
-									where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
-									select gameUser)
-			.SingleOrDefaultAsync();
-		if (gameUserRecord == null) return PatchGameActionResult.NotFound();
-		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.UpdateGame(gameId)))
-			return PatchGameActionResult.Forbidden();
-		// TODO: change permissions, with permissions
+		switch (await HasPermission(gameId, GameSecurity.UpdateGame(gameId)))
+		{
+			case null: return PatchGameActionResult.NotFound();
+			case false: return PatchGameActionResult.Forbidden();
+		}
 
+		var gameRecord = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+
+		// TODO: I can do better at patches for this
 		var editable = new JsonObject(
 			new[]
 			{
-				KeyValuePair.Create<string, JsonNode?>("name", gameUserRecord.Game.Name),
+				KeyValuePair.Create<string, JsonNode?>("name", gameRecord.Name),
 			}
 		);
 		var result = patchGameBody.Apply(editable);
 		if (!result.IsSuccess)
 			return PatchGameActionResult.BadRequest(result.Error ?? "Unknown error");
-		gameUserRecord.Game.Name = result.Result?["name"]?.GetValue<string?>() ?? gameUserRecord.Game.Name;
+		gameRecord.Name = result.Result?["name"]?.GetValue<string?>() ?? gameRecord.Name;
 		await dbContext.SaveChangesAsync();
 
-		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameUserRecord.Game, PermissionSet.Stub));
+		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, PermissionSet.Stub));
 	}
 
 	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
@@ -118,6 +127,26 @@ public class GameController : Api.GameControllerBase
 		return gameTypes.All.TryGetValue(gameType, out var r)
 			? GetGameTypeActionResult.Ok(await gameTypeMapper.ToApi(dbContext, r))
 			: GetGameTypeActionResult.NotFound();
+	}
+
+	protected override async Task<RemoveUserFromGameActionResult> RemoveUserFromGame(Guid gameId, Guid userId)
+	{
+		switch (await HasPermission(gameId, GameSecurity.UpdateGameUserAccess(gameId)))
+		{
+			case null: return RemoveUserFromGameActionResult.NotFound();
+			case false: return RemoveUserFromGameActionResult.Forbidden();
+		}
+
+		if (userId == User.GetUserIdOrThrow()) return RemoveUserFromGameActionResult.Forbidden();
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
+									where gameUser.UserId == userId && gameUser.GameId == gameId
+									select gameUser)
+			.SingleOrDefaultAsync();
+		if (gameUserRecord == null) return RemoveUserFromGameActionResult.NotFound();
+
+		dbContext.Remove(gameUserRecord);
+		await dbContext.SaveChangesAsync();
+		return RemoveUserFromGameActionResult.NoContent();
 	}
 }
 
@@ -150,6 +179,7 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 
 	public async Task<GameDetails> ToApiBeforeChanges(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet)
 	{
+		// TODO: There has to be a better way for this... and I think it's probably wrong
 		var gameEntry = dbContext.Entry(entity);
 		var originalGame = OriginalModel(gameEntry);
 		var gameUserModelEntries = await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == originalGame.Id);

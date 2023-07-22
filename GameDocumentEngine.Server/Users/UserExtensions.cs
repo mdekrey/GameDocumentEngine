@@ -15,6 +15,11 @@ public static class UserExtensions
 		return Guid.TryParse(id, out var userId) ? userId : null;
 	}
 
+	public static Guid GetUserIdOrThrow(this ClaimsPrincipal user)
+	{
+		return user.GetCurrentUserId() ?? throw new InvalidOperationException("No user id from authenticated user");
+	}
+
 	public static async Task<UserModel?> GetCurrentUser(this Data.DocumentDbContext dbContext, ClaimsPrincipal user)
 	{
 		return GetCurrentUserId(user) is Guid userId ? await dbContext.Users.FindAsync(userId) : null;

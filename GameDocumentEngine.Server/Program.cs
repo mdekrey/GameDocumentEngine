@@ -98,6 +98,8 @@ services.AddAuthorization(options =>
 	});
 });
 
+services.AddTransient<GamePermissionSetResolver>();
+
 services.AddTransient<IApiMapper<UserModel, UserDetails>, UserModelApiMapper>();
 services.AddTransient<IPermissionedApiMapper<GameModel, GameDetails>, GameModelApiMapper>();
 services.AddTransient<IPermissionedApiMapper<DocumentModel, DocumentDetails>, DocumentModelApiMapper>();

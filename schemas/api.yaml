@@ -158,6 +158,8 @@ paths:
                 $ref: "#/components/schemas/GameDetails"
         401:
           $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
         404:
           description: Target game not found
     delete:
@@ -217,6 +219,33 @@ paths:
           description: Target game not found
         409:
           description: Game was updated while request was being processed; try again later.
+  /game/{gameId}/user/{userId}:
+    # TODO: change permissions on game
+    delete:
+      x-dotnet-mvc-server-controller: Game
+      operationId: removeUserFromGame
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      - name: userId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      responses:
+        204:
+          description: Success
+        400:
+          description: User was not in the game
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Target game not found
   /game/{gameId}/document:
     get:
       # TODO: pagination
@@ -358,6 +387,7 @@ paths:
           description: Target document not found
         409:
           description: Document was updated while request was being processed; try again later.
+  # TODO: change permissions on document
 
   /game/{gameId}/invitations:
     get:
