@@ -1,0 +1,12 @@
+﻿namespace GameDocumentEngine.Server;
+
+public static class SerialTask
+{
+	public static async Task WhenAll<TIn>(this IEnumerable<TIn> input, Func<TIn, Task> operation)
+	{
+		foreach (var item in input)
+		{
+			await operation(item);
+		}
+	}
+}

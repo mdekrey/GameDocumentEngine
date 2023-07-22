@@ -656,6 +656,15 @@ components:
         name: { type: string }
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
+    UserRoleAssignement:
+      type: object
+      required:
+        - id
+        - role
+      properties:
+        id: { type: string, format: guid }
+        role: { type: string }
+
   responses:
     "401":
       description: User was not authenticated

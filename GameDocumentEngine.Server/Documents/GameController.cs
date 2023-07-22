@@ -1,4 +1,5 @@
-﻿using GameDocumentEngine.Server.Api;
+﻿using GameDocumentEngine.Server;
+using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
@@ -8,6 +9,7 @@ using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Internal;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -152,14 +154,27 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 	private async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, DbContextChangeUsage usage)
 	{
 		// TODO: Consider not including user info in the Game, which is what causes this complexity
-		// TODO: There has to be a better way for this... and I think it's probably wrong
+		await dbContext.Entry(entity).Collection(game => game.Players).Query().Include(gu => gu.User).LoadAsync();
+
 		var resultGame = dbContext.Entry(entity).AtState(usage);
-		var userIds = (await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == entity.Id))
+
+		var userEntries = dbContext
+			.Entry(entity)
+			.Collection(game => game.Players)
+			.Entries(dbContext)
 			.AtStateEntries(usage)
-			.Select(e => e.Entity.UserId)
+			.Select(e => e.Reference(gu => gu.User));
+
+		// TODO: https://github.com/mdekrey/GameDocumentEngine/issues/1
+		// I believe this was caused by an issue in EF Core. If an entity is
+		// marked as "Deleted" but later has a query that loads a reference, that
+		// referenced entity is added to the change tracker but not linked on the property.
+		await userEntries.WhenAll(nav => nav.LoadWithFixupAsync());
+
+		var users = userEntries
+			.Select(e => e.TargetEntry ?? throw new InvalidOperationException("LoadWithFixup failed"))
+			.AtState(usage)
 			.ToArray();
-		var users = (await dbContext.LoadEntityEntriesAsync<UserModel>(u => userIds.Contains(u.Id)))
-			.AtState(usage);
 
 		var typeInfo = gameTypes.All.TryGetValue(resultGame.Type, out var gameType)
 			? await gameTypeMapper.ToApi(dbContext, gameType)

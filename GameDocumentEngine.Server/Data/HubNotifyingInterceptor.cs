@@ -26,7 +26,8 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 	{
 		if (eventData.Context is not Data.DocumentDbContext context) return result;
 
-		foreach (var changedEntity in context.ChangeTracker.Entries())
+		// Note that this assumes nothing in the notifications will change state.
+		foreach (var changedEntity in context.ChangeTracker.Entries().ToArray())
 		{
 			if (changedEntity.State == Microsoft.EntityFrameworkCore.EntityState.Unchanged) continue;
 
