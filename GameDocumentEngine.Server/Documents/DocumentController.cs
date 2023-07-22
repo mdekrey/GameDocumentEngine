@@ -166,8 +166,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 	public Task<DocumentDetails> ToApiBeforeChanges(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet)
 	{
 		return Task.FromResult(ToApi(
-			dbContext.Entry(entity).OriginalValues.Clone().ToObject() as DocumentModel
-				?? throw new InvalidOperationException("Could not create original"),
+			dbContext.Entry(entity).OriginalModel(),
 			permissionSet
 		));
 	}

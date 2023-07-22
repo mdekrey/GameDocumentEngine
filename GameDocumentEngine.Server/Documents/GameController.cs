@@ -143,58 +143,29 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		this.gameTypeMapper = gameTypeMapper;
 	}
 
-	// TODO: Consider not including user info in the Game, which is what causes this complexity
-	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel game, PermissionSet permissionSet)
+	public Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel game, PermissionSet permissionSet) =>
+		ToApi(dbContext, game, DbContextChangeUsage.AfterChange);
+
+	public Task<GameDetails> ToApiBeforeChanges(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet) =>
+		ToApi(dbContext, entity, DbContextChangeUsage.BeforeChange);
+
+	private async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, DbContextChangeUsage usage)
 	{
-		var userIds = (await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == game.Id))
-			.AtStateEntries(DbContextChangeUsage.AfterChange)
-			.Select(e => e.Entity.UserId)
-			.ToArray();
-		var users = await dbContext.Users.Where(u => userIds.Contains(u.Id)).ToArrayAsync();
-
-		var typeInfo = gameTypes.All.TryGetValue(game.Type, out var gameType)
-			? await gameTypeMapper.ToApi(dbContext, gameType)
-			: throw new NotSupportedException("Unknown game type");
-
-		return ToApi(game, users, typeInfo);
-	}
-
-	public async Task<GameDetails> ToApiBeforeChanges(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet)
-	{
+		// TODO: Consider not including user info in the Game, which is what causes this complexity
 		// TODO: There has to be a better way for this... and I think it's probably wrong
-		var gameEntry = dbContext.Entry(entity);
-		var originalGame = OriginalModel(gameEntry);
-		var gameUserModelEntries = await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == originalGame.Id);
-		var userIds = gameUserModelEntries
-			.AtStateEntries(DbContextChangeUsage.BeforeChange)
+		var resultGame = dbContext.Entry(entity).AtState(usage);
+		var userIds = (await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == entity.Id))
+			.AtStateEntries(usage)
 			.Select(e => e.Entity.UserId)
 			.ToArray();
-		var newUsers = await dbContext.Users.Where(u => userIds.Contains(u.Id)).ToArrayAsync();
-		var users = newUsers.Select(userModel => LoadOriginalUserModel(dbContext, userModel)).ToArray();
+		var users = (await dbContext.LoadEntityEntriesAsync<UserModel>(u => userIds.Contains(u.Id)))
+			.AtState(usage);
 
-		var typeInfo = gameTypes.All.TryGetValue(originalGame.Type, out var gameType)
+		var typeInfo = gameTypes.All.TryGetValue(resultGame.Type, out var gameType)
 			? await gameTypeMapper.ToApi(dbContext, gameType)
 			: throw new NotSupportedException("Unknown game type");
 
-		return ToApi(originalGame, users, typeInfo);
-	}
-
-	private async Task<UserModel> LoadCurrentUserModel(DocumentDbContext dbContext, GameUserModel gameUser)
-	{
-		return await dbContext.Users.FindAsync(gameUser.UserId)
-			?? throw new InvalidOperationException("Could not find the user by id");
-	}
-
-	private UserModel LoadOriginalUserModel(DocumentDbContext dbContext, UserModel userModel)
-	{
-		return OriginalModel(dbContext.Entry(userModel));
-	}
-
-	private T OriginalModel<T>(EntityEntry<T> entityEntry)
-		where T : class
-	{
-		return entityEntry.OriginalValues.Clone().ToObject() as T
-			?? throw new InvalidOperationException("Could not create original");
+		return ToApi(resultGame, users, typeInfo);
 	}
 
 	private static GameDetails ToApi(GameModel game, UserModel[] users, GameTypeDetails typeInfo)

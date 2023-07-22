@@ -53,7 +53,7 @@ class UserModelApiMapper : IApiMapper<UserModel, Api.UserDetails>
 		Task.FromResult(ToApi(entity));
 
 	public Task<UserDetails> ToApiBeforeChanges(DocumentDbContext dbContext, UserModel entity) =>
-		Task.FromResult(ToApi(dbContext.Entry(entity).OriginalValues.Clone().ToObject() as UserModel
+		Task.FromResult(ToApi(dbContext.Entry(entity).OriginalModel()
 				?? throw new InvalidOperationException("Could not create original")));
 
 	private static UserDetails ToApi(UserModel entity)
