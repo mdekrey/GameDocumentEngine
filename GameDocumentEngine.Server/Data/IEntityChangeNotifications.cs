@@ -6,5 +6,5 @@ namespace GameDocumentEngine.Server.Data;
 interface IEntityChangeNotifications
 {
 	bool CanHandle(EntityEntry changedEntity);
-	ValueTask SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity);
+	Task SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity);
 }

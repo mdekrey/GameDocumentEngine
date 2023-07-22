@@ -254,13 +254,13 @@ class GameApiChangeNotification : IApiChangeNotification<Api.GameDetails>
 		this.hubContext = hubContext;
 	}
 
-	public async ValueTask SendAddedNotification(object apiKey, GameDetails newApiObject, Guid userId) =>
+	public async Task SendAddedNotification(object apiKey, GameDetails newApiObject, Guid userId) =>
 		await hubContext.User(userId).SendValue("Game", apiKey, newApiObject);
 
-	public async ValueTask SendDeletedNotification(object apiKey, Guid userId) =>
+	public async Task SendDeletedNotification(object apiKey, Guid userId) =>
 		await hubContext.User(userId).SendDeleted("Game", apiKey);
 
-	public async ValueTask SendModifiedNotification(object apiKey, GameDetails oldApiObject, GameDetails newApiObject, Guid userId)
+	public async Task SendModifiedNotification(object apiKey, GameDetails oldApiObject, GameDetails newApiObject, Guid userId)
 	{
 		await hubContext.User(userId).SendWithPatch("Game", apiKey, oldApiObject, newApiObject);
 	}

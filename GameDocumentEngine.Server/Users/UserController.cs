@@ -88,11 +88,11 @@ class UserApiChangeNotification : IApiChangeNotification<UserDetails>
 		this.hubContext = hubContext;
 	}
 
-	public ValueTask SendAddedNotification(object apiKey, UserDetails newApiObject, Guid userId) => ValueTask.CompletedTask;
+	public Task SendAddedNotification(object apiKey, UserDetails newApiObject, Guid userId) => Task.CompletedTask;
 
-	public ValueTask SendDeletedNotification(object apiKey, Guid userId) => ValueTask.CompletedTask;
+	public Task SendDeletedNotification(object apiKey, Guid userId) => Task.CompletedTask;
 
-	public async ValueTask SendModifiedNotification(object apiKey, UserDetails oldApiObject, UserDetails newApiObject, Guid userId)
+	public async Task SendModifiedNotification(object apiKey, UserDetails oldApiObject, UserDetails newApiObject, Guid userId)
 	{
 		await hubContext.User(userId).SendWithPatch("User", apiKey, oldApiObject, newApiObject);
 	}

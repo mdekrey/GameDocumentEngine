@@ -25,7 +25,7 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 
 	public virtual bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is TEntity;
 
-	public virtual async ValueTask SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	public virtual async Task SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		if (changedEntity.Entity is not TEntity entity) return;
 		var users = await GetUsersFor(context, entity);
@@ -90,14 +90,14 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 
 	public virtual bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is TEntity or TUserEntity;
 
-	public virtual async ValueTask SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
+	public virtual async Task SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		if (changedEntity.Entity is TEntity entity) await SendEntityNotification(context, context.Entry(entity));
 		if (changedEntity.Entity is TUserEntity userEntity) await SendUserChangedNotification(context, context.Entry(userEntity));
 	}
 
 
-	protected virtual async ValueTask SendEntityNotification(DocumentDbContext context, EntityEntry<TEntity> changedEntity)
+	protected virtual async Task SendEntityNotification(DocumentDbContext context, EntityEntry<TEntity> changedEntity)
 	{
 		var entity = changedEntity.Entity;
 		if (changedEntity.State != EntityState.Modified) return;
@@ -114,7 +114,7 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 				await apiMapper.ToApi(context, entity, user),
 				user.UserId);
 	}
-	protected virtual async ValueTask SendUserChangedNotification(DocumentDbContext context, EntityEntry<TUserEntity> changedEntity)
+	protected virtual async Task SendUserChangedNotification(DocumentDbContext context, EntityEntry<TUserEntity> changedEntity)
 	{
 		var target = changedEntity.Entity;
 		if (target == null)

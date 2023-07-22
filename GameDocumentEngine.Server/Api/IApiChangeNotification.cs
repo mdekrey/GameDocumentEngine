@@ -7,9 +7,9 @@ namespace GameDocumentEngine.Server.Api;
 
 interface IApiChangeNotification<TApi>
 {
-	ValueTask SendAddedNotification(object apiKey, TApi newApiObject, Guid userId);
-	ValueTask SendDeletedNotification(object apiKey, Guid userId);
-	ValueTask SendModifiedNotification(object apiKey, TApi oldApiObject, TApi newApiObject, Guid userId);
+	Task SendAddedNotification(object apiKey, TApi newApiObject, Guid userId);
+	Task SendDeletedNotification(object apiKey, Guid userId);
+	Task SendModifiedNotification(object apiKey, TApi oldApiObject, TApi newApiObject, Guid userId);
 
 }
 
