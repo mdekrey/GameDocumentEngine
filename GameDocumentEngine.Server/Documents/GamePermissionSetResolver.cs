@@ -24,7 +24,7 @@ public class GamePermissionSetResolver
 									where gameUser.UserId == userId && gameUser.GameId == gameId
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return null;
-		return new PermissionSet(userId, gameUserRecord.ToPermissions());
+		return gameUserRecord.ToPermissionSet();
 	}
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId, Guid documentId)

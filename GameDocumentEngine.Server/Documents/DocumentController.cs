@@ -34,23 +34,12 @@ public class DocumentController : Api.DocumentControllerBase
 		this.permissionSetResolver = permissionSetResolver;
 	}
 
-	protected async Task<bool?> HasGamePermission(Guid gameId, string permission)
-	{
-		return await permissionSetResolver.HasPermission(User, gameId, permission);
-	}
-
-	protected async Task<bool?> HasPermission(Guid gameId, Guid documentId, string permission)
-	{
-		return await permissionSetResolver.HasPermission(User, gameId, documentId, permission);
-	}
-
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
 	{
-		switch (await HasGamePermission(gameId, GameSecurity.CreateDocument(gameId)))
-		{
-			case null: return CreateDocumentActionResult.NotFound();
-			case false: return CreateDocumentActionResult.Forbidden();
-		}
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
+		if (permissions == null) return CreateDocumentActionResult.NotFound();
+		if (!permissions.HasPermission(GameSecurity.CreateDocument(gameId))) return CreateDocumentActionResult.Forbidden();
+
 		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId);
 		var gameType = allGameTypes.All[game.Type];
 
@@ -84,12 +73,12 @@ public class DocumentController : Api.DocumentControllerBase
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();
 
-		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document, PermissionSet.Stub));
+		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
 	{
-		var viewAny = await HasGamePermission(gameId, GameSecurity.SeeAnyDocument(gameId));
+		var viewAny = await permissionSetResolver.HasPermission(User, gameId, SeeAnyDocument(gameId));
 		if (viewAny == null) return ListDocumentsActionResult.NotFound();
 
 		var documents = await (viewAny.Value
@@ -104,7 +93,7 @@ public class DocumentController : Api.DocumentControllerBase
 
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
 	{
-		switch (await HasPermission(gameId, id, GameSecurity.DeleteDocument(gameId, id)))
+		switch (await permissionSetResolver.HasPermission(User, gameId, id, GameSecurity.DeleteDocument(gameId, id)))
 		{
 			case null: return DeleteDocumentActionResult.NotFound();
 			case false: return DeleteDocumentActionResult.Forbidden();
@@ -212,7 +201,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		var gameUsers = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.GameId);
 
 		var gameUserPermissions = gameUsers.AtState(changeState)
-			.Select(gameUser => new PermissionSet(gameUser.UserId, gameUser.ToPermissions()));
+			.Select(gameUser => gameUser.ToPermissionSet());
 
 		return documentUsers.AtState(changeState)
 			// TODO: load document permissions
