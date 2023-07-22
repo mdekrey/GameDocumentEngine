@@ -8,10 +8,6 @@ using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Reflection;
-using System.Security.AccessControl;
-using System.Security.Claims;
-using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -104,18 +100,9 @@ public class GameController : Api.GameControllerBase
 		}
 
 		var gameRecord = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+		if (!patchGameBody.ApplyModelPatch(gameRecord, EditableGameModel.Create, dbContext, out var error))
+			return PatchGameActionResult.BadRequest(error.Message ?? "Unknown error");
 
-		// TODO: I can do better at patches for this
-		var editable = new JsonObject(
-			new[]
-			{
-				KeyValuePair.Create<string, JsonNode?>("name", gameRecord.Name),
-			}
-		);
-		var result = patchGameBody.Apply(editable);
-		if (!result.IsSuccess)
-			return PatchGameActionResult.BadRequest(result.Error ?? "Unknown error");
-		gameRecord.Name = result.Result?["name"]?.GetValue<string?>() ?? gameRecord.Name;
 		await dbContext.SaveChangesAsync();
 
 		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, PermissionSet.Stub));

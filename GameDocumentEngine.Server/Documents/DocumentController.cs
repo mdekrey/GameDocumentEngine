@@ -1,6 +1,5 @@
 ﻿using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
-using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
@@ -9,9 +8,6 @@ using Json.Patch;
 using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Reflection.Metadata;
-using System.Text.Json.Nodes;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -146,19 +142,13 @@ public class DocumentController : Api.DocumentControllerBase
 
 		var document = await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
 
-		var editable = System.Text.Json.JsonSerializer.SerializeToNode(new EditableDocumentModel(document));
-		var result = patchDocumentBody.Apply(editable);
-		if (!result.IsSuccess)
-			return PatchDocumentActionResult.BadRequest(result.Error ?? "Unknown error");
-
-		var resultDocument = System.Text.Json.JsonSerializer.Deserialize<EditableDocumentModel>(result.Result);
-		if (resultDocument == null) return PatchDocumentActionResult.BadRequest("Error deserializing result");
-		dbContext.Documents.Entry(document).CurrentValues.SetValues(resultDocument);
-
 		var gameType = allGameTypes.All[document.Game.Type];
 		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == document.Type);
 		if (docType == null)
 			return PatchDocumentActionResult.BadRequest("Unknown document type for game");
+
+		if (!patchDocumentBody.ApplyModelPatch(document, EditableDocumentModel.Create, dbContext, out var error))
+			return PatchDocumentActionResult.BadRequest(error.Message ?? "Unknown error");
 
 		var schema = await schemaResolver.GetOrLoadSchema(docType);
 		var results = schema.Evaluate(document.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });

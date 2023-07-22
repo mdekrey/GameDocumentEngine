@@ -3,16 +3,17 @@ using System.Text.Json.Serialization;
 
 namespace GameDocumentEngine.Server.Documents;
 
+#nullable disable warnings
+
 class EditableDocumentModel
 {
-	public EditableDocumentModel() { }
-	public EditableDocumentModel(DocumentModel model)
-	{
-		Name = model.Name;
-		Details = model.Details;
-	}
-
 	[JsonPropertyName("name")] public string Name { get; set; }
 	[JsonPropertyName("details")] public JsonNode Details { get; set; }
 
+
+	public static EditableDocumentModel Create(DocumentModel model) => new EditableDocumentModel
+	{
+		Name = model.Name,
+		Details = model.Details,
+	};
 }
