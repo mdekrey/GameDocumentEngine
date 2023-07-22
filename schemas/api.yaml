@@ -505,6 +505,7 @@ components:
             lastUpdated: { type: string, format: date-time }
             players:
               type: object
+              # TODO: show player permissions
               additionalProperties:
                 type: string
             typeInfo:
