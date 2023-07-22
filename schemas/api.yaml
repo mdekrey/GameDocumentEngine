@@ -269,6 +269,8 @@ paths:
                   $ref: "#/components/schemas/DocumentSummary"
         401:
           $ref: "#/components/responses/401"
+        404:
+          description: Target game not found
     post:
       x-dotnet-mvc-server-controller: Document
       operationId: createDocument

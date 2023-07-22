@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection.Metadata;
 using System.Text.Json.Nodes;
+using static GameDocumentEngine.Server.Documents.GameSecurity;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -21,28 +22,41 @@ public class DocumentController : Api.DocumentControllerBase
 	private readonly DocumentDbContext dbContext;
 	private readonly JsonSchemaResolver schemaResolver;
 	private readonly IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper;
+	private readonly GamePermissionSetResolver permissionSetResolver;
 
 	public DocumentController(
 		Documents.GameTypes allGameTypes,
 		DocumentDbContext dbContext,
 		JsonSchemaResolver schemaResolver,
-		IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper)
+		IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper,
+		GamePermissionSetResolver permissionSetResolver)
 	{
 		this.allGameTypes = allGameTypes;
 		this.dbContext = dbContext;
 		this.schemaResolver = schemaResolver;
 		this.documentMapper = documentMapper;
+		this.permissionSetResolver = permissionSetResolver;
+	}
+
+	protected async Task<bool?> HasGamePermission(Guid gameId, string permission)
+	{
+		return await permissionSetResolver.HasPermission(User, gameId, permission);
+	}
+
+	protected async Task<bool?> HasPermission(Guid gameId, Guid documentId, string permission)
+	{
+		return await permissionSetResolver.HasPermission(User, gameId, documentId, permission);
 	}
 
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
 	{
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game).Include(gu => gu.User)
-									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
-									select gameUser)
-			.SingleOrDefaultAsync();
-		if (gameUserRecord == null) return CreateDocumentActionResult.NotFound();
-		// TODO: check permissions
-		var gameType = allGameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var result) ? result : throw new NotSupportedException($"Unknown game type: {gameUserRecord.Game.Type}");
+		switch (await HasGamePermission(gameId, GameSecurity.CreateDocument(gameId)))
+		{
+			case null: return CreateDocumentActionResult.NotFound();
+			case false: return CreateDocumentActionResult.Forbidden();
+		}
+		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+		var gameType = allGameTypes.All[game.Type];
 
 		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == createDocumentBody.Type);
 		if (docType == null)
@@ -66,8 +80,8 @@ public class DocumentController : Api.DocumentControllerBase
 			Type = createDocumentBody.Type,
 			Players = { new DocumentUserModel
 			{
-				GameId = gameUserRecord.GameId,
-				User = gameUserRecord.User,
+				GameId = game.Id,
+				UserId = User.GetUserIdOrThrow(),
 				Role = docType.CreatorPermissionLevel
 			} },
 		};
@@ -79,72 +93,75 @@ public class DocumentController : Api.DocumentControllerBase
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
 	{
-		var documents = await (from gameUser in dbContext.DocumentUsers
-							   where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
-							   select new DocumentSummary(gameUser.Document.Id, gameUser.Document.Name, gameUser.Document.Type)).ToArrayAsync();
+		var viewAny = await HasGamePermission(gameId, GameSecurity.SeeAnyDocument(gameId));
+		if (viewAny == null) return ListDocumentsActionResult.NotFound();
+
+		var documents = await (viewAny.Value
+			? dbContext.Documents.Where(doc => doc.GameId == gameId)
+			: from gameUser in dbContext.DocumentUsers
+			  where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
+			  select gameUser.Document)
+			  .Select(doc => new DocumentSummary(doc.Id, doc.Name, doc.Type)).ToArrayAsync();
+
 		return ListDocumentsActionResult.Ok(documents.ToDictionary(d => d.Id.ToString()));
 	}
 
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
 	{
-		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers
-										.Include(du => du.GameUser).Include(du => du.Document).ThenInclude(d => d.Players)
-										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId()
-										select documentUser)
-			.SingleOrDefaultAsync();
-		if (documentUserRecord == null) return DeleteDocumentActionResult.NotFound();
-		// TODO - check permissions
+		switch (await HasPermission(gameId, id, GameSecurity.DeleteDocument(gameId, id)))
+		{
+			case null: return DeleteDocumentActionResult.NotFound();
+			case false: return DeleteDocumentActionResult.Forbidden();
+		}
 
-		dbContext.RemoveRange(documentUserRecord.Document.Players);
-		dbContext.Remove(documentUserRecord.Document);
+		var document = await dbContext.Documents.Include(d => d.Players).FirstOrDefaultAsync(d => d.Id == id);
+		if (document == null) return DeleteDocumentActionResult.NotFound();
+
+		dbContext.RemoveRange(document.Players);
+		dbContext.Remove(document);
 		await dbContext.SaveChangesAsync();
 		return DeleteDocumentActionResult.Ok();
 	}
 
 	protected override async Task<GetDocumentActionResult> GetDocument(Guid gameId, Guid id)
 	{
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
+		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return GetDocumentActionResult.NotFound();
+
 		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers.Include(du => du.GameUser).Include(du => du.Document)
 										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId() && documentUser.GameId == gameId
 										select documentUser)
 			.SingleOrDefaultAsync();
 		if (documentUserRecord == null) return GetDocumentActionResult.NotFound();
-		// TODO: check permissions
 
-		return GetDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document, PermissionSet.Stub));
+		return GetDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document, permissions));
 	}
 
 	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, JsonPatch patchDocumentBody)
 	{
 		if (!ModelState.IsValid) return PatchDocumentActionResult.BadRequest("Unable to parse JSON Patch");
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
+		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return PatchDocumentActionResult.NotFound();
+		// TODO: check permissions with patch to see if allowed
 
-		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers.Include(du => du.GameUser).ThenInclude(gu => gu.Game).Include(du => du.Document)
-										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId() && documentUser.GameId == gameId
-										select documentUser)
-			.SingleOrDefaultAsync();
-		if (documentUserRecord == null) return PatchDocumentActionResult.NotFound();
+		var document = await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
 
-		var editable = new JsonObject(
-			new[]
-			{
-				KeyValuePair.Create<string, JsonNode?>("name", documentUserRecord.Document.Name),
-				KeyValuePair.Create<string, JsonNode?>("details", documentUserRecord.Document.Details),
-			}
-		);
+		var editable = System.Text.Json.JsonSerializer.SerializeToNode(new EditableDocumentModel(document));
 		var result = patchDocumentBody.Apply(editable);
 		if (!result.IsSuccess)
 			return PatchDocumentActionResult.BadRequest(result.Error ?? "Unknown error");
-		// TODO: check permissions
 
-		documentUserRecord.Document.Name = result.Result?["name"]?.GetValue<string?>() ?? documentUserRecord.Document.Name;
-		documentUserRecord.Document.Details = result.Result?["details"] ?? documentUserRecord.Document.Details;
+		var resultDocument = System.Text.Json.JsonSerializer.Deserialize<EditableDocumentModel>(result.Result);
+		if (resultDocument == null) return PatchDocumentActionResult.BadRequest("Error deserializing result");
+		dbContext.Documents.Entry(document).CurrentValues.SetValues(resultDocument);
 
-		var gameType = allGameTypes.All.TryGetValue(documentUserRecord.GameUser.Game.Type, out var resultGameType) ? resultGameType : throw new NotSupportedException($"Unknown game type: {documentUserRecord.GameUser.Game.Type}");
-		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == documentUserRecord.Document.Type);
+		var gameType = allGameTypes.All[document.Game.Type];
+		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == document.Type);
 		if (docType == null)
 			return PatchDocumentActionResult.BadRequest("Unknown document type for game");
 
 		var schema = await schemaResolver.GetOrLoadSchema(docType);
-		var results = schema.Evaluate(documentUserRecord.Document.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
+		var results = schema.Evaluate(document.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
 		if (!results.IsValid)
 		{
 			var errors = results.Errors;
@@ -155,7 +172,7 @@ public class DocumentController : Api.DocumentControllerBase
 
 		await dbContext.SaveChangesAsync();
 
-		return PatchDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document, PermissionSet.Stub));
+		return PatchDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
 	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document, PermissionSet permissionSet) =>

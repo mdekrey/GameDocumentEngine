@@ -9,6 +9,8 @@ public record PermissionList(ImmutableArray<string> Permissions)
 
 	public static PermissionList From(params string[] permissions) =>
 		new PermissionList(permissions.ToImmutableArray());
+	public static PermissionList From(IEnumerable<string> permissions) =>
+		new PermissionList(permissions.ToImmutableArray());
 	public PermissionList Add(PermissionList other) =>
 		new PermissionList(Permissions.Concat(other.Permissions).ToImmutableArray());
 }

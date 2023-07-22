@@ -39,8 +39,7 @@ public class GameController : Api.GameControllerBase
 
 	protected async Task<bool?> HasPermission(Guid gameId, string permission)
 	{
-		var permissionSet = await permissionSetResolver.GetPermissions(User.GetUserIdOrThrow(), gameId);
-		return permissionSet?.Permissions.HasPermission(permission);
+		return await permissionSetResolver.HasPermission(User, gameId, permission);
 	}
 
 	protected override async Task<CreateGameActionResult> CreateGame(CreateGameDetails createGameBody)
