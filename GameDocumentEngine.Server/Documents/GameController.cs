@@ -135,9 +135,11 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 	// TODO: Consider not including user info in the Game, which is what causes this complexity
 	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel game, PermissionSet permissionSet)
 	{
-		var users = await Task.WhenAll((await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == game.Id))
+		var userIds = (await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == game.Id))
 			.AtStateEntries(DbContextChangeUsage.AfterChange)
-			.Select(e => LoadCurrentUserModel(dbContext, e.Entity)));
+			.Select(e => e.Entity.UserId)
+			.ToArray();
+		var users = await dbContext.Users.Where(u => userIds.Contains(u.Id)).ToArrayAsync();
 
 		var typeInfo = gameTypes.All.TryGetValue(game.Type, out var gameType)
 			? await gameTypeMapper.ToApi(dbContext, gameType)
@@ -150,9 +152,13 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 	{
 		var gameEntry = dbContext.Entry(entity);
 		var originalGame = OriginalModel(gameEntry);
-		var users = await Task.WhenAll((await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == originalGame.Id))
+		var gameUserModelEntries = await dbContext.LoadEntityEntriesAsync<GameUserModel>(gu => gu.GameId == originalGame.Id);
+		var userIds = gameUserModelEntries
 			.AtStateEntries(DbContextChangeUsage.BeforeChange)
-			.Select(e => LoadOriginalUserModel(dbContext, e.Entity)));
+			.Select(e => e.Entity.UserId)
+			.ToArray();
+		var newUsers = await dbContext.Users.Where(u => userIds.Contains(u.Id)).ToArrayAsync();
+		var users = newUsers.Select(userModel => LoadOriginalUserModel(dbContext, userModel)).ToArray();
 
 		var typeInfo = gameTypes.All.TryGetValue(originalGame.Type, out var gameType)
 			? await gameTypeMapper.ToApi(dbContext, gameType)
@@ -167,10 +173,9 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 			?? throw new InvalidOperationException("Could not find the user by id");
 	}
 
-	private async Task<UserModel> LoadOriginalUserModel(DocumentDbContext dbContext, GameUserModel gameUser)
+	private UserModel LoadOriginalUserModel(DocumentDbContext dbContext, UserModel userModel)
 	{
-		var user = await LoadCurrentUserModel(dbContext, gameUser);
-		return OriginalModel(dbContext.Entry(user));
+		return OriginalModel(dbContext.Entry(userModel));
 	}
 
 	private T OriginalModel<T>(EntityEntry<T> entityEntry)

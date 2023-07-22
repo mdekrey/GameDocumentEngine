@@ -134,7 +134,7 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 			Old = oldUserPermissions.FirstOrDefault(p => p.UserId == currentUserId),
 			New = newUserPermissions.FirstOrDefault(p => p.UserId == currentUserId),
 		};
-		var otherUsers = newUserPermissions.Where(p => p.UserId != currentUserId).Select(p => p.UserId);
+		var otherUsers = newUserPermissions.Where(p => p.UserId != currentUserId);
 
 		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
 		var key = apiMapper.ToKey(entity);
@@ -156,7 +156,15 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 			);
 		}
 
-		// TODO: send notification to otherUsers that users changed?
+		foreach (var user in otherUsers)
+		{
+			await changeNotification.SendModifiedNotification(
+				key,
+				await apiMapper.ToApiBeforeChanges(context, entity, oldUserPermissions.FirstOrDefault(p => p.UserId == user.UserId) ?? user),
+				await apiMapper.ToApi(context, entity, user),
+				user.UserId
+			);
+		}
 	}
 
 	protected abstract Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, TEntity entity, DbContextChangeUsage changeState);
