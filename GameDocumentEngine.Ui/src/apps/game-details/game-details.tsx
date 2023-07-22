@@ -2,11 +2,17 @@ import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { HiOutlineUserAdd, HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
+import {
+	HiOutlineUserGroup,
+	HiOutlineUserAdd,
+	HiOutlineCog,
+	HiOutlineTrash,
+} from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
+import { UserRoleAssignmentValue } from '@/api/models/UserRoleAssignmentValue';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
@@ -39,6 +45,9 @@ export function GameDetails({ gameId }: { gameId: string }) {
 				<IconButton onClick={() => navigate(`/game/${gameId}/invites`)}>
 					<HiOutlineUserAdd />
 				</IconButton>
+				<IconButton onClick={() => navigate(`/game/${gameId}/roles`)}>
+					<HiOutlineUserGroup />
+				</IconButton>
 				<IconButton onClick={() => navigate(`/game/${gameId}/edit`)}>
 					<HiOutlineCog />
 				</IconButton>
@@ -48,18 +57,18 @@ export function GameDetails({ gameId }: { gameId: string }) {
 			</div>
 			<h2 className="text-lg font-bold">Users</h2>
 			<ul className="list-disc ml-8">
-				{Object.entries(gameDetails.players).map(
-					([id, name]: [string, string]) => (
-						<li key={id} className="flex flex-row gap-3 my-3 items-center">
-							{name}
-							<IconButton.Destructive
-								onClick={() => void onDeleteUser(id, name)}
-							>
-								<HiOutlineTrash />
-							</IconButton.Destructive>
-						</li>
-					),
-				)}
+				{Object.entries(
+					gameDetails.players as {
+						[P: string]: UserRoleAssignmentValue;
+					},
+				).map(([id, { name, role }]) => (
+					<li key={id} className="flex flex-row gap-3 my-3 items-center">
+						{name} @ {role}
+						<IconButton.Destructive onClick={() => void onDeleteUser(id, name)}>
+							<HiOutlineTrash />
+						</IconButton.Destructive>
+					</li>
+				))}
 			</ul>
 		</NarrowContent>
 	);

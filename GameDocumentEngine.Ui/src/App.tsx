@@ -12,6 +12,7 @@ import { DocumentDetails } from './apps/documents/details/doc-details';
 import { RealtimeApiProvider } from './utils/api/realtime';
 import { GameEdit } from './apps/game-edit/game-edit';
 import { GameInvites } from './apps/game-invites/game-invites';
+import { GameRoles } from './apps/game-roles/game-roles';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -47,6 +48,10 @@ function App() {
 						<Route path="profile/" Component={Profile} />
 						<Route path="game/:gameId" Component={withGameId(GameDetails)} />
 						<Route path="game/:gameId/edit" Component={withGameId(GameEdit)} />
+						<Route
+							path="game/:gameId/roles"
+							Component={withGameId(GameRoles)}
+						/>
 						<Route
 							path="game/:gameId/invites"
 							Component={withGameId(GameInvites)}

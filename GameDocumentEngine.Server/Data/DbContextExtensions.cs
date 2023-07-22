@@ -54,11 +54,18 @@ public static class DbContextExtensions
 
 	}
 
-	public static T[] AtState<T>(this IEnumerable<EntityEntry<T>> entries, DbContextChangeUsage changeState)
+	public static T[] AtState<T>(this IEnumerable<EntityEntry<T>> entries, DbContextChangeUsage changeState, Action<T, EntityEntry<T>>? fixup = null)
 		where T : class
 	{
 		return (from entry in entries.AtStateEntries(changeState)
-				select entry.AtState(changeState)).ToArray();
+				select Build(entry)).ToArray();
+
+		T Build(EntityEntry<T> entry)
+		{
+			var result = entry.AtState(changeState);
+			fixup?.Invoke(result, entry);
+			return result;
+		}
 	}
 
 	public static T AtState<T>(this EntityEntry<T> entry, DbContextChangeUsage changeState)

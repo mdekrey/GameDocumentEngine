@@ -219,6 +219,64 @@ paths:
           description: Target game not found
         409:
           description: Game was updated while request was being processed; try again later.
+  /game/{gameId}/roles:
+    get:
+      x-dotnet-mvc-server-controller: Game
+      operationId: getGameRoles
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: string }
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Target game not found
+  /game/{gameId}/role-assignments:
+    put:
+      x-dotnet-mvc-server-controller: Game
+      operationId: updateGameRoleAssignments
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: { type: string }
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRoleAssignment"
+        400:
+          description: There was a problem updating assignments
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Target game not found
   /game/{gameId}/user/{userId}:
     # TODO: change permissions on game
     delete:
@@ -536,10 +594,7 @@ components:
             id: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
             players:
-              type: object
-              # TODO: show player permissions
-              additionalProperties:
-                type: string
+              $ref: "#/components/schemas/UserRoleAssignment"
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
     GameSummary:
@@ -656,15 +711,18 @@ components:
         name: { type: string }
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
-    UserRoleAssignement:
+    UserRoleAssignment:
       type: object
-      required:
-        - id
-        - role
-      properties:
-        id: { type: string, format: guid }
-        role: { type: string }
-
+      additionalProperties:
+        $ref: '#/components/schemas/UserRoleAssignmentValue'
+    UserRoleAssignmentValue:
+        type: object
+        required:
+          - name
+          - role
+        properties:
+          name: { type: string }
+          role: { type: string }
   responses:
     "401":
       description: User was not authenticated

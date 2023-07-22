@@ -20,9 +20,9 @@ export function GameObjects({ gameId }: { gameId: string }) {
 	return (
 		<>
 			<div className="flex flex-row gap-3">
-				<span className="flex-1 text-lg font-bold">
+				<Link to={`/game/${gameId}`} className="flex-1 text-lg font-bold">
 					{gameDetails.data.name}
-				</span>
+				</Link>
 				<IconButton.Save
 					onClick={() => navigate(`/game/${gameId}/create-document`)}
 				>

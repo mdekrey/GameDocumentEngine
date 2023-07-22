@@ -267,7 +267,8 @@ function getZodSchemaForPath<T, TPath extends Path<T>>(
 
 	function doStep(step: string | number, current: ZodTypeAny): ZodTypeAny {
 		if ('shape' in current) {
-			return (current.shape as never)[step];
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+			return (current.shape as never)[step] ?? current._def.catchall;
 		} else if ('element' in current) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
 			return (current as any).element;

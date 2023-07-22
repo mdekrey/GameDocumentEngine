@@ -132,6 +132,43 @@ public class GameController : Api.GameControllerBase
 		await dbContext.SaveChangesAsync();
 		return RemoveUserFromGameActionResult.NoContent();
 	}
+
+	protected override async Task<GetGameRolesActionResult> GetGameRoles(Guid gameId)
+	{
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
+		if (permissions == null) return GetGameRolesActionResult.NotFound();
+		if (!permissions.HasPermission(UpdateGameUserAccess(gameId))) return GetGameRolesActionResult.Forbidden();
+
+		return GetGameRolesActionResult.Ok(GameRoles);
+	}
+
+	protected override async Task<UpdateGameRoleAssignmentsActionResult> UpdateGameRoleAssignments(Guid gameId, Dictionary<string, string> updateGameRoleAssignmentsBody)
+	{
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
+		if (permissions == null) return UpdateGameRoleAssignmentsActionResult.NotFound();
+		if (!permissions.HasPermission(UpdateGameUserAccess(gameId))) return UpdateGameRoleAssignmentsActionResult.Forbidden();
+
+		var gameUserRecords = await (from gameUser in dbContext.GameUsers.Include(gu => gu.User)
+									 where gameUser.GameId == gameId
+									 select gameUser).ToArrayAsync();
+		foreach (var kvp in updateGameRoleAssignmentsBody)
+		{
+			var key = Guid.Parse(kvp.Key);
+			if (key == permissions.UserId)
+				// Can't update your own permissions!
+				return UpdateGameRoleAssignmentsActionResult.Forbidden();
+			if (gameUserRecords.FirstOrDefault(u => u.UserId == key) is not GameUserModel modifiedUser)
+				return UpdateGameRoleAssignmentsActionResult.BadRequest();
+			if (!GameRoles.Contains(kvp.Value))
+				return UpdateGameRoleAssignmentsActionResult.BadRequest();
+
+			modifiedUser.Role = kvp.Value;
+		}
+		await dbContext.SaveChangesAsync();
+		return UpdateGameRoleAssignmentsActionResult.Ok(
+			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => new UserRoleAssignmentValue(gu.User.Name, gu.Role))
+		);
+	}
 }
 
 class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
@@ -163,9 +200,10 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		// it only includes active results.
 		// Doing this does work some of the time; it helps with the LoadWithFixupAsync runs.
 		await gameUsers.Query().Include(gu => gu.User).LoadAsync();
-		var userEntries = gameUsers
+		var gameUserEntries = gameUsers
 			.Entries(dbContext)
-			.AtStateEntries(usage)
+			.AtStateEntries(usage);
+		var userEntries = gameUserEntries
 			.Select(e => e.Reference(gu => gu.User));
 
 		// TODO: https://github.com/mdekrey/GameDocumentEngine/issues/1
@@ -177,20 +215,24 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		var users = userEntries
 			.Select(e => e.TargetEntry ?? throw new InvalidOperationException("LoadWithFixup failed"))
 			.AtState(usage)
-			.ToArray();
+			.ToDictionary(u => u.Id);
 
 		var typeInfo = gameTypes.All.TryGetValue(resultGame.Type, out var gameType)
 			? await gameTypeMapper.ToApi(dbContext, gameType)
 			: throw new NotSupportedException("Unknown game type");
 
-		return ToApi(resultGame, users, typeInfo);
+		return ToApi(resultGame, gameUserEntries.AtState(usage, (gu, _) => gu.User ??= users[gu.UserId]), users, typeInfo);
 	}
 
-	private static GameDetails ToApi(GameModel game, UserModel[] users, GameTypeDetails typeInfo)
+	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, Dictionary<Guid, UserModel> users, GameTypeDetails typeInfo)
 	{
+		// "original values" game users won't have the 
 		return new GameDetails(Name: game.Name,
 					LastUpdated: game.LastModifiedDate,
-					Players: users.ToDictionary(p => p.Id.ToString(), p => p.Name),
+					Players: gameUsers.ToDictionary(
+						p => p.UserId.ToString(),
+						p => new UserRoleAssignmentValue(users[p.UserId].Name, p.Role)
+					),
 					Id: game.Id,
 					TypeInfo: typeInfo
 				);

@@ -28,7 +28,6 @@ export function getConnection(signal: AbortSignal) {
 			]).catch((err) => {
 				console.error(err);
 			});
-			console.log(hub);
 			return hub;
 		})(),
 	] as const;
