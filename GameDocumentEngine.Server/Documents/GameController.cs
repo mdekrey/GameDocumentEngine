@@ -153,14 +153,17 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 
 	private async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, DbContextChangeUsage usage)
 	{
-		// TODO: Consider not including user info in the Game, which is what causes this complexity
-		await dbContext.Entry(entity).Collection(game => game.Players).Query().Include(gu => gu.User).LoadAsync();
-
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 
-		var userEntries = dbContext
+		var gameUsers = dbContext
 			.Entry(entity)
-			.Collection(game => game.Players)
+			.Collection(game => game.Players);
+		// TODO: Consider not including user info in the Game. This causes us to load
+		// a query instead of the collection. Also, we can't use these results because
+		// it only includes active results.
+		// Doing this does work some of the time; it helps with the LoadWithFixupAsync runs.
+		await gameUsers.Query().Include(gu => gu.User).LoadAsync();
+		var userEntries = gameUsers
 			.Entries(dbContext)
 			.AtStateEntries(usage)
 			.Select(e => e.Reference(gu => gu.User));
