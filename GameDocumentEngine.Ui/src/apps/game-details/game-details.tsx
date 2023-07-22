@@ -6,14 +6,20 @@ import { HiOutlineUserAdd, HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
+import { RemoveGameUserModal } from './remove-game-user-modal';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
 }
 
+function useRemoveUserFromGame() {
+	return useMutation(queries.removeUserFromGame);
+}
+
 export function GameDetails({ gameId }: { gameId: string }) {
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const deleteGame = useDeleteGame();
+	const removeUser = useRemoveUserFromGame();
 	const navigate = useNavigate();
 	const launchModal = useModal();
 
@@ -40,7 +46,21 @@ export function GameDetails({ gameId }: { gameId: string }) {
 					<HiOutlineTrash />
 				</IconButton.Destructive>
 			</div>
-			{JSON.stringify(gameDetails.players)}
+			<h2 className="text-lg font-bold">Users</h2>
+			<ul className="list-disc ml-8">
+				{Object.entries(gameDetails.players).map(
+					([id, name]: [string, string]) => (
+						<li key={id} className="flex flex-row gap-3 my-3 items-center">
+							{name}
+							<IconButton.Destructive
+								onClick={() => void onDeleteUser(id, name)}
+							>
+								<HiOutlineTrash />
+							</IconButton.Destructive>
+						</li>
+					),
+				)}
+			</ul>
 		</NarrowContent>
 	);
 
@@ -52,6 +72,16 @@ export function GameDetails({ gameId }: { gameId: string }) {
 		if (shouldDelete) {
 			deleteGame.mutate(gameId);
 			navigate('..');
+		}
+	}
+
+	async function onDeleteUser(userId: string, name: string) {
+		const shouldDelete = await launchModal({
+			ModalContents: RemoveGameUserModal,
+			additional: { name },
+		}).catch(() => false);
+		if (shouldDelete) {
+			removeUser.mutate({ gameId, userId });
 		}
 	}
 }

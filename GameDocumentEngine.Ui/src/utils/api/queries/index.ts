@@ -7,6 +7,7 @@ import {
 	getGameDetails,
 	listGameTypes,
 	listGames,
+	removeUserFromGame,
 } from './games';
 import {
 	getDocument,
@@ -29,6 +30,7 @@ export const queries = {
 	deleteGame,
 	patchGame,
 	getGameType,
+	removeUserFromGame,
 	listDocuments,
 	createDocument,
 	getDocument,
