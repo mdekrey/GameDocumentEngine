@@ -1,17 +1,18 @@
-﻿using Json.More;
+﻿using GameDocumentEngine.Server.Documents;
+using Json.More;
+using Json.Patch;
 using Json.Path;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Metadata;
 using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Json;
 
 public static class FilterExtensions
 {
-	[return: NotNullIfNotNull(nameof(target))]
-	public static JsonNode? FilterNode(this JsonNode? target, string[] jsonPaths)
+	public static IEnumerable<JsonPath> GetMatchingPaths(this JsonNode? target, IEnumerable<string> jsonPaths)
 	{
-		var pointers = new HashSet<IEnumerable<PathSegment>>();
-
 		foreach (var path in jsonPaths)
 		{
 			var parsed = JsonPath.Parse(path);
@@ -22,14 +23,30 @@ public static class FilterExtensions
 			{
 				if (match.Location == null) throw new InvalidOperationException("Why?");
 
-				var current = Enumerable.Empty<PathSegment>();
-				for (var i = 0; i < match.Location.Segments.Length; i++)
-				{
-					current = current.Append(match.Location.Segments[i]);
-					pointers.Add(current);
-				}
+				yield return match.Location;
 			}
 		}
+
+	}
+
+	public static bool HasOnlyAllowedPaths<T>(this JsonPatch patch, T target, IEnumerable<string> paths)
+	{
+		var node = System.Text.Json.JsonSerializer.SerializeToNode(target);
+		var allowedPaths = (from path in node.GetMatchingPaths(paths)
+							select path.AsJsonPointer()).Distinct().ToHashSet();
+		return patch.Operations.All(op =>
+		{
+			var test = op.Path.ToString();
+			return allowedPaths.Any(path => test.StartsWith(path));
+		});
+	}
+
+	[return: NotNullIfNotNull(nameof(target))]
+	public static JsonNode? FilterNode(this JsonNode? target, string[] jsonPaths)
+	{
+		var pointers = from path in target.GetMatchingPaths(jsonPaths)
+					   from i in Enumerable.Range(1, path.Segments.Length)
+					   select path.Segments[..i];
 
 		return BuildNodeFrom(target, pointers);
 	}
@@ -58,8 +75,8 @@ public static class FilterExtensions
 			var props = GroupSegments(pointers).ToArray();
 			foreach (var pair in props)
 			{
-				if (pair.Key.Selectors[0] is not NameSelector { Name: var propName }) throw new InvalidOperationException("Did not have a property name");
-				result.Add(propName, BuildNodeFrom(target[propName], pair));
+				if (pair.Head.Selectors[0] is not NameSelector { Name: var propName }) throw new InvalidOperationException("Did not have a property name");
+				result.Add(propName, BuildNodeFrom(target[propName], pair.Tails));
 			}
 			return result;
 		}
@@ -70,18 +87,19 @@ public static class FilterExtensions
 			var props = GroupSegments(pointers).ToArray();
 			foreach (var pair in props)
 			{
-				if (pair.Key.Selectors[0] is not IndexSelector { Index: var index }) throw new InvalidOperationException("Did not have a property name");
-				result.Add(BuildNodeFrom(target[index], pair));
+				if (pair.Head.Selectors[0] is not IndexSelector { Index: var index }) throw new InvalidOperationException("Did not have a property name");
+				result.Add(BuildNodeFrom(target[index], pair.Tails));
 			}
 			return result;
 		}
 
-		static IEnumerable<IGrouping<PathSegment, IEnumerable<PathSegment>>> GroupSegments(IEnumerable<IEnumerable<PathSegment>> pointers) =>
+		static IEnumerable<(PathSegment Head, IEnumerable<IEnumerable<PathSegment>> Tails)> GroupSegments(IEnumerable<IEnumerable<PathSegment>> pointers) =>
 			from pointer in pointers
 			let segments = pointer.ToArray()
 			where segments.Length > 0
 			let head = segments.First()
 			let tail = segments.Skip(1)
-			group tail by head;
+			group (head, tail) by head.ToString() into entries
+			select (entries.First().head, from v in entries select v.tail);
 	}
 }

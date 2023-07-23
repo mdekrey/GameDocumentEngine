@@ -28,11 +28,23 @@ public static class GameSecurity
 	/// </summary>
 	public static string SeeDocument(Guid gameId, Guid documentId) => $"{BaseDocument(gameId, documentId)}:view";
 
-	public static string ViewDocumentDetails(Guid gameId, Guid documentId, string jsonPath = "$") =>
-		$"{ViewDocumentDetailsPrefix(gameId, documentId)}#{(jsonPath.StartsWith("$") ? jsonPath : ("$" + jsonPath))}";
+	public static string ReadDocumentDetails(Guid gameId, Guid documentId, string jsonPath = "$") =>
+		$"{ReadDocumentDetailsPrefix(gameId, documentId)}#{(jsonPath.StartsWith("$") ? jsonPath : ("$" + jsonPath))}";
 
-	internal static string ViewDocumentDetailsPrefix(Guid gameId, Guid documentId) =>
-		$"{BaseDocument(gameId, documentId)}:details";
+	internal static string ReadDocumentDetailsPrefix(Guid gameId, Guid documentId) =>
+		$"{BaseDocument(gameId, documentId)}:details:read";
+
+	public static string WriteDocumentDetails(Guid gameId, Guid documentId, string jsonPath = "$") =>
+		$"{WriteDocumentDetailsPrefix(gameId, documentId)}#{(jsonPath.StartsWith("$") ? jsonPath : ("$" + jsonPath))}";
+
+	internal static string WriteDocumentDetailsPrefix(Guid gameId, Guid documentId) =>
+		$"{BaseDocument(gameId, documentId)}:details:write";
+
+	public static string ReadWriteDocumentDetails(Guid gameId, Guid documentId, string jsonPath = "$") =>
+		$"{ReadWriteDocumentDetailsPrefix(gameId, documentId)}#{(jsonPath.StartsWith("$") ? jsonPath : ("$" + jsonPath))}";
+
+	internal static string ReadWriteDocumentDetailsPrefix(Guid gameId, Guid documentId) =>
+		$"{BaseDocument(gameId, documentId)}:details:*";
 
 	public static readonly ImmutableArray<string> GameRoles = new[]
 	{

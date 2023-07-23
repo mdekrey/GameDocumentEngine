@@ -5,11 +5,13 @@ using GameDocumentEngine.Server.Json;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
 using GameDocumentEngine.Server.Users;
+using Json.More;
 using Json.Patch;
 using Json.Path;
 using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
 
@@ -132,9 +134,13 @@ public class DocumentController : Api.DocumentControllerBase
 		if (!ModelState.IsValid) return PatchDocumentActionResult.BadRequest("Unable to parse JSON Patch");
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
 		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return PatchDocumentActionResult.NotFound();
-		// TODO: check permissions with patch to see if allowed
 
 		var document = await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
+		// check permissions with patch to see if allowed
+		var jsonPaths = permissions.Permissions.MatchingPermissionsParams(WriteDocumentDetailsPrefix(gameId, id));
+		if (!patchDocumentBody.HasOnlyAllowedPaths(EditableDocumentModel.Create(document), jsonPaths))
+			return PatchDocumentActionResult.Forbidden();
+
 		var docType = GetDocumentType(document);
 		if (docType == null)
 			return PatchDocumentActionResult.BadRequest("Unknown document type for game");
@@ -226,18 +232,21 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 		await documentUsersCollection.Query().LoadAsync();
 
 		// mask parts of document data based on permissions
-		var matchingPermissions = permissionSet.Permissions.MatchingPermissions(ViewDocumentDetailsPrefix(entity.GameId, entity.Id));
-		var jsonPaths = (from match in matchingPermissions
-						 where match.Contains('$')
-						 select match[match.IndexOf('$')..]).ToArray();
+		var jsonPaths = permissionSet.Permissions
+			.MatchingPermissionsParams(ReadDocumentDetailsPrefix(entity.GameId, entity.Id))
+			.Append("$.details")
+			.ToArray();
+
+		var filtered = JsonSerializer.SerializeToNode(new { details = resultGame.Details })
+				?.FilterNode(jsonPaths)["details"]
+				?? throw new InvalidDataException("Json path excluded details object");
 
 		return new DocumentDetails(
 			GameId: resultGame.GameId,
 			Id: resultGame.Id,
 			Name: resultGame.Name,
 			Type: resultGame.Type,
-			Details: resultGame.Details.FilterNode(jsonPaths),
-			LastUpdated: resultGame.LastModifiedDate,
+			Details: filtered,
 			Permissions: documentUsersCollection
 				.Entries(dbContext)
 				.AtState(usage)

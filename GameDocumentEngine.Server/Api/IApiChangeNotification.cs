@@ -27,6 +27,8 @@ static class ApiChangeNotification
 	public static Task SendWithPatch<TApi>(this IClientProxy target, string eventName, object key, TApi oldApiObject, TApi newApiObject)
 	{
 		var patch = PatchExtensions.CreatePatch(oldApiObject, newApiObject);
-		return target.SendAsync(eventName, new { key, patch });
+		if (patch.Operations.Count > 0)
+			return target.SendAsync(eventName, new { key, patch });
+		return Task.CompletedTask;
 	}
 }

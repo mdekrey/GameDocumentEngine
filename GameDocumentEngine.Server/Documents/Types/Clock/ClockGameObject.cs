@@ -28,20 +28,21 @@ public class ClockGameObject : IGameObjectType
 		{
 			case "owner":
 				yield return $"{BaseDocument(gameId, documentId)}:**";
-				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..*");
+				yield return GameSecurity.ReadWriteDocumentDetails(gameId, documentId, "$..*");
 				yield break;
 			case "ticker":
 				yield return $"{BaseDocument(gameId, documentId)}:view";
 				yield return $"{BaseDocument(gameId, documentId)}:edit:ticks";
-				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..*");
+				yield return GameSecurity.ReadDocumentDetails(gameId, documentId, "$..*");
+				yield return GameSecurity.WriteDocumentDetails(gameId, documentId, "$.details.current");
 				yield break;
 			case "observer":
 				yield return $"{BaseDocument(gameId, documentId)}:view";
-				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..*");
+				yield return GameSecurity.ReadDocumentDetails(gameId, documentId, "$..*");
 				yield break;
 			case "doomsday":
 				yield return $"{BaseDocument(gameId, documentId)}:view";
-				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..max");
+				yield return GameSecurity.ReadDocumentDetails(gameId, documentId, "$..max");
 				yield break;
 		}
 	}

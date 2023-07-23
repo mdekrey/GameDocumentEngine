@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Security;
 using System.Text.RegularExpressions;
 
 namespace GameDocumentEngine.Server.Security;
@@ -21,9 +22,12 @@ public static class Permissions
 	{
 		return permissionList.Permissions.Any(p => MatchPermission(p, targetPermission));
 	}
-	public static IEnumerable<string> MatchingPermissions(this PermissionList permissionList, string targetPermission)
+	public static IEnumerable<string> MatchingPermissionsParams(this PermissionList permissionList, string targetPermission)
 	{
-		return permissionList.Permissions.Where(p => MatchPermission(p, targetPermission));
+		return (from permission in permissionList.Permissions
+				where permission.Contains('#')
+				where MatchPermission(permission, targetPermission)
+				select permission[(permission.IndexOf('#') + 1)..]).ToArray();
 	}
 
 	public static bool MatchPermission(string permissionPattern, string targetPermission)
@@ -44,4 +48,12 @@ public static class Permissions
 					};
 		return new Regex($"^{string.Join(':', parts)}$");
 	}
+
+	internal static string? GetParameter(string match)
+	{
+		if (!match.Contains('#')) return null;
+		return match[(match.IndexOf('#') + 1)..];
+	}
+
+
 }

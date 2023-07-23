@@ -671,10 +671,8 @@ components:
         - $ref: '#/components/schemas/BaseDocumentDetails'
         - type: object
           required:
-          - lastUpdated
           - permissions
           properties:
-            lastUpdated: { type: string, format: date-time }
             permissions:
               type: object
               additionalProperties: { type: string }
