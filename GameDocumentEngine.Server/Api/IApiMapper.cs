@@ -13,6 +13,5 @@ public interface IApiMapper<TBase, TTarget> where TBase : class
 public interface IPermissionedApiMapper<TBase, TTarget> where TBase : class
 {
 	object ToKey(TBase entity);
-	Task<TTarget> ToApi(DocumentDbContext dbContext, TBase entity, PermissionSet permissionSet);
-	Task<TTarget> ToApiBeforeChanges(DocumentDbContext dbContext, TBase entity, PermissionSet permissionSet);
+	Task<TTarget> ToApi(DocumentDbContext dbContext, TBase entity, PermissionSet permissionSet, DbContextChangeUsage usage);
 }

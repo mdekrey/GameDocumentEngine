@@ -57,7 +57,7 @@ public class GameController : Api.GameControllerBase
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
 		var permissions = gameUser.ToPermissionSet();
-		return CreateGameActionResult.Ok(await gameMapper.ToApi(dbContext, game, permissions));
+		return CreateGameActionResult.Ok(await gameMapper.ToApi(dbContext, game, permissions, DbContextChangeUsage.AfterChange));
 	}
 
 	protected override async Task<ListGamesActionResult> ListGames()
@@ -88,7 +88,7 @@ public class GameController : Api.GameControllerBase
 		if (!permissions.HasPermission(ViewGame(gameId))) return GetGameDetailsActionResult.Forbidden();
 
 		var gameRecord = await dbContext.Games.FirstAsync(g => g.Id == gameId);
-		return GetGameDetailsActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, permissions));
+		return GetGameDetailsActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, permissions, DbContextChangeUsage.AfterChange));
 	}
 
 	protected override async Task<PatchGameActionResult> PatchGame(Guid gameId, JsonPatch patchGameBody)
@@ -105,7 +105,7 @@ public class GameController : Api.GameControllerBase
 
 		await dbContext.SaveChangesAsync();
 
-		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, permissions));
+		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, permissions, DbContextChangeUsage.AfterChange));
 	}
 
 	protected override async Task<GetGameTypeActionResult> GetGameType(string gameType)
@@ -173,13 +173,7 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		this.gameTypeMapper = gameTypeMapper;
 	}
 
-	public Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel game, PermissionSet permissionSet) =>
-		ToApi(dbContext, game, DbContextChangeUsage.AfterChange);
-
-	public Task<GameDetails> ToApiBeforeChanges(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet) =>
-		ToApi(dbContext, entity, DbContextChangeUsage.BeforeChange);
-
-	private async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, DbContextChangeUsage usage)
+	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
 	{
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 

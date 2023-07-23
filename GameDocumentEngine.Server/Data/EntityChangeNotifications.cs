@@ -107,11 +107,8 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 		foreach (var user in userPermissions)
 			await changeNotification.SendModifiedNotification(
 				apiMapper.ToKey(entity),
-				await apiMapper.ToApiBeforeChanges(
-					context,
-					changedEntity.Entity,
-					user),
-				await apiMapper.ToApi(context, entity, user),
+				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.BeforeChange),
+				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.AfterChange),
 				user.UserId);
 	}
 	protected virtual async Task SendUserChangedNotification(DocumentDbContext context, EntityEntry<TUserEntity> changedEntity)
@@ -143,25 +140,26 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 		else if (currentUser.Old == null && currentUser.New != null)
 			await changeNotification.SendAddedNotification(
 				key,
-				await apiMapper.ToApi(context, entity, currentUser.New),
+				await apiMapper.ToApi(context, entity, currentUser.New, DbContextChangeUsage.AfterChange),
 				currentUserId
 			);
 		else if (currentUser.Old != null && currentUser.New != null)
 		{
 			await changeNotification.SendModifiedNotification(
 				key,
-				await apiMapper.ToApiBeforeChanges(context, entity, currentUser.Old),
-				await apiMapper.ToApi(context, entity, currentUser.New),
+				await apiMapper.ToApi(context, entity, currentUser.Old, DbContextChangeUsage.BeforeChange),
+				await apiMapper.ToApi(context, entity, currentUser.New, DbContextChangeUsage.AfterChange),
 				currentUserId
 			);
 		}
 
 		foreach (var user in otherUsers)
 		{
+			var oldPermissions = oldUserPermissions.FirstOrDefault(p => p.UserId == user.UserId) ?? user;
 			await changeNotification.SendModifiedNotification(
 				key,
-				await apiMapper.ToApiBeforeChanges(context, entity, oldUserPermissions.FirstOrDefault(p => p.UserId == user.UserId) ?? user),
-				await apiMapper.ToApi(context, entity, user),
+				await apiMapper.ToApi(context, entity, oldPermissions, DbContextChangeUsage.BeforeChange),
+				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.AfterChange),
 				user.UserId
 			);
 		}

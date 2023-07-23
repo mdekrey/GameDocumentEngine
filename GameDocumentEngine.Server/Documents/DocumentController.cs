@@ -5,9 +5,11 @@ using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
+using Json.Path;
 using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Nodes;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -208,18 +210,12 @@ public class DocumentController : Api.DocumentControllerBase
 	}
 
 	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document, PermissionSet permissionSet) =>
-		documentMapper.ToApi(dbContext, document, permissionSet);
+		documentMapper.ToApi(dbContext, document, permissionSet, DbContextChangeUsage.AfterChange);
 }
 
 class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.DocumentDetails>
 {
-	public Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet) =>
-		ToApi(dbContext, entity, DbContextChangeUsage.AfterChange);
-
-	public Task<DocumentDetails> ToApiBeforeChanges(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet) =>
-		ToApi(dbContext, entity, DbContextChangeUsage.BeforeChange);
-
-	private async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, DbContextChangeUsage usage)
+	public async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
 	{
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 
@@ -234,9 +230,10 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 		return ToApi(resultGame, documentUserEntries.AtState(usage));
 	}
 
-	private DocumentDetails ToApi(DocumentModel document, DocumentUserModel[] documentUsers) =>
+	private DocumentDetails ToApi(DocumentModel document, DocumentUserModel[] documentUsers)
+	{
 		// TODO: mask parts of document data based on permissions
-		new DocumentDetails(
+		return new DocumentDetails(
 			GameId: document.GameId,
 			Id: document.Id,
 			Name: document.Name,
@@ -248,6 +245,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 					p => p.Role
 				)
 		);
+	}
 
 	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
 }
