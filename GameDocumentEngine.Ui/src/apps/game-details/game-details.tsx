@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
-import { UserRoleAssignmentValue } from '@/api/models/UserRoleAssignmentValue';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
@@ -57,13 +56,9 @@ export function GameDetails({ gameId }: { gameId: string }) {
 			</div>
 			<h2 className="text-lg font-bold">Users</h2>
 			<ul className="list-disc ml-8">
-				{Object.entries(
-					gameDetails.players as {
-						[P: string]: UserRoleAssignmentValue;
-					},
-				).map(([id, { name, role }]) => (
+				{Object.entries(gameDetails.playerNames).map(([id, name]) => (
 					<li key={id} className="flex flex-row gap-3 my-3 items-center">
-						{name} @ {role}
+						{name}
 						<IconButton.Destructive onClick={() => void onDeleteUser(id, name)}>
 							<HiOutlineTrash />
 						</IconButton.Destructive>

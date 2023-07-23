@@ -1,6 +1,5 @@
 import { UseMutationOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
-import { UserRoleAssignment } from '@/api/models/UserRoleAssignment';
 
 export const getGameRoles = (gameId: string) => ({
 	queryKey: ['game', gameId, 'roles'],
@@ -14,9 +13,9 @@ export const getGameRoles = (gameId: string) => ({
 export function updateGameRoleAssignments(
 	gameId: string,
 ): UseMutationOptions<
-	UserRoleAssignment,
+	{ [Id: string]: string },
 	unknown,
-	UserRoleAssignment,
+	{ [Id: string]: string },
 	unknown
 > {
 	return {

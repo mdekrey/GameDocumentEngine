@@ -2,7 +2,6 @@ import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
-import { UserRoleAssignmentValue } from '@/api/models/UserRoleAssignmentValue';
 
 function useUpdateGameRoleAssignments(gameId: string) {
 	return useMutation(queries.updateGameRoleAssignments(gameId));
@@ -21,14 +20,12 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	}
 
 	const gameDetails = gameResult.data;
-	const players = gameDetails.players as {
-		[id: string]: UserRoleAssignmentValue;
-	};
 
 	return (
 		<NarrowContent>
 			<RoleAssignment
-				currentAssignments={players}
+				currentAssignments={gameDetails.permissions}
+				playerNames={gameDetails.playerNames}
 				roles={gameRolesResult.data}
 				onSaveRoles={onSaveRoles}
 			/>
@@ -37,7 +34,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	function onSaveRoles(roleAssignments: { [userId: string]: string }) {
 		const changed = Object.fromEntries(
 			Object.entries(roleAssignments).filter(
-				([key, newValue]) => newValue !== players[key].role,
+				([key, newValue]) => newValue !== gameDetails.permissions[key],
 			),
 		);
 		updateGameRoleAssignments.mutate(changed);

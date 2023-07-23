@@ -1,4 +1,3 @@
-import { UserRoleAssignmentValue } from '@/api/models/UserRoleAssignmentValue';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
@@ -11,7 +10,8 @@ import { z } from 'zod';
 export const UserRoleAssignment = z.object({}).catchall(z.string());
 
 export type RoleAssignmentProps = {
-	currentAssignments: { [id: string]: UserRoleAssignmentValue };
+	currentAssignments: { [id: string]: string };
+	playerNames: { [id: string]: string };
 	roles: string[];
 	onSaveRoles: (
 		roles: z.infer<typeof UserRoleAssignment>,
@@ -20,25 +20,26 @@ export type RoleAssignmentProps = {
 
 export function RoleAssignment({
 	currentAssignments,
+	playerNames,
 	roles,
 	onSaveRoles,
 }: RoleAssignmentProps) {
 	const form = useForm({
-		defaultValue: Object.fromEntries(
-			Object.entries(currentAssignments).map(([k, v]) => [k, v.role]),
-		),
+		defaultValue: currentAssignments,
 		schema: UserRoleAssignment,
 		fields: {
 			row: (userId: string) => [userId] as const,
 		},
 	});
 
+	console.log(currentAssignments, playerNames);
+
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<Fieldset className="m-0">
-				{Object.entries(currentAssignments).map(([k, v]) => (
+				{Object.entries(currentAssignments).map(([k]) => (
 					<Field key={k}>
-						<Field.Label>{v.name}</Field.Label>
+						<Field.Label>{playerNames[k]}</Field.Label>
 
 						<Field.Contents>
 							<SelectInput

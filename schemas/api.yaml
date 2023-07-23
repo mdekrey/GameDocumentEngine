@@ -268,7 +268,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserRoleAssignment"
+                type: object
+                additionalProperties: { type: string }
         400:
           description: There was a problem updating assignments
         401:
@@ -586,14 +587,19 @@ components:
         - type: object
           required:
           - lastUpdated
-          - players
+          - playerNames
+          - permissions
           - typeInfo
           - id
           properties:
             id: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
-            players:
-              $ref: "#/components/schemas/UserRoleAssignment"
+            playerNames:
+              type: object
+              additionalProperties: { type: string }
+            permissions:
+              type: object
+              additionalProperties: { type: string }
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
     GameSummary:
@@ -713,18 +719,6 @@ components:
         name: { type: string }
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
-    UserRoleAssignment:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/UserRoleAssignmentValue'
-    UserRoleAssignmentValue:
-        type: object
-        required:
-          - name
-          - role
-        properties:
-          name: { type: string }
-          role: { type: string }
   responses:
     "401":
       description: User was not authenticated

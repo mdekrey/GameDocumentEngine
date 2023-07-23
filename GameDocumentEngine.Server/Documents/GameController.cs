@@ -148,7 +148,7 @@ public class GameController : Api.GameControllerBase
 		if (permissions == null) return UpdateGameRoleAssignmentsActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateGameUserAccess(gameId))) return UpdateGameRoleAssignmentsActionResult.Forbidden();
 
-		var gameUserRecords = await (from gameUser in dbContext.GameUsers.Include(gu => gu.User)
+		var gameUserRecords = await (from gameUser in dbContext.GameUsers
 									 where gameUser.GameId == gameId
 									 select gameUser).ToArrayAsync();
 		foreach (var kvp in updateGameRoleAssignmentsBody)
@@ -166,7 +166,7 @@ public class GameController : Api.GameControllerBase
 		}
 		await dbContext.SaveChangesAsync();
 		return UpdateGameRoleAssignmentsActionResult.Ok(
-			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => new UserRoleAssignmentValue(gu.User.Name, gu.Role))
+			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => gu.Role)
 		);
 	}
 }
@@ -215,23 +215,27 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		var users = userEntries
 			.Select(e => e.TargetEntry ?? throw new InvalidOperationException("LoadWithFixup failed"))
 			.AtState(usage)
-			.ToDictionary(u => u.Id);
+			.ToArray();
 
 		var typeInfo = gameTypes.All.TryGetValue(resultGame.Type, out var gameType)
 			? await gameTypeMapper.ToApi(dbContext, gameType)
 			: throw new NotSupportedException("Unknown game type");
 
-		return ToApi(resultGame, gameUserEntries.AtState(usage, (gu, _) => gu.User ??= users[gu.UserId]), users, typeInfo);
+		return ToApi(resultGame, gameUserEntries.AtState(usage), users, typeInfo);
 	}
 
-	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, Dictionary<Guid, UserModel> users, GameTypeDetails typeInfo)
+	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, UserModel[] users, GameTypeDetails typeInfo)
 	{
 		// "original values" game users won't have the 
 		return new GameDetails(Name: game.Name,
 					LastUpdated: game.LastModifiedDate,
-					Players: gameUsers.ToDictionary(
+					Permissions: gameUsers.ToDictionary(
 						p => p.UserId.ToString(),
-						p => new UserRoleAssignmentValue(users[p.UserId].Name, p.Role)
+						p => p.Role
+					),
+					PlayerNames: users.ToDictionary(
+						p => p.Id.ToString(),
+						p => p.Name
 					),
 					Id: game.Id,
 					TypeInfo: typeInfo
