@@ -48,3 +48,14 @@ export function buttonThemes<TProps extends { className?: string | undefined }>(
 		Secondary: mergeButton(Component, `Secondary${nameSuffix}`, secondary),
 	};
 }
+
+export const iconButtonClasses =
+	'p-1 text-xl rounded-full flex items-center bg-slate-800 text-white font-bold focus:bg-slate-700 hover:bg-slate-700 outline-blue-700 transition-colors self-center';
+export const buttonClasses = twMerge(
+	'bg-slate-800 text-white focus:bg-slate-700 hover:bg-slate-700 outline-blue-700',
+	'px-3 py-2 rounded-md',
+	'w-full sm:w-auto',
+	'inline-flex items-center justify-center',
+	'text-sm font-semibold',
+	'transition-colors shadow-sm',
+);

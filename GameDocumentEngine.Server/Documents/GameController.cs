@@ -133,15 +133,6 @@ public class GameController : Api.GameControllerBase
 		return RemoveUserFromGameActionResult.NoContent();
 	}
 
-	protected override async Task<GetGameRolesActionResult> GetGameRoles(Guid gameId)
-	{
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
-		if (permissions == null) return GetGameRolesActionResult.NotFound();
-		if (!permissions.HasPermission(UpdateGameUserAccess(gameId))) return GetGameRolesActionResult.Forbidden();
-
-		return GetGameRolesActionResult.Ok(GameRoles);
-	}
-
 	protected override async Task<UpdateGameRoleAssignmentsActionResult> UpdateGameRoleAssignments(Guid gameId, Dictionary<string, string> updateGameRoleAssignmentsBody)
 	{
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);

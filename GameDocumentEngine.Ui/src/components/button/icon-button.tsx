@@ -1,5 +1,5 @@
 import { twMerge } from 'tailwind-merge';
-import { buttonThemes } from './buttonThemes';
+import { buttonThemes, iconButtonClasses } from './buttonThemes';
 
 export function IconButtonComponent({
 	children,
@@ -11,7 +11,7 @@ export function IconButtonComponent({
 	return (
 		<button
 			className={twMerge(
-				'p-1 text-xl rounded-full flex items-center bg-slate-800 text-white font-bold focus:bg-slate-700 hover:bg-slate-700 outline-blue-700 transition-colors self-center',
+				iconButtonClasses,
 				disabled && 'opacity-20',
 				className,
 			)}

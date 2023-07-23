@@ -1,12 +1,11 @@
-import { IconButton } from '@/components/button/icon-button';
+import { IconLinkButton } from '@/components/button/icon-link-button';
 import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
 import { HiPlus } from 'react-icons/hi';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useGameType } from '../documents/useGameType';
 
 export function GameObjects({ gameId }: { gameId: string }) {
-	const navigate = useNavigate();
 	const docsResult = useQuery(queries.listDocuments(gameId));
 	const gameDetails = useQuery(queries.getGameDetails(gameId));
 	const gameType = useGameType(gameId);
@@ -23,11 +22,9 @@ export function GameObjects({ gameId }: { gameId: string }) {
 				<Link to={`/game/${gameId}`} className="flex-1 text-lg font-bold">
 					{gameDetails.data.name}
 				</Link>
-				<IconButton.Save
-					onClick={() => navigate(`/game/${gameId}/create-document`)}
-				>
+				<IconLinkButton.Save to={`/game/${gameId}/create-document`}>
 					<HiPlus />
-				</IconButton.Save>
+				</IconLinkButton.Save>
 			</div>
 			<ul>
 				{Object.values(docsResult.data).map((s) => {

@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
+import { IconLinkButton } from '@/components/button/icon-link-button';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
@@ -41,15 +42,15 @@ export function GameDetails({ gameId }: { gameId: string }) {
 		<NarrowContent>
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{gameDetails.name}</h1>
-				<IconButton onClick={() => navigate(`/game/${gameId}/invites`)}>
+				<IconLinkButton to={`/game/${gameId}/invites`}>
 					<HiOutlineUserAdd />
-				</IconButton>
-				<IconButton onClick={() => navigate(`/game/${gameId}/roles`)}>
+				</IconLinkButton>
+				<IconLinkButton to={`/game/${gameId}/roles`}>
 					<HiOutlineUserGroup />
-				</IconButton>
-				<IconButton onClick={() => navigate(`/game/${gameId}/edit`)}>
+				</IconLinkButton>
+				<IconLinkButton to={`/game/${gameId}/edit`}>
 					<HiOutlineCog />
-				</IconButton>
+				</IconLinkButton>
 				<IconButton.Destructive onClick={() => void onDeleteGame()}>
 					<HiOutlineTrash />
 				</IconButton.Destructive>

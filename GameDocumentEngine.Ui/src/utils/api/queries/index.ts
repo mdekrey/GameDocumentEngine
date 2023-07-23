@@ -18,7 +18,8 @@ import {
 } from './document';
 import { getGameType } from './game-types';
 import { listInvitations, createInvitation, cancelInvitation } from './invites';
-import { getGameRoles, updateGameRoleAssignments } from './game-roles';
+import { updateGameRoleAssignments } from './game-roles';
+import { updateDocumentRoleAssignments } from './document-roles';
 
 export const queries = {
 	getCurrentUser,
@@ -31,7 +32,6 @@ export const queries = {
 	getGameDetails,
 	deleteGame,
 	patchGame,
-	getGameRoles,
 	updateGameRoleAssignments,
 	removeUserFromGame,
 	listDocuments,
@@ -39,6 +39,7 @@ export const queries = {
 	getDocument,
 	deleteDocument,
 	patchDocument,
+	updateDocumentRoleAssignments,
 	listInvitations,
 	createInvitation,
 	claimInvitation: null,

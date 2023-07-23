@@ -41,11 +41,26 @@ public class DocumentController : Api.DocumentControllerBase
 		if (!permissions.HasPermission(GameSecurity.CreateDocument(gameId))) return CreateDocumentActionResult.Forbidden();
 
 		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId);
-		var gameType = allGameTypes.All[game.Type];
 
-		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == createDocumentBody.Type);
+		var document = new DocumentModel
+		{
+			Game = game,
+			GameId = gameId,
+			Details = createDocumentBody.Details,
+			Name = createDocumentBody.Name,
+			Type = createDocumentBody.Type,
+		};
+
+		var docType = GetDocumentType(document);
 		if (docType == null)
 			return CreateDocumentActionResult.BadRequest("Unknown document type for game");
+
+		document.Players.Add(new DocumentUserModel
+		{
+			GameId = game.Id,
+			UserId = User.GetUserIdOrThrow(),
+			Role = docType.CreatorPermissionLevel
+		});
 
 		var schema = await schemaResolver.GetOrLoadSchema(docType);
 		var results = schema.Evaluate(createDocumentBody.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
@@ -57,19 +72,6 @@ public class DocumentController : Api.DocumentControllerBase
 			return CreateDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
 		}
 
-		var document = new DocumentModel
-		{
-			GameId = gameId,
-			Details = createDocumentBody.Details,
-			Name = createDocumentBody.Name,
-			Type = createDocumentBody.Type,
-			Players = { new DocumentUserModel
-			{
-				GameId = game.Id,
-				UserId = User.GetUserIdOrThrow(),
-				Role = docType.CreatorPermissionLevel
-			} },
-		};
 		dbContext.Add(document);
 		await dbContext.SaveChangesAsync();
 
@@ -130,9 +132,7 @@ public class DocumentController : Api.DocumentControllerBase
 		// TODO: check permissions with patch to see if allowed
 
 		var document = await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
-
-		var gameType = allGameTypes.All[document.Game.Type];
-		var docType = gameType.ObjectTypes.FirstOrDefault(t => t.Name == document.Type);
+		var docType = GetDocumentType(document);
 		if (docType == null)
 			return PatchDocumentActionResult.BadRequest("Unknown document type for game");
 
@@ -152,6 +152,59 @@ public class DocumentController : Api.DocumentControllerBase
 		await dbContext.SaveChangesAsync();
 
 		return PatchDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
+	}
+
+	private IGameObjectType? GetDocumentType(DocumentModel document)
+	{
+		var gameType = allGameTypes.All[document.Game.Type];
+		return gameType.ObjectTypes.FirstOrDefault(t => t.Name == document.Type);
+	}
+
+	protected override async Task<UpdateDocumentRoleAssignmentsActionResult> UpdateDocumentRoleAssignments(Guid gameId, Guid id, Dictionary<string, string?> updateDocumentRoleAssignmentsBody)
+	{
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
+		if (permissions == null) return UpdateDocumentRoleAssignmentsActionResult.NotFound();
+		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId, id))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
+
+		var document = await dbContext.Documents.Include(d => d.Game).SingleAsync();
+
+		var docType = GetDocumentType(document);
+		if (docType == null)
+			return UpdateDocumentRoleAssignmentsActionResult.BadRequest();
+
+		var gameUserRecords = await (from documentUser in dbContext.DocumentUsers
+									 where documentUser.GameId == gameId && documentUser.DocumentId == id
+									 select documentUser).ToListAsync();
+		foreach (var kvp in updateDocumentRoleAssignmentsBody)
+		{
+			var key = Guid.Parse(kvp.Key);
+			if (key == permissions.UserId)
+				// Can't update your own permissions!
+				return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
+			var modifiedUser = gameUserRecords.FirstOrDefault(u => u.UserId == key);
+			if (kvp.Value == null)
+			{
+				if (modifiedUser != null)
+				{
+					dbContext.DocumentUsers.Remove(modifiedUser);
+					gameUserRecords.Remove(modifiedUser);
+				}
+				continue;
+			}
+			else if (!docType.PermissionLevels.Contains(kvp.Value))
+				return UpdateDocumentRoleAssignmentsActionResult.BadRequest();
+			else if (modifiedUser == null)
+			{
+				modifiedUser = new DocumentUserModel { UserId = key, GameId = gameId, DocumentId = id, Role = kvp.Value };
+				dbContext.DocumentUsers.Add(modifiedUser);
+				gameUserRecords.Add(modifiedUser);
+			}
+			else modifiedUser.Role = kvp.Value;
+		}
+		await dbContext.SaveChangesAsync();
+		return UpdateDocumentRoleAssignmentsActionResult.Ok(
+			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => gu.Role)
+		);
 	}
 
 	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document, PermissionSet permissionSet) =>
@@ -190,7 +243,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			Type: document.Type,
 			Details: document.Details,
 			LastUpdated: document.LastModifiedDate,
-			Players: documentUsers.ToDictionary(
+			Permissions: documentUsers.ToDictionary(
 					p => p.UserId.ToString(),
 					p => p.Role
 				)

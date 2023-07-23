@@ -9,13 +9,12 @@ function useUpdateGameRoleAssignments(gameId: string) {
 
 export function GameRoles({ gameId }: { gameId: string }) {
 	const gameResult = useQuery(queries.getGameDetails(gameId));
-	const gameRolesResult = useQuery(queries.getGameRoles(gameId));
 	const updateGameRoleAssignments = useUpdateGameRoleAssignments(gameId);
 
-	if (gameResult.isLoading || gameRolesResult.isLoading) {
+	if (gameResult.isLoading) {
 		return 'Loading';
 	}
-	if (!gameResult.isSuccess || !gameRolesResult.isSuccess) {
+	if (!gameResult.isSuccess) {
 		return 'An error occurred loading the game.';
 	}
 
@@ -24,9 +23,9 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	return (
 		<NarrowContent>
 			<RoleAssignment
-				currentAssignments={gameDetails.permissions}
+				permissions={gameDetails.permissions}
 				playerNames={gameDetails.playerNames}
-				roles={gameRolesResult.data}
+				roles={gameDetails.typeInfo.userRoles}
 				onSaveRoles={onSaveRoles}
 			/>
 		</NarrowContent>

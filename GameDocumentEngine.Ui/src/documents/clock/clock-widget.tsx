@@ -3,13 +3,18 @@ import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { ClockSvg } from './clock-svg';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { IconButton } from '@/components/button/icon-button';
-import { HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
+import {
+	HiOutlineCog,
+	HiOutlineTrash,
+	HiOutlineUserGroup,
+} from 'react-icons/hi';
 import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
 import { Clock, ClockDocument } from './clock-types';
 import { useQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { useMemo } from 'react';
+import { IconLinkButton } from '@/components/button/icon-link-button';
 
 export function Clock({
 	document,
@@ -27,6 +32,9 @@ export function Clock({
 		<NarrowContent>
 			<div className="flex flex-row gap-3">
 				<span className="font-bold flex-1">{document.data.name}</span>
+				<IconLinkButton to="roles">
+					<HiOutlineUserGroup />
+				</IconLinkButton>
 				<IconButton onClick={onEdit}>
 					<HiOutlineCog />
 				</IconButton>

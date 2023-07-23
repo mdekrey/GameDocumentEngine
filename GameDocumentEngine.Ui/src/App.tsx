@@ -13,6 +13,7 @@ import { RealtimeApiProvider } from './utils/api/realtime';
 import { GameEdit } from './apps/game-edit/game-edit';
 import { GameInvites } from './apps/game-invites/game-invites';
 import { GameRoles } from './apps/game-roles/game-roles';
+import { DocumentRoles } from './apps/documents/document-roles/document-roles';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -63,6 +64,10 @@ function App() {
 						<Route
 							path="game/:gameId/document/:documentId"
 							Component={withDocumentId(withGameId(DocumentDetails))}
+						/>
+						<Route
+							path="game/:gameId/document/:documentId/roles"
+							Component={withDocumentId(withGameId(DocumentRoles))}
 						/>
 						<Route path="game/" Component={ListGames} />
 						<Route path="create-game/" Component={CreateGame} />
