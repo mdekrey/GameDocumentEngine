@@ -2,7 +2,7 @@ import { IconLinkButton } from '@/components/button/icon-link-button';
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useQuery } from '@tanstack/react-query';
-import { HiArrowRight, HiPlus } from 'react-icons/hi';
+import { HiArrowRight, HiPlus } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
 export function ListGames() {

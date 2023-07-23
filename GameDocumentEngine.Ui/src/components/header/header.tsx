@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useReducer } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-import { HiOutlineDocumentText, HiMenu } from 'react-icons/hi';
+import { HiOutlineDocumentText, HiBars3 } from 'react-icons/hi2';
 
 export function Header({ children }: { children?: React.ReactNode }) {
 	const userQuery = useQuery(queries.getCurrentUser);
@@ -21,7 +21,7 @@ export function Header({ children }: { children?: React.ReactNode }) {
 					title="menu"
 					onClick={toggleIsMobileNavOpen}
 				>
-					<HiMenu />
+					<HiBars3 />
 				</button>
 			</div>
 

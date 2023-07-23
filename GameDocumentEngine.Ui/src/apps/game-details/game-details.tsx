@@ -4,10 +4,10 @@ import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
 	HiOutlineUserGroup,
-	HiOutlineUserAdd,
+	HiOutlineUserPlus,
 	HiOutlineCog,
 	HiOutlineTrash,
-} from 'react-icons/hi';
+} from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
@@ -43,7 +43,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{gameDetails.name}</h1>
 				<IconLinkButton to={`/game/${gameId}/invites`}>
-					<HiOutlineUserAdd />
+					<HiOutlineUserPlus />
 				</IconLinkButton>
 				<IconLinkButton to={`/game/${gameId}/roles`}>
 					<HiOutlineUserGroup />

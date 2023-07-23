@@ -3,7 +3,7 @@ import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { HiPlus, HiLink, HiOutlineTrash, HiX } from 'react-icons/hi';
+import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
 import { GameInvite } from '@/api/models/GameInvite';
@@ -58,7 +58,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 									<span className="col-span-4 justify-self-stretch bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center">
 										Copied link to clipboard!
 										<IconButton.Save onClick={() => copyLink.reset()}>
-											<HiX />
+											<HiXMark />
 										</IconButton.Save>
 									</span>
 								</>

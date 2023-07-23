@@ -1,7 +1,7 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
-import { HiPlus } from 'react-icons/hi';
+import { HiPlus } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { useGameType } from '../documents/useGameType';
 
