@@ -653,9 +653,12 @@ components:
         - type: object
           required:
           - lastUpdated
-          # TODO: show player permissions
+          - players
           properties:
             lastUpdated: { type: string, format: date-time }
+            players:
+              type: object
+              additionalProperties: { type: string }
     DocumentSummary:
       type: object
       required:

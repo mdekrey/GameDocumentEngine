@@ -160,18 +160,28 @@ public class DocumentController : Api.DocumentControllerBase
 
 class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.DocumentDetails>
 {
-	public Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel document, PermissionSet permissionSet) =>
-		Task.FromResult(ToApi(document, permissionSet));
+	public Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet) =>
+		ToApi(dbContext, entity, DbContextChangeUsage.AfterChange);
 
-	public Task<DocumentDetails> ToApiBeforeChanges(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet)
+	public Task<DocumentDetails> ToApiBeforeChanges(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet) =>
+		ToApi(dbContext, entity, DbContextChangeUsage.BeforeChange);
+
+	private async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, DbContextChangeUsage usage)
 	{
-		return Task.FromResult(ToApi(
-			dbContext.Entry(entity).OriginalModel(),
-			permissionSet
-		));
+		var resultGame = dbContext.Entry(entity).AtState(usage);
+
+		var documentUsers = dbContext
+			.Entry(entity)
+			.Collection(game => game.Players);
+		await documentUsers.Query().LoadAsync();
+		var documentUserEntries = documentUsers
+			.Entries(dbContext)
+			.AtStateEntries(usage);
+
+		return ToApi(resultGame, documentUserEntries.AtState(usage));
 	}
 
-	private DocumentDetails ToApi(DocumentModel document, PermissionSet permissionSet) =>
+	private DocumentDetails ToApi(DocumentModel document, DocumentUserModel[] documentUsers) =>
 		// TODO: mask parts of document data based on permissions
 		new DocumentDetails(
 			GameId: document.GameId,
@@ -179,7 +189,11 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			Name: document.Name,
 			Type: document.Type,
 			Details: document.Details,
-			LastUpdated: document.LastModifiedDate
+			LastUpdated: document.LastModifiedDate,
+			Players: documentUsers.ToDictionary(
+					p => p.UserId.ToString(),
+					p => p.Role
+				)
 		);
 
 	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
