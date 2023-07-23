@@ -225,7 +225,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			.Collection(game => game.Players);
 		await documentUsersCollection.Query().LoadAsync();
 
-		// TODO: mask parts of document data based on permissions
+		// mask parts of document data based on permissions
 		var matchingPermissions = permissionSet.Permissions.MatchingPermissions(ViewDocumentDetailsPrefix(entity.GameId, entity.Id));
 		var jsonPaths = (from match in matchingPermissions
 						 where match.Contains('$')
