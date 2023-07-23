@@ -98,6 +98,7 @@ services.AddAuthorization(options =>
 	});
 });
 
+services.AddSingleton<GamePermissionSetResolverFactory>();
 services.AddTransient<GamePermissionSetResolver>();
 
 services.AddTransient<IApiMapper<UserModel, UserDetails>, UserModelApiMapper>();

@@ -25,6 +25,7 @@
 		</PackageReference>
 		<PackageReference Include="PrincipleStudios.OpenApiCodegen.Json.Extensions" Version="0.14.0" />
 		<PackageReference Include="PrincipleStudios.OpenApiCodegen.Server.Mvc" Version="0.14.1" />
+		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

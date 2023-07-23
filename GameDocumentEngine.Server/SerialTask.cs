@@ -9,4 +9,11 @@ public static class SerialTask
 			await operation(item);
 		}
 	}
+	public static async IAsyncEnumerable<TOut> WhenAll<TIn, TOut>(this IEnumerable<TIn> input, Func<TIn, Task<TOut>> operation)
+	{
+		foreach (var item in input)
+		{
+			yield return await operation(item);
+		}
+	}
 }

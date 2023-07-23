@@ -7,6 +7,23 @@ using System.Security.Claims;
 
 namespace GameDocumentEngine.Server.Documents;
 
+public class GamePermissionSetResolverFactory
+{
+	private readonly GameTypes gameTypes;
+
+	public GamePermissionSetResolverFactory(GameTypes gameTypes)
+	{
+		this.gameTypes = gameTypes;
+	}
+
+	public GamePermissionSetResolver Create(Data.DocumentDbContext context) =>
+		new(context, gameTypes);
+}
+
+
+/// <summary>
+/// Do not depend on this directly within DbContext interceptors; it'll get stuck in a recursive loop constructing.
+/// </summary>
 public class GamePermissionSetResolver
 {
 	private readonly DocumentDbContext context;
@@ -29,31 +46,44 @@ public class GamePermissionSetResolver
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId, Guid documentId)
 	{
-		var userPermissions = await GetPermissions(userId, gameId);
-		if (userPermissions == null) return null;
-		var documentPermissions = await GetDocumentPermissions();
+		var gameUserRecord = await context.GameUsers.SingleOrDefaultAsync(gu => gu.UserId == userId && gu.GameId == gameId);
+		if (gameUserRecord == null) return null;
+		var documentUserRecord = await context.DocumentUsers.Include(du => du.Document)
+			.SingleOrDefaultAsync(du => du.UserId == userId && du.GameId == gameId && du.DocumentId == documentId);
 
-		if (documentPermissions == null && !userPermissions.Permissions.HasPermission(GameSecurity.SeeAnyDocument(gameId)))
-			return null;
+		return await GetPermissions(gameUserRecord, documentUserRecord);
+	}
+
+	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, DocumentUserModel? documentUser)
+	{
+		if (documentUser is not null && documentUser.GameId != gameUser.GameId)
+			throw new ArgumentException("Not from the same game!", nameof(documentUser));
+		var userPermissions = gameUser.ToPermissions();
+
+		var documentPermissions = documentUser == null
+			? null
+			: await GetDocumentPermissions();
 
 		if (documentPermissions == null)
-			return userPermissions;
+		{
+			if (!userPermissions.HasPermission(GameSecurity.SeeAnyDocument(gameUser.GameId)))
+				return null;
 
-		return userPermissions with { Permissions = userPermissions.Permissions.Add(documentPermissions) };
+			return new(UserId: gameUser.UserId, userPermissions);
+		}
+
+		return new(UserId: gameUser.UserId, userPermissions.Add(documentPermissions));
 
 		async Task<PermissionList?> GetDocumentPermissions()
 		{
-			var documentUserRecord = await (from documentUser in context.DocumentUsers.Include(du => du.Document)
-											where documentUser.UserId == userId && documentUser.GameId == gameId && documentUser.DocumentId == documentId
-											select documentUser).SingleOrDefaultAsync();
-			if (documentUserRecord == null) return null;
-
-			var game = await context.Games.FirstAsync(g => g.Id == gameId);
+			var game = gameUser.Game
+				?? context.Games.Local.FirstOrDefault(g => g.Id == gameUser.GameId)
+				?? await context.Games.FirstAsync(g => g.Id == gameUser.GameId);
 			var gameType = gameTypes.All[game.Type];
-			var docType = gameType.ObjectTypes.First(dt => dt.Name == documentUserRecord.Document.Type);
+			var docType = gameType.ObjectTypes.First(dt => dt.Name == documentUser.Document.Type);
 			if (docType == null) return null;
 
-			return PermissionList.From(docType.GetPermissions(gameId, documentId, documentUserRecord.Role));
+			return PermissionList.From(docType.GetPermissions(gameUser.GameId, documentUser.DocumentId, documentUser.Role));
 		}
 	}
 }

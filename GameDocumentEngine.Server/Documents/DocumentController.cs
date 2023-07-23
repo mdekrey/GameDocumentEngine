@@ -254,25 +254,41 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 
 class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<DocumentModel, DocumentUserModel, Api.DocumentDetails>
 {
+	private readonly GamePermissionSetResolverFactory permissionSetResolverFactory;
+
 	public DocumentModelChangeNotifications(
 		IPermissionedApiMapper<DocumentModel, DocumentDetails> apiMapper,
-		IApiChangeNotification<DocumentDetails> changeNotification)
+		IApiChangeNotification<DocumentDetails> changeNotification,
+		GamePermissionSetResolverFactory permissionSetResolverFactory)
 		: base(apiMapper, changeNotification, du => du.UserId, du => du.Document)
 	{
+		this.permissionSetResolverFactory = permissionSetResolverFactory;
 	}
 
 	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
 	{
-		var documentUsers = await context.LoadEntityEntriesAsync<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
-		var gameUsers = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.GameId);
+		var documentUserEntries = await context.LoadEntityEntriesAsync<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
+		var gameUserEntries = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.GameId);
 
-		var gameUserPermissions = gameUsers.AtState(changeState)
-			.Select(gameUser => gameUser.ToPermissionSet());
+		var documentUsers = documentUserEntries.AtState(changeState);
+		var gameUsers = gameUserEntries.AtState(changeState);
 
-		return documentUsers.AtState(changeState)
-			// TODO: load document permissions
-			// TODO: merge with game permissions
-			.Select(gameUser => new PermissionSet(gameUser.UserId, PermissionList.Empty));
+		var byUser = from gameUser in gameUsers
+					 let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
+					 select new
+					 {
+						 gameUser,
+						 documentUser
+					 };
+
+		var permissionSetResolver = permissionSetResolverFactory.Create(context);
+		var permissions = await byUser
+			.WhenAll(user => permissionSetResolver.GetPermissions(user.gameUser, user.documentUser))
+			.Where(ps => ps != null)
+			.Select(ps => ps!)
+			.ToArrayAsync();
+
+		return permissions;
 	}
 }
 
