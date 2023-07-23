@@ -21,21 +21,26 @@ public static class Permissions
 	{
 		return permissionList.Permissions.Any(p => MatchPermission(p, targetPermission));
 	}
+	public static IEnumerable<string> MatchingPermissions(this PermissionList permissionList, string targetPermission)
+	{
+		return permissionList.Permissions.Where(p => MatchPermission(p, targetPermission));
+	}
 
 	public static bool MatchPermission(string permissionPattern, string targetPermission)
 	{
 		return ToPermissionPatternRegex(permissionPattern).IsMatch(targetPermission);
 	}
 
+	private static readonly Regex EscapedRegexCharacters = new(@"([-[\]{}()*+?.,\\^$|#\s])", RegexOptions.Compiled);
 	public static Regex ToPermissionPatternRegex(string permissionPattern)
 	{
-		var parts = from part in permissionPattern.Split(':')
+		var parts = from part in permissionPattern.Split('#')[0].Split(':')
 					select part switch
 					{
 						"*" => "[^:]+",
 						"**" => ".+",
 						var s when s.Contains("**") => throw new InvalidOperationException("Deep-path wildcards may only be used as complete segments"),
-						_ => part.Replace("*", "[^:]+"),
+						_ => EscapedRegexCharacters.Replace(part, @"\$1"),
 					};
 		return new Regex($"^{string.Join(':', parts)}$");
 	}

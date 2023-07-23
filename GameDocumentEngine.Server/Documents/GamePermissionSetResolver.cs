@@ -51,18 +51,28 @@ public class GamePermissionSetResolver
 		var documentUserRecord = await context.DocumentUsers.Include(du => du.Document)
 			.SingleOrDefaultAsync(du => du.UserId == userId && du.GameId == gameId && du.DocumentId == documentId);
 
-		return await GetPermissions(gameUserRecord, documentUserRecord);
+		return await GetPermissions(
+			gameUserRecord,
+			documentUserRecord == null
+				? null
+				: (documentUserRecord.Document, documentUserRecord));
 	}
 
-	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, DocumentUserModel? documentUser)
+	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, (DocumentModel Document, DocumentUserModel DocumentUser)? documentUserTuple)
 	{
-		if (documentUser is not null && documentUser.GameId != gameUser.GameId)
-			throw new ArgumentException("Not from the same game!", nameof(documentUser));
-		var userPermissions = gameUser.ToPermissions();
+		PermissionList? documentPermissions = null;
+		if (documentUserTuple is (var document, var documentUser))
+		{
+			if (documentUser.GameId != gameUser.GameId || document.GameId != gameUser.GameId)
+				throw new ArgumentException("Not from the same game!", nameof(documentUser));
+			if (documentUser.DocumentId != document.Id)
+				throw new ArgumentException("Not the same document", nameof(documentUserTuple));
 
-		var documentPermissions = documentUser == null
-			? null
-			: await GetDocumentPermissions();
+			documentPermissions = documentUser == null
+				? null
+				: await GetDocumentPermissions();
+		}
+		var userPermissions = gameUser.ToPermissions();
 
 		if (documentPermissions == null)
 		{
@@ -80,7 +90,7 @@ public class GamePermissionSetResolver
 				?? context.Games.Local.FirstOrDefault(g => g.Id == gameUser.GameId)
 				?? await context.Games.FirstAsync(g => g.Id == gameUser.GameId);
 			var gameType = gameTypes.All[game.Type];
-			var docType = gameType.ObjectTypes.First(dt => dt.Name == documentUser.Document.Type);
+			var docType = gameType.ObjectTypes.First(dt => dt.Name == document.Type);
 			if (docType == null) return null;
 
 			return PermissionList.From(docType.GetPermissions(gameUser.GameId, documentUser.DocumentId, documentUser.Role));

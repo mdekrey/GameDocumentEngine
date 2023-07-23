@@ -28,6 +28,11 @@ public static class GameSecurity
 	/// </summary>
 	public static string SeeDocument(Guid gameId, Guid documentId) => $"{BaseDocument(gameId, documentId)}:view";
 
+	public static string ViewDocumentDetails(Guid gameId, Guid documentId, string jsonPath = "$") =>
+		$"{ViewDocumentDetailsPrefix(gameId, documentId)}#{(jsonPath.StartsWith("$") ? jsonPath : ("$" + jsonPath))}";
+
+	internal static string ViewDocumentDetailsPrefix(Guid gameId, Guid documentId) =>
+		$"{BaseDocument(gameId, documentId)}:details";
 
 	public static readonly ImmutableArray<string> GameRoles = new[]
 	{
@@ -78,4 +83,5 @@ public static class GameSecurity
 
 	public static PermissionSet ToPermissionSet(this GameUserModel gameUser) =>
 		new PermissionSet(gameUser.UserId, gameUser.ToPermissions());
+
 }

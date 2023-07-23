@@ -1,6 +1,7 @@
 ﻿using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents.Types;
+using GameDocumentEngine.Server.Json;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
 using GameDocumentEngine.Server.Users;
@@ -219,28 +220,28 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 	{
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 
-		var documentUsers = dbContext
+		var documentUsersCollection = dbContext
 			.Entry(entity)
 			.Collection(game => game.Players);
-		await documentUsers.Query().LoadAsync();
-		var documentUserEntries = documentUsers
-			.Entries(dbContext)
-			.AtStateEntries(usage);
+		await documentUsersCollection.Query().LoadAsync();
 
-		return ToApi(resultGame, documentUserEntries.AtState(usage));
-	}
-
-	private DocumentDetails ToApi(DocumentModel document, DocumentUserModel[] documentUsers)
-	{
 		// TODO: mask parts of document data based on permissions
+		var matchingPermissions = permissionSet.Permissions.MatchingPermissions(ViewDocumentDetailsPrefix(entity.GameId, entity.Id));
+		var jsonPaths = (from match in matchingPermissions
+						 where match.Contains('$')
+						 select match[match.IndexOf('$')..]).ToArray();
+
 		return new DocumentDetails(
-			GameId: document.GameId,
-			Id: document.Id,
-			Name: document.Name,
-			Type: document.Type,
-			Details: document.Details,
-			LastUpdated: document.LastModifiedDate,
-			Permissions: documentUsers.ToDictionary(
+			GameId: resultGame.GameId,
+			Id: resultGame.Id,
+			Name: resultGame.Name,
+			Type: resultGame.Type,
+			Details: resultGame.Details.FilterNode(jsonPaths),
+			LastUpdated: resultGame.LastModifiedDate,
+			Permissions: documentUsersCollection
+				.Entries(dbContext)
+				.AtState(usage)
+				.ToDictionary(
 					p => p.UserId.ToString(),
 					p => p.Role
 				)
@@ -281,7 +282,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 
 		var permissionSetResolver = permissionSetResolverFactory.Create(context);
 		var permissions = await byUser
-			.WhenAll(user => permissionSetResolver.GetPermissions(user.gameUser, user.documentUser))
+			.WhenAll(user => permissionSetResolver.GetPermissions(user.gameUser, (entity, user.documentUser)))
 			.Where(ps => ps != null)
 			.Select(ps => ps!)
 			.ToArrayAsync();

@@ -13,7 +13,8 @@ public class ClockGameObject : IGameObjectType
 	{
 		"owner",
 		"ticker",
-		"observer"
+		"observer",
+		"doomsday"
 	}.ToImmutableArray();
 
 	public string DefaultPermissionLevel => "observer";
@@ -27,13 +28,20 @@ public class ClockGameObject : IGameObjectType
 		{
 			case "owner":
 				yield return $"{BaseDocument(gameId, documentId)}:**";
+				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..*");
 				yield break;
 			case "ticker":
 				yield return $"{BaseDocument(gameId, documentId)}:view";
 				yield return $"{BaseDocument(gameId, documentId)}:edit:ticks";
+				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..*");
 				yield break;
 			case "observer":
 				yield return $"{BaseDocument(gameId, documentId)}:view";
+				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..*");
+				yield break;
+			case "doomsday":
+				yield return $"{BaseDocument(gameId, documentId)}:view";
+				yield return GameSecurity.ViewDocumentDetails(gameId, documentId, "$..max");
 				yield break;
 		}
 	}
