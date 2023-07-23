@@ -28,22 +28,22 @@ export function Header({ children }: { children?: React.ReactNode }) {
 			<nav className={twMerge(isMobileNavOpen ? 'block' : 'hidden md:block')}>
 				<hr className="my-3" />
 
-				{userQuery.isSuccess ? (
-					<ul>
-						<li>Hello, {userQuery.data?.name}!</li>
-						<li>
-							<a href="#/game">Select Game</a>
-						</li>
-						<li>
-							<a href="#/create-game">New Game</a>
-						</li>
-						<li>
-							<a href="#/profile">View Profile</a>
-						</li>
-					</ul>
-				) : (
-					<span>TODO Loading...</span>
-				)}
+				<ul>
+					<li>
+						{userQuery.isSuccess
+							? `Hello, ${userQuery.data.name}!`
+							: 'Signing in...'}
+					</li>
+					<li>
+						<a href="#/game">Select Game</a>
+					</li>
+					<li>
+						<a href="#/create-game">New Game</a>
+					</li>
+					<li>
+						<a href="#/profile">View Profile</a>
+					</li>
+				</ul>
 
 				{children && (
 					<>

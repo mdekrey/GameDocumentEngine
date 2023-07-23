@@ -55,16 +55,14 @@ export function CreateGame() {
 					<Field>
 						<Field.Label>Type</Field.Label>
 						<Field.Contents>
-							{gameTypesResult.isSuccess ? (
-								<SelectInput
-									items={Object.entries(gameTypesResult.data)}
-									valueSelector={(gt) => gt[0]}
-									{...gameForm.fields.type.standardProps}
-								>
-									{(gt) => <span className="font-bold">{gt[1].name}</span>}
-								</SelectInput>
-							) : // TODO: loading spinner
-							null}
+							<SelectInput
+								items={Object.entries(gameTypesResult.data ?? {})}
+								key={gameTypesResult.data ? 1 : 0}
+								valueSelector={(gt) => gt[0]}
+								{...gameForm.fields.type.standardProps}
+							>
+								{(gt) => <span className="font-bold">{gt[1].name}</span>}
+							</SelectInput>
 							<ErrorsList
 								errors={gameForm.fields.type.errors}
 								prefix="CreateGameDetails.type"
