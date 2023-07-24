@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
@@ -10,8 +9,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
+import { useTranslation } from 'react-i18next';
 
 export function GameInvites({ gameId }: { gameId: string }) {
+	const { t } = useTranslation(['list-invites']);
+
 	const gameData = useQuery(queries.getGameDetails(gameId));
 	const invitationsResult = useQuery(queries.listInvitations(gameId));
 	const launchModal = useModal();
@@ -38,43 +40,52 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	return (
 		<NarrowContent>
 			<div className="flex flex-row gap-3">
-				<h1 className="text-2xl font-bold flex-1">Invites</h1>
+				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
 
 				<IconButton.Save onClick={createInvite}>
 					<HiPlus />
 				</IconButton.Save>
 			</div>
-			<ul className="grid grid-cols-[auto,auto,auto,auto] gap-3 items-center justify-items-center">
-				<li className="contents">
-					<span>Role:</span>
-					<span>Uses:</span>
-					<span>Expires:</span>
-					<span>{/* Actions */}</span>
-				</li>
+			<table className="gap-3 items-center justify-items-center w-full">
+				<tr>
+					<th>{t('table.role')}</th>
+					<th>{t('table.uses')}</th>
+					<th>{t('table.expires')}</th>
+					<th className="sr-only">{/* Actions */}</th>
+				</tr>
 				{invitations.length ? (
 					invitations.map((invite) => (
-						<li key={invite.id} className="contents">
+						<tr key={invite.id}>
 							{copyLink.isSuccess && copyLink.variables?.id === invite.id ? (
-								<>
-									<span className="col-span-4 justify-self-stretch bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center">
-										Copied link to clipboard!
-										<IconButton.Save onClick={() => copyLink.reset()}>
+								<td colSpan={4}>
+									<div className="bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center">
+										{t('copied-to-clipboard')}
+										<IconButton.Save
+											title={t('cancel-copied-notice')}
+											onClick={() => copyLink.reset()}
+										>
 											<HiXMark />
 										</IconButton.Save>
-									</span>
-								</>
+									</div>
+								</td>
 							) : (
 								<>
-									<span>{invite.role /* TODO: translate */}</span>
-									<span>
+									<td className="text-center">
+										{invite.role /* TODO: translate game type role */}
+									</td>
+									<td className="text-center">
 										{invite.usesRemaining === -1
-											? 'Unlimited'
+											? t('unlimited-uses-remaining')
 											: invite.usesRemaining}
-									</span>
-									<span>
-										in {formatDistanceToNow(Date.parse(invite.expiration))}
-									</span>
-									<span className="justify-self-end flex flex-row-reverse gap-3 p-1">
+									</td>
+									<td className="text-center">
+										{t('expires-in', {
+											timeDistance: formatDistanceToNow(
+												Date.parse(invite.expiration),
+											),
+										})}
+									</td>
+									<td className="justify-self-end flex flex-row-reverse gap-3 p-1">
 										<IconButton onClick={() => copyLink.mutate(invite)}>
 											<HiLink />
 										</IconButton>
@@ -83,15 +94,17 @@ export function GameInvites({ gameId }: { gameId: string }) {
 										>
 											<HiOutlineTrash />
 										</IconButton.Destructive>
-									</span>
+									</td>
 								</>
 							)}
-						</li>
+						</tr>
 					))
 				) : (
-					<li>No open invitations</li>
+					<tr>
+						<td>{t('none')}</td>
+					</tr>
 				)}
-			</ul>
+			</table>
 		</NarrowContent>
 	);
 

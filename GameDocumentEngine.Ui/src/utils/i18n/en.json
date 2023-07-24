@@ -59,6 +59,9 @@
 		"submit": "Delete",
 		"cancel": "Cancel"
 	},
+	"document-roles": {
+		"submit": "Save Changes"
+	},
 	"game-details": {
 		"add-user": "Manage invite links",
 		"manage-users": "Manage users",
@@ -90,5 +93,76 @@
 		"are-you-sure": "Are you sure you want to remove <0>{{name}}</0> from the game? All of their permissions within this game will be removed.",
 		"submit": "Remove",
 		"cancel": "Cancel"
+	},
+	"edit-game": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			}
+		},
+		"submit": "Save Changes"
+	},
+	"create-invite": {
+		"title": "Create Invite",
+		"fields": {
+			"role": {
+				"label": "Initial role",
+				"errors": {
+					"custom": "Please select a player role."
+				}
+			},
+			"isUnlimited": {
+				"label": "Unlimited uses"
+			},
+			"uses": {
+				"label": "Uses"
+			}
+		},
+		"submit": "Create",
+		"cancel": "Cancel"
+	},
+	"delete-invite": {
+		"title": "Delete invite",
+		"are-you-sure": "Are you sure you want to delete the invite with the url <0>{{url}}</0>? This action cannot be undone.",
+		"submit": "Delete",
+		"cancel": "Cancel"
+	},
+	"list-invites": {
+		"title": "Invites",
+
+		"table": {
+			"role": "Role",
+			"uses": "Uses",
+			"expires": "Expires",
+			"actions": "Actions"
+		},
+
+		"copied-to-clipboard": "Copied link to clipboard!",
+		"cancel-copied-notice": "Close copied notice",
+		"expires-in": "in {{timeDistance}}",
+
+		"unlimited-uses-remaining": "Unlimited",
+		"none": "There are no open invitation links."
+	},
+	"game-roles": {
+		"submit": "Save Changes"
+	},
+	"list-games": {
+		"title": "All Games",
+		"none": "You are not in any games. Why not create one?"
+	},
+	"profile": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			}
+		},
+		"submit": "Save Changes"
 	}
 }

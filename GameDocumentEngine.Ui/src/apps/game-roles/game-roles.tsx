@@ -2,12 +2,14 @@ import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
+import { useTranslation } from 'react-i18next';
 
 function useUpdateGameRoleAssignments(gameId: string) {
 	return useMutation(queries.updateGameRoleAssignments(gameId));
 }
 
 export function GameRoles({ gameId }: { gameId: string }) {
+	const { t } = useTranslation('game-roles');
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const updateGameRoleAssignments = useUpdateGameRoleAssignments(gameId);
 
@@ -27,6 +29,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 				playerNames={gameDetails.playerNames}
 				roles={gameDetails.typeInfo.userRoles}
 				onSaveRoles={onSaveRoles}
+				translations={t}
 			/>
 		</NarrowContent>
 	);

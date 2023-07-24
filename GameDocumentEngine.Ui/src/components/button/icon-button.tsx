@@ -1,6 +1,7 @@
 import { twMerge } from 'tailwind-merge';
 import { buttonThemes, iconButtonClasses } from './buttonThemes';
 
+// TODO: require title
 export function IconButtonComponent({
 	children,
 	className,

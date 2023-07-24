@@ -36,7 +36,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	const {
 		t,
 		i18n: { getFixedT },
-	} = useTranslation(['create-game']);
+	} = useTranslation(['create-document']);
 	const gameForm = useForm(createDocumentForm);
 
 	const gameType = useGameType(gameId);

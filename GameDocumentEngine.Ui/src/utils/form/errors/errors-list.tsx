@@ -22,8 +22,8 @@ export function ErrorsList({
 					{t?.(
 						[
 							...(prefix ? [prefix] : []),
-							'errors',
 							...issue.path,
+							'errors',
 							issue.code,
 						].join('.'),
 					)}

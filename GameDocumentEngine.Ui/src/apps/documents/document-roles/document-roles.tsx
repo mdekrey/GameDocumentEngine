@@ -2,6 +2,7 @@ import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
+import { useTranslation } from 'react-i18next';
 
 function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
@@ -14,6 +15,7 @@ export function DocumentRoles({
 	gameId: string;
 	documentId: string;
 }) {
+	const { t } = useTranslation('document-roles');
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const documentResult = useQuery(queries.getDocument(gameId, documentId));
 	const updateDocumentRoleAssignments = useUpdateDocumentRoleAssignments(
@@ -46,6 +48,7 @@ export function DocumentRoles({
 				defaultRole=""
 				roles={actualRoles}
 				onSaveRoles={onSaveRoles}
+				translations={t}
 			/>
 		</NarrowContent>
 	);

@@ -1,4 +1,5 @@
 import { DocumentDetails } from '@/api/models/DocumentDetails';
+import { i18n } from '@/utils/i18n/setup';
 import { UseQueryResult } from '@tanstack/react-query';
 import { Draft } from 'immer';
 import type { IconType } from 'react-icons';
@@ -29,6 +30,7 @@ export type IGameObjectType<T = unknown> = {
 	icon: IconType;
 	template: T;
 	component: React.ComponentType<GameObjectWidgetProps<T>>;
+	translations: Record<string, Record<string, unknown>>;
 };
 
 declare global {
@@ -52,4 +54,11 @@ export function defineDocument<T>(
 ) {
 	window.widgets ??= {};
 	window.widgets[name] = objectTypeDefinition as IGameObjectType;
+
+	for (const [language, resources] of Object.entries(
+		objectTypeDefinition.translations,
+	)) {
+		console.log(language, `doc-types:${name}`, resources);
+		i18n.addResourceBundle(language, `doc-types:${name}`, resources);
+	}
 }

@@ -1,0 +1,19 @@
+{
+	"edit-clock": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			},
+			"current": {
+				"label": "Current"
+			},
+			"max": {
+				"label": "Max"
+			}
+		},
+		"submit": "Save Changes"
+	},
+	"view-clock": {
+		"clock-title": "{{current}} of {{max}}"
+	}
+}

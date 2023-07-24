@@ -3,6 +3,7 @@ import { defineDocument } from '../defineDocument';
 import { Clock } from './clock-widget';
 import clockSchema from './schema';
 import { z } from 'zod';
+import en from './en.json';
 
 defineDocument('Clock', {
 	// TODO: Research: why this is giving a warning
@@ -13,4 +14,5 @@ defineDocument('Clock', {
 		max: 6,
 	} satisfies z.infer<typeof clockSchema>,
 	component: Clock,
+	translations: { en },
 });

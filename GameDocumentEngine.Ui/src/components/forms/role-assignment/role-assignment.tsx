@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
@@ -19,6 +18,7 @@ export type RoleAssignmentProps = {
 	onSaveRoles: (
 		roles: z.infer<typeof UserRoleAssignment>,
 	) => void | Promise<void>;
+	translations: (key: string) => string;
 };
 
 export function RoleAssignment({
@@ -27,6 +27,7 @@ export function RoleAssignment({
 	roles,
 	defaultRole,
 	onSaveRoles,
+	translations: t,
 }: RoleAssignmentProps) {
 	const formData =
 		defaultRole !== undefined
@@ -68,7 +69,7 @@ export function RoleAssignment({
 					</Field>
 				))}
 				<ButtonRow>
-					<Button type="submit">Save Changes</Button>
+					<Button type="submit">{t('submit')}</Button>
 				</ButtonRow>
 			</Fieldset>
 		</form>

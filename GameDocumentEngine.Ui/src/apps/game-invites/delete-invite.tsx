@@ -1,27 +1,31 @@
-/* eslint-disable i18next/no-literal-string */
 import { Button } from '@/components/button/button';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { ModalContentsProps } from '@/utils/modal/modal-service';
+import { Trans, useTranslation } from 'react-i18next';
 
 export function DeleteInviteModal({
 	resolve,
 	reject,
 	additional: { url },
 }: ModalContentsProps<boolean, { url: string }>) {
+	const { t } = useTranslation(['delete-invite']);
 	return (
 		<ModalAlertLayout>
-			<ModalAlertLayout.Title>Delete invite</ModalAlertLayout.Title>
+			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
 			<p className="text-sm text-gray-500">
-				Are you sure you want to delete the invite with the url{' '}
-				<span className="font-mono text-blue-950">{url}</span>? This action
-				cannot be undone.
+				<Trans
+					i18nKey="are-you-sure"
+					t={t}
+					values={{ url }}
+					components={[<span className="font-mono text-blue-950" />]}
+				/>
 			</p>
 			<ModalAlertLayout.Buttons>
 				<Button.Destructive onClick={() => resolve(true)}>
-					Delete
+					{t('submit')}
 				</Button.Destructive>
 				<Button.Secondary onClick={() => reject('Cancel')}>
-					Cancel
+					{t('cancel')}
 				</Button.Secondary>
 			</ModalAlertLayout.Buttons>
 		</ModalAlertLayout>

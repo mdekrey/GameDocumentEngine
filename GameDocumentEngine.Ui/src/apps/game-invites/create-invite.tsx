@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 import { z } from 'zod';
 import { useForm } from '@/utils/form/useForm';
 import { Button } from '@/components/button/button';
@@ -9,13 +8,14 @@ import { queries } from '@/utils/api/queries';
 import { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { Field } from '@/utils/form/field/field';
-import { SelectInput } from '@/utils/form/select-input/select-input';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { Atom, useAtomValue } from 'jotai';
 import { UseFieldResult } from '@/utils/form/useField';
 import { CheckboxField } from '@/utils/form/checkbox-input/checkbox-field';
+import { useTranslation } from 'react-i18next';
+import { SelectField } from '@/utils/form/select-field/select-field';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -41,6 +41,10 @@ export function CreateInvite({
 		gameData: GameDetails;
 	}
 >) {
+	const {
+		t,
+		i18n: { getFixedT },
+	} = useTranslation(['create-invite']);
 	const createInvite = useCreateInvite(gameId);
 	const form = useForm({
 		schema: CreateInviteForm,
@@ -74,31 +78,26 @@ export function CreateInvite({
 	return (
 		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
 			<ModalDialogLayout>
-				<ModalDialogLayout.Title>Create Invite</ModalDialogLayout.Title>
+				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
 
 				<Fieldset>
-					<Field>
-						<Field.Label>Role</Field.Label>
-						<Field.Contents>
-							<SelectInput
-								items={gameData.typeInfo.userRoles}
-								valueSelector={(gt) => gt}
-								{...form.fields.role.standardProps}
-							>
-								{(gt) => <>{gt}</> /* TODO: translate */}
-							</SelectInput>
-							<ErrorsList
-								errors={form.fields.role.errors}
-								prefix="CreateInvite.role"
-							/>
-						</Field.Contents>
-					</Field>
+					<SelectField
+						field={form.fields.role}
+						translations={getFixedT(null, 'create-invite', 'fields.role')}
+						items={gameData.typeInfo.userRoles}
+						valueSelector={(dt) => dt}
+					>
+						{/* TODO: translate role names */}
+						{(dt) => <>{dt}</>}
+					</SelectField>
 					<CheckboxField {...form.fields.isUnlimited.standardProps}>
-						<CheckboxField.Label>Unlimited Uses</CheckboxField.Label>
+						<CheckboxField.Label>
+							{t('fields.isUnlimited.label')}
+						</CheckboxField.Label>
 						<CheckboxField.Contents>
 							<ErrorsList
 								errors={form.fields.isUnlimited.errors}
-								prefix="CreateInvite.isUnlimited"
+								translations={getFixedT(null, 'create-invite', 'fields.uses')}
 							/>
 						</CheckboxField.Contents>
 					</CheckboxField>
@@ -106,9 +105,9 @@ export function CreateInvite({
 				</Fieldset>
 
 				<ModalDialogLayout.Buttons>
-					<Button.Save type="submit">Create</Button.Save>
+					<Button.Save type="submit">{t('submit')}</Button.Save>
 					<Button.Secondary onClick={() => reject('Cancel')}>
-						Cancel
+						{t('cancel')}
 					</Button.Secondary>
 				</ModalDialogLayout.Buttons>
 			</ModalDialogLayout>
@@ -128,15 +127,17 @@ function NumberOfUses({
 	disabled: Atom<boolean>;
 	field: UseFieldResult<number, string, 'hasErrors'>;
 }) {
+	const { i18n } = useTranslation();
+	const t = i18n.getFixedT(null, 'create-invite', 'fields.uses');
 	const disabled = useAtomValue(disabledAtom);
 	return (
 		<Field>
 			<Field.Label className={disabled ? 'text-gray-500' : ''}>
-				Uses
+				{t('label')}
 			</Field.Label>
 			<Field.Contents>
 				<TextInput disabled={disabled} {...field.standardProps} />
-				<ErrorsList errors={field.errors} prefix="CreateInvite.uses" />
+				<ErrorsList errors={field.errors} translations={t} />
 			</Field.Contents>
 		</Field>
 	);

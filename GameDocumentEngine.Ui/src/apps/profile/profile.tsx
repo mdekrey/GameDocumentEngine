@@ -1,6 +1,4 @@
-/* eslint-disable i18next/no-literal-string */
 import { Button } from '@/components/button/button';
-import { Field } from '@/utils/form/field/field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,12 +7,17 @@ import { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { ErrorsList } from '../../utils/form/errors/errors-list';
-import { TextInput } from '@/utils/form/text-input/text-input';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
+import { useTranslation } from 'react-i18next';
+import { TextField } from '@/utils/form/text-field/text-field';
+// import profile from './en.json';
+// import { i18n } from '@/utils/i18n/setup';
+
+// i18n.addResourceBundle('en', 'profile', profile);
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -22,17 +25,18 @@ function usePatchUser() {
 }
 
 export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
+	const {
+		t,
+		i18n: { getFixedT },
+	} = useTranslation(['profile']);
 	return (
 		<Fieldset>
-			<Field>
-				<Field.Label>Name</Field.Label>
-				<Field.Contents>
-					<TextInput {...name.standardProps} />
-					<ErrorsList errors={name.errors} prefix="UserDetail.name" />
-				</Field.Contents>
-			</Field>
+			<TextField
+				field={name}
+				translations={getFixedT(null, 'profile', 'fields.name')}
+			/>
 			<ButtonRow>
-				<Button type="submit">Save Changes</Button>
+				<Button type="submit">{t('submit')}</Button>
 			</ButtonRow>
 		</Fieldset>
 	);
@@ -43,6 +47,7 @@ const UserDetails = z.object({
 });
 
 export function Profile() {
+	const { i18n } = useTranslation(['profile']);
 	const userForm = useForm({
 		defaultValue: { name: '' },
 		schema: UserDetails,
@@ -67,7 +72,10 @@ export function Profile() {
 		<NarrowContent>
 			<form onSubmit={userForm.handleSubmit(onSubmit)}>
 				<ProfileFields {...userForm.fields} />
-				<ErrorsList errors={userForm.errors} prefix="UserDetails" />
+				<ErrorsList
+					errors={userForm.errors}
+					translations={i18n.getFixedT(null, 'profile', 'fields')}
+				/>
 			</form>
 		</NarrowContent>
 	);

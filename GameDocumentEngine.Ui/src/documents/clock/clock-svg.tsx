@@ -1,6 +1,6 @@
-/* eslint-disable i18next/no-literal-string */
 import { useMemo } from 'react';
 import { arc, pie, PieArcDatum } from 'd3-shape';
+import { useTranslation } from 'react-i18next';
 
 export function ClockSvg({
 	className,
@@ -15,6 +15,7 @@ export function ClockSvg({
 	currentTicks: number;
 	totalTicks: number;
 }) {
+	const { t } = useTranslation('doc-types:Clock', { keyPrefix: 'view-clock' });
 	const clockArc = useMemo(
 		() => arc<void, PieArcDatum<unknown>>().innerRadius(0).outerRadius(radius),
 		[radius],
@@ -31,7 +32,7 @@ export function ClockSvg({
 			className={className}
 		>
 			<title>
-				{currentTicks} of {totalTicks}
+				{t('clock-title', { current: currentTicks, max: totalTicks })}
 			</title>
 			<g
 				transform={`translate(${padding / 2 + radius} ${padding / 2 + radius})`}

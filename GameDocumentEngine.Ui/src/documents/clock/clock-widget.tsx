@@ -23,7 +23,7 @@ export function Clock({
 }: GameObjectWidgetProps<Clock>) {
 	const launchModal = useModal();
 	if (!document.data) {
-		return <>Loading...</>;
+		return 'Loading...';
 	}
 
 	const clockData = document.data;
@@ -88,7 +88,7 @@ function EditModal({
 		[documentQuery.isSuccess, documentQuery.data],
 	);
 	if (!clockData) {
-		return <div className="p-6">Loading...</div>;
+		return 'Loading...';
 	}
 
 	return (
