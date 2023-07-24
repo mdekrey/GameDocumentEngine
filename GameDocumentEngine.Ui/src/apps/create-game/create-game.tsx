@@ -3,13 +3,12 @@ import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';
-import { ErrorsList } from '@/utils/form/errors/errors-list';
-import { Field } from '@/utils/form/field/field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
-import { SelectInput } from '@/utils/form/select-input/select-input';
-import { TextInput } from '@/utils/form/text-input/text-input';
+import { TextField } from '@/utils/form/text-field/text-field';
+import { SelectField } from '@/utils/form/select-field/select-field';
 import { useForm, FormOptions } from '@/utils/form/useForm';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ZodType, z } from 'zod';
 
@@ -19,7 +18,7 @@ function useCreateGame() {
 }
 
 const CreateGameDetails = z.object({
-	name: z.string().min(3),
+	name: z.string().nonempty(),
 	type: z.string().nonempty(),
 }) satisfies ZodType<CreateGameDetails>;
 
@@ -33,6 +32,10 @@ const createGameForm = {
 } as const satisfies FormOptions<CreateGameDetails>;
 
 export function CreateGame() {
+	const {
+		t,
+		i18n: { getFixedT },
+	} = useTranslation(['create-game']);
 	const gameForm = useForm(createGameForm);
 
 	const gameTypesResult = useQuery(queries.listGameTypes());
@@ -42,35 +45,21 @@ export function CreateGame() {
 		<NarrowContent>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<Fieldset>
-					<Field>
-						<Field.Label>Name</Field.Label>
-						<Field.Contents>
-							<TextInput {...gameForm.fields.name.standardProps} />
-							<ErrorsList
-								errors={gameForm.fields.name.errors}
-								prefix="CreateGameDetails.name"
-							/>
-						</Field.Contents>
-					</Field>
-					<Field>
-						<Field.Label>Type</Field.Label>
-						<Field.Contents>
-							<SelectInput
-								items={Object.entries(gameTypesResult.data ?? {})}
-								key={gameTypesResult.data ? 1 : 0}
-								valueSelector={(gt) => gt[0]}
-								{...gameForm.fields.type.standardProps}
-							>
-								{(gt) => <span className="font-bold">{gt[1].name}</span>}
-							</SelectInput>
-							<ErrorsList
-								errors={gameForm.fields.type.errors}
-								prefix="CreateGameDetails.type"
-							/>
-						</Field.Contents>
-					</Field>
+					<TextField
+						field={gameForm.fields.name}
+						translations={getFixedT(null, 'create-game', 'fields.name')}
+					/>
+					<SelectField
+						field={gameForm.fields.type}
+						translations={getFixedT(null, 'create-game', 'fields.type')}
+						items={Object.entries(gameTypesResult.data ?? {})}
+						key={gameTypesResult.data ? 1 : 0}
+						valueSelector={(gt) => gt[0]}
+					>
+						{(gt) => <span className="font-bold">{gt[1].name}</span>}
+					</SelectField>
 					<ButtonRow>
-						<Button type="submit">Create Game</Button>
+						<Button type="submit">{t('submit')}</Button>
 					</ButtonRow>
 				</Fieldset>
 			</form>

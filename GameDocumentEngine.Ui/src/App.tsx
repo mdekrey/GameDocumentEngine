@@ -15,6 +15,8 @@ import { GameInvites } from './apps/game-invites/game-invites';
 import { GameRoles } from './apps/game-roles/game-roles';
 import { DocumentRoles } from './apps/documents/document-roles/document-roles';
 
+import '@/utils/i18n/setup';
+
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
 		Component: React.ComponentType<TProps>,

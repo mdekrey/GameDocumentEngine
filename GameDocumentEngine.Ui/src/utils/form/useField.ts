@@ -15,6 +15,7 @@ export type UseFieldResult<
 	TFieldValue = TValue,
 	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
+	fullPath: string;
 	valueAtom: PrimitiveAtom<TValue>;
 	setValue(v: TValue): void;
 	getValue(): TValue;

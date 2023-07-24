@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { z } from 'zod';
 import { useForm } from '@/utils/form/useForm';
 import { Button } from '@/components/button/button';

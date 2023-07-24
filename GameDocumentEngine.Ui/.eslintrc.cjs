@@ -1,7 +1,7 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
 	root: true,
-	plugins: ['@typescript-eslint'],
+	plugins: ['@typescript-eslint', 'i18next'],
 	extends: [
 		// The order of these matter:
 		// eslint baseline
@@ -33,6 +33,22 @@ module.exports = {
 				sourceType: 'module',
 				project: './tsconfig.node.json',
 				tsconfigRootDir: __dirname,
+			},
+			rules: {
+				'i18next/no-literal-string': [
+					2,
+					{
+						mode: 'jsx-only',
+						'jsx-attributes': { include: ['title', 'alt'] },
+					},
+				],
+			},
+		},
+		{
+			files: ['**/*.stories.{ts,tsx}'],
+
+			rules: {
+				'i18next/no-literal-string': [0],
 			},
 		},
 		{

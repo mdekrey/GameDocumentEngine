@@ -1,0 +1,94 @@
+{
+	"layout": {
+		"header": {
+			"app-title": "Game Docs Engine",
+			"menu": "Menu"
+		},
+		"menu": {
+			"edit-profile": "Edit Profile",
+			"select-game": "Select Game",
+			"new-game": "New Game"
+		}
+	},
+	"create-game": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			},
+			"type": {
+				"label": "Game type",
+				"errors": {
+					"too_small": "Please select a game type."
+				}
+			}
+		},
+		"submit": "Create Game"
+	},
+	"create-document": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			},
+			"type": {
+				"label": "Document type",
+				"errors": {
+					"too_small": "Please select a document type."
+				}
+			}
+		},
+		"submit": "Create Document"
+	},
+	"delete-document": {
+		"title": "Delete document",
+		"are-you-sure": "Are you sure you want to delete the document called <0>{{name}}</0>? This action cannot be undone.",
+		"please-type-name-to-confirm": "Please type the name of the document below to confirm deletion.",
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"custom": "Confirm the name of the document you are deleting."
+				}
+			}
+		},
+		"submit": "Delete",
+		"cancel": "Cancel"
+	},
+	"game-details": {
+		"add-user": "Manage invite links",
+		"manage-users": "Manage users",
+		"edit-game": "Edit the game's details",
+		"delete-game": "Delete the game",
+		"heading-users": "Users",
+		"delete-user": "Remove {{name}} from game"
+	},
+	"game-objects": {
+		"create-document": "Create a new document within the game"
+	},
+	"delete-game": {
+		"title": "Delete game",
+		"are-you-sure": "Are you sure you want to delete the game called <0>{{name}}</0>? This action cannot be undone.",
+		"please-type-name-to-confirm": "Please type the name of the game below to confirm deletion.",
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"custom": "Confirm the name of the game you are deleting."
+				}
+			}
+		},
+		"submit": "Delete",
+		"cancel": "Cancel"
+	},
+	"remove-game-user": {
+		"title": "Remove user",
+		"are-you-sure": "Are you sure you want to remove <0>{{name}}</0> from the game? All of their permissions within this game will be removed.",
+		"submit": "Remove",
+		"cancel": "Cancel"
+	}
+}

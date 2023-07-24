@@ -1,26 +1,31 @@
 import { Button } from '@/components/button/button';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { ModalContentsProps } from '@/utils/modal/modal-service';
+import { Trans, useTranslation } from 'react-i18next';
 
 export function RemoveGameUserModal({
 	resolve,
 	reject,
 	additional: { name: originalName },
 }: ModalContentsProps<boolean, { name: string }>) {
+	const { t } = useTranslation(['remove-game-user']);
 	return (
 		<ModalAlertLayout>
-			<ModalAlertLayout.Title>Remove user</ModalAlertLayout.Title>
+			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
 			<p className="text-sm text-gray-500">
-				Are you sure you want to remove{' '}
-				<span className="font-bold">{originalName}</span> from the game? All of
-				their permissions within this game will be removed.
+				<Trans
+					i18nKey="are-you-sure"
+					t={t}
+					values={{ name: originalName }}
+					components={[<span className="font-bold" />]}
+				/>
 			</p>
 			<ModalAlertLayout.Buttons>
 				<Button.Destructive onClick={() => resolve(true)}>
-					Delete
+					{t('submit')}
 				</Button.Destructive>
 				<Button.Secondary onClick={() => reject('Cancel')}>
-					Cancel
+					{t('cancel')}
 				</Button.Secondary>
 			</ModalAlertLayout.Buttons>
 		</ModalAlertLayout>

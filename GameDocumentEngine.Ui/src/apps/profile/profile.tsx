@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { Button } from '@/components/button/button';
 import { Field } from '@/utils/form/field/field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';

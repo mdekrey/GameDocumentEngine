@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { Updater } from '../defineDocument';
 import { useForm } from '@/utils/form/useForm';
 import { ErrorsList } from '@/utils/form/errors/errors-list';

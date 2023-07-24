@@ -29,10 +29,13 @@
 		"@types/d3-shape": "^3.1.1",
 		"d3-shape": "^3.2.0",
 		"date-fns": "^2.30.0",
+		"eslint-plugin-i18next": "^6.0.3",
 		"glob": "^10.3.3",
+		"i18next": "^23.2.11",
 		"json-schema-to-zod": "^1.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"react-i18next": "^13.0.2",
 		"react-icons": "^4.10.1",
 		"rfc6902": "^5.0.1",
 		"ts-node": "^10.9.1"

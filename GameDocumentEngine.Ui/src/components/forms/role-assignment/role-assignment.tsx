@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { ErrorsList } from '@/utils/form/errors/errors-list';

@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { Button } from '@/components/button/button';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { ModalContentsProps } from '@/utils/modal/modal-service';

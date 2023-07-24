@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
 import { NarrowContent } from '@/utils/containers/narrow-content';

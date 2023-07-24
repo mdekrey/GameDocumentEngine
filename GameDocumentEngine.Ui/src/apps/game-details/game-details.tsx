@@ -13,6 +13,7 @@ import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
 import { IconLinkButton } from '@/components/button/icon-link-button';
+import { useTranslation } from 'react-i18next';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
@@ -23,6 +24,7 @@ function useRemoveUserFromGame() {
 }
 
 export function GameDetails({ gameId }: { gameId: string }) {
+	const { t } = useTranslation(['game-details']);
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
@@ -42,25 +44,31 @@ export function GameDetails({ gameId }: { gameId: string }) {
 		<NarrowContent>
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{gameDetails.name}</h1>
-				<IconLinkButton to={`/game/${gameId}/invites`}>
+				<IconLinkButton to={`/game/${gameId}/invites`} title={t('add-user')}>
 					<HiOutlineUserPlus />
 				</IconLinkButton>
-				<IconLinkButton to={`/game/${gameId}/roles`}>
+				<IconLinkButton to={`/game/${gameId}/roles`} title={t('manage-users')}>
 					<HiOutlineUserGroup />
 				</IconLinkButton>
-				<IconLinkButton to={`/game/${gameId}/edit`}>
+				<IconLinkButton to={`/game/${gameId}/edit`} title={t('edit-game')}>
 					<HiOutlineCog />
 				</IconLinkButton>
-				<IconButton.Destructive onClick={() => void onDeleteGame()}>
+				<IconButton.Destructive
+					title={t('delete-game')}
+					onClick={() => void onDeleteGame()}
+				>
 					<HiOutlineTrash />
 				</IconButton.Destructive>
 			</div>
-			<h2 className="text-lg font-bold">Users</h2>
+			<h2 className="text-lg font-bold">{t('heading-users')}</h2>
 			<ul className="list-disc ml-8">
 				{Object.entries(gameDetails.playerNames).map(([id, name]) => (
 					<li key={id} className="flex flex-row gap-3 my-3 items-center">
 						{name}
-						<IconButton.Destructive onClick={() => void onDeleteUser(id, name)}>
+						<IconButton.Destructive
+							onClick={() => void onDeleteUser(id, name)}
+							title={t('delete-user', { name })}
+						>
 							<HiOutlineTrash />
 						</IconButton.Destructive>
 					</li>

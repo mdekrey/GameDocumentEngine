@@ -5,9 +5,12 @@ import { HiX } from 'react-icons/hi';
 export function ErrorsList({
 	errors,
 	prefix,
+	translations: t,
 }: {
 	errors: ErrorsAtom<unknown>;
-	prefix: string;
+	// TODO: require translation function and remove prefix
+	translations?: (key: string) => string;
+	prefix?: string;
 }) {
 	const errorsValue = useAtomValue(errors);
 	if (errorsValue.state !== 'hasData' || !errorsValue.data) return null;
@@ -16,7 +19,14 @@ export function ErrorsList({
 			{errorsValue.data.issues.map((issue, key) => (
 				<li key={key}>
 					<HiX class="inline-block mb-1 mr-1" />
-					{[prefix, ...issue.path, issue.code].join('.')}
+					{t?.(
+						[
+							...(prefix ? [prefix] : []),
+							'errors',
+							...issue.path,
+							issue.code,
+						].join('.'),
+					)}
 				</li>
 			))}
 		</ul>
