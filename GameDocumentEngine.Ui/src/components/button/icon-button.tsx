@@ -1,14 +1,13 @@
 import { twMerge } from 'tailwind-merge';
 import { buttonThemes, iconButtonClasses } from './buttonThemes';
 
-// TODO: require title
 export function IconButtonComponent({
 	children,
 	className,
 	type,
 	disabled,
 	...props
-}: JSX.IntrinsicElements['button']) {
+}: JSX.IntrinsicElements['button'] & { title: string }) {
 	return (
 		<button
 			className={twMerge(

@@ -7,7 +7,7 @@ export function IconLinkButtonComponent({
 	className,
 	type,
 	...props
-}: LinkProps) {
+}: LinkProps & { title: string }) {
 	return (
 		<Link
 			className={twMerge(iconButtonClasses, className)}

@@ -133,6 +133,9 @@
 	},
 	"list-invites": {
 		"title": "Invites",
+		"create-new": "Create new Invite",
+		"copy": "Copy Invite Link",
+		"delete": "Delete Invite Link",
 
 		"table": {
 			"role": "Role",
@@ -153,7 +156,9 @@
 	},
 	"list-games": {
 		"title": "All Games",
-		"none": "You are not in any games. Why not create one?"
+		"none": "You are not in any games. Why not create one?",
+		"new-game": "Create new game",
+		"go-to-game": "Go to '{{name}}'"
 	},
 	"profile": {
 		"fields": {

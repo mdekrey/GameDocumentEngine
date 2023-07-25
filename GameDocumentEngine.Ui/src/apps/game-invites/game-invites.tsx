@@ -53,7 +53,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
 
-				<IconButton.Save onClick={createInvite}>
+				<IconButton.Save title={t('create-new')} onClick={createInvite}>
 					<HiPlus />
 				</IconButton.Save>
 			</div>
@@ -95,10 +95,14 @@ export function GameInvites({ gameId }: { gameId: string }) {
 										})}
 									</td>
 									<td className="justify-self-end flex flex-row-reverse gap-3 p-1">
-										<IconButton onClick={() => copyLink.mutate(invite)}>
+										<IconButton
+											title={t('copy')}
+											onClick={() => copyLink.mutate(invite)}
+										>
 											<HiLink />
 										</IconButton>
 										<IconButton.Destructive
+											title={t('delete')}
 											onClick={() => void showDeleteInviteModal(invite)}
 										>
 											<HiOutlineTrash />

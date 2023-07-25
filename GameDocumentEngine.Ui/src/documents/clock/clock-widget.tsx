@@ -20,6 +20,7 @@ export function Clock({
 	document,
 	onDeleteDocument,
 	onUpdateDocument,
+	translation: t,
 }: GameObjectWidgetProps<Clock>) {
 	const launchModal = useModal();
 	if (!document.data) {
@@ -32,13 +33,16 @@ export function Clock({
 		<NarrowContent>
 			<div className="flex flex-row gap-3">
 				<span className="font-bold flex-1">{document.data.name}</span>
-				<IconLinkButton to="roles">
+				<IconLinkButton title={t('details.edit-roles')} to="roles">
 					<HiOutlineUserGroup />
 				</IconLinkButton>
-				<IconButton onClick={onEdit}>
+				<IconButton title={t('details.edit')} onClick={onEdit}>
 					<HiOutlineCog />
 				</IconButton>
-				<IconButton.Destructive onClick={onDeleteDocument}>
+				<IconButton.Destructive
+					title={t('details.delete')}
+					onClick={onDeleteDocument}
+				>
 					<HiOutlineTrash />
 				</IconButton.Destructive>
 			</div>

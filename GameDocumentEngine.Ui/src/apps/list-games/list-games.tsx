@@ -21,7 +21,7 @@ export function ListGames() {
 		<NarrowContent>
 			<span className="flex flex-row items-center gap-4 mb-4">
 				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
-				<IconLinkButton.Save to={'/create-game'}>
+				<IconLinkButton.Save title={t('new-game')} to={'/create-game'}>
 					<HiPlus />
 				</IconLinkButton.Save>
 			</span>
@@ -32,7 +32,10 @@ export function ListGames() {
 							<Link to={`/game/${game.id}`}>{game.name}</Link>
 							<hr className="flex-1" />
 							<div className="my-2 flex flex-row gap-2">
-								<IconLinkButton to={`/game/${game.id}`}>
+								<IconLinkButton
+									title={t('go-to-game', { name: game.name })}
+									to={`/game/${game.id}`}
+								>
 									<HiArrowRight />
 								</IconLinkButton>
 							</div>

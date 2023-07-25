@@ -1,5 +1,10 @@
 {
 	"name": "Clock",
+	"details": {
+		"edit-roles": "Edit roles",
+		"edit": "Edit",
+		"delete": "Delete"
+	},
 	"roles": {
 		"owner": {
 			"name": "Owner",

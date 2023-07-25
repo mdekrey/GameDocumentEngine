@@ -4,7 +4,7 @@ import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
 	HiOutlineUserGroup,
-	HiOutlineUserPlus,
+	HiLink,
 	HiOutlineCog,
 	HiOutlineTrash,
 } from 'react-icons/hi2';
@@ -45,7 +45,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{gameDetails.name}</h1>
 				<IconLinkButton to={`/game/${gameId}/invites`} title={t('add-user')}>
-					<HiOutlineUserPlus />
+					<HiLink />
 				</IconLinkButton>
 				<IconLinkButton to={`/game/${gameId}/roles`} title={t('manage-users')}>
 					<HiOutlineUserGroup />

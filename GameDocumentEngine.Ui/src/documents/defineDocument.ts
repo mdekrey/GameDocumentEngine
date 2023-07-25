@@ -1,6 +1,7 @@
 import { DocumentDetails } from '@/api/models/DocumentDetails';
 import { i18n } from '@/utils/i18n/setup';
 import { UseQueryResult } from '@tanstack/react-query';
+import { TFunction } from 'i18next';
 import { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { z } from 'zod';
@@ -24,6 +25,7 @@ export type GameObjectWidgetProps<T = unknown> = {
 	document: UseQueryResult<TypedDocumentDetails<T>>;
 	onUpdateDocument: Updater<T>;
 	onDeleteDocument: () => void;
+	translation: TFunction<`doc-types:${string}`, undefined>;
 };
 
 export type IGameObjectType<T = unknown> = {
@@ -58,7 +60,6 @@ export function defineDocument<T>(
 	for (const [language, resources] of Object.entries(
 		objectTypeDefinition.translations,
 	)) {
-		console.log(language, `doc-types:${name}`, resources);
 		i18n.addResourceBundle(language, `doc-types:${name}`, resources);
 	}
 }

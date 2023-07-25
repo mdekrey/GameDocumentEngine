@@ -36,8 +36,10 @@ export function DocumentDetails({
 
 	const docData = document.data;
 
-	const { component: Component } =
-		gameType.data.objectTypes[document.data.type].typeInfo;
+	const {
+		typeInfo: { component: Component },
+		translation,
+	} = gameType.data.objectTypes[document.data.type];
 
 	return (
 		<Component
@@ -46,6 +48,7 @@ export function DocumentDetails({
 			document={document}
 			onDeleteDocument={() => void handleDelete()}
 			onUpdateDocument={handleUpdate}
+			translation={translation}
 		/>
 	);
 
