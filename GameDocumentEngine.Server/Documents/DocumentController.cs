@@ -175,7 +175,7 @@ public class DocumentController : Api.DocumentControllerBase
 		if (permissions == null) return UpdateDocumentRoleAssignmentsActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId, id))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
 
-		var document = await dbContext.Documents.Include(d => d.Game).SingleAsync();
+		var document = await dbContext.Documents.Include(d => d.Game).Where(d => d.Id == id && d.GameId == gameId).SingleAsync();
 
 		var docType = GetDocumentType(document);
 		if (docType == null)
@@ -283,6 +283,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 
 		var byUser = (from gameUser in gameUsers
 					  let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
+					  // Document User may not have existed for every user, such as when creating or destroying
 					  where documentUser != null
 					  select new
 					  {
