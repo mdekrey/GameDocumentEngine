@@ -286,8 +286,8 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 					  where documentUser != null
 					  select new
 					  {
-						gameUser,
-						documentUser
+						  gameUser,
+						  documentUser
 					  }).ToArray();
 
 		var permissionSetResolver = permissionSetResolverFactory.Create(context);
