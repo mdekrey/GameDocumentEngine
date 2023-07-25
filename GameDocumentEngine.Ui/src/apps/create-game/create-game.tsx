@@ -56,7 +56,7 @@ export function CreateGame() {
 						key={gameTypesResult.data ? 1 : 0}
 						valueSelector={(gt) => gt[0]}
 					>
-						{(gt) => <span className="font-bold">{gt[1].name}</span>}
+						{([gt]) => <>{getGameTypeName(gt)}</>}
 					</SelectField>
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>
@@ -68,5 +68,10 @@ export function CreateGame() {
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {
 		createGame.mutate(currentValue);
+	}
+
+	function getGameTypeName(gameType: string) {
+		const t = getFixedT(null, `game-types:${gameType}`);
+		return t('name');
 	}
 }

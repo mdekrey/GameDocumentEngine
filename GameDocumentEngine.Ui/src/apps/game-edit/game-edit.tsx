@@ -43,6 +43,7 @@ const GameDetails = z.object({
 });
 
 export function GameEdit({ gameId }: { gameId: string }) {
+	const { i18n } = useTranslation(['edit-game']);
 	const gameForm = useForm({
 		defaultValue: { name: '' },
 		schema: GameDetails,
@@ -67,7 +68,10 @@ export function GameEdit({ gameId }: { gameId: string }) {
 		<NarrowContent>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<GameEditFields {...gameForm.fields} />
-				<ErrorsList errors={gameForm.errors} prefix="GameDetails" />
+				<ErrorsList
+					errors={gameForm.errors}
+					translations={i18n.getFixedT(null, 'edit-game', 'fields')}
+				/>
 			</form>
 		</NarrowContent>
 	);

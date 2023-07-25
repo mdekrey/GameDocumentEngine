@@ -27,11 +27,7 @@ export function SelectField<T>({
 				>
 					{children}
 				</SelectInput>
-				<ErrorsList
-					errors={field.errors}
-					translations={t}
-					prefix="fields.type.errors"
-				/>
+				<ErrorsList errors={field.errors} translations={t} />
 			</Field.Contents>
 		</Field>
 	);

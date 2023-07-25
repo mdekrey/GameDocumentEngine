@@ -1,4 +1,23 @@
 {
+	"name": "Clock",
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the clock with full control"
+		},
+		"ticker": {
+			"name": "Ticker",
+			"description": "Can change the current value of the clock"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the clock's details"
+		},
+		"doomsday": {
+			"name": "Doomsday",
+			"description": "Can see the clock's maximum value, but not the ticks"
+		}
+	},
 	"edit-clock": {
 		"fields": {
 			"name": {

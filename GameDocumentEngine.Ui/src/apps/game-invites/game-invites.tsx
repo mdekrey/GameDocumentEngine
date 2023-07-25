@@ -10,6 +10,7 @@ import { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
 import { useTranslation } from 'react-i18next';
+import { useGameType } from '../documents/useGameType';
 
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
@@ -26,16 +27,26 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const deleteInvite = useMutation(
 		queries.cancelInvitation(queryClient, gameId),
 	);
+	const gameTypeInfo = useGameType(gameId);
 
-	if (invitationsResult.isLoading || gameData.isLoading) {
+	if (
+		invitationsResult.isLoading ||
+		gameData.isLoading ||
+		gameTypeInfo.isLoading
+	) {
 		return 'Loading';
 	}
-	if (!invitationsResult.isSuccess || !gameData.isSuccess) {
+	if (
+		!invitationsResult.isSuccess ||
+		!gameData.isSuccess ||
+		!gameTypeInfo.isSuccess
+	) {
 		return 'An error occurred loading invitations.';
 	}
 
 	const gameDetails = gameData.data;
 	const invitations = Object.values(invitationsResult.data);
+	const gameType = gameTypeInfo.data;
 
 	return (
 		<NarrowContent>
@@ -48,7 +59,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 			</div>
 			<table className="gap-3 items-center justify-items-center w-full">
 				<tr>
-					<th>{t('table.role')}</th>
+					<th className="text-left">{t('table.role')}</th>
 					<th>{t('table.uses')}</th>
 					<th>{t('table.expires')}</th>
 					<th className="sr-only">{/* Actions */}</th>
@@ -70,9 +81,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 								</td>
 							) : (
 								<>
-									<td className="text-center">
-										{invite.role /* TODO: translate game type role */}
-									</td>
+									<td>{gameType.translation(`roles.${invite.role}.name`)}</td>
 									<td className="text-center">
 										{invite.usesRemaining === -1
 											? t('unlimited-uses-remaining')
@@ -113,6 +122,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 			additional: {
 				gameId,
 				gameData: gameDetails,
+				gameType,
 			},
 			ModalContents: CreateInvite,
 		});

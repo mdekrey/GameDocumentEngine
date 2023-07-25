@@ -18,6 +18,7 @@ export type RoleAssignmentProps = {
 	onSaveRoles: (
 		roles: z.infer<typeof UserRoleAssignment>,
 	) => void | Promise<void>;
+	roleTranslations: (key: string) => string;
 	translations: (key: string) => string;
 };
 
@@ -27,6 +28,7 @@ export function RoleAssignment({
 	roles,
 	defaultRole,
 	onSaveRoles,
+	roleTranslations,
 	translations: t,
 }: RoleAssignmentProps) {
 	const formData =
@@ -59,12 +61,15 @@ export function RoleAssignment({
 								items={roles}
 								valueSelector={(gt) => gt}
 							>
-								{(gt) => <>{gt}</> /* TODO: translate */}
+								{(gt) =>
+									gt ? (
+										<>{roleTranslations(`roles.${gt}.name`)}</>
+									) : (
+										<>{t('no-role')}</>
+									)
+								}
 							</SelectInput>
-							<ErrorsList
-								errors={form.fields.row(k).errors}
-								prefix="RoleAssignment.role" // TODO: prefix
-							/>
+							<ErrorsList errors={form.fields.row(k).errors} translations={t} />
 						</Field.Contents>
 					</Field>
 				))}

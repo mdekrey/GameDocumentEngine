@@ -55,13 +55,14 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						field={gameForm.fields.type}
 						translations={getFixedT(null, 'create-document', 'fields.type')}
 						items={
-							gameType.isSuccess ? Object.keys(gameType.data.objectTypes) : []
+							gameType.isSuccess
+								? Object.entries(gameType.data.objectTypes)
+								: []
 						}
 						key={gameType.data ? 1 : 0}
-						valueSelector={(dt) => dt}
+						valueSelector={([dt]) => dt}
 					>
-						{/* TODO: translate game type names */}
-						{(dt) => <span className="font-bold">{dt}</span>}
+						{([, { translation: t }]) => t('name')}
 					</SelectField>
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>

@@ -3,6 +3,8 @@ import { QueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 import { IGameObjectType } from '@/documents/defineDocument';
 import { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
+import { TFunction } from 'i18next';
+import { i18n } from '@/utils/i18n/setup';
 
 export function getGameType(
 	gameType: string,
@@ -19,10 +21,12 @@ export function getGameType(
 
 export type GameTypeScripts = {
 	objectTypes: Record<string, GameTypeObjectScripts>;
+	translation: TFunction<`game-types:${string}`, undefined>;
 };
 
 export type GameTypeObjectScripts = {
 	typeInfo: IGameObjectType;
+	translation: TFunction<`doc-types:${string}`, undefined>;
 };
 
 export function getGameTypeScripts(
@@ -47,6 +51,7 @@ export function getGameTypeScripts(
 						),
 					),
 				),
+				translation: i18n.getFixedT(null, `game-types:${gameTypeName}`),
 			} as GameTypeScripts;
 		},
 	};
@@ -55,7 +60,7 @@ export function getGameTypeScripts(
 function getObjectType(objectType: GameObjectTypeDetails) {
 	return {
 		queryKey: ['gameObjectType', objectType.name],
-		queryFn: async () => {
+		queryFn: async (): Promise<GameTypeObjectScripts> => {
 			await Promise.all(
 				objectType.scripts.map(
 					(src) =>
@@ -89,6 +94,7 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 			);
 
 			return {
+				translation: i18n.getFixedT(null, `doc-types:${objectType.name}`),
 				typeInfo: window.widgets[objectType.name],
 			};
 		},

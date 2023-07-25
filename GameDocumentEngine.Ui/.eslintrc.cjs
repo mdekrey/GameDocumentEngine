@@ -39,7 +39,10 @@ module.exports = {
 					2,
 					{
 						mode: 'jsx-only',
-						'jsx-attributes': { include: ['title', 'alt'] },
+						'jsx-attributes': {
+							include: ['title', 'alt'],
+							callees: { exclude: ['translation'] },
+						},
 					},
 				],
 			},

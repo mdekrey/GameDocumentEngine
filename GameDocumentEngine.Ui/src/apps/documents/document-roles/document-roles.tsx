@@ -3,6 +3,7 @@ import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { useTranslation } from 'react-i18next';
+import { useGameType } from '../useGameType';
 
 function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
@@ -22,11 +23,16 @@ export function DocumentRoles({
 		gameId,
 		documentId,
 	);
+	const gameType = useGameType(gameId);
 
-	if (gameResult.isLoading || documentResult.isLoading) {
+	if (gameResult.isLoading || documentResult.isLoading || gameType.isLoading) {
 		return 'Loading';
 	}
-	if (!gameResult.isSuccess || !documentResult.isSuccess) {
+	if (
+		!gameResult.isSuccess ||
+		!documentResult.isSuccess ||
+		!gameType.isSuccess
+	) {
 		return 'An error occurred loading the game.';
 	}
 
@@ -49,6 +55,9 @@ export function DocumentRoles({
 				roles={actualRoles}
 				onSaveRoles={onSaveRoles}
 				translations={t}
+				roleTranslations={
+					gameType.data.objectTypes[documentResult.data.type].translation
+				}
 			/>
 		</NarrowContent>
 	);

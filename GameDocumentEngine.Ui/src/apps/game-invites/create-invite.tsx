@@ -16,6 +16,7 @@ import { UseFieldResult } from '@/utils/form/useField';
 import { CheckboxField } from '@/utils/form/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/utils/form/select-field/select-field';
+import { GameTypeScripts } from '@/utils/api/queries/game-types';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -33,12 +34,13 @@ function useCreateInvite(gameId: string) {
 export function CreateInvite({
 	resolve,
 	reject,
-	additional: { gameId, gameData },
+	additional: { gameId, gameData, gameType },
 }: ModalContentsProps<
 	boolean,
 	{
 		gameId: string;
 		gameData: GameDetails;
+		gameType: GameTypeScripts;
 	}
 >) {
 	const {
@@ -87,8 +89,7 @@ export function CreateInvite({
 						items={gameData.typeInfo.userRoles}
 						valueSelector={(dt) => dt}
 					>
-						{/* TODO: translate role names */}
-						{(dt) => <>{dt}</>}
+						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
 					</SelectField>
 					<CheckboxField {...form.fields.isUnlimited.standardProps}>
 						<CheckboxField.Label>
