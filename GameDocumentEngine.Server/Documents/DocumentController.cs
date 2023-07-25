@@ -281,13 +281,14 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		var documentUsers = documentUserEntries.AtState(changeState);
 		var gameUsers = gameUserEntries.AtState(changeState);
 
-		var byUser = from gameUser in gameUsers
-					 let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
-					 select new
-					 {
-						 gameUser,
-						 documentUser
-					 };
+		var byUser = (from gameUser in gameUsers
+					  let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
+					  where documentUser != null
+					  select new
+					  {
+						gameUser,
+						documentUser
+					  }).ToArray();
 
 		var permissionSetResolver = permissionSetResolverFactory.Create(context);
 		var permissions = await byUser
