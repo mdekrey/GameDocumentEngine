@@ -422,7 +422,6 @@ paths:
           description: Target document not found
         409:
           description: Document was updated while request was being processed; try again later.
-  # TODO: change permissions on document
   /game/{gameId}/document/{id}/role-assignments:
     put:
       x-dotnet-mvc-server-controller: Document
@@ -686,7 +685,6 @@ components:
         id: { type: string, format: guid }
         name: { type: string }
         type: { type: string }
-        # TODO: summary of document details?
 
     UserDetails:
       type: object
