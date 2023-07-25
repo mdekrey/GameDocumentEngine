@@ -30,17 +30,15 @@ export function Header({ children }: { children?: React.ReactNode }) {
 			</div>
 
 			<nav className={twMerge(isMobileNavOpen ? 'block' : 'hidden md:block')}>
+				{children && (
+					<>
+						<hr className="my-3" />
+						{children}
+					</>
+				)}
 				<hr className="my-3" />
 
 				<ul>
-					<li>
-						{userQuery.isSuccess
-							? `Hello, ${userQuery.data.name}!`
-							: 'Signing in...'}
-					</li>
-					<li>
-						<a href="#/profile">{t('menu.edit-profile')}</a>
-					</li>
 					<li>
 						<a href="#/game">{t('menu.select-game')}</a>
 					</li>
@@ -49,12 +47,14 @@ export function Header({ children }: { children?: React.ReactNode }) {
 					</li>
 				</ul>
 
-				{children && (
-					<>
-						<hr className="my-3" />
-						{children}
-					</>
-				)}
+				<hr className="my-3" />
+				<ul>
+					<li>
+						<a href="#/profile">
+							{t('menu.edit-profile', { name: userQuery.data?.name })}
+						</a>
+					</li>
+				</ul>
 			</nav>
 		</div>
 	);

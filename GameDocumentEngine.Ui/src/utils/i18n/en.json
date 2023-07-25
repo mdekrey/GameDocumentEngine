@@ -5,7 +5,7 @@
 			"menu": "Menu"
 		},
 		"menu": {
-			"edit-profile": "Edit Profile",
+			"edit-profile": "Hello, {{name}} [Edit]",
 			"select-game": "Select Game",
 			"new-game": "New Game"
 		}
