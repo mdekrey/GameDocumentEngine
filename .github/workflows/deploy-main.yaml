@@ -13,6 +13,7 @@ env:
   imageName: 'gamedocsengine'
   k8sNamespace: 'game-docs-engine'
   releaseName: 'vtt-dekrey-net'
+  dockerImageTag: 'main-${{ github.run_number }}'
 
 # Secrets generated via ./deployment/generate-credentials.ps1 - need to be reset regularly
 
@@ -31,8 +32,9 @@ jobs:
 
     - name: 'Build and push image'
       run: |
-        docker build . -t $registryLoginServer/$imageName:${{ github.sha }} --build-arg GITHASH=${{ github.sha }}
-        docker push $registryLoginServer/$imageName:${{ github.sha }}
+        docker build . -t $registryLoginServer/$imageName:${{ env.dockerImageTag }} --build-arg GITHASH=${{ github.sha }}
+        docker push $registryLoginServer/$imageName:${{ env.dockerImageTag }}
+
 
     # Set the target Azure Kubernetes Service (AKS) cluster.
     - uses: azure/login@v1
@@ -52,6 +54,6 @@ jobs:
       run: |
         helm upgrade --install -n $k8sNamespace $releaseName --create-namespace \
           --repo https://mdekrey.github.io/helm-charts single-container \
-          --set-string "image.tag=${{ github.sha }}" \
+          --set-string "image.tag=${{ env.dockerImageTag }}" \
           --values ./eng/deployment/values.prod.yaml \
           --wait
