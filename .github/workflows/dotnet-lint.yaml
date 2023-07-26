@@ -1,0 +1,18 @@
+name: Lint DotNet
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        lfs: true
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+    - name: 'Run dotnet checks'
+      run: |
+        dotnet format --verify-no-changes
