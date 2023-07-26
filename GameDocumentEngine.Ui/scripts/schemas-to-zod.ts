@@ -15,9 +15,7 @@ const schemaExtension = '.json';
 
 const documentTypes = (
 	await glob(`*${schemaExtension}`, { cwd: documentSchemaDir })
-).map((file) =>
-	file.substring(0, file.length - schemaExtension.length).toLowerCase(),
-);
+).map((file) => file.substring(0, file.length - schemaExtension.length));
 
 await Promise.all(
 	documentTypes.map(async (documentType) => {
@@ -25,7 +23,11 @@ await Promise.all(
 			documentSchemaDir,
 			`${documentType}${schemaExtension}`,
 		);
-		const outPath = path.resolve(documentsDir, documentType, 'schema.ts');
+		const outPath = path.resolve(
+			documentsDir,
+			documentType.toLowerCase(),
+			'schema.ts',
+		);
 		const schema = require(schemaPath) as JSONSchema7;
 
 		const module = jsonSchemaToZod(schema);

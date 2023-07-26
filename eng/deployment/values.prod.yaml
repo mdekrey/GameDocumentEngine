@@ -1,0 +1,45 @@
+replicaCount: 1
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts:
+  - host: vttrpg.dekrey.net
+  - host: vtt.dekrey.net
+
+serviceAccount:
+  create: false
+  name: main-docs-user
+
+image:
+  pullPolicy: Always
+
+podspec:
+  env:
+  - name: Authentication__Google__ClientId
+    valueFrom:
+      secretKeyRef:
+        name: vtt-dekrey-net-env
+        key: Authentication__Google__ClientId
+  - name: Authentication__Google__ClientSecret
+    valueFrom:
+      secretKeyRef:
+        name: vtt-dekrey-net-env
+        key: Authentication__Google__ClientSecret
+  - name: Sql__ConnectionString
+    valueFrom:
+      secretKeyRef:
+        name: vtt-dekrey-net-env
+        key: Sql__ConnectionString
+
+podLabels:
+  azure.workload.identity/use: 'true'
+
+resources:
+  limits:
+    # Reminder: CPU limits are soft, but memory limits are HARD. If memory limits exceed, the pod gets killed.
+    cpu: 100m
+    # This shouldn't go above 100Mi, but it is production, so we let it go a bit more.
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 100Mi

@@ -58,6 +58,6 @@ az identity federated-credential create `
   --identity-name "$identityName" `
   --resource-group "$resourceGroup" `
   --issuer "$oidcUrl" `
-  --subject "system:serviceaccount:${k8sServiceAccountName}:${k8sServiceAccountName}"
+  --subject "system:serviceaccount:${k8sNamespace}:${k8sServiceAccountName}"
 
 # 6. Specify account in pod via `serviceAccountName: $k8sServiceAccountName`

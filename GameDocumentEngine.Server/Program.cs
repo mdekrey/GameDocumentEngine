@@ -8,6 +8,8 @@ using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Security.AccessControl;
 using System.Security.Claims;
@@ -22,6 +24,14 @@ services.AddCompressedStaticFiles();
 var signalr = services.AddSignalR();
 if (builder.Configuration["Azure:SignalR:ConnectionString"] != null)
 	signalr.AddAzureSignalR();
+services.Configure<ForwardedHeadersOptions>(options =>
+{
+	options.ForwardLimit = 1;
+	// When running within k8s, we don't need to set known proxies/networks
+	options.KnownProxies.Clear();
+	options.KnownNetworks.Clear();
+	options.ForwardedHeaders = ForwardedHeaders.All;
+});
 
 services
 	.AddAuthentication(options =>
@@ -126,7 +136,12 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
+app.UseForwardedHeaders();
+if (app.Environment.IsDevelopment())
+{
+	app.UseHttpsRedirection();
+}
+app.UseHealthChecks("/health");
 app.UseDefaultFiles();
 
 app.UseCompressedStaticFiles(new StaticFileOptions
@@ -148,10 +163,11 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<GameDocumentsHub>("/hub");
 
-using (var scope = app.Services.CreateScope())
-{
-	var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
-	dbContext.Database.EnsureCreated();
-}
+if (app.Environment.IsDevelopment())
+	using (var scope = app.Services.CreateScope())
+	{
+		var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
+		dbContext.Database.EnsureCreated();
+	}
 
 app.Run();

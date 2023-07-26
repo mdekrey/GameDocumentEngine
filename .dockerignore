@@ -1,0 +1,16 @@
+Dockerfile
+.dockerignore
+/artifacts
+/.vs
+/.git
+/eng/**/secrets.ps1
+/GameDocumentEngine.Ui/node_modules
+/GameDocumentEngine.Ui/src/api
+/GameDocumentEngine.Ui/src/documents/*/schema.ts
+/GameDocumentEngine.Server/obj
+/GameDocumentEngine.Server/wwwroot
+/GameDocumentEngine.Server/setup.ps1
+/GameDocumentEngine.Db
+
+**/*.user
+**/.env
