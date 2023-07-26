@@ -1,0 +1,21 @@
+name: Run Tests
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        lfs: true
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: ./GameDocumentEinge.Ui/.nvmrc
+    - name: 'Run tests'
+      run: |
+        dotnet test

@@ -18,7 +18,8 @@
 		"prepare": "cd .. && husky install GameDocumentEngine.Ui/.husky",
 		"generation": "npm run generate-api && npm run generate-zod",
 		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml",
-		"generate-zod": "ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts"
+		"generate-zod": "ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts",
+		"test": "echo 'TODO'"
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^7.0.9",
