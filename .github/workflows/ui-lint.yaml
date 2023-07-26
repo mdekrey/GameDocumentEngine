@@ -1,0 +1,20 @@
+name: Lint UI
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        lfs: true
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: ./GameDocumentEinge.Ui/.nvmrc
+    - name: 'Run full lint'
+      working-directory: ./GameDocumentEinge.Ui
+      run: |
+        npm ci
+        npm run lint
