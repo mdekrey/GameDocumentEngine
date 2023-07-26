@@ -1,0 +1,27 @@
+name: Lint UI
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        lfs: true
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: ./GameDocumentEngine.Ui/.nvmrc
+    - name: 'Prepare UI for linting'
+      working-directory: ./GameDocumentEngine.Ui
+      run: |
+        npm ci
+        npm run generation
+    - name: 'Run full lint'
+      working-directory: ./GameDocumentEngine.Ui
+      run: |
+        npm run lint

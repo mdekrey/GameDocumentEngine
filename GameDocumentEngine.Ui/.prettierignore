@@ -1,5 +1,7 @@
 node_modules/
 dist/
+src/api/
+src/documents/*/schema.ts
 
 package.json
 package-lock.json
