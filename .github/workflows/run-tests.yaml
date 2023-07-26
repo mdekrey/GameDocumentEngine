@@ -15,7 +15,7 @@ jobs:
         global-json-file: global.json
     - uses: actions/setup-node@v3
       with:
-        node-version-file: ./GameDocumentEinge.Ui/.nvmrc
+        node-version-file: ./GameDocumentEngine.Ui/.nvmrc
     - name: 'Run tests'
       run: |
         dotnet test
