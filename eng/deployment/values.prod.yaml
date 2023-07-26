@@ -12,6 +12,7 @@ serviceAccount:
 
 image:
   pullPolicy: Always
+  repository: dekreydotnet.azurecr.io/gamedocsengine
 
 podspec:
   env:
