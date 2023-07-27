@@ -10,7 +10,10 @@ export function SelectField<T>({
 	valueSelector,
 	children,
 }: {
-	field: Omit<UseFieldResult<unknown, string, 'hasErrors'>, 'valueAtom'>;
+	field: Omit<
+		UseFieldResult<unknown, string, { hasErrors: true; isCheckbox: false }>,
+		'valueAtom'
+	>;
 	translations: (key: string) => string;
 	items: T[];
 	valueSelector: (item: T) => string;

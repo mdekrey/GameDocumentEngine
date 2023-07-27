@@ -126,7 +126,7 @@ function NumberOfUses({
 	field,
 }: {
 	disabled: Atom<boolean>;
-	field: UseFieldResult<number, string, 'hasErrors'>;
+	field: UseFieldResult<number, string, { hasErrors: true; isCheckbox: false }>;
 }) {
 	const { i18n } = useTranslation();
 	const t = i18n.getFixedT(null, 'create-invite', 'fields.uses');

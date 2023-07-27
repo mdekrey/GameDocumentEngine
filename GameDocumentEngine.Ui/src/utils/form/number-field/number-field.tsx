@@ -7,7 +7,10 @@ export function NumberField({
 	field,
 	translations: t,
 }: {
-	field: Omit<UseFieldResult<unknown, string, 'hasErrors'>, 'valueAtom'>;
+	field: Omit<
+		UseFieldResult<unknown, string, { hasErrors: true; isCheckbox: false }>,
+		'valueAtom'
+	>;
 	translations: (key: string) => string;
 }) {
 	return (

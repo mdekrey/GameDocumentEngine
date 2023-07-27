@@ -6,9 +6,10 @@ import { StandardWritableAtom } from './StandardWritableAtom';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { RegisterErrorStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
+import { IfTrueThenElse, IfTrueThenProp } from './type-helpers';
 
-export type DefaultUseFieldResultFlags = 'hasErrors';
-export type UseFieldResultFlags = 'hasErrors' | 'isCheckbox';
+export type DefaultUseFieldResultFlags = { hasErrors: true; isCheckbox: false };
+export type UseFieldResultFlags = { hasErrors: boolean; isCheckbox: boolean };
 export type ErrorsAtom<TValue> = Atom<Loadable<ZodError<TValue> | null>>;
 export type UseFieldResult<
 	TValue,
@@ -19,11 +20,13 @@ export type UseFieldResult<
 	valueAtom: PrimitiveAtom<TValue>;
 	setValue(v: TValue): void;
 	getValue(): TValue;
-	standardProps: 'isCheckbox' extends TFlags
-		? CheckboxFieldProps<TFieldValue>
-		: InputFieldProps<TFieldValue>;
+	standardProps: IfTrueThenElse<
+		TFlags['isCheckbox'],
+		CheckboxFieldProps<TFieldValue>,
+		InputFieldProps<TFieldValue>
+	>;
 	errors?: ErrorsAtom<TValue>;
-} & ('hasErrors' extends TFlags ? { errors: ErrorsAtom<TValue> } : object);
+} & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom<TValue> }>;
 
 export type InputFieldProps<TFieldValue> = {
 	defaultValue: Atom<TFieldValue>;
@@ -57,9 +60,10 @@ type MappedOptions<TValue, TFieldValue> = Partial<
 	mapping: FieldOptions<TValue, TFieldValue>['mapping'];
 };
 
-type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> =
-	| ('schema' extends keyof TOptions ? 'hasErrors' : never)
-	| ({ isCheckbox: true } extends TOptions ? 'isCheckbox' : never);
+type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> = {
+	hasErrors: 'schema' extends keyof TOptions ? true : false;
+	isCheckbox: Exclude<TOptions['isCheckbox'], undefined>;
+};
 
 export function useField<TValue, TOptions extends UnmappedOptions<TValue>>(
 	defaultValue: TValue,

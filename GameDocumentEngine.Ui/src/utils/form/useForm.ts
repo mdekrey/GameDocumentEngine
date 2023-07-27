@@ -22,6 +22,7 @@ import {
 	errorsStrategy,
 } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
+import { IfTrueThenElse } from './type-helpers';
 
 type UnmappedFieldConfig<
 	T extends Objectish,
@@ -64,9 +65,12 @@ export type ConfiguredFormField<
 type FlagsForFormFieldConfig<
 	T extends Objectish,
 	TFieldConfig extends FieldConfig<T>,
-> =
-	| 'hasErrors'
-	| (TFieldConfig extends { isCheckbox: true } ? 'isCheckbox' : never);
+> = {
+	hasErrors: true;
+	isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
+		? IfTrueThenElse<TFieldConfig['isCheckbox'], true, false>
+		: false;
+};
 
 type FormFieldReturnType<
 	T extends Objectish,
