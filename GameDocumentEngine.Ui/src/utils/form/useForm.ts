@@ -70,6 +70,7 @@ type FlagsForFormFieldConfig<
 	isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
 		? IfTrueThenElse<TFieldConfig['isCheckbox'], true, false>
 		: false;
+	hasTranslations: true;
 };
 
 type FormFieldReturnType<
@@ -117,6 +118,7 @@ export type FormOptions<
 > = {
 	schema: ZodType<T>;
 	defaultValue: T;
+	translation: (field: string) => string;
 	preSubmit?: ErrorsStrategy;
 	postSubmit?: ErrorsStrategy;
 	fields?: TFields;
@@ -133,6 +135,7 @@ export type UseFormResult<
 	fields: FormFields<T, TFields>;
 	formEvents: FormEvents;
 	defaultValue: React.MutableRefObject<T>;
+	translation: (field: string) => string;
 
 	get(this: void): T;
 	set(this: void, value: T | ((prevValue: T) => T)): void;
@@ -157,6 +160,7 @@ function buildFormResult<
 	fields: TFields,
 	formEvents: FormEvents,
 	errorStrategy: RegisterErrorStrategy,
+	translation: (key: string) => string,
 	defaultValue: MutableRefObject<T>,
 ): UseFormResult<T, TFields> {
 	const [errors, trigger] = createTriggeredErrorsAtom(atom, schema);
@@ -178,6 +182,8 @@ function buildFormResult<
 				const options: Partial<FieldOptions<T, unknown>> = {
 					schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
 					errorStrategy,
+					translation: (part) =>
+						translation(['fields', ...path, ...part].join('.')),
 				};
 				if (!isArray(config) && 'mapping' in config)
 					options.mapping = config.mapping;
@@ -201,10 +207,11 @@ function buildFormResult<
 		formEvents,
 		get: () => store.get(atom),
 		set: (value: T) => store.set(atom, value),
+		translation,
 		subset: (path) =>
 			toFormSubset(
 				path,
-				{ store, atom, schema, defaultValue },
+				{ store, atom, schema, defaultValue, translation },
 				formEvents,
 				errorStrategy,
 			),
@@ -244,6 +251,7 @@ export function useForm<
 				options.fields ?? ({} as unknown as TFields),
 				formEvents,
 				strategy,
+				options.translation,
 				{
 					get current(): T {
 						return formAtom.init;
@@ -338,7 +346,10 @@ function getRefForPath<T extends Objectish, TPath extends Path<T>>(
 
 function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 	steps: TPath,
-	options: Pick<UseFormResult<T>, 'store' | 'atom' | 'schema' | 'defaultValue'>,
+	options: Pick<
+		UseFormResult<T>,
+		'store' | 'atom' | 'schema' | 'defaultValue' | 'translation'
+	>,
 	formEvents: FormEvents,
 	errorStrategy: RegisterErrorStrategy,
 ): UseFormResult<PathValue<T, TPath>> {
@@ -353,6 +364,7 @@ function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 		{},
 		formEvents,
 		errorStrategy,
+		options.translation,
 		resultDefaultValue,
 	);
 }

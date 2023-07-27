@@ -28,11 +28,13 @@
 			"name": {
 				"label": "Name"
 			},
-			"current": {
-				"label": "Current"
-			},
-			"max": {
-				"label": "Max"
+			"details": {
+				"current": {
+					"label": "Current"
+				},
+				"max": {
+					"label": "Max"
+				}
 			}
 		},
 		"submit": "Save Changes"

@@ -13,10 +13,7 @@ export function DeleteGameModal({
 	reject,
 	additional: { name: originalName },
 }: ModalContentsProps<boolean, { name: string }>) {
-	const {
-		t,
-		i18n: { getFixedT },
-	} = useTranslation(['delete-game']);
+	const { t } = useTranslation(['delete-game']);
 	const DeleteGame = useMemo(
 		() =>
 			z.object({
@@ -30,6 +27,7 @@ export function DeleteGameModal({
 		schema: DeleteGame,
 		defaultValue: { name: '' },
 		fields: { name: ['name'] },
+		translation: t,
 	});
 
 	return (
@@ -48,10 +46,7 @@ export function DeleteGameModal({
 					{t('please-type-name-to-confirm')}
 				</p>
 				<Fieldset className="m-0">
-					<TextField
-						field={form.fields.name}
-						translations={getFixedT(null, 'delete-game', 'fields.name')}
-					/>
+					<TextField field={form.fields.name} />
 				</Fieldset>
 				<ModalAlertLayout.Buttons>
 					<Button.Destructive type="submit">{t('submit')}</Button.Destructive>

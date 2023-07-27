@@ -5,20 +5,22 @@ import { UseFieldResult } from '../useField';
 
 export function TextField({
 	field,
-	translations: t,
 }: {
 	field: Omit<
-		UseFieldResult<unknown, string, { hasErrors: true; isCheckbox: false }>,
+		UseFieldResult<
+			unknown,
+			string,
+			{ hasErrors: true; isCheckbox: false; hasTranslations: true }
+		>,
 		'valueAtom'
 	>;
-	translations: (key: string) => string;
 }) {
 	return (
 		<Field>
-			<Field.Label>{t('label')}</Field.Label>
+			<Field.Label>{field.translation(['label'])}</Field.Label>
 			<Field.Contents>
 				<TextInput {...field.standardProps} />
-				<ErrorsList errors={field.errors} translations={t} />
+				<ErrorsList errors={field.errors} translations={field.translation} />
 			</Field.Contents>
 		</Field>
 	);

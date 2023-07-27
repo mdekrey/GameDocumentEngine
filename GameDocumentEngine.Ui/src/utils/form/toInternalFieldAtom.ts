@@ -48,6 +48,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		getValue: () => store.get(fieldValueAtom),
 		standardProps,
 		errors,
+		translation: options.translation,
 	} as never;
 
 	function createErrorStrategyAtom(

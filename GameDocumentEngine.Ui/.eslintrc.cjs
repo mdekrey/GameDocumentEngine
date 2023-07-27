@@ -38,10 +38,9 @@ module.exports = {
 				'i18next/no-literal-string': [
 					2,
 					{
-						mode: 'jsx-only',
+						mode: 'jsx-text-only',
 						'jsx-attributes': {
 							include: ['title', 'alt'],
-							callees: { exclude: ['translation'] },
 						},
 					},
 				],

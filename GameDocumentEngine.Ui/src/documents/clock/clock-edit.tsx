@@ -23,13 +23,11 @@ export function ClockEdit({
 	clock: ClockDocument;
 	onUpdateClock: Updater<Clock>;
 }) {
-	const {
-		t,
-		i18n: { getFixedT },
-	} = useTranslation('doc-types:Clock', { keyPrefix: 'edit-clock' });
+	const { t } = useTranslation('doc-types:Clock', { keyPrefix: 'edit-clock' });
 	const form = useForm({
 		defaultValue: clock,
 		schema: ClockDocument,
+		translation: t,
 		fields: {
 			name: ['name'],
 			current: { path: ['details', 'current'], mapping: integerMapping },
@@ -41,30 +39,9 @@ export function ClockEdit({
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<Fieldset>
-				<TextField
-					translations={getFixedT(
-						null,
-						'doc-types:Clock',
-						'edit-clock.fields.name',
-					)}
-					field={form.fields.name}
-				/>
-				<NumberField
-					translations={getFixedT(
-						null,
-						'doc-types:Clock',
-						'edit-clock.fields.current',
-					)}
-					field={form.fields.current}
-				/>
-				<NumberField
-					translations={getFixedT(
-						null,
-						'doc-types:Clock',
-						'edit-clock.fields.max',
-					)}
-					field={form.fields.max}
-				/>
+				<TextField field={form.fields.name} />
+				<NumberField field={form.fields.current} />
+				<NumberField field={form.fields.max} />
 				<ButtonRow>
 					<Button type="submit">{t('submit')}</Button>
 				</ButtonRow>

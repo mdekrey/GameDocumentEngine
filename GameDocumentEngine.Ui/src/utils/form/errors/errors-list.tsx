@@ -1,13 +1,13 @@
-import { ErrorsAtom } from '@/utils/form/useField';
+import { ErrorsAtom, FieldTranslation } from '@/utils/form/useField';
 import { useAtomValue } from 'jotai';
 import { HiX } from 'react-icons/hi';
 
 export function ErrorsList({
 	errors,
-	translations: t,
+	translations,
 }: {
 	errors: ErrorsAtom<unknown>;
-	translations: (key: string) => string;
+	translations: FieldTranslation;
 }) {
 	const errorsValue = useAtomValue(errors);
 	if (errorsValue.state !== 'hasData' || !errorsValue.data) return null;
@@ -16,7 +16,7 @@ export function ErrorsList({
 			{errorsValue.data.issues.map((issue, key) => (
 				<li key={key}>
 					<HiX class="inline-block mb-1 mr-1" />
-					{t?.([...issue.path, 'errors', issue.code].join('.'))}
+					{translations(['errors', issue.code], issue.path)}
 				</li>
 			))}
 		</ul>

@@ -5,23 +5,25 @@ import { UseFieldResult } from '@/utils/form/useField';
 
 export function SelectField<T>({
 	field,
-	translations: t,
 	items,
 	valueSelector,
 	children,
 }: {
 	field: Omit<
-		UseFieldResult<unknown, string, { hasErrors: true; isCheckbox: false }>,
+		UseFieldResult<
+			unknown,
+			string,
+			{ hasErrors: true; isCheckbox: false; hasTranslations: true }
+		>,
 		'valueAtom'
 	>;
-	translations: (key: string) => string;
 	items: T[];
 	valueSelector: (item: T) => string;
 	children: (item: T) => React.ReactNode;
 }) {
 	return (
 		<Field>
-			<Field.Label>{t('label')}</Field.Label>
+			<Field.Label>{field.translation(['label'])}</Field.Label>
 			<Field.Contents>
 				<SelectInput
 					items={items}
@@ -30,7 +32,7 @@ export function SelectField<T>({
 				>
 					{children}
 				</SelectInput>
-				<ErrorsList errors={field.errors} translations={t} />
+				<ErrorsList errors={field.errors} translations={field.translation} />
 			</Field.Contents>
 		</Field>
 	);

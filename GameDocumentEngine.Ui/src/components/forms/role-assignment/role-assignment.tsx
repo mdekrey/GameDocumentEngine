@@ -42,6 +42,7 @@ export function RoleAssignment({
 	const form = useForm({
 		defaultValue: formData,
 		schema: UserRoleAssignment,
+		translation: t,
 		fields: {
 			row: (userId: string) => [userId] as const,
 		},
@@ -51,28 +52,34 @@ export function RoleAssignment({
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<Fieldset className="m-0">
-				{Object.entries(playerNames).map(([k, name]) => (
-					<Field key={k}>
-						<Field.Label>{name}</Field.Label>
+				{Object.entries(playerNames).map(([k, name]) => {
+					const field = form.fields.row(k);
+					return (
+						<Field key={k}>
+							<Field.Label>{name}</Field.Label>
 
-						<Field.Contents>
-							<SelectInput
-								{...form.fields.row(k).standardProps}
-								items={roles}
-								valueSelector={(gt) => gt}
-							>
-								{(gt) =>
-									gt ? (
-										<>{roleTranslations(`roles.${gt}.name`)}</>
-									) : (
-										<>{t('no-role')}</>
-									)
-								}
-							</SelectInput>
-							<ErrorsList errors={form.fields.row(k).errors} translations={t} />
-						</Field.Contents>
-					</Field>
-				))}
+							<Field.Contents>
+								<SelectInput
+									{...field.standardProps}
+									items={roles}
+									valueSelector={(gt) => gt}
+								>
+									{(gt) =>
+										gt ? (
+											<>{roleTranslations(`roles.${gt}.name`)}</>
+										) : (
+											<>{t('no-role')}</>
+										)
+									}
+								</SelectInput>
+								<ErrorsList
+									errors={field.errors}
+									translations={field.translation}
+								/>
+							</Field.Contents>
+						</Field>
+					);
+				})}
 				<ButtonRow>
 					<Button type="submit">{t('submit')}</Button>
 				</ButtonRow>

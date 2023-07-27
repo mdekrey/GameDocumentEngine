@@ -14,10 +14,6 @@ import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/utils/form/text-field/text-field';
-// import profile from './en.json';
-// import { i18n } from '@/utils/i18n/setup';
-
-// i18n.addResourceBundle('en', 'profile', profile);
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -25,16 +21,10 @@ function usePatchUser() {
 }
 
 export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
-	const {
-		t,
-		i18n: { getFixedT },
-	} = useTranslation(['profile']);
+	const { t } = useTranslation(['profile']);
 	return (
 		<Fieldset>
-			<TextField
-				field={name}
-				translations={getFixedT(null, 'profile', 'fields.name')}
-			/>
+			<TextField field={name} />
 			<ButtonRow>
 				<Button type="submit">{t('submit')}</Button>
 			</ButtonRow>
@@ -47,10 +37,11 @@ const UserDetails = z.object({
 });
 
 export function Profile() {
-	const { i18n } = useTranslation(['profile']);
+	const { t, i18n } = useTranslation(['profile']);
 	const userForm = useForm({
 		defaultValue: { name: '' },
 		schema: UserDetails,
+		translation: t,
 		fields: {
 			name: ['name'],
 		},

@@ -8,8 +8,23 @@ import { RegisterErrorStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
 import { IfTrueThenElse, IfTrueThenProp } from './type-helpers';
 
-export type DefaultUseFieldResultFlags = { hasErrors: true; isCheckbox: false };
-export type UseFieldResultFlags = { hasErrors: boolean; isCheckbox: boolean };
+export type FieldTranslatablePart = ['label'] | ['errors', string];
+export type FieldTranslation = (
+	this: void,
+	part: FieldTranslatablePart,
+	otherField?: (string | number)[],
+) => string;
+
+export type DefaultUseFieldResultFlags = {
+	hasErrors: true;
+	isCheckbox: false;
+	hasTranslations: true;
+};
+export type UseFieldResultFlags = {
+	hasErrors: boolean;
+	isCheckbox: boolean;
+	hasTranslations: boolean;
+};
 export type ErrorsAtom<TValue> = Atom<Loadable<ZodError<TValue> | null>>;
 export type UseFieldResult<
 	TValue,
@@ -26,7 +41,8 @@ export type UseFieldResult<
 		InputFieldProps<TFieldValue>
 	>;
 	errors?: ErrorsAtom<TValue>;
-} & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom<TValue> }>;
+} & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom<TValue> }> &
+	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
 
 export type InputFieldProps<TFieldValue> = {
 	defaultValue: Atom<TFieldValue>;
@@ -49,6 +65,7 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
 	isCheckbox: boolean;
+	translation: FieldTranslation;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,
@@ -63,6 +80,9 @@ type MappedOptions<TValue, TFieldValue> = Partial<
 type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> = {
 	hasErrors: 'schema' extends keyof TOptions ? true : false;
 	isCheckbox: Exclude<TOptions['isCheckbox'], undefined>;
+	hasTranslations: TOptions['translation'] extends FieldTranslation
+		? true
+		: false;
 };
 
 export function useField<TValue, TOptions extends UnmappedOptions<TValue>>(

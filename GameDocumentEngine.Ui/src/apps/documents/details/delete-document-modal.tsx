@@ -13,10 +13,7 @@ export function DeleteDocumentModal({
 	reject,
 	additional: { name: originalName },
 }: ModalContentsProps<boolean, { name: string }>) {
-	const {
-		t,
-		i18n: { getFixedT },
-	} = useTranslation(['delete-document']);
+	const { t } = useTranslation(['delete-document']);
 	const DeleteDocument = useMemo(
 		() =>
 			z.object({
@@ -28,6 +25,7 @@ export function DeleteDocumentModal({
 	);
 	const form = useForm({
 		schema: DeleteDocument,
+		translation: t,
 		defaultValue: { name: '' },
 		fields: { name: ['name'] },
 	});
@@ -48,10 +46,7 @@ export function DeleteDocumentModal({
 					{t('please-type-name-to-confirm')}
 				</p>
 				<Fieldset className="m-0">
-					<TextField
-						field={form.fields.name}
-						translations={getFixedT(null, 'delete-document', 'fields.name')}
-					/>
+					<TextField field={form.fields.name} />
 				</Fieldset>
 				<ModalAlertLayout.Buttons>
 					<Button.Destructive type="submit">{t('submit')}</Button.Destructive>

@@ -6,7 +6,6 @@ import { produceWithPatches } from 'immer';
 import { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { ErrorsList } from '../../utils/form/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
 import { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
@@ -21,16 +20,10 @@ function usePatchGame(gameId: string) {
 }
 
 export function GameEditFields({ name }: { name: UseFieldResult<string> }) {
-	const {
-		t,
-		i18n: { getFixedT },
-	} = useTranslation(['edit-game']);
+	const { t } = useTranslation(['edit-game']);
 	return (
 		<Fieldset>
-			<TextField
-				field={name}
-				translations={getFixedT(null, 'edit-game', 'fields.name')}
-			/>
+			<TextField field={name} />
 			<ButtonRow>
 				<Button type="submit">{t('submit')}</Button>
 			</ButtonRow>
@@ -43,9 +36,10 @@ const GameDetails = z.object({
 });
 
 export function GameEdit({ gameId }: { gameId: string }) {
-	const { i18n } = useTranslation(['edit-game']);
+	const { t } = useTranslation(['edit-game']);
 	const gameForm = useForm({
 		defaultValue: { name: '' },
+		translation: t,
 		schema: GameDetails,
 		fields: {
 			name: ['name'],
@@ -68,10 +62,6 @@ export function GameEdit({ gameId }: { gameId: string }) {
 		<NarrowContent>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<GameEditFields {...gameForm.fields} />
-				<ErrorsList
-					errors={gameForm.errors}
-					translations={i18n.getFixedT(null, 'edit-game', 'fields')}
-				/>
 			</form>
 		</NarrowContent>
 	);

@@ -43,14 +43,12 @@ export function CreateInvite({
 		gameType: GameTypeScripts;
 	}
 >) {
-	const {
-		t,
-		i18n: { getFixedT },
-	} = useTranslation(['create-invite']);
+	const { t } = useTranslation(['create-invite']);
 	const createInvite = useCreateInvite(gameId);
 	const form = useForm({
 		schema: CreateInviteForm,
 		defaultValue: { uses: -1, role: '' },
+		translation: t,
 		fields: {
 			isUnlimited: {
 				path: ['uses'],
@@ -85,7 +83,6 @@ export function CreateInvite({
 				<Fieldset>
 					<SelectField
 						field={form.fields.role}
-						translations={getFixedT(null, 'create-invite', 'fields.role')}
 						items={gameData.typeInfo.userRoles}
 						valueSelector={(dt) => dt}
 					>
@@ -98,7 +95,7 @@ export function CreateInvite({
 						<CheckboxField.Contents>
 							<ErrorsList
 								errors={form.fields.isUnlimited.errors}
-								translations={getFixedT(null, 'create-invite', 'fields.uses')}
+								translations={(p) => t(`fields.uses.${p.join('.')}`)}
 							/>
 						</CheckboxField.Contents>
 					</CheckboxField>
@@ -126,19 +123,21 @@ function NumberOfUses({
 	field,
 }: {
 	disabled: Atom<boolean>;
-	field: UseFieldResult<number, string, { hasErrors: true; isCheckbox: false }>;
+	field: UseFieldResult<
+		number,
+		string,
+		{ hasErrors: true; isCheckbox: false; hasTranslations: true }
+	>;
 }) {
-	const { i18n } = useTranslation();
-	const t = i18n.getFixedT(null, 'create-invite', 'fields.uses');
 	const disabled = useAtomValue(disabledAtom);
 	return (
 		<Field>
 			<Field.Label className={disabled ? 'text-gray-500' : ''}>
-				{t('label')}
+				{field.translation(['label'])}
 			</Field.Label>
 			<Field.Contents>
 				<TextInput disabled={disabled} {...field.standardProps} />
-				<ErrorsList errors={field.errors} translations={t} />
+				<ErrorsList errors={field.errors} translations={field.translation} />
 			</Field.Contents>
 		</Field>
 	);
