@@ -30,13 +30,13 @@ export type GameTypeObjectScripts = {
 };
 
 export function getGameTypeScripts(
-	gameTypeName: string,
+	gameTypeKey: string,
 	queryClient: QueryClient,
 ): UseQueryOptions<GameTypeScripts> {
 	return {
-		queryKey: ['gameType', gameTypeName, 'scripts'],
+		queryKey: ['gameType', gameTypeKey, 'scripts'],
 		queryFn: async () => {
-			const typeInfo = await queryClient.fetchQuery(getGameType(gameTypeName));
+			const typeInfo = await queryClient.fetchQuery(getGameType(gameTypeKey));
 
 			return {
 				...typeInfo,
@@ -45,13 +45,13 @@ export function getGameTypeScripts(
 						typeInfo.objectTypes.map(
 							async (objectType) =>
 								[
-									objectType.name,
+									objectType.key,
 									await queryClient.fetchQuery(getObjectType(objectType)),
 								] as const,
 						),
 					),
 				),
-				translation: i18n.getFixedT(null, `game-types:${gameTypeName}`),
+				translation: i18n.getFixedT(null, `game-types:${gameTypeKey}`),
 			} as GameTypeScripts;
 		},
 	};
@@ -59,7 +59,7 @@ export function getGameTypeScripts(
 
 function getObjectType(objectType: GameObjectTypeDetails) {
 	return {
-		queryKey: ['gameObjectType', objectType.name],
+		queryKey: ['gameObjectType', objectType.key],
 		queryFn: async (): Promise<GameTypeObjectScripts> => {
 			await Promise.all(
 				objectType.scripts.map(
@@ -94,8 +94,8 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 			);
 
 			return {
-				translation: i18n.getFixedT(null, `doc-types:${objectType.name}`),
-				typeInfo: window.widgets[objectType.name],
+				translation: i18n.getFixedT(null, `doc-types:${objectType.key}`),
+				typeInfo: window.widgets[objectType.key],
 			};
 		},
 	};

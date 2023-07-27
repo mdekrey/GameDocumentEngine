@@ -166,7 +166,7 @@ public class DocumentController : Api.DocumentControllerBase
 	private IGameObjectType? GetDocumentType(DocumentModel document)
 	{
 		var gameType = allGameTypes.All[document.Game.Type];
-		return gameType.ObjectTypes.FirstOrDefault(t => t.Name == document.Type);
+		return gameType.ObjectTypes.FirstOrDefault(t => t.Key == document.Type);
 	}
 
 	protected override async Task<UpdateDocumentRoleAssignmentsActionResult> UpdateDocumentRoleAssignments(Guid gameId, Guid id, Dictionary<string, string?> updateDocumentRoleAssignmentsBody)

@@ -1,0 +1,41 @@
+{
+	"title": "MouseGuard-Character",
+	"type": "object",
+	"required": ["bio", "skills"],
+	"properties": {
+		"bio": { "$ref": "#/$defs/bio" },
+		"skills": {
+			"type": "array",
+			"items": { "$ref": "#/$defs/skill" }
+		}
+	},
+
+	"$defs": {
+		"bio": {
+			"type": "object",
+			"required": [],
+			"properties": {
+				"age": { "type": "integer" },
+				"home": { "type": "string" },
+				"furColor": { "type": "string" },
+				"guardRank": { "type": "string" },
+				"cloakColor": { "type": "string" },
+				"parents": { "type": "string" },
+				"senior": { "type": "string" },
+				"mentor": { "type": "string" },
+				"friend": { "type": "string" },
+				"enemy": { "type": "string" }
+			}
+		},
+		"skill": {
+			"type": "object",
+			"required": ["name", "rank", "passes", "fails"],
+			"properties": {
+				"name": { "type": "string" },
+				"rank": { "type": "integer" },
+				"passes": { "type": "integer" },
+				"fails": { "type": "integer" }
+			}
+		}
+	}
+}

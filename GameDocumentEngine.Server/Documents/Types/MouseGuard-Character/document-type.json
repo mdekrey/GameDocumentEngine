@@ -1,0 +1,17 @@
+{
+	"name": "MouseGuard-Character",
+	"script": {
+		"type": "manifest",
+		"path": "src/documents/mouseguard-character/index.ts"
+	},
+	"roles": {
+		"owner": {
+			"creatorDefault": true,
+			"permissions": ["**", "details:*#$..*"]
+		},
+		"observer": {
+			"default": true,
+			"permissions": ["view", "details:read#$..*"]
+		}
+	}
+}

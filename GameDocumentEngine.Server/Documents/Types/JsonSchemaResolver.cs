@@ -15,7 +15,7 @@ public class JsonSchemaResolver
 
 	public async Task<JsonSchema> GetOrLoadSchema(IGameObjectType gameObjectType)
 	{
-		var key = new SchemaCacheKey(gameObjectType.Name);
+		var key = new SchemaCacheKey(gameObjectType.Key);
 		return await cache.GetOrCreateAsync<JsonSchema>(key, async (entry) =>
 		{
 			var resourceName = gameObjectType.SchemaManifestResourceName();

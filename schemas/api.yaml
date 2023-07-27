@@ -698,21 +698,19 @@ components:
     GameTypeSummary:
       type: object
       required:
-        - name
-        - description
+        - key
         - objectTypes
       properties:
-        name: { type: string }
-        description: { type: string }
+        key: { type: string }
         objectTypes: { type: array, items: { type: string } }
     GameTypeDetails:
       type: object
       required:
-        - name
+        - key
         - objectTypes
         - userRoles
       properties:
-        name: { type: string }
+        key: { type: string }
         userRoles: { type: array, items: { type: string } }
         objectTypes:
           type: array
@@ -721,11 +719,11 @@ components:
     GameObjectTypeDetails:
       type: object
       required:
-        - name
+        - key
         - scripts
         - userRoles
       properties:
-        name: { type: string }
+        key: { type: string }
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
   responses:

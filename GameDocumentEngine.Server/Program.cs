@@ -3,7 +3,6 @@ using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
-using GameDocumentEngine.Server.GameTypes.Clocks;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,8 +12,11 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Security.AccessControl;
 using System.Security.Claims;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// TODO: https://www.nuget.org/packages/Azure.Extensions.AspNetCore.DataProtection.Keys/
 
 // Add services to the container.
 var services = builder.Services;
@@ -96,8 +98,19 @@ services
 services.AddMemoryCache();
 services.AddTransient<JsonSchemaResolver>();
 services.AddSingleton<GameTypes>();
-services.AddSingleton<GameObjectManifestManager>();
-services.AddSingleton<IGameType, ClocksGameType>();
+services.AddSingleton<RollupManifestManager>();
+// TODO: move these to json, but find a way to support translations
+services.AddSingleton<IGameType, GameDocumentEngine.Server.GameTypes.Clocks.ClocksGameType>();
+services.AddSingleton<IGameType, GameDocumentEngine.Server.GameTypes.MouseGuard.MouseGuardGameType>();
+
+foreach (var gameObjectTypeJson in typeof(JsonGameObjectType).Assembly.GetManifestResourceNames().Where(n => n.EndsWith(".document-type.json")))
+{
+	using var stream = typeof(JsonGameObjectType).Assembly.GetManifestResourceStream(gameObjectTypeJson);
+	if (stream == null) throw new InvalidOperationException("Could not load embedded stream");
+	var gameObjectType = JsonSerializer.Deserialize<JsonGameObjectType>(stream);
+	if (gameObjectType != null)
+		services.AddSingleton<IGameObjectType>(gameObjectType);
+}
 
 services.AddAuthorization(options =>
 {

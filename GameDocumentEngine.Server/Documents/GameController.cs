@@ -243,11 +243,11 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 	public async Task<GameTypeDetails> ToApi(DocumentDbContext dbContext, IGameType gameType)
 	{
 		return new GameTypeDetails(
-			Name: gameType.Name,
+			Key: gameType.Key,
 			UserRoles: GameRoles,
 			ObjectTypes: await Task.WhenAll(
 				gameType.ObjectTypes.Select(async obj => new GameObjectTypeDetails(
-				Name: obj.Name,
+				Key: obj.Key,
 					Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameTypes.ResolveGameObjectScripts))).SelectMany(a => a).Distinct(),
 					// Game types could have different roles eventually; for now, we use a hard-coded set
 					UserRoles: obj.PermissionLevels
@@ -258,7 +258,7 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 	public Task<GameTypeDetails> ToApiBeforeChanges(DocumentDbContext dbContext, IGameType gameType) =>
 		ToApi(dbContext, gameType);
 
-	public object ToKey(IGameType entity) => entity.Name;
+	public object ToKey(IGameType entity) => entity.Key;
 }
 
 class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameModel, GameUserModel, Api.GameDetails>

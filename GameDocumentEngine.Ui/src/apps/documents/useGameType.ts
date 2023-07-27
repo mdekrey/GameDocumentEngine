@@ -15,7 +15,7 @@ export function useGameType(
 	const queryClient = useQueryClient();
 	const game = useQuery(queries.getGameDetails(gameId));
 	return useQuery({
-		...getGameTypeScripts(game.data?.typeInfo.name ?? 'none', queryClient),
+		...getGameTypeScripts(game.data?.typeInfo.key ?? 'none', queryClient),
 		enabled: game.isSuccess,
 	});
 }

@@ -57,9 +57,10 @@ export function defineDocument<T>(
 	window.widgets ??= {};
 	window.widgets[name] = objectTypeDefinition as IGameObjectType;
 
+	const translationNamespace = `doc-types:${name}`;
 	for (const [language, resources] of Object.entries(
 		objectTypeDefinition.translations,
 	)) {
-		i18n.addResourceBundle(language, `doc-types:${name}`, resources);
+		i18n.addResourceBundle(language, translationNamespace, resources);
 	}
 }

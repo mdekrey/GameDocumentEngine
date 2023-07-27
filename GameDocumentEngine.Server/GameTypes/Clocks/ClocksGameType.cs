@@ -4,14 +4,15 @@ namespace GameDocumentEngine.Server.GameTypes.Clocks;
 
 public class ClocksGameType : IGameType
 {
-	private static readonly IReadOnlyList<IGameObjectType> objectTypes = new IGameObjectType[]
+	private readonly IReadOnlyList<IGameObjectType> objectTypes;
+
+	public ClocksGameType(IEnumerable<IGameObjectType> gameObjectTypes)
 	{
-		new Documents.Types.Clock.ClockGameObject(),
-	};
+		var typeNames = new[] { "Clock" };
+		objectTypes = gameObjectTypes.Where(t => typeNames.Contains(t.Key)).ToArray();
+	}
 
-	public string Name => "Clocks";
-
-	public string Description => "A simple game type to track PbtA-style clocks";
+	public string Key => "Clocks";
 
 	public IEnumerable<IGameObjectType> ObjectTypes => objectTypes;
 }

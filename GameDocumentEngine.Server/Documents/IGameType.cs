@@ -2,7 +2,6 @@
 
 public interface IGameType
 {
-	string Name { get; }
-	string Description { get; }
+	string Key { get; }
 	IEnumerable<IGameObjectType> ObjectTypes { get; }
 }

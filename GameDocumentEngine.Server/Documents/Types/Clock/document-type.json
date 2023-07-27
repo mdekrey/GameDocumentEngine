@@ -1,0 +1,27 @@
+{
+	"name": "Clock",
+	"script": {
+		"type": "manifest",
+		"path": "src/documents/clock/index.ts"
+	},
+	"roles": {
+		"owner": {
+			"creatorDefault": true,
+			"permissions": ["**", "details:*#$..*"]
+		},
+		"ticker": {
+			"permissions": [
+				"view",
+				"details:read#$..*",
+				"details:write#$.details.current"
+			]
+		},
+		"observer": {
+			"default": true,
+			"permissions": ["view", "details:read#$..*"]
+		},
+		"doomsday": {
+			"permissions": ["view", "details:read#$..max"]
+		}
+	}
+}

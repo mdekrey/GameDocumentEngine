@@ -36,6 +36,7 @@
 			<LogicalName>Documents.Types.%(FileName).schema.json</LogicalName>
 			<Link>Documents/Types/%(FileName)/schema.json</Link>
 		</EmbeddedResource>
+		<EmbeddedResource Include="Documents\Types\*\document-type.json" />
 	</ItemGroup>
 
 	<ItemGroup>

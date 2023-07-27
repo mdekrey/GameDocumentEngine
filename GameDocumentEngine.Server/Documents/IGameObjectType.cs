@@ -4,7 +4,7 @@ namespace GameDocumentEngine.Server.Documents;
 
 public interface IGameObjectType
 {
-	string Name { get; }
+	string Key { get; }
 
 	IReadOnlyList<string> PermissionLevels { get; }
 	string DefaultPermissionLevel { get; }
@@ -14,4 +14,5 @@ public interface IGameObjectType
 	/// Determines additional permissions based on user's role for the object
 	/// </summary>
 	IEnumerable<string> GetPermissions(Guid gameId, Guid documentId, string role);
+	Task<IEnumerable<string>> ResolveScripts(RollupManifestManager manifestManager);
 }

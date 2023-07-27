@@ -90,7 +90,7 @@ public class GamePermissionSetResolver
 				?? context.Games.Local.FirstOrDefault(g => g.Id == gameUser.GameId)
 				?? await context.Games.FirstAsync(g => g.Id == gameUser.GameId);
 			var gameType = gameTypes.All[game.Type];
-			var docType = gameType.ObjectTypes.First(dt => dt.Name == document.Type);
+			var docType = gameType.ObjectTypes.First(dt => dt.Key == document.Type);
 			if (docType == null) return null;
 
 			return PermissionList.From(docType.GetPermissions(gameUser.GameId, documentUser.DocumentId, documentUser.Role));

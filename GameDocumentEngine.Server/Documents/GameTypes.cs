@@ -7,22 +7,22 @@ namespace GameDocumentEngine.Server.Documents;
 
 public class GameTypes
 {
-	private readonly GameObjectManifestManager gameObjectManifestManager;
+	private readonly RollupManifestManager manifestManager;
 
-	public GameTypes(IEnumerable<IGameType> gameTypes, GameObjectManifestManager gameObjectManifestManager)
+	public GameTypes(IEnumerable<IGameType> gameTypes, RollupManifestManager manifestManager)
 	{
-		this.All = gameTypes.ToImmutableDictionary(g => g.Name);
-		this.gameObjectManifestManager = gameObjectManifestManager;
+		this.All = gameTypes.ToImmutableDictionary(g => g.Key);
+		this.manifestManager = manifestManager;
 	}
 
 	public ImmutableDictionary<string, IGameType> All { get; }
 
 	public Task<IEnumerable<string>> ResolveGameObjectScripts(IGameObjectType gameObjectType) =>
-		gameObjectManifestManager.ResolveGameObjectScripts(gameObjectType);
+		gameObjectType.ResolveScripts(manifestManager);
 
 }
 
-public class GameObjectManifestManager
+public class RollupManifestManager
 {
 #if !DEBUG
 	private readonly Lazy<Task<JsonNode>> AssetManifest;
@@ -39,7 +39,7 @@ public class GameObjectManifestManager
 #else
 	private readonly string webRootPath;
 
-	public GameObjectManifestManager(IWebHostEnvironment webHostEnvironment)
+	public RollupManifestManager(IWebHostEnvironment webHostEnvironment)
 	{
 		webRootPath = webHostEnvironment.WebRootPath;
 	}
@@ -55,10 +55,11 @@ public class GameObjectManifestManager
 	}
 
 
-	internal async Task<IEnumerable<string>> ResolveGameObjectScripts(IGameObjectType gameObjectType)
+	internal async Task<IEnumerable<string>> ResolveScript(string path)
 	{
 		var assetManifest = await GetAssetManifest();
-		var node = assetManifest[$"src/documents/{gameObjectType.Name.ToLower()}/index.ts"];
+		var node = assetManifest[path];
 		return new[] { node!["file"]!.GetValue<string>() };
 	}
+
 }

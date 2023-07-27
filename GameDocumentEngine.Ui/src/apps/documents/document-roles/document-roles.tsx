@@ -38,7 +38,7 @@ export function DocumentRoles({
 
 	const gameDetails = gameResult.data;
 	const docType = gameDetails.typeInfo.objectTypes.find(
-		(t) => t.name == documentResult.data.type,
+		(t) => t.key == documentResult.data.type,
 	);
 	if (!docType) {
 		return 'Unknown document type';
