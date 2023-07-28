@@ -1,7 +1,15 @@
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from '../text-input/text-input';
-import { UseFieldResult } from '../useField';
+import { FieldMapping, UseFieldResult } from '../useField';
+
+export const undefinedAsEmptyStringMapping: FieldMapping<
+	string | undefined,
+	string
+> = {
+	toForm: (v: string | undefined) => v ?? '',
+	fromForm: (v: string) => (v ? v : undefined),
+};
 
 export function TextField({
 	field,

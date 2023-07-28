@@ -3,18 +3,15 @@ import { useForm } from '@/utils/form/useForm';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
-import { FieldMapping } from '@/utils/form/useField';
 import { Clock, ClockDocument } from './clock-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/utils/form/text-field/text-field';
-import { NumberField } from '@/utils/form/number-field/number-field';
-
-const integerMapping: FieldMapping<number, string> = {
-	toForm: (v: number) => v.toFixed(0),
-	fromForm: (v: string) => Number.parseInt(v, 10),
-};
+import {
+	NumberField,
+	integerMapping,
+} from '@/utils/form/number-field/number-field';
 
 export function ClockEdit({
 	clock,

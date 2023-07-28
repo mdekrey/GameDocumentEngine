@@ -1,6 +1,6 @@
 import { HiOutlineClock } from 'react-icons/hi2';
 import { defineDocument } from '../defineDocument';
-import { CharacterSheet } from './character-sheet';
+import { FullCharacterSheet } from './character-sheet';
 import characterSchema from './schema-improved';
 import { z } from 'zod';
 import en from './en.json';
@@ -13,6 +13,6 @@ defineDocument('MouseGuard-Character', {
 		bio: {},
 		skills: [],
 	} satisfies z.infer<typeof characterSchema>,
-	component: CharacterSheet,
+	component: FullCharacterSheet,
 	translations: { en },
 });
