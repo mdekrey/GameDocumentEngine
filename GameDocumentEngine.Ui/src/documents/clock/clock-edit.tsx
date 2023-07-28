@@ -27,8 +27,8 @@ export function ClockEdit({
 		translation: t,
 		fields: {
 			name: ['name'],
-			current: { path: ['details', 'current'], mapping: integerMapping },
-			max: { path: ['details', 'max'], mapping: integerMapping },
+			current: ['details', 'current'],
+			max: ['details', 'max'],
 		},
 	});
 	updateFormDefault(form, clock);
@@ -37,8 +37,8 @@ export function ClockEdit({
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<Fieldset>
 				<TextField field={form.fields.name} />
-				<NumberField field={form.fields.current} />
-				<NumberField field={form.fields.max} />
+				<NumberField field={form.fields.current} mapping={integerMapping} />
+				<NumberField field={form.fields.max} mapping={integerMapping} />
 				<ButtonRow>
 					<Button type="submit">{t('submit')}</Button>
 				</ButtonRow>

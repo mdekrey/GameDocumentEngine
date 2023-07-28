@@ -31,7 +31,6 @@ export type UseFieldResult<
 	TFieldValue = TValue,
 	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
-	fullPath: string;
 	valueAtom: PrimitiveAtom<TValue>;
 	setValue(v: TValue): void;
 	getValue(): TValue;
@@ -41,6 +40,8 @@ export type UseFieldResult<
 		InputFieldProps<TFieldValue>
 	>;
 	errors?: ErrorsAtom<TValue>;
+	onChange(this: void, v: TValue): void;
+	onBlur(this: void): void;
 } & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom<TValue> }> &
 	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
 

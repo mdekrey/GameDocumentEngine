@@ -8,70 +8,40 @@ import {
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import {
 	TextField,
-	undefinedAsEmptyStringMapping,
+	undefinedAsEmptyStringMapping as emptyStringUndefined,
 } from '@/utils/form/text-field/text-field';
 
 export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
 	useDebugValue({ form });
 	const fields = useFormFields(form, {
 		name: ['name'],
-		age: {
-			path: ['details', 'bio', 'age'],
-			mapping: undefinedOrIntegerMapping,
-		},
-		home: {
-			path: ['details', 'bio', 'home'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		furColor: {
-			path: ['details', 'bio', 'furColor'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		guardRank: {
-			path: ['details', 'bio', 'guardRank'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		cloakColor: {
-			path: ['details', 'bio', 'cloakColor'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		parents: {
-			path: ['details', 'bio', 'parents'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		senior: {
-			path: ['details', 'bio', 'senior'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		mentor: {
-			path: ['details', 'bio', 'mentor'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		friend: {
-			path: ['details', 'bio', 'friend'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
-		enemy: {
-			path: ['details', 'bio', 'enemy'],
-			mapping: undefinedAsEmptyStringMapping,
-		},
+		age: ['details', 'bio', 'age'],
+		home: ['details', 'bio', 'home'],
+		furColor: ['details', 'bio', 'furColor'],
+		guardRank: ['details', 'bio', 'guardRank'],
+		cloakColor: ['details', 'bio', 'cloakColor'],
+		parents: ['details', 'bio', 'parents'],
+		senior: ['details', 'bio', 'senior'],
+		mentor: ['details', 'bio', 'mentor'],
+		friend: ['details', 'bio', 'friend'],
+		enemy: ['details', 'bio', 'enemy'],
 	});
 	return (
 		<div>
 			<Fieldset>
 				<TextField field={fields.name} />
-				<NumberField field={fields.age} />
-				<TextField field={fields.home} />
-				<TextField field={fields.furColor} />
-				<TextField field={fields.guardRank} />
-				<TextField field={fields.cloakColor} />
+				<NumberField field={fields.age} mapping={undefinedOrIntegerMapping} />
+				<TextField field={fields.home} mapping={emptyStringUndefined} />
+				<TextField field={fields.furColor} mapping={emptyStringUndefined} />
+				<TextField field={fields.guardRank} mapping={emptyStringUndefined} />
+				<TextField field={fields.cloakColor} mapping={emptyStringUndefined} />
 			</Fieldset>
 			<Fieldset>
-				<TextField field={fields.parents} />
-				<TextField field={fields.mentor} />
-				<TextField field={fields.senior} />
-				<TextField field={fields.friend} />
-				<TextField field={fields.enemy} />
+				<TextField field={fields.parents} mapping={emptyStringUndefined} />
+				<TextField field={fields.mentor} mapping={emptyStringUndefined} />
+				<TextField field={fields.senior} mapping={emptyStringUndefined} />
+				<TextField field={fields.friend} mapping={emptyStringUndefined} />
+				<TextField field={fields.enemy} mapping={emptyStringUndefined} />
 			</Fieldset>
 		</div>
 	);

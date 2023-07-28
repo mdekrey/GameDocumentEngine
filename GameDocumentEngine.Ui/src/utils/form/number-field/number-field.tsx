@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from '../text-input/text-input';
 import { FieldMapping, UseFieldResult } from '../useField';
+import { mapAtom } from '../mapAtom';
 
 export const undefinedOrIntegerMapping: FieldMapping<
 	number | undefined,
@@ -25,23 +27,36 @@ export const integerMapping: FieldMapping<number, string> = {
 	},
 };
 
-export function NumberField({
+export function NumberField<TValue>({
 	field,
+	mapping,
 }: {
 	field: Omit<
 		UseFieldResult<
+			TValue,
 			unknown,
-			string,
 			{ hasErrors: true; isCheckbox: false; hasTranslations: true }
 		>,
-		'valueAtom'
+		'standardProps'
 	>;
+	mapping: FieldMapping<TValue, string>;
 }) {
+	const internalValue = useMemo(
+		() => mapAtom(field.valueAtom, mapping.toForm, mapping.fromForm),
+		[field.valueAtom, mapping],
+	);
 	return (
 		<Field>
 			<Field.Label>{field.translation(['label'])}</Field.Label>
 			<Field.Contents>
-				<TextInput type="number" {...field.standardProps} />
+				<TextInput
+					type="number"
+					defaultValue={internalValue}
+					onChange={(ev) =>
+						field.onChange(mapping.fromForm(ev.currentTarget.value))
+					}
+					onBlur={field.onBlur}
+				/>
 				<ErrorsList errors={field.errors} translations={field.translation} />
 			</Field.Contents>
 		</Field>

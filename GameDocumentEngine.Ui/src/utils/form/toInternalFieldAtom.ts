@@ -38,18 +38,34 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
+	const setValue = (v: TValue) => store.set(fieldValueAtom, v);
 	const standardProps = options.isCheckbox
-		? toInputCheckboxField(store, formValueAtom, fieldEvents)
-		: toInputTextField(store, formValueAtom, fieldEvents);
+		? toInputCheckboxField(
+				(v) => store.set(formValueAtom, v),
+				formValueAtom,
+				fieldEvents,
+		  )
+		: toInputTextField(
+				(v) => store.set(formValueAtom, v),
+				formValueAtom,
+				fieldEvents,
+		  );
 
 	return {
 		valueAtom: fieldValueAtom,
-		setValue: (v: TValue) => store.set(fieldValueAtom, v),
+		setValue,
 		getValue: () => store.get(fieldValueAtom),
 		standardProps,
 		errors,
 		translation: options.translation,
-	} as never;
+		onChange(v: TValue) {
+			fieldEvents.dispatchEvent(FieldEvents.Change);
+			store.set(fieldValueAtom, v);
+		},
+		onBlur() {
+			fieldEvents.dispatchEvent(FieldEvents.Blur);
+		},
+	};
 
 	function createErrorStrategyAtom(
 		schema: ZodType<TValue>,
@@ -62,7 +78,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 }
 
 export function toInputTextField<TFieldValue>(
-	store: ReturnType<typeof useStore>,
+	setValue: (v: TFieldValue) => void,
 	atom: StandardWritableAtom<TFieldValue>,
 	fieldEvents: FieldEvents,
 ): InputFieldProps<TFieldValue> {
@@ -70,8 +86,7 @@ export function toInputTextField<TFieldValue>(
 		defaultValue: atom,
 		onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
-			console.log({ newValue: ev.currentTarget.value });
-			store.set(atom, ev.currentTarget.value);
+			setValue(ev.currentTarget.value);
 		},
 		onBlur: () => {
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
@@ -80,7 +95,7 @@ export function toInputTextField<TFieldValue>(
 }
 
 export function toInputCheckboxField<TFieldValue>(
-	store: ReturnType<typeof useStore>,
+	setValue: (v: TFieldValue) => void,
 	atom: StandardWritableAtom<TFieldValue>,
 	fieldEvents: FieldEvents,
 ): CheckboxFieldProps<TFieldValue> {
@@ -88,7 +103,7 @@ export function toInputCheckboxField<TFieldValue>(
 		defaultChecked: atom,
 		onChange: (ev: React.ChangeEvent<{ checked: TFieldValue }>) => {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
-			store.set(atom, ev.currentTarget.checked);
+			setValue(ev.currentTarget.checked);
 		},
 		onBlur: () => {
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
