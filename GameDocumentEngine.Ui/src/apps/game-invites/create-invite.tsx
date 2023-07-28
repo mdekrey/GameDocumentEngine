@@ -88,7 +88,7 @@ export function CreateInvite({
 					>
 						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
 					</SelectField>
-					<CheckboxField {...form.fields.isUnlimited.standardProps}>
+					<CheckboxField {...form.fields.isUnlimited.htmlProps.asCheckbox()}>
 						<CheckboxField.Label>
 							{t('fields.isUnlimited.label')}
 						</CheckboxField.Label>
@@ -136,7 +136,7 @@ function NumberOfUses({
 				{field.translation(['label'])}
 			</Field.Label>
 			<Field.Contents>
-				<TextInput disabled={disabled} {...field.standardProps} />
+				<TextInput disabled={disabled} {...field.htmlProps()} />
 				<ErrorsList errors={field.errors} translations={field.translation} />
 			</Field.Contents>
 		</Field>

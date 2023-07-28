@@ -6,7 +6,7 @@ import { StandardWritableAtom } from './StandardWritableAtom';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { RegisterErrorStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
-import { IfTrueThenElse, IfTrueThenProp } from './type-helpers';
+import { IfTrueThenProp } from './type-helpers';
 
 export type FieldTranslatablePart = ['label'] | ['errors', string];
 export type FieldTranslation = (
@@ -34,16 +34,26 @@ export type UseFieldResult<
 	valueAtom: PrimitiveAtom<TValue>;
 	setValue(v: TValue): void;
 	getValue(): TValue;
-	standardProps: IfTrueThenElse<
-		TFlags['isCheckbox'],
-		CheckboxFieldProps<TFieldValue>,
-		InputFieldProps<TFieldValue>
-	>;
 	errors?: ErrorsAtom<TValue>;
 	onChange(this: void, v: TValue): void;
 	onBlur(this: void): void;
+	htmlProps: ToHtmlProps<TFieldValue>;
 } & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom<TValue> }> &
 	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
+
+export type ToHtmlInputProps<TInputValue> = TInputValue extends string
+	? (mapping?: FieldMapping<TInputValue, string>) => InputFieldProps<string>
+	: (mapping: FieldMapping<TInputValue, string>) => InputFieldProps<string>;
+
+export type ToHtmlProps<TInputValue> = ToHtmlInputProps<TInputValue> & {
+	asCheckbox: TInputValue extends boolean
+		? (
+				mapping?: FieldMapping<TInputValue, boolean>,
+		  ) => CheckboxFieldProps<boolean>
+		: (
+				mapping: FieldMapping<TInputValue, boolean>,
+		  ) => CheckboxFieldProps<boolean>;
+};
 
 export type InputFieldProps<TFieldValue> = {
 	defaultValue: Atom<TFieldValue>;

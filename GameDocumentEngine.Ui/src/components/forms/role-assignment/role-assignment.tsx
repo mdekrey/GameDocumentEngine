@@ -60,7 +60,7 @@ export function RoleAssignment({
 
 							<Field.Contents>
 								<SelectInput
-									{...field.standardProps}
+									{...field.htmlProps()}
 									items={roles}
 									valueSelector={(gt) => gt}
 								>

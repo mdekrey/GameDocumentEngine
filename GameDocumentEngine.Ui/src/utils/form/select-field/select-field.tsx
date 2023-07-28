@@ -28,7 +28,7 @@ export function SelectField<T>({
 				<SelectInput
 					items={items}
 					valueSelector={valueSelector}
-					{...field.standardProps}
+					{...field.htmlProps()}
 				>
 					{children}
 				</SelectInput>
