@@ -22,7 +22,6 @@ import {
 	errorsStrategy,
 } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
-import { IfTrueThenElse } from './type-helpers';
 import { atomFamily as createAtomFamily } from 'jotai/utils';
 
 export type UnmappedFieldConfig<
@@ -30,7 +29,6 @@ export type UnmappedFieldConfig<
 	TPath extends Path<T> = Path<T>,
 > = {
 	path: TPath;
-	isCheckbox?: boolean;
 	mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;
 };
 export type MappedFieldConfig<
@@ -39,7 +37,6 @@ export type MappedFieldConfig<
 	TValue = PathValue<T, TPath>,
 > = {
 	path: TPath;
-	isCheckbox?: boolean;
 	mapping: FieldMapping<PathValue<T, TPath>, TValue>;
 };
 
@@ -54,23 +51,24 @@ export type FieldsConfig<T extends Objectish> = {
 };
 
 export type ConfiguredFormField<
-	T extends Objectish,
-	TPath extends Path<T>,
 	TValue,
 	TArgs extends null | AnyArray,
 	TFlags extends UseFieldResultFlags,
 > = TArgs extends AnyArray
-	? (...args: TArgs) => UseFieldResult<PathValue<T, TPath>, TValue, TFlags>
-	: UseFieldResult<PathValue<T, TPath>, TValue, TFlags>;
+	? (...args: TArgs) => UseFieldResult<TValue, TFlags>
+	: UseFieldResult<TValue, TFlags>;
 
 type FlagsForFormFieldConfig<
 	T extends Objectish,
+	// keeping the type param for future use
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	TFieldConfig extends FieldConfig<T>,
 > = {
 	hasErrors: true;
-	isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
-		? IfTrueThenElse<TFieldConfig['isCheckbox'], true, false>
-		: false;
+	// example usage for how these flags work
+	// isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
+	// 	? IfTrueThenElse<TFieldConfig['isCheckbox'], true, false>
+	// 	: false;
 	hasTranslations: true;
 };
 
@@ -80,18 +78,12 @@ type FormFieldReturnType<
 > = TFieldConfig extends Path<T>
 	? UseFieldResult<
 			PathValue<T, TFieldConfig>,
-			PathValue<T, TFieldConfig>,
 			FlagsForFormFieldConfig<T, TFieldConfig>
 	  >
-	: TFieldConfig extends MappedFieldConfig<T, infer TPath, infer TValue>
-	? UseFieldResult<
-			PathValue<T, TPath>,
-			TValue,
-			FlagsForFormFieldConfig<T, TFieldConfig>
-	  >
+	: TFieldConfig extends MappedFieldConfig<T, Path<T>, infer TValue>
+	? UseFieldResult<TValue, FlagsForFormFieldConfig<T, TFieldConfig>>
 	: TFieldConfig extends UnmappedFieldConfig<T, infer TPath>
 	? UseFieldResult<
-			PathValue<T, TPath>,
 			PathValue<T, TPath>,
 			FlagsForFormFieldConfig<T, TFieldConfig>
 	  >
@@ -246,7 +238,6 @@ function toField<T extends Objectish, TField extends FieldConfig<T>>(
 		translation: (part) => translation(['fields', ...path, ...part].join('.')),
 	};
 	if (!isArray(config) && 'mapping' in config) options.mapping = config.mapping;
-	if ('isCheckbox' in config) options.isCheckbox = config.isCheckbox;
 	return toInternalFieldAtom(
 		store,
 		family(path),

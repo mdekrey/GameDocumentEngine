@@ -14,30 +14,20 @@ export const undefinedAsEmptyStringMapping: FieldMapping<
 export function TextField<TValue>({
 	field,
 }: {
-	field: UseFieldResult<
-		TValue,
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		any,
-		{ hasErrors: true; isCheckbox: false; hasTranslations: true }
-	>;
+	field: UseFieldResult<TValue, { hasErrors: true; hasTranslations: true }>;
 	mapping: FieldMapping<TValue, string>;
 }): React.ReactNode;
 export function TextField({
 	field,
 }: {
-	field: UseFieldResult<
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		any,
-		string,
-		{ hasErrors: true; isCheckbox: false; hasTranslations: true }
-	>;
+	field: UseFieldResult<string, { hasErrors: true; hasTranslations: true }>;
 }): React.ReactNode;
 export function TextField<T>({
 	field,
 	mapping,
 }: {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	field: UseFieldResult<any, T>;
+	field: UseFieldResult<T>;
 	mapping?: FieldMapping<T, string>;
 }) {
 	return (

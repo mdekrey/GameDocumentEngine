@@ -23,7 +23,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): UseFieldResult<TValue, TFieldValue, any> {
+): UseFieldResult<TFieldValue, any> {
 	const fieldEvents = new FieldEvents(options.formEvents);
 	const mapping = 'mapping' in options ? options.mapping : undefined;
 	const formValueAtom = mapping
@@ -41,17 +41,17 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const setValue = (v: TValue) => store.set(fieldValueAtom, v);
+	const setValue = (v: TFieldValue) => store.set(formValueAtom, v);
 
 	return {
-		valueAtom: fieldValueAtom,
+		valueAtom: formValueAtom,
 		setValue,
-		getValue: () => store.get(fieldValueAtom),
+		getValue: () => store.get(formValueAtom),
 		errors,
 		translation: options.translation,
-		onChange(v: TValue) {
+		onChange(v: TFieldValue) {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
-			store.set(fieldValueAtom, v);
+			setValue(v);
 		},
 		onBlur() {
 			fieldEvents.dispatchEvent(FieldEvents.Blur);

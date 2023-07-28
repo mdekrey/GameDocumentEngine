@@ -9,14 +9,7 @@ export function SelectField<T>({
 	valueSelector,
 	children,
 }: {
-	field: Omit<
-		UseFieldResult<
-			unknown,
-			string,
-			{ hasErrors: true; isCheckbox: false; hasTranslations: true }
-		>,
-		'valueAtom'
-	>;
+	field: UseFieldResult<string, { hasErrors: true; hasTranslations: true }>;
 	items: T[];
 	valueSelector: (item: T) => string;
 	children: (item: T) => React.ReactNode;

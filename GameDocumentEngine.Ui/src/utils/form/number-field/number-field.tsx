@@ -29,14 +29,7 @@ export function NumberField<TValue>({
 	field,
 	mapping,
 }: {
-	field: Omit<
-		UseFieldResult<
-			unknown,
-			TValue,
-			{ hasErrors: true; isCheckbox: false; hasTranslations: true }
-		>,
-		'valueAtom' | 'setValue' | 'getValue'
-	>;
+	field: UseFieldResult<TValue, { hasErrors: true; hasTranslations: true }>;
 	mapping: FieldMapping<TValue, string>;
 }) {
 	return (

@@ -17,28 +17,25 @@ export type FieldTranslation = (
 
 export type DefaultUseFieldResultFlags = {
 	hasErrors: true;
-	isCheckbox: false;
 	hasTranslations: true;
 };
 export type UseFieldResultFlags = {
 	hasErrors: boolean;
-	isCheckbox: boolean;
 	hasTranslations: boolean;
 };
-export type ErrorsAtom<TValue> = Atom<Loadable<ZodError<TValue> | null>>;
+export type ErrorsAtom = Atom<Loadable<ZodError | null>>;
 export type UseFieldResult<
-	TValue,
-	TFieldValue = TValue,
+	TFieldValue,
 	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
-	valueAtom: PrimitiveAtom<TValue>;
-	setValue(v: TValue): void;
-	getValue(): TValue;
-	errors?: ErrorsAtom<TValue>;
-	onChange(this: void, v: TValue): void;
+	valueAtom: PrimitiveAtom<TFieldValue>;
+	setValue(v: TFieldValue): void;
+	getValue(): TFieldValue;
+	errors?: ErrorsAtom;
+	onChange(this: void, v: TFieldValue): void;
 	onBlur(this: void): void;
 	htmlProps: ToHtmlProps<TFieldValue>;
-} & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom<TValue> }> &
+} & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom }> &
 	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
 
 export type ToHtmlInputProps<TInputValue> = TInputValue extends string
@@ -75,7 +72,6 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 	mapping: FieldMapping<TValue, TFormFieldValue>;
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
-	isCheckbox: boolean;
 	translation: FieldTranslation;
 };
 type UnmappedOptions<TValue> = Omit<
@@ -90,7 +86,6 @@ type MappedOptions<TValue, TFieldValue> = Partial<
 
 type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> = {
 	hasErrors: 'schema' extends keyof TOptions ? true : false;
-	isCheckbox: Exclude<TOptions['isCheckbox'], undefined>;
 	hasTranslations: TOptions['translation'] extends FieldTranslation
 		? true
 		: false;
@@ -99,7 +94,7 @@ type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> = {
 export function useField<TValue, TOptions extends UnmappedOptions<TValue>>(
 	defaultValue: TValue,
 	options?: TOptions,
-): UseFieldResult<TValue, TValue, Flags<TOptions>>;
+): UseFieldResult<TValue, Flags<TOptions>>;
 export function useField<
 	TValue,
 	TFieldValue,
@@ -107,12 +102,12 @@ export function useField<
 >(
 	defaultValue: TValue,
 	options: TOptions,
-): UseFieldResult<TValue, TFieldValue, Flags<TOptions>>;
+): UseFieldResult<TFieldValue, Flags<TOptions>>;
 export function useField<TValue, TFieldValue>(
 	defaultValue: TValue,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): UseFieldResult<TValue, TFieldValue, any> {
+): UseFieldResult<TFieldValue, any> {
 	const fieldValueAtom = useMemo(
 		() => atom<TValue>(defaultValue),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,7 +119,7 @@ export function useField<TValue, TFieldValue>(
 export function useFieldAtom<TValue, TOptions extends UnmappedOptions<TValue>>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options?: TOptions,
-): UseFieldResult<TValue, TValue, Flags<TOptions>>;
+): UseFieldResult<TValue, Flags<TOptions>>;
 export function useFieldAtom<
 	TValue,
 	TFieldValue,
@@ -132,12 +127,12 @@ export function useFieldAtom<
 >(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: TOptions,
-): UseFieldResult<TValue, TFieldValue, Flags<TOptions>>;
+): UseFieldResult<TFieldValue, Flags<TOptions>>;
 export function useFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): UseFieldResult<TValue, TFieldValue, any> {
+): UseFieldResult<TFieldValue, any> {
 	return useInternalFieldAtom(fieldValueAtom, options);
 }
 
@@ -145,7 +140,7 @@ function useInternalFieldAtom<TValue, TFieldValue>(
 	fieldValueAtom: StandardWritableAtom<TValue>,
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): UseFieldResult<TValue, TFieldValue, any> {
+): UseFieldResult<TFieldValue, any> {
 	const store = useStore();
 	return useMemo(
 		() => toInternalFieldAtom(store, fieldValueAtom, options),

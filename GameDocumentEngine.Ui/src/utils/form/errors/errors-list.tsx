@@ -6,7 +6,7 @@ export function ErrorsList({
 	errors,
 	translations,
 }: {
-	errors: ErrorsAtom<unknown>;
+	errors: ErrorsAtom;
 	translations: FieldTranslation;
 }) {
 	const errorsValue = useAtomValue(errors);

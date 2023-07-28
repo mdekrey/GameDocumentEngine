@@ -52,7 +52,6 @@ export function CreateInvite({
 		fields: {
 			isUnlimited: {
 				path: ['uses'],
-				isCheckbox: true,
 				mapping: {
 					toForm: (v: number) => v === -1,
 					fromForm: (v: boolean) => (v ? -1 : 1),
@@ -123,11 +122,7 @@ function NumberOfUses({
 	field,
 }: {
 	disabled: Atom<boolean>;
-	field: UseFieldResult<
-		number,
-		string,
-		{ hasErrors: true; isCheckbox: false; hasTranslations: true }
-	>;
+	field: UseFieldResult<string>;
 }) {
 	const disabled = useAtomValue(disabledAtom);
 	return (

@@ -3,7 +3,12 @@ import { loadable } from 'jotai/utils';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
 import { ZodError, ZodType } from 'zod';
 
-export function createErrorsAtom<T>(target: Atom<T>, schema: ZodType<T>) {
+type MaybeErrors = ZodError | null;
+
+export function createErrorsAtom<T>(
+	target: Atom<T>,
+	schema: ZodType<T>,
+): Atom<Loadable<MaybeErrors>> {
 	return loadable(
 		atom(async (get) => {
 			const parseResult = await schema.safeParseAsync(get(target));
@@ -13,13 +18,11 @@ export function createErrorsAtom<T>(target: Atom<T>, schema: ZodType<T>) {
 	);
 }
 
-type MaybeErrors<T> = ZodError<T> | null;
-
 export function createTriggeredErrorsAtom<T>(
 	target: Atom<T>,
 	schema: ZodType<T>,
-): [Atom<Loadable<ZodError<T> | null>>, WritableAtom<void, [], void>] {
-	const errors = atom<Promise<MaybeErrors<T>>>(Promise.resolve(null));
+): [Atom<Loadable<MaybeErrors>>, WritableAtom<void, [], void>] {
+	const errors = atom<Promise<MaybeErrors>>(Promise.resolve(null));
 
 	const writable = atom<void, [], void>(void 0, (get, set) => {
 		set(
