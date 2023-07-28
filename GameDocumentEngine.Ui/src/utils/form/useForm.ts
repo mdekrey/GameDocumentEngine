@@ -393,14 +393,26 @@ function getAtomForPath<T extends Objectish, TPath extends Path<T>>(
 		(get): PathValue<T, TPath> => getPathValue(get(source)),
 		(_get, set, effect: TOut | SetStateAction<TOut>) =>
 			set(source, (prev) => {
+				// 'val' is added and removed here to handle `undefined` returns.
+				// If `undefined` is returned, immer assumes the Draft (`d`) is
+				// modified, losing track of the `undefined`. This necessitates
+				// the `.slice(1)` below.
 				const patches: Patch[] =
 					typeof effect === 'function'
-						? produceWithPatches<PathValue<T, TPath>>(getPathValue(prev), (d) =>
-								(effect as SetStateAction<TOut>)(d as TOut),
+						? produceWithPatches<{ val: PathValue<T, TPath> }>(
+								{ val: getPathValue(prev) },
+								(d) => {
+									d.val = (effect as SetStateAction<TOut>)(
+										d.val as TOut,
+									) as never;
+								},
 						  )[1]
 						: [{ op: 'replace', path: [], value: effect }];
 				const finalPatches = patches.map(
-					(patch): Patch => ({ ...patch, path: [...steps, ...patch.path] }),
+					(patch): Patch => ({
+						...patch,
+						path: [...steps, ...patch.path.slice(1)],
+					}),
 				);
 				return applyPatches(prev, finalPatches);
 			}),

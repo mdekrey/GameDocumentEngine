@@ -70,6 +70,7 @@ export function toInputTextField<TFieldValue>(
 		defaultValue: atom,
 		onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
+			console.log({ newValue: ev.currentTarget.value });
 			store.set(atom, ev.currentTarget.value);
 		},
 		onBlur: () => {
