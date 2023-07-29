@@ -8,7 +8,7 @@ export const undefinedAsEmptyStringMapping: FieldMapping<
 	string
 > = {
 	toForm: (v: string | undefined) => v ?? '',
-	fromForm: (v: string) => (v ? v : undefined),
+	fromForm: (v, setValue) => setValue(v ? v : undefined),
 };
 
 export function TextField<TValue>({

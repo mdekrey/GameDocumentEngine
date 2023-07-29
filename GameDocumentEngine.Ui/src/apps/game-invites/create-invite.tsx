@@ -12,7 +12,7 @@ import { ErrorsList } from '@/utils/form/errors/errors-list';
 import { TextInput } from '@/utils/form/text-input/text-input';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { Atom, useAtomValue } from 'jotai';
-import { UseFieldResult } from '@/utils/form/useField';
+import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import { CheckboxField } from '@/utils/form/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/utils/form/select-field/select-field';
@@ -30,6 +30,19 @@ function useCreateInvite(gameId: string) {
 	);
 	return createInvite;
 }
+
+const unlimitedCheckboxMapping: FieldMapping<number, boolean> = {
+	toForm: (v: number) => v === -1,
+	fromForm: (v: boolean, setValue: (v: number) => void) => setValue(v ? -1 : 1),
+};
+
+const positiveIntegerMapping: FieldMapping<number, string> = {
+	toForm: (v: number) => (v < 1 ? '' : v.toFixed(0)),
+	fromForm: (v: string, setValue: (v: number) => void) => {
+		const result = Number.parseInt(v);
+		if (!Number.isNaN(result) && result >= 1) setValue(result);
+	},
+};
 
 export function CreateInvite({
 	resolve,
@@ -50,24 +63,7 @@ export function CreateInvite({
 		defaultValue: { uses: -1, role: '' },
 		translation: t,
 		fields: {
-			isUnlimited: {
-				path: ['uses'],
-				mapping: {
-					toForm: (v: number) => v === -1,
-					fromForm: (v: boolean) => (v ? -1 : 1),
-				},
-			},
-			uses: {
-				path: ['uses'],
-				mapping: {
-					toForm: (v: number) => (v < 1 ? '' : v.toFixed(0)),
-					fromForm: (v: string) => {
-						const result = Number.parseInt(v);
-						if (Number.isNaN(result) || result < 1) return 1;
-						return result;
-					},
-				},
-			},
+			uses: ['uses'],
 			role: ['role'],
 		},
 	});
@@ -87,13 +83,15 @@ export function CreateInvite({
 					>
 						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
 					</SelectField>
-					<CheckboxField {...form.fields.isUnlimited.htmlProps.asCheckbox()}>
+					<CheckboxField
+						{...form.fields.uses.htmlProps.asCheckbox(unlimitedCheckboxMapping)}
+					>
 						<CheckboxField.Label>
 							{t('fields.isUnlimited.label')}
 						</CheckboxField.Label>
 						<CheckboxField.Contents>
 							<ErrorsList
-								errors={form.fields.isUnlimited.errors}
+								errors={form.fields.uses.errors}
 								translations={(p) => t(`fields.uses.${p.join('.')}`)}
 							/>
 						</CheckboxField.Contents>
@@ -122,7 +120,7 @@ function NumberOfUses({
 	field,
 }: {
 	disabled: Atom<boolean>;
-	field: UseFieldResult<string>;
+	field: UseFieldResult<number>;
 }) {
 	const disabled = useAtomValue(disabledAtom);
 	return (
@@ -131,7 +129,10 @@ function NumberOfUses({
 				{field.translation(['label'])}
 			</Field.Label>
 			<Field.Contents>
-				<TextInput disabled={disabled} {...field.htmlProps()} />
+				<TextInput
+					disabled={disabled}
+					{...field.htmlProps(positiveIntegerMapping)}
+				/>
 				<ErrorsList errors={field.errors} translations={field.translation} />
 			</Field.Contents>
 		</Field>

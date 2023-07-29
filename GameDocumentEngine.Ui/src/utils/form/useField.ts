@@ -61,7 +61,11 @@ export type CheckboxFieldProps = {
 
 export type FieldMapping<TValue, TFormFieldValue> = {
 	toForm(this: void, v: TValue): TFormFieldValue;
-	fromForm(this: void, v: TFormFieldValue): TValue;
+	fromForm(
+		this: void,
+		v: TFormFieldValue,
+		setValue: (v: TValue) => void,
+	): void | undefined;
 };
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
