@@ -1,21 +1,71 @@
 {
+	"$schema": "https://json-schema.org/draft-07/schema",
 	"title": "MouseGuard-Character",
 	"type": "object",
-	"required": ["bio", "skills"],
+	"required": [
+		"abilities",
+		"bio",
+		"conditions",
+		"notes",
+		"personality",
+		"rewards",
+		"skills",
+		"traits",
+		"wises"
+	],
 	"properties": {
+		"abilities": { "$ref": "#/$defs/abilities" },
 		"bio": { "$ref": "#/$defs/bio" },
+		"conditions": { "$ref": "#/$defs/conditions" },
+		"notes": { "$ref": "#/$defs/notes" },
+		"personality": { "$ref": "#/$defs/personality" },
+		"rewards": { "$ref": "#/$defs/rewards" },
 		"skills": {
 			"type": "array",
-			"items": { "$ref": "#/$defs/skill" }
-		}
+			"items": { "$ref": "#/$defs/skill" },
+			"maxLength": 24
+		},
+		"traits": { "$ref": "#/$defs/traits" },
+		"wises": { "$ref": "#/$defs/wises" }
 	},
 
 	"$defs": {
+		"abilities": {
+			"type": "object",
+			"required": ["nature", "will", "health", "resources", "circles"],
+			"properties": {
+				"nature": {
+					"allOf": [
+						{
+							"type": "object",
+							"required": ["current"],
+							"properties": {
+								"current": { "type": "integer" }
+							}
+						},
+						{ "$ref": "#/$defs/advanceable" }
+					]
+				},
+				"will": { "$ref": "#/$defs/advanceable" },
+				"health": { "$ref": "#/$defs/advanceable" },
+				"resources": { "$ref": "#/$defs/advanceable" },
+				"circles": { "$ref": "#/$defs/advanceable" }
+			}
+		},
+		"advanceable": {
+			"type": "object",
+			"required": ["rating", "passes", "fails"],
+			"properties": {
+				"rating": { "type": "integer", "minimum": 0 },
+				"passes": { "type": "integer", "minimum": 0 },
+				"fails": { "type": "integer", "minimum": 0 }
+			}
+		},
 		"bio": {
 			"type": "object",
 			"required": [],
 			"properties": {
-				"age": { "type": "integer", "minValue": 14 },
+				"age": { "type": "integer", "minimum": 14 },
 				"home": { "type": "string" },
 				"furColor": { "type": "string" },
 				"guardRank": { "type": "string" },
@@ -27,14 +77,81 @@
 				"enemy": { "type": "string" }
 			}
 		},
-		"skill": {
+		"personality": {
 			"type": "object",
-			"required": ["name", "rank", "passes", "fails"],
+			"required": [],
+			"properties": {
+				"belief": { "type": "string" },
+				"goal": { "type": "string" },
+				"instinct": { "type": "string" }
+			}
+		},
+		"notes": {
+			"type": "object",
+			"required": [],
+			"properties": {
+				"equipment": { "type": "string" },
+				"contacts": { "type": "string" }
+			}
+		},
+		"rewards": {
+			"type": "object",
+			"required": ["fate", "persona", "checks"],
+			"properties": {
+				"fate": { "type": "integer", "minimum": 0 },
+				"persona": { "type": "integer", "minimum": 0 },
+				"checks": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"skill": {
+			"allOf": [
+				{
+					"type": "object",
+					"required": ["name"],
+					"properties": {
+						"name": { "type": "string" }
+					}
+				},
+				{ "$ref": "#/$defs/advanceable" }
+			]
+		},
+		"conditions": {
+			"type": "object",
+			"properties": {
+				"hungryThirsty": { "enum": [true] },
+				"angry": { "enum": [true] },
+				"tired": { "enum": [true] },
+				"injured": { "enum": [true] },
+				"sick": { "enum": [true] }
+			}
+		},
+		"traits": {
+			"type": "array",
+			"items": { "$ref": "#/$defs/trait" }
+		},
+		"trait": {
+			"type": "object",
+			"required": ["name", "level"],
 			"properties": {
 				"name": { "type": "string" },
-				"rank": { "type": "integer" },
-				"passes": { "type": "integer" },
-				"fails": { "type": "integer" }
+				"level": { "type": "number", "minimum": 1, "maximum": 3 },
+				"usedFor": { "type": "number", "minimum": 0 },
+				"usedAgainst": { "type": "number", "minimum": 0 }
+			}
+		},
+		"wises": {
+			"type": "array",
+			"items": { "$ref": "#/$defs/wise" }
+		},
+		"wise": {
+			"type": "object",
+			"required": ["name"],
+			"properties": {
+				"name": { "type": "string" },
+				"pass": { "enum": [true] },
+				"fail": { "enum": [true] },
+				"fate": { "enum": [true] },
+				"persona": { "enum": [true] }
 			}
 		}
 	}

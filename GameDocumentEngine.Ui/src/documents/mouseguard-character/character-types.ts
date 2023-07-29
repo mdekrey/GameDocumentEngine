@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { documentSchema } from '../defineDocument';
-import characterSchema from './schema-improved';
+import characterSchema from './schema';
 
 export type Character = z.infer<typeof characterSchema>;
 export const CharacterDocument = documentSchema<Character>(characterSchema);

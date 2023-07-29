@@ -3,7 +3,7 @@ import path from 'node:path';
 import { writeFile, mkdir } from 'node:fs';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'node:module';
-import { jsonSchemaToZod } from 'json-schema-to-zod';
+import { jsonSchemaToZodDereffed } from 'json-schema-to-zod';
 import type { JSONSchema7 } from 'json-schema';
 
 const require = createRequire(import.meta.url);
@@ -30,7 +30,7 @@ await Promise.all(
 		);
 		const schema = require(schemaPath) as JSONSchema7;
 
-		const module = jsonSchemaToZod(schema);
+		const module = await jsonSchemaToZodDereffed(schema);
 
 		await new Promise((resolve) => mkdir(path.dirname(outPath), resolve));
 		await new Promise((resolve, reject) =>
