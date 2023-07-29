@@ -5,10 +5,7 @@ import {
 	undefinedOrIntegerMapping,
 } from '@/utils/form/number-field/number-field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
-import {
-	TextField,
-	undefinedAsEmptyStringMapping as emptyStringUndefined,
-} from '@/utils/form/text-field/text-field';
+import { TextField } from '@/utils/form/text-field/text-field';
 
 export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {
@@ -25,21 +22,21 @@ export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
 		enemy: ['details', 'bio', 'enemy'],
 	});
 	return (
-		<div>
+		<div className="grid grid-cols-2 gap-2">
 			<Fieldset>
 				<TextField field={fields.name} />
 				<NumberField field={fields.age} mapping={undefinedOrIntegerMapping} />
-				<TextField field={fields.home} mapping={emptyStringUndefined} />
-				<TextField field={fields.furColor} mapping={emptyStringUndefined} />
-				<TextField field={fields.guardRank} mapping={emptyStringUndefined} />
-				<TextField field={fields.cloakColor} mapping={emptyStringUndefined} />
+				<TextField.AllowUndefined field={fields.home} />
+				<TextField.AllowUndefined field={fields.furColor} />
+				<TextField.AllowUndefined field={fields.guardRank} />
+				<TextField.AllowUndefined field={fields.cloakColor} />
 			</Fieldset>
 			<Fieldset>
-				<TextField field={fields.parents} mapping={emptyStringUndefined} />
-				<TextField field={fields.mentor} mapping={emptyStringUndefined} />
-				<TextField field={fields.senior} mapping={emptyStringUndefined} />
-				<TextField field={fields.friend} mapping={emptyStringUndefined} />
-				<TextField field={fields.enemy} mapping={emptyStringUndefined} />
+				<TextField.AllowUndefined field={fields.parents} />
+				<TextField.AllowUndefined field={fields.mentor} />
+				<TextField.AllowUndefined field={fields.senior} />
+				<TextField.AllowUndefined field={fields.friend} />
+				<TextField.AllowUndefined field={fields.enemy} />
 			</Fieldset>
 		</div>
 	);

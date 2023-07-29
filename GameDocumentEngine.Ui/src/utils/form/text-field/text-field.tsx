@@ -41,3 +41,14 @@ export function TextField<T>({
 		</Field>
 	);
 }
+
+TextField.AllowUndefined = function TextFieldWithUndefined({
+	field,
+}: {
+	field: UseFieldResult<
+		string | undefined,
+		{ hasErrors: true; hasTranslations: true }
+	>;
+}) {
+	return <TextField field={field} mapping={undefinedAsEmptyStringMapping} />;
+};

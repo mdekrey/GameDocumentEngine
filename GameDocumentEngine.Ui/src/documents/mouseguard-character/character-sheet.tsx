@@ -64,7 +64,10 @@ export function CharacterSheet({
 
 	useDebugValue(form);
 	return (
-		<form onSubmit={form.handleSubmit(onSubmit)}>
+		<form
+			onSubmit={form.handleSubmit(onSubmit)}
+			className="flex flex-col gap-2"
+		>
 			<Bio form={form} />
 			<Personality form={form} />
 			<Notes form={form} />

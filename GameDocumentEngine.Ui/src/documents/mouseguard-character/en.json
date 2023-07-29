@@ -38,6 +38,18 @@
 					"mentor": { "label": "Mentor" },
 					"friend": { "label": "Friend" },
 					"enemy": { "label": "Enemy" }
+				},
+				"personality": {
+					"belief": { "label": "Belief" },
+					"goal": { "label": "Goal" },
+					"instinct": { "label": "Instinct" }
+				},
+				"notes": {
+					"equipment": {
+						"label": "Gear and Posessions",
+						"description": "Gear is limited to what you can carry. Posessions are kept in Lockhaven or another location."
+					},
+					"contacts": { "label": "Contacts" }
 				}
 			}
 		}

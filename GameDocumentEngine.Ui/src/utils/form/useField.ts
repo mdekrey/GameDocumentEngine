@@ -9,7 +9,10 @@ import { FormEvents } from './events/FormEvents';
 import { IfTrueThenProp } from './type-helpers';
 import { noChange } from './mapAtom';
 
-export type FieldTranslatablePart = ['label'] | ['errors', string];
+export type FieldTranslatablePart =
+	| ['label']
+	| ['description']
+	| ['errors', string];
 export type FieldTranslation = (
 	this: void,
 	part: FieldTranslatablePart,
