@@ -29,10 +29,6 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 		defaultValue: { name: '', type: '' },
 		schema: CreateDocumentDetails,
 		translation: t,
-		fields: {
-			name: ['name'],
-			type: ['type'],
-		},
 	});
 
 	const gameType = useGameType(gameId);
@@ -43,9 +39,9 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 		<NarrowContent>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<Fieldset>
-					<TextField field={gameForm.fields.name} />
+					<TextField field={gameForm.field(['name'])} />
 					<SelectField
-						field={gameForm.fields.type}
+						field={gameForm.field(['type'])}
 						items={
 							gameType.isSuccess
 								? Object.entries(gameType.data.objectTypes)

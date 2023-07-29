@@ -28,10 +28,6 @@ export function CreateGame() {
 		defaultValue: { name: '', type: '' },
 		schema: CreateGameDetails,
 		translation: t,
-		fields: {
-			name: ['name'],
-			type: ['type'],
-		},
 	});
 
 	const gameTypesResult = useQuery(queries.listGameTypes());
@@ -41,9 +37,9 @@ export function CreateGame() {
 		<NarrowContent>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<Fieldset>
-					<TextField field={gameForm.fields.name} />
+					<TextField field={gameForm.field(['name'])} />
 					<SelectField
-						field={gameForm.fields.type}
+						field={gameForm.field(['type'])}
 						items={Object.entries(gameTypesResult.data ?? {})}
 						key={gameTypesResult.data ? 1 : 0}
 						valueSelector={(gt) => gt[0]}
