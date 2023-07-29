@@ -1,4 +1,3 @@
-import { useDebugValue } from 'react';
 import { CharacterDocument } from '../character-types';
 import { UseFormResult, useFormFields } from '@/utils/form/useForm';
 import {
@@ -12,7 +11,6 @@ import {
 } from '@/utils/form/text-field/text-field';
 
 export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
-	useDebugValue({ form });
 	const fields = useFormFields(form, {
 		name: ['name'],
 		age: ['details', 'bio', 'age'],
