@@ -39,28 +39,24 @@ export type UseFieldResult<
 	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
 
 export type ToHtmlInputProps<TInputValue> = TInputValue extends string
-	? (mapping?: FieldMapping<TInputValue, string>) => InputFieldProps<string>
-	: (mapping: FieldMapping<TInputValue, string>) => InputFieldProps<string>;
+	? (mapping?: FieldMapping<TInputValue, string>) => InputFieldProps
+	: (mapping: FieldMapping<TInputValue, string>) => InputFieldProps;
 
 export type ToHtmlProps<TInputValue> = ToHtmlInputProps<TInputValue> & {
 	asCheckbox: TInputValue extends boolean
-		? (
-				mapping?: FieldMapping<TInputValue, boolean>,
-		  ) => CheckboxFieldProps<boolean>
-		: (
-				mapping: FieldMapping<TInputValue, boolean>,
-		  ) => CheckboxFieldProps<boolean>;
+		? (mapping?: FieldMapping<TInputValue, boolean>) => CheckboxFieldProps
+		: (mapping: FieldMapping<TInputValue, boolean>) => CheckboxFieldProps;
 };
 
-export type InputFieldProps<TFieldValue> = {
-	defaultValue: Atom<TFieldValue>;
-	onChange: (ev: React.ChangeEvent<{ value: TFieldValue }>) => void;
-	onBlur: React.ReactEventHandler;
+export type InputFieldProps = {
+	defaultValue: Atom<string>;
+	onChange: React.ChangeEventHandler<{ value: string }>;
+	onBlur: React.FocusEventHandler<{ value: string }>;
 };
-export type CheckboxFieldProps<TFieldValue> = {
-	defaultChecked: Atom<TFieldValue>;
-	onChange: (ev: React.ChangeEvent<{ checked: TFieldValue }>) => void;
-	onBlur: React.ReactEventHandler;
+export type CheckboxFieldProps = {
+	defaultChecked: Atom<boolean>;
+	onChange: React.ChangeEventHandler<{ checked: boolean }>;
+	onBlur: React.FocusEventHandler<{ checked: boolean }>;
 };
 
 export type FieldMapping<TValue, TFormFieldValue> = {

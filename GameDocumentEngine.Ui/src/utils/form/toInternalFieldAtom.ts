@@ -81,20 +81,22 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 
 		const toInput = function toInput(
 			mapping?: FieldMapping<TFieldValue, string>,
-		): InputFieldProps<string> {
+		): InputFieldProps {
 			const htmlAtom = mappedAtom(mapping);
 			return toInputTextField(
 				(v) => store.set(htmlAtom, v),
+				() => store.get(htmlAtom),
 				htmlAtom,
 				fieldEvents,
 			);
 		} as ToHtmlInputProps<TFieldValue> as ToHtmlProps<TFieldValue>;
 		toInput.asCheckbox = function asCheckbox(
 			mapping?: FieldMapping<TFieldValue, boolean>,
-		): CheckboxFieldProps<boolean> {
+		): CheckboxFieldProps {
 			const htmlAtom = mappedAtom(mapping);
 			return toInputCheckboxField(
 				(v) => store.set(htmlAtom, v),
+				() => store.get(htmlAtom),
 				htmlAtom,
 				fieldEvents,
 			);
@@ -106,34 +108,38 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 
 function toInputTextField(
 	setValue: (v: string) => void,
+	getValue: () => string,
 	atom: StandardWritableAtom<string>,
 	fieldEvents: FieldEvents,
-): InputFieldProps<string> {
+): InputFieldProps {
 	return {
 		defaultValue: atom,
-		onChange: (ev: React.ChangeEvent<{ value: string }>) => {
+		onChange: (ev) => {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.value);
 		},
-		onBlur: () => {
+		onBlur: (ev) => {
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
+			ev.currentTarget.value = getValue();
 		},
 	};
 }
 
 function toInputCheckboxField(
 	setValue: (v: boolean) => void,
+	getValue: () => boolean,
 	atom: StandardWritableAtom<boolean>,
 	fieldEvents: FieldEvents,
-): CheckboxFieldProps<boolean> {
+): CheckboxFieldProps {
 	return {
 		defaultChecked: atom,
-		onChange: (ev: React.ChangeEvent<{ checked: boolean }>) => {
+		onChange: (ev) => {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.checked);
 		},
-		onBlur: () => {
+		onBlur: (ev) => {
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
+			ev.currentTarget.checked = getValue();
 		},
 	};
 }
