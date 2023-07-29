@@ -1,14 +1,17 @@
 import type { IFieldEvents } from './FieldEvents';
 
+const updateAllErrorsEvent = 'UpdateAllErrors';
 const submitEvent = 'submit';
 const anyBlurEvent = 'blur';
 const anyChangeEvent = 'change';
 type FormEventNames =
+	| typeof updateAllErrorsEvent
 	| typeof submitEvent
 	| typeof anyBlurEvent
 	| typeof anyChangeEvent;
 
 export class FormEvents implements IFieldEvents {
+	static readonly UpdateAllErrors = updateAllErrorsEvent;
 	static readonly Submit = submitEvent;
 	static readonly AnyBlur = anyBlurEvent;
 	static readonly AnyChange = anyChangeEvent;

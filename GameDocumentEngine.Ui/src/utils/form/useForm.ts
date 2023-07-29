@@ -127,6 +127,7 @@ export type UseFormResult<T extends Objectish> = {
 	defaultValue: React.MutableRefObject<T>;
 	translation: (field: string) => string;
 	field<TPath extends Path<T>>(path: TPath): FormFieldReturnType<T, TPath>;
+	updateAllErrors(this: void): void;
 
 	get(this: void): T;
 	set(this: void, value: T | ((prevValue: T) => T)): void;
@@ -178,6 +179,9 @@ function buildFormResult<T extends Objectish>(
 				atomFamily,
 			);
 		},
+		updateAllErrors() {
+			formEvents.dispatchEvent(FormEvents.UpdateAllErrors);
+		},
 		get: () => store.get(atom),
 		set: (value: T) => store.set(atom, value),
 		translation,
@@ -199,7 +203,6 @@ function buildFormResult<T extends Objectish>(
 			await callback(errorsResult.data);
 		},
 		errorStrategy,
-		// TODO: allow manual trigger to display errors
 	};
 }
 

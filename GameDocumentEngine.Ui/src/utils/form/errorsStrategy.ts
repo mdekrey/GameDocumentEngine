@@ -25,6 +25,7 @@ export function errorsStrategy(
 	const [registerPostSubmit] = getErrorStrategy(postSubmit);
 
 	return (fieldEvents, callback) => {
+		formEvents.addEventListener(FormEvents.UpdateAllErrors, callback);
 		if (!hasSubmitted) {
 			registerPreSubmit(formEvents, fieldEvents, callback);
 			formEvents.addEventListener(FormEvents.Submit, swapRegistrations);
