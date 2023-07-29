@@ -2,6 +2,7 @@ import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from '../text-input/text-input';
 import { FieldMapping, UseFieldResult } from '../useField';
+import { MappedFieldProps } from './MappedFieldProps';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
 	string | undefined,
@@ -11,32 +12,28 @@ export const undefinedAsEmptyStringMapping: FieldMapping<
 	fromForm: (v) => (v ? v : undefined),
 };
 
-export function TextField<TValue>({
-	field,
-}: {
-	field: UseFieldResult<TValue, { hasErrors: true; hasTranslations: true }>;
-	mapping: FieldMapping<TValue, string>;
-}): React.ReactNode;
-export function TextField({
-	field,
-}: {
-	field: UseFieldResult<string, { hasErrors: true; hasTranslations: true }>;
-}): React.ReactNode;
-export function TextField<T>({
-	field,
-	mapping,
-}: {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	field: UseFieldResult<T>;
-	mapping?: FieldMapping<T, string>;
-}) {
+type TextFieldPersistentProps = {
+	description?: boolean;
+};
+export type TextFieldProps<TValue> = MappedFieldProps<TValue, string> &
+	TextFieldPersistentProps;
+
+export function TextField<T>(props: TextFieldProps<T>) {
+	const htmlProps =
+		'mapping' in props
+			? props.field.htmlProps(props.mapping)
+			: props.field.htmlProps();
+	const {
+		field: { translation: t, errors },
+		description,
+	} = props;
 	return (
 		<Field>
-			<Field.Label>{field.translation(['label'])}</Field.Label>
+			<Field.Label>{t(['label'])}</Field.Label>
 			<Field.Contents>
-				{/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-				<TextInput {...field.htmlProps(mapping!)} />
-				<ErrorsList errors={field.errors} translations={field.translation} />
+				<TextInput {...htmlProps} />
+				{description && <p className="text-xs italic">{t(['description'])}</p>}
+				<ErrorsList errors={errors} translations={t} />
 			</Field.Contents>
 		</Field>
 	);
@@ -44,11 +41,18 @@ export function TextField<T>({
 
 TextField.AllowUndefined = function TextFieldWithUndefined({
 	field,
+	...props
 }: {
 	field: UseFieldResult<
 		string | undefined,
 		{ hasErrors: true; hasTranslations: true }
 	>;
-}) {
-	return <TextField field={field} mapping={undefinedAsEmptyStringMapping} />;
+} & TextFieldPersistentProps) {
+	return (
+		<TextField
+			field={field}
+			mapping={undefinedAsEmptyStringMapping}
+			{...props}
+		/>
+	);
 };

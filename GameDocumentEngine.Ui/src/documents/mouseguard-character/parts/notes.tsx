@@ -12,7 +12,7 @@ export function Notes({ form }: { form: UseFormResult<CharacterDocument> }) {
 	useDebugValue(fields);
 	return (
 		<Fieldset>
-			<TextField.AllowUndefined field={fields.equipment} />
+			<TextField.AllowUndefined field={fields.equipment} description />
 			<TextField.AllowUndefined field={fields.contacts} />
 		</Fieldset>
 	);
