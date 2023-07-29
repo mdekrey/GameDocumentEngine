@@ -35,16 +35,13 @@
 			"required": ["nature", "will", "health", "resources", "circles"],
 			"properties": {
 				"nature": {
-					"allOf": [
-						{
-							"type": "object",
-							"required": ["current"],
-							"properties": {
-								"current": { "type": "integer" }
-							}
-						},
-						{ "$ref": "#/$defs/advanceable" }
-					]
+					"type": "object",
+					"required": ["current", "max", "advancement"],
+					"properties": {
+						"current": { "type": "integer" },
+						"max": { "type": "integer" },
+						"advancement": { "$ref": "#/$defs/passesAndFails" }
+					}
 				},
 				"will": { "$ref": "#/$defs/advanceable" },
 				"health": { "$ref": "#/$defs/advanceable" },
@@ -54,11 +51,10 @@
 		},
 		"advanceable": {
 			"type": "object",
-			"required": ["rating", "passes", "fails"],
+			"required": ["rating", "advancement"],
 			"properties": {
 				"rating": { "type": "integer", "minimum": 0 },
-				"passes": { "type": "integer", "minimum": 0 },
-				"fails": { "type": "integer", "minimum": 0 }
+				"advancement": { "$ref": "#/$defs/passesAndFails" }
 			}
 		},
 		"bio": {
@@ -77,13 +73,14 @@
 				"enemy": { "type": "string" }
 			}
 		},
-		"personality": {
+		"conditions": {
 			"type": "object",
-			"required": [],
 			"properties": {
-				"belief": { "type": "string" },
-				"goal": { "type": "string" },
-				"instinct": { "type": "string" }
+				"hungryThirsty": { "enum": [true] },
+				"angry": { "enum": [true] },
+				"tired": { "enum": [true] },
+				"injured": { "enum": [true] },
+				"sick": { "enum": [true] }
 			}
 		},
 		"notes": {
@@ -92,6 +89,23 @@
 			"properties": {
 				"equipment": { "type": "string" },
 				"contacts": { "type": "string" }
+			}
+		},
+		"passesAndFails": {
+			"type": "object",
+			"required": ["passes", "fails"],
+			"properties": {
+				"passes": { "type": "integer", "minimum": 0 },
+				"fails": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"personality": {
+			"type": "object",
+			"required": [],
+			"properties": {
+				"belief": { "type": "string" },
+				"goal": { "type": "string" },
+				"instinct": { "type": "string" }
 			}
 		},
 		"rewards": {
@@ -114,16 +128,6 @@
 				},
 				{ "$ref": "#/$defs/advanceable" }
 			]
-		},
-		"conditions": {
-			"type": "object",
-			"properties": {
-				"hungryThirsty": { "enum": [true] },
-				"angry": { "enum": [true] },
-				"tired": { "enum": [true] },
-				"injured": { "enum": [true] },
-				"sick": { "enum": [true] }
-			}
 		},
 		"traits": {
 			"type": "array",

@@ -6,7 +6,6 @@ import { z } from 'zod';
 import en from './en.json';
 
 defineDocument('MouseGuard-Character', {
-	// TODO: Research: why this is giving a warning
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	icon: HiOutlineClock,
 	template: {
@@ -14,11 +13,11 @@ defineDocument('MouseGuard-Character', {
 		skills: [],
 		conditions: {},
 		abilities: {
-			nature: { current: 0, rating: 0, passes: 0, fails: 0 },
-			will: { rating: 0, passes: 0, fails: 0 },
-			health: { rating: 0, passes: 0, fails: 0 },
-			resources: { rating: 0, passes: 0, fails: 0 },
-			circles: { rating: 0, passes: 0, fails: 0 },
+			nature: { current: 0, max: 0, advancement: { passes: 0, fails: 0 } },
+			will: { rating: 0, advancement: { passes: 0, fails: 0 } },
+			health: { rating: 0, advancement: { passes: 0, fails: 0 } },
+			resources: { rating: 0, advancement: { passes: 0, fails: 0 } },
+			circles: { rating: 0, advancement: { passes: 0, fails: 0 } },
 		},
 		notes: {},
 		personality: {},
