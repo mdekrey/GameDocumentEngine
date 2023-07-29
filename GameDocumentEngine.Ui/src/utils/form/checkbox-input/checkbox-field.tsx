@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import { CheckboxFieldProps } from '../useField';
 import { CheckboxInput } from './checkbox-input';
 
-export type FieldProps = CheckboxFieldProps<boolean>;
+export type FieldProps = CheckboxFieldProps;
 
 export type FieldSlots = {
 	Label: {
