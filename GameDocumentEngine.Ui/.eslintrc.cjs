@@ -44,6 +44,8 @@ module.exports = {
 						},
 					},
 				],
+				// TODO: no-unsafe-assignment seems broken with my config, especially around passing components as variables
+				'@typescript-eslint/no-unsafe-assignment': [0],
 			},
 		},
 		{

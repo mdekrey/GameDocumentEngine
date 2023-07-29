@@ -1,4 +1,4 @@
-import { HiOutlineClock } from 'react-icons/hi2';
+import { GiSeatedMouse } from 'react-icons/gi';
 import { defineDocument } from '../defineDocument';
 import { FullCharacterSheet } from './character-sheet';
 import characterSchema from './schema';
@@ -6,8 +6,7 @@ import { z } from 'zod';
 import en from './en.json';
 
 defineDocument('MouseGuard-Character', {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	icon: HiOutlineClock,
+	icon: GiSeatedMouse,
 	template: {
 		bio: {},
 		skills: [],

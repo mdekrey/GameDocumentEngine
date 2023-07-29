@@ -6,8 +6,6 @@ import { z } from 'zod';
 import en from './en.json';
 
 defineDocument('Clock', {
-	// TODO: Research: why this is giving a warning
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	icon: HiOutlineClock,
 	template: {
 		current: 0,

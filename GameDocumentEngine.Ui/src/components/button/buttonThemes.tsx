@@ -1,16 +1,15 @@
 import { twMerge } from 'tailwind-merge';
 
 function mergeButton<TProps extends { className?: string | undefined }>(
-	component: React.ComponentType<TProps>,
+	Component: React.ComponentType<TProps>,
 	name: string,
 	themeClassName: string,
 ) {
-	// TODO: Research: why does this need to be cast?
-	const Component = component as React.ComponentType<
-		{ className: string } & Omit<TProps, 'className'>
-	>;
-	const result: React.FC<TProps> = ({ className, ...props }) => (
-		<Component className={twMerge(themeClassName, className)} {...props} />
+	const result: React.FC<TProps> = ({ ...props }) => (
+		<Component
+			{...props}
+			className={twMerge(themeClassName, props.className)}
+		/>
 	);
 	result.displayName = name;
 	return result;
