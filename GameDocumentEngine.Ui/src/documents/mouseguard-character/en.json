@@ -10,6 +10,9 @@
 			"description": "Can see the character's details"
 		}
 	},
+	"details": {
+		"delete": "Delete character"
+	},
 	"character-sheet": {
 		"fields": {
 			"name": {
