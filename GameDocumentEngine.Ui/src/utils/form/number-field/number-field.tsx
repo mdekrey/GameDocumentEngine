@@ -1,5 +1,6 @@
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
+import { noChange } from '../mapAtom';
 import { TextInput } from '../text-input/text-input';
 import { FieldMapping, UseFieldResult } from '../useField';
 
@@ -8,23 +9,18 @@ export const undefinedOrIntegerMapping: FieldMapping<
 	string
 > = {
 	toForm: (v: number | undefined) => (v === undefined ? '' : v.toFixed(0)),
-	fromForm: (v, setValue) => {
-		if (!v) {
-			setValue(undefined);
-			return;
-		}
+	fromForm: (v) => {
+		if (!v) return undefined;
 		const result = Number.parseInt(v, 10);
-		if (isNaN(result)) return;
-		setValue(result);
+		return isNaN(result) ? noChange : result;
 	},
 };
 
 export const integerMapping: FieldMapping<number, string> = {
 	toForm: (v: number) => v.toFixed(0),
-	fromForm: (v, setValue) => {
+	fromForm: (v) => {
 		const result = Number.parseInt(v, 10);
-		if (isNaN(result)) return;
-		setValue(result);
+		return isNaN(result) ? noChange : result;
 	},
 };
 

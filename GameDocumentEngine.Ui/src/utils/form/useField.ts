@@ -7,6 +7,7 @@ import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { RegisterErrorStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
 import { IfTrueThenProp } from './type-helpers';
+import { noChange } from './mapAtom';
 
 export type FieldTranslatablePart = ['label'] | ['errors', string];
 export type FieldTranslation = (
@@ -61,12 +62,9 @@ export type CheckboxFieldProps = {
 
 export type FieldMapping<TValue, TFormFieldValue> = {
 	toForm(this: void, v: TValue): TFormFieldValue;
-	fromForm(
-		this: void,
-		v: TFormFieldValue,
-		setValue: (v: TValue) => void,
-	): void | undefined;
+	fromForm(this: void, v: TFormFieldValue): TValue | typeof noChange;
 };
+
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
 	mapping: FieldMapping<TValue, TFormFieldValue>;

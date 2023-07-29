@@ -1,25 +1,23 @@
 import { atom } from 'jotai';
 import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
 
+export const noChange = Symbol('field-mapping-no-change');
+
 export function mapAtom<TIn, TOut>(
 	target: StandardWritableAtom<TIn>,
 	toOut: (v: TIn) => TOut,
-	fromOut: (v: TOut, setValue: (v: TIn) => void) => void,
+	fromOut: (v: TOut) => TIn | typeof noChange,
 ): StandardWritableAtom<TOut> {
 	return atom(
 		(get) => toOut(get(target)),
 		(_get, set, effect: TOut | SetStateAction<TOut>) =>
 			set(target, (prev) => {
-				let result = prev;
-				fromOut(
+				const result = fromOut(
 					typeof effect === 'function'
 						? (effect as SetStateAction<TOut>)(toOut(prev))
 						: effect,
-					(v) => {
-						result = v;
-					},
 				);
-				return result;
+				return result === noChange ? prev : result;
 			}),
 	);
 }

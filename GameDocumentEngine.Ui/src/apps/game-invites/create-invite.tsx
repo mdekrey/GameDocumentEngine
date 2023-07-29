@@ -17,6 +17,7 @@ import { CheckboxField } from '@/utils/form/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/utils/form/select-field/select-field';
 import { GameTypeScripts } from '@/utils/api/queries/game-types';
+import { noChange } from '@/utils/form/mapAtom';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -33,14 +34,14 @@ function useCreateInvite(gameId: string) {
 
 const unlimitedCheckboxMapping: FieldMapping<number, boolean> = {
 	toForm: (v: number) => v === -1,
-	fromForm: (v: boolean, setValue: (v: number) => void) => setValue(v ? -1 : 1),
+	fromForm: (v: boolean) => (v ? -1 : 1),
 };
 
 const positiveIntegerMapping: FieldMapping<number, string> = {
 	toForm: (v: number) => (v < 1 ? '' : v.toFixed(0)),
-	fromForm: (v: string, setValue: (v: number) => void) => {
-		const result = Number.parseInt(v);
-		if (!Number.isNaN(result) && result >= 1) setValue(result);
+	fromForm: (v: string) => {
+		const result = Number.parseInt(v, 10);
+		return Number.isNaN(result) || result < 1 ? noChange : result;
 	},
 };
 
