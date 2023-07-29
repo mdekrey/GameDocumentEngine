@@ -15,7 +15,7 @@
 			"type": "object",
 			"required": [],
 			"properties": {
-				"age": { "type": "integer" },
+				"age": { "type": "integer", "minValue": 14 },
 				"home": { "type": "string" },
 				"furColor": { "type": "string" },
 				"guardRank": { "type": "string" },

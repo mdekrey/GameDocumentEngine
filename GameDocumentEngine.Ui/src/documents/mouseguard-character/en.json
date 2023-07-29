@@ -1,3 +1,42 @@
 {
-	"name": "Mouse Guard Character"
+	"name": "Mouse Guard Character",
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the character with full control"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the character's details"
+		}
+	},
+	"character-sheet": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			},
+			"details": {
+				"bio": {
+					"age": {
+						"label": "Age",
+						"errors": {
+							"too_small": "Mouse Guard members must be at least 14 years old."
+						}
+					},
+					"home": { "label": "Home" },
+					"furColor": { "label": "Fur Color" },
+					"guardRank": { "label": "Guard Rank" },
+					"cloakColor": { "label": "Cloak Color" },
+					"parents": { "label": "Parents" },
+					"senior": { "label": "Senior" },
+					"mentor": { "label": "Mentor" },
+					"friend": { "label": "Friend" },
+					"enemy": { "label": "Enemy" }
+				}
+			}
+		}
+	}
 }

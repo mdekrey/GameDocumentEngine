@@ -3,7 +3,7 @@ import { z } from 'zod';
 // TODO: this file should be generated
 export const bio = z
 	.object({
-		age: z.number().int(),
+		age: z.number().int().min(14),
 		home: z.string(),
 		furColor: z.string(),
 		guardRank: z.string(),

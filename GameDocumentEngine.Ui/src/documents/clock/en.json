@@ -26,14 +26,23 @@
 	"edit-clock": {
 		"fields": {
 			"name": {
-				"label": "Name"
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
 			},
 			"details": {
 				"current": {
-					"label": "Current"
+					"label": "Current",
+					"errors": {
+						"too_small": "Please enter a number at least 0."
+					}
 				},
 				"max": {
-					"label": "Max"
+					"label": "Max",
+					"errors": {
+						"too_small": "Please enter a number at least 1."
+					}
 				}
 			}
 		},
