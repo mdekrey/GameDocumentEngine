@@ -1,6 +1,0 @@
-USE [master]
-GO
-ALTER DATABASE [GameDocumentEngine.Db] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
-GO
-
-DROP DATABASE [GameDocumentEngine.Db]
