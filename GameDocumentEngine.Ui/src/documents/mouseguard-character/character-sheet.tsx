@@ -15,6 +15,7 @@ import { Traits } from './parts/traits';
 import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
 import { FormEvents } from '@/utils/form/events/FormEvents';
+import { updateFormDefault } from '@/utils/form/update-form-default';
 
 export function FullCharacterSheet({
 	document,
@@ -60,6 +61,7 @@ export function CharacterSheet({
 		schema: CharacterDocument,
 		translation: (f) => t(`character-sheet.${f}`),
 	});
+	updateFormDefault(form, character);
 
 	const onSubmit = useCallback(
 		function onSubmit(currentValue: CharacterDocument) {
