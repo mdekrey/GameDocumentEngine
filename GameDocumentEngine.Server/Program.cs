@@ -42,7 +42,7 @@ if (builder.Environment.IsProduction() &&
 {
 	services
 		.AddDataProtection()
-		.PersistKeysToAzureBlobStorage(new Uri(blobUri))
+		.PersistKeysToAzureBlobStorage(new Uri(blobUri), new DefaultAzureCredential())
 		.ProtectKeysWithAzureKeyVault(new Uri(keyUri), new DefaultAzureCredential());
 }
 
