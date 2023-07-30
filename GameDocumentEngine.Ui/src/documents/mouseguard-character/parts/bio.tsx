@@ -19,7 +19,7 @@ export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
 		enemy: ['details', 'bio', 'enemy'],
 	});
 	return (
-		<div className="grid grid-cols-2 gap-2">
+		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
 			<Fieldset>
 				<TextField field={fields.name} />
 				<NumberField.UndefinedOrInteger field={fields.age} />
