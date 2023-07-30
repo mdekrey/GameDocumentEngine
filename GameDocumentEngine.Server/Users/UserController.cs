@@ -3,6 +3,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Realtime;
 using Json.Patch;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 
@@ -24,7 +25,8 @@ public class UserController : Api.UserControllerBase
 		var user = await dbContext.GetCurrentUser(User);
 		if (user == null)
 		{
-			return GetCurrentUserActionResult.NotFound();
+			await HttpContext.SignOutAsync();
+			return GetCurrentUserActionResult.Unauthorized();
 		}
 
 		return GetCurrentUserActionResult.Ok(await ToUserDetails(user));
