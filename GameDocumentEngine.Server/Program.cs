@@ -140,9 +140,16 @@ services.AddTransient<IEntityChangeNotifications, DocumentModelChangeNotificatio
 services.AddTransient<IEntityChangeNotifications, GameModelChangeNotifications>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
-	o.UseSqlServer(builder.Configuration["Sql:ConnectionString"] ?? throw new InvalidOperationException("Sql not configured"))
-		.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
-		.AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
+	if (builder.Configuration["Postgres:ConnectionString"] != null)
+	{
+		o.UseNpgsql(builder.Configuration["Postgres:ConnectionString"]);
+	}
+	else
+	{
+		o.UseSqlServer(builder.Configuration["Sql:ConnectionString"] ?? throw new InvalidOperationException("Sql and Postgres both are not configured"));
+	}
+	o.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
+	 .AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });
 
 var app = builder.Build();

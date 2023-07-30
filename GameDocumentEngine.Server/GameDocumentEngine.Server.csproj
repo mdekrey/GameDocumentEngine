@@ -24,6 +24,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
 		<PackageReference Include="PrincipleStudios.OpenApiCodegen.Json.Extensions" Version="0.14.0" />
 		<PackageReference Include="PrincipleStudios.OpenApiCodegen.Server.Mvc" Version="0.14.1" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />

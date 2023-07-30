@@ -26,11 +26,11 @@ podspec:
       secretKeyRef:
         name: vtt-dekrey-net-env
         key: Authentication__Google__ClientSecret
-  - name: Sql__ConnectionString
+  - name: Postgres__ConnectionString
     valueFrom:
       secretKeyRef:
         name: vtt-dekrey-net-env
-        key: Sql__ConnectionString
+        key: Postgres__ConnectionString
 
 podLabels:
   azure.workload.identity/use: 'true'
