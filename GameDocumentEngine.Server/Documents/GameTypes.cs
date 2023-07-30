@@ -42,7 +42,7 @@ public class RollupManifestManager
 #if !DEBUG
 	private Task<JsonNode> GetAssetManifest() => AssetManifest.Value;
 #else
-	private async Task<JsonNode> GetAssetManifest() => LoadAssetManifest(webRootPath);
+	private Task<JsonNode> GetAssetManifest() => LoadAssetManifest(webRootPath);
 #endif
 
 	private static async Task<JsonNode> LoadAssetManifest(string webRootPath)
