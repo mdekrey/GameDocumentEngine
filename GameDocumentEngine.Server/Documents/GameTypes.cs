@@ -26,26 +26,26 @@ public class RollupManifestManager
 {
 #if !DEBUG
 	private readonly Lazy<Task<JsonNode>> AssetManifest;
-	
-	public GameObjectManifestManager(IWebHostEnvironment webHostEnvironment)
-	{
-		AssetManifest = new Lazy<Task<JsonNode>>(LoadAssetManifest(webHostEnvironment.WebRootPath));
-	}
-
-	private Task<JsonNode> GetAssetManifest() => AssetManifest.Value;
-
-
-	private async Task<JsonNode> LoadAssetManifest(string webRootPath)
 #else
 	private readonly string webRootPath;
+#endif
 
 	public RollupManifestManager(IWebHostEnvironment webHostEnvironment)
 	{
+#if !DEBUG
+		AssetManifest = new Lazy<Task<JsonNode>>(LoadAssetManifest(webHostEnvironment.WebRootPath));
+#else
 		webRootPath = webHostEnvironment.WebRootPath;
+#endif
 	}
 
-	private async Task<JsonNode> GetAssetManifest()
+#if !DEBUG
+	private Task<JsonNode> GetAssetManifest() => AssetManifest.Value;
+#else
+	private async Task<JsonNode> GetAssetManifest() => LoadAssetManifest(webRootPath);
 #endif
+
+	private static async Task<JsonNode> LoadAssetManifest(string webRootPath)
 	{
 		var manifestPath = Path.Join(webRootPath, "manifest.json");
 		using var stream = File.OpenRead(manifestPath);
@@ -53,7 +53,6 @@ public class RollupManifestManager
 		if (manifest == null) throw new InvalidOperationException("Could not load manifest.json");
 		return manifest;
 	}
-
 
 	internal async Task<IEnumerable<string>> ResolveScript(string path)
 	{
