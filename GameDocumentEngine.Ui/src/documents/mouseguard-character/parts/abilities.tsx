@@ -151,12 +151,12 @@ export function PassFail({
 				<CheckboxesButton
 					count={fields.passes.valueAtom}
 					filled
-					title={fields.passes.translation('increase')}
+					title={fields.passes.translation('decrease')}
 					onClick={() => adjust('passes', -1)}
 				/>
 				<CheckboxesButton
 					count={passesUncheckedChecked}
-					title={fields.passes.translation('decrease')}
+					title={fields.passes.translation('increase')}
 					onClick={() => adjust('passes', 1)}
 				/>
 				<span className="inline-flex gap-2 invisible">
@@ -169,12 +169,12 @@ export function PassFail({
 				<CheckboxesButton
 					count={fields.fails.valueAtom}
 					filled
-					title={fields.fails.translation('increase')}
+					title={fields.fails.translation('decrease')}
 					onClick={() => adjust('fails', -1)}
 				/>
 				<CheckboxesButton
 					count={failsUncheckedChecked}
-					title={fields.fails.translation('decrease')}
+					title={fields.fails.translation('increase')}
 					onClick={() => adjust('fails', 1)}
 				/>
 			</div>
