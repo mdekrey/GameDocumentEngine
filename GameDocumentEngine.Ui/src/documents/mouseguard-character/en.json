@@ -14,6 +14,10 @@
 		"delete": "Delete character"
 	},
 	"character-sheet": {
+		"passes-and-fails": {
+			"pass-abbrev": "P",
+			"fail-abbrev": "F"
+		},
 		"fields": {
 			"name": {
 				"label": "Name",
@@ -55,10 +59,18 @@
 					"nature": {
 						"label": "Mouse Nature",
 						"current": {
-							"label": "Current Nature Rating"
+							"label": "Current Nature Rating",
+							"errors": {
+								"too_small": "Nature must be at least 1",
+								"too_big": "Nature must be at most 6"
+							}
 						},
 						"max": {
-							"label": "Max Nature Rating"
+							"label": "Max Nature Rating",
+							"errors": {
+								"too_small": "Nature must be at least 1",
+								"too_big": "Nature must be at most 6"
+							}
 						},
 						"advancement": {
 							"passes": {
@@ -70,6 +82,94 @@
 								"label": "Failures with Mouse Nature",
 								"increase": "Add Fail for Mouse Nature",
 								"decrease": "Remove Fail for Mouse Nature"
+							}
+						}
+					},
+					"will": {
+						"label": "Will",
+						"rating": {
+							"label": "Will Rating",
+							"errors": {
+								"too_small": "Will must be at least 1",
+								"too_big": "Will must be at most 6"
+							}
+						},
+						"advancement": {
+							"passes": {
+								"label": "Passes with Will",
+								"increase": "Add Pass for Will",
+								"decrease": "Remove Pass for Will"
+							},
+							"fails": {
+								"label": "Failures with Will",
+								"increase": "Add Fail for Will",
+								"decrease": "Remove Fail for Will"
+							}
+						}
+					},
+					"health": {
+						"label": "Health",
+						"rating": {
+							"label": "Health Rating",
+							"errors": {
+								"too_small": "Health must be at least 1",
+								"too_big": "Health must be at most 6"
+							}
+						},
+						"advancement": {
+							"passes": {
+								"label": "Passes with Health",
+								"increase": "Add Pass for Health",
+								"decrease": "Remove Pass for Health"
+							},
+							"fails": {
+								"label": "Failures with Health",
+								"increase": "Add Fail for Health",
+								"decrease": "Remove Fail for Health"
+							}
+						}
+					},
+					"circles": {
+						"label": "Circles",
+						"rating": {
+							"label": "Circles Rating",
+							"errors": {
+								"too_small": "Circles must be at least 1",
+								"too_big": "Circles must be at most 6"
+							}
+						},
+						"advancement": {
+							"passes": {
+								"label": "Passes with Circles",
+								"increase": "Add Pass for Circles",
+								"decrease": "Remove Pass for Circles"
+							},
+							"fails": {
+								"label": "Failures with Circles",
+								"increase": "Add Fail for Circles",
+								"decrease": "Remove Fail for Circles"
+							}
+						}
+					},
+					"resources": {
+						"label": "Resources",
+						"rating": {
+							"label": "Resources Rating",
+							"errors": {
+								"too_small": "Resources must be at least 1",
+								"too_big": "Resources must be at most 6"
+							}
+						},
+						"advancement": {
+							"passes": {
+								"label": "Passes with Resources",
+								"increase": "Add Pass for Resources",
+								"decrease": "Remove Pass for Resources"
+							},
+							"fails": {
+								"label": "Failures with Resources",
+								"increase": "Add Fail for Resources",
+								"decrease": "Remove Fail for Resources"
 							}
 						}
 					}

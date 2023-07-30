@@ -38,22 +38,38 @@
 					"type": "object",
 					"required": ["current", "max", "advancement"],
 					"properties": {
-						"current": { "type": "integer", "minimum": 1, "maxiumum": 6 },
-						"max": { "type": "integer", "minimum": 1, "maxiumum": 6 },
+						"current": { "type": "integer", "minimum": 1, "maximum": 6 },
+						"max": { "type": "integer", "minimum": 1, "maximum": 6 },
 						"advancement": { "$ref": "#/$defs/passesAndFails" }
 					}
 				},
-				"will": { "$ref": "#/$defs/advanceable" },
-				"health": { "$ref": "#/$defs/advanceable" },
-				"resources": { "$ref": "#/$defs/advanceable" },
-				"circles": { "$ref": "#/$defs/advanceable" }
+				"will": { "$ref": "#/$defs/advanceable-will-or-health" },
+				"health": { "$ref": "#/$defs/advanceable-will-or-health" },
+				"resources": { "$ref": "#/$defs/advanceable-resources-or-circles" },
+				"circles": { "$ref": "#/$defs/advanceable-resources-or-circles" }
 			}
 		},
-		"advanceable": {
+		"advanceable-will-or-health": {
 			"type": "object",
 			"required": ["rating", "advancement"],
 			"properties": {
-				"rating": { "type": "integer", "minimum": 0, "maxiumum": 6 },
+				"rating": { "type": "integer", "minimum": 1, "maximum": 6 },
+				"advancement": { "$ref": "#/$defs/passesAndFails" }
+			}
+		},
+		"advanceable-resources-or-circles": {
+			"type": "object",
+			"required": ["rating", "advancement"],
+			"properties": {
+				"rating": { "type": "integer", "minimum": 1, "maximum": 10 },
+				"advancement": { "$ref": "#/$defs/passesAndFails" }
+			}
+		},
+		"advanceable-skill": {
+			"type": "object",
+			"required": ["rating", "advancement"],
+			"properties": {
+				"rating": { "type": "integer", "minimum": 0, "maximum": 6 },
 				"advancement": { "$ref": "#/$defs/passesAndFails" }
 			}
 		},
@@ -126,7 +142,7 @@
 						"name": { "type": "string" }
 					}
 				},
-				{ "$ref": "#/$defs/advanceable" }
+				{ "$ref": "#/$defs/advanceable-skill" }
 			]
 		},
 		"traits": {

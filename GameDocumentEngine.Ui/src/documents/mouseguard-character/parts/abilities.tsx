@@ -10,6 +10,7 @@ import { Atom, useAtomValue } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { GiPlainCircle, GiCircle } from 'react-icons/gi';
 import { IconType } from 'react-icons';
+import { useTranslation } from 'react-i18next';
 
 export function Abilities({
 	form,
@@ -27,6 +28,12 @@ export function Abilities({
 		<>
 			<Fieldset>
 				<NatureAbility nature={abilities.nature} />
+				<StandardAbility ability={abilities.will} padToCount={6} />
+				<StandardAbility ability={abilities.health} padToCount={6} />
+			</Fieldset>
+			<Fieldset>
+				<StandardAbility ability={abilities.resources} padToCount={10} />
+				<StandardAbility ability={abilities.circles} padToCount={10} />
 			</Fieldset>
 		</>
 	);
@@ -46,7 +53,7 @@ export function NatureAbility({
 	});
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
-			<div className="text-xl self-center flex-1">
+			<div className="text-xl font-bold self-center flex-1">
 				{nature.translation(['label'])}
 			</div>
 			<div className="flex flex-row gap-2 items-center">
@@ -73,6 +80,45 @@ export function NatureAbility({
 	);
 }
 
+export function StandardAbility({
+	ability,
+	padToCount,
+}: {
+	ability: FormFieldReturnType<{
+		advancement: {
+			passes: number;
+			fails: number;
+		};
+		rating: number;
+	}>;
+	padToCount: number;
+}) {
+	const fields = useFormFields(ability, {
+		rating: ['rating'],
+		advancement: ['advancement'],
+	});
+	return (
+		<div className="flex flex-row col-span-2 gap-2">
+			<div className="text-xl font-bold self-center flex-1">
+				{ability.translation(['label'])}
+			</div>
+			<div className="flex flex-row gap-2 items-center">
+				<TextField.Integer
+					contentsClassName="w-10"
+					labelClassName="sr-only"
+					inputClassName="text-center"
+					field={fields.rating}
+				/>
+			</div>
+			<PassFail
+				advancement={fields.advancement}
+				rating={fields.rating.valueAtom}
+				padToCount={padToCount}
+			/>
+		</div>
+	);
+}
+
 export function PassFail({
 	advancement,
 	rating,
@@ -82,6 +128,9 @@ export function PassFail({
 	rating: Atom<number>;
 	padToCount: number;
 }) {
+	const { t } = useTranslation('doc-types:MouseGuard-Character', {
+		keyPrefix: 'character-sheet.passes-and-fails',
+	});
 	const fields = useFormFields(advancement, {
 		passes: ['passes'],
 		fails: ['fails'],
@@ -93,10 +142,11 @@ export function PassFail({
 		(get) => get(rating) - 1 - get(fields.fails.valueAtom),
 	);
 	const spacing = useComputedAtom((get) => padToCount - get(rating));
-	//
+
 	return (
 		<div className="flex flex-col justify-between">
-			<div className="flex gap-2">
+			<div className="flex gap-2 items-center">
+				<span>{t('pass-abbrev')}:</span>
 				<TextField.Integer className="block sr-only" field={fields.passes} />
 				<CheckboxesButton
 					count={fields.passes.valueAtom}
@@ -113,7 +163,8 @@ export function PassFail({
 					<EmptyCirclesFromAtom count={spacing} />
 				</span>
 			</div>
-			<div className="flex gap-2">
+			<div className="flex gap-2 items-center">
+				<span>{t('fail-abbrev')}:</span>
 				<TextField.Integer className="block sr-only" field={fields.fails} />
 				<CheckboxesButton
 					count={fields.fails.valueAtom}
