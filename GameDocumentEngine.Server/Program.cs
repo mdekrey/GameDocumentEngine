@@ -40,6 +40,8 @@ if (builder.Environment.IsProduction() && builder.Configuration["DataProduction:
 {
 	services
 		.AddDataProtection()
+		//TODO: .PersistKeysToAzureBlobStorage(new Uri("<blobUriWithSasToken>"))
+		.PersistKeysToFileSystem(new DirectoryInfo("/etc/keys"))
 		.ProtectKeysWithAzureKeyVault(new Uri(keyUri), new DefaultAzureCredential());
 }
 
