@@ -1,3 +1,4 @@
+using Azure.Identity;
 using CompressedStaticFiles;
 using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
@@ -5,8 +6,10 @@ using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Users;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +18,6 @@ using System.Security.Claims;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// TODO: https://www.nuget.org/packages/Azure.Extensions.AspNetCore.DataProtection.Keys/
 
 // Add services to the container.
 var services = builder.Services;
@@ -35,6 +36,13 @@ services.Configure<ForwardedHeadersOptions>(options =>
 	options.ForwardedHeaders = ForwardedHeaders.All;
 });
 
+if (builder.Environment.IsProduction() && builder.Configuration["DataProduction:AzureKeyVault"] is string keyUri)
+{
+	services
+		.AddDataProtection()
+		.ProtectKeysWithAzureKeyVault(new Uri(keyUri), new DefaultAzureCredential());
+}
+
 services
 	.AddAuthentication(options =>
 	{
@@ -47,10 +55,10 @@ services
 		options.Cookie.Expiration = null;
 		options.Cookie.Path = "/";
 		options.Events.OnRedirectToAccessDenied =
-			options.Events.OnRedirectToLogin = c =>
+			options.Events.OnRedirectToLogin = async c =>
 			{
+				await c.HttpContext.SignOutAsync();
 				c.Response.StatusCode = 401;
-				return Task.CompletedTask;
 			};
 	})
 	.AddGoogle(googleOptions =>

@@ -1,3 +1,4 @@
+# This associates a Managed User for use from Kubernetes.
 # Note: this is mostly a log of what I did, not an actual script
 
 # First: Set account:
