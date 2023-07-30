@@ -1,10 +1,8 @@
 import { GameObjectWidgetProps, Updater } from '../defineDocument';
-import { useDebugValue } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useForm } from '@/utils/form/useForm';
 import { Character, CharacterDocument } from './character-types';
 import { applyPatch, createPatch } from 'rfc6902';
-import { ButtonRow } from '@/components/button/button-row';
-import { Button } from '@/components/button/button';
 import { IconButton } from '@/components/button/icon-button';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { Bio } from './parts/bio';
@@ -16,6 +14,7 @@ import { Skills } from './parts/skills';
 import { Traits } from './parts/traits';
 import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
+import { FormEvents } from '@/utils/form/events/FormEvents';
 
 export function FullCharacterSheet({
 	document,
@@ -62,7 +61,32 @@ export function CharacterSheet({
 		translation: (f) => t(`character-sheet.${f}`),
 	});
 
-	useDebugValue(form);
+	const onSubmit = useCallback(
+		function onSubmit(currentValue: CharacterDocument) {
+			const ops = createPatch(
+				{
+					name: character.name,
+					details: character.details,
+				},
+				currentValue,
+			);
+			onUpdateDocument((prev) => {
+				applyPatch(prev, ops);
+			});
+		},
+		[character, onUpdateDocument],
+	);
+	useEffect(() => {
+		form.formEvents.addEventListener(FormEvents.AnyBlur, submitOnChange);
+		return () => {
+			form.formEvents.removeEventListener(FormEvents.AnyBlur, submitOnChange);
+		};
+
+		function submitOnChange() {
+			form.handleSubmit(onSubmit)();
+		}
+	}, [form, onUpdateDocument, onSubmit]);
+
 	return (
 		<form
 			onSubmit={form.handleSubmit(onSubmit)}
@@ -77,24 +101,6 @@ export function CharacterSheet({
 			<Traits form={form} />
 			<Rewards form={form} />
 			<Conditions form={form} />
-
-			<ButtonRow>
-				<Button type="submit">{t('submit')}</Button>
-			</ButtonRow>
 		</form>
 	);
-
-	function onSubmit(currentValue: CharacterDocument) {
-		const ops = createPatch(
-			{
-				name: character.name,
-				details: character.details,
-			},
-			currentValue,
-		);
-		console.log(currentValue);
-		onUpdateDocument((prev) => {
-			applyPatch(prev, ops);
-		});
-	}
 }

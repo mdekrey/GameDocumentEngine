@@ -58,43 +58,52 @@ export type ConfiguredFormField<
 	? (...args: TArgs) => UseFieldResult<TValue, TFlags>
 	: UseFieldResult<TValue, TFlags>;
 
+type DefaultFormFieldResultFlags = {
+	hasErrors: true;
+	hasTranslations: true;
+};
 type FlagsForFormFieldConfig<
 	T extends Objectish,
 	// keeping the type param for future use
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	TFieldConfig extends FieldConfig<T>,
-> = {
-	hasErrors: true;
-	// example usage for how these flags work
-	// isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
-	// 	? IfTrueThenElse<TFieldConfig['isCheckbox'], true, false>
-	// 	: false;
-	hasTranslations: true;
-};
+> = DefaultFormFieldResultFlags;
+// example usage for how these flags work
+// isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
+// 	? IfTrueThenElse<TFieldConfig['isCheckbox'], true, false>
+// 	: false;
 
-type FormFieldReturnType<
+export type FormFieldReturnType<
+	T,
+	TFlags extends UseFieldResultFlags = DefaultFormFieldResultFlags,
+> = UseFieldResult<T, TFlags> &
+	(T extends Objectish ? UseFormResult<T> : object);
+
+export type FormFieldReturnTypeFromConfig<
 	T extends Objectish,
 	TFieldConfig extends FieldConfig<T>,
 > = TFieldConfig extends Path<T>
-	? UseFieldResult<
+	? FormFieldReturnType<
 			PathValue<T, TFieldConfig>,
 			FlagsForFormFieldConfig<T, TFieldConfig>
 	  >
-	: TFieldConfig extends MappedFieldConfig<T, Path<T>, infer TValue>
-	? UseFieldResult<TValue, FlagsForFormFieldConfig<T, TFieldConfig>>
+	: TFieldConfig extends MappedFieldConfig<T, infer TPath, infer TValue>
+	? UseFieldResult<TValue, FlagsForFormFieldConfig<T, TFieldConfig>> &
+			UseFormResult<PathValue<T, TPath>>
 	: TFieldConfig extends UnmappedFieldConfig<T, infer TPath>
 	? UseFieldResult<
 			PathValue<T, TPath>,
 			FlagsForFormFieldConfig<T, TFieldConfig>
-	  >
+	  > &
+			UseFormResult<PathValue<T, TPath>>
 	: never;
 
 export type FormFields<T extends Objectish, TFields extends FieldsConfig<T>> = {
 	[K in keyof TFields]: TFields[K] extends FieldConfig<T>
-		? FormFieldReturnType<T, TFields[K]>
+		? FormFieldReturnTypeFromConfig<T, TFields[K]>
 		: TFields[K] extends (...args: infer TArgs) => infer TReturn
 		? TReturn extends FieldConfig<T>
-			? (...args: TArgs) => FormFieldReturnType<T, TReturn>
+			? (...args: TArgs) => FormFieldReturnTypeFromConfig<T, TReturn>
 			: never
 		: never;
 };
@@ -118,6 +127,7 @@ export type AtomFamily<T extends Objectish> = <TPath extends Path<T>>(
 ) => StandardWritableAtom<PathValue<T, TPath>>;
 
 export type UseFormResult<T extends Objectish> = {
+	pathPrefix: Array<string | number | symbol>;
 	store: ReturnType<typeof useStore>;
 	atom: StandardWritableAtom<T>;
 	atomFamily: AtomFamily<T>;
@@ -125,8 +135,10 @@ export type UseFormResult<T extends Objectish> = {
 	errors: Atom<Loadable<ZodError<T> | null>>;
 	formEvents: FormEvents;
 	defaultValue: React.MutableRefObject<T>;
-	translation: (field: string) => string;
-	field<TPath extends Path<T>>(path: TPath): FormFieldReturnType<T, TPath>;
+	formTranslation: (field: string) => string;
+	field<TPath extends Path<T>>(
+		path: TPath,
+	): FormFieldReturnTypeFromConfig<T, TPath>;
 	updateAllErrors(this: void): void;
 
 	get(this: void): T;
@@ -138,7 +150,7 @@ export type UseFormResult<T extends Objectish> = {
 	handleSubmit(
 		this: void,
 		callback: (value: T) => void | Promise<void>,
-	): React.ReactEventHandler;
+	): (ev?: React.SyntheticEvent<unknown>) => void;
 	errorStrategy: RegisterErrorStrategy;
 };
 
@@ -149,19 +161,48 @@ export type UseFieldsResult<
 	fields: FormFields<T, TFields>;
 };
 
-function buildFormResult<T extends Objectish>(
-	store: ReturnType<typeof useStore>,
-	atom: StandardWritableAtom<T>,
-	atomFamily: AtomFamily<T>,
-	schema: ZodType<T>,
-	formEvents: FormEvents,
-	errorStrategy: RegisterErrorStrategy,
-	translation: (key: string) => string,
-	defaultValue: MutableRefObject<T>,
-): UseFormResult<T> {
+type BuildFormResultOptions<T extends Objectish> = {
+	pathPrefix: Array<string | number | symbol>;
+	store: ReturnType<typeof useStore>;
+	atom: StandardWritableAtom<T>;
+	atomFamily: AtomFamily<T>;
+	schema: ZodType<T>;
+	formEvents: FormEvents;
+	errorStrategy: RegisterErrorStrategy;
+	formTranslation: (key: string) => string;
+	defaultValue: MutableRefObject<T>;
+};
+
+function buildFormResult<T extends Objectish>({
+	pathPrefix,
+	store,
+	atom,
+	atomFamily,
+	schema,
+	formEvents,
+	errorStrategy,
+	formTranslation,
+	defaultValue,
+}: BuildFormResultOptions<T>): UseFormResult<T> {
 	const [errors, trigger] = createTriggeredErrorsAtom(atom, schema);
 	errorStrategy(formEvents, () => store.set(trigger));
+	const subset = (path: Path<T>) =>
+		toFormSubset(
+			path,
+			{
+				pathPrefix,
+				store,
+				atom,
+				atomFamily,
+				schema,
+				defaultValue,
+				formTranslation,
+			},
+			formEvents,
+			errorStrategy,
+		);
 	return {
+		pathPrefix,
 		defaultValue,
 		store,
 		atom,
@@ -170,31 +211,28 @@ function buildFormResult<T extends Objectish>(
 		errors,
 		formEvents,
 		field(path) {
-			return toField(
-				path,
+			return toField({
+				prefix: pathPrefix,
+				config: path,
 				schema,
 				errorStrategy,
-				translation,
+				formTranslation,
 				store,
-				atomFamily,
-			);
+				family: atomFamily,
+				subset,
+				formEvents,
+			});
 		},
 		updateAllErrors() {
 			formEvents.dispatchEvent(FormEvents.UpdateAllErrors);
 		},
 		get: () => store.get(atom),
 		set: (value: T) => store.set(atom, value),
-		translation,
-		subset: (path) =>
-			toFormSubset(
-				path,
-				{ store, atom, atomFamily, schema, defaultValue, translation },
-				formEvents,
-				errorStrategy,
-			),
+		formTranslation,
+		subset,
 		handleSubmit: (callback) => async (event) => {
 			formEvents.dispatchEvent(FormEvents.Submit);
-			event.preventDefault();
+			event?.preventDefault();
 			const data = store.get(atom);
 			const errorsResult = await schema.safeParseAsync(data);
 			if (!errorsResult.success) {
@@ -206,57 +244,112 @@ function buildFormResult<T extends Objectish>(
 	};
 }
 
+type BuildFormFieldsOptions<
+	T extends Objectish,
+	TFields extends FieldsConfig<T> = Record<never, never>,
+> = {
+	pathPrefix: Array<string | number | symbol>;
+	fields: TFields;
+	schema: ZodType<T>;
+	errorStrategy: RegisterErrorStrategy;
+	translation: (key: string) => string;
+	store: ReturnType<typeof useStore>;
+	family: AtomFamily<T>;
+	subset: <TPath extends Path<T>>(
+		this: void,
+		path: TPath,
+	) => UseFormResult<PathValue<T, TPath>>;
+	formEvents: FormEvents;
+};
+
 function buildFormFields<
 	T extends Objectish,
 	TFields extends FieldsConfig<T> = Record<never, never>,
->(
-	fields: TFields,
-	schema: ZodType<T>,
-	errorStrategy: RegisterErrorStrategy,
-	translation: (key: string) => string,
-	store: ReturnType<typeof useStore>,
-	family: AtomFamily<T>,
-) {
+>({
+	pathPrefix,
+	fields,
+	schema,
+	errorStrategy,
+	translation,
+	store,
+	family,
+	subset,
+	formEvents,
+}: BuildFormFieldsOptions<T, TFields>) {
+	const params = {
+		prefix: pathPrefix,
+		schema,
+		errorStrategy,
+		formTranslation: translation,
+		store,
+		family,
+		subset,
+		formEvents,
+	};
 	return Object.fromEntries(
 		Object.entries(fields).map(([field, config]) => {
 			return [
 				field,
 				typeof config === 'function'
 					? (...args: AnyArray) =>
-							toField(
-								config(args),
-								schema,
-								errorStrategy,
-								translation,
-								store,
-								family,
-							)
-					: toField(config, schema, errorStrategy, translation, store, family),
+							toField<T, FieldConfig<T>>({ config: config(args), ...params })
+					: toField({ config, ...params }),
 			];
 		}),
 	) as FormFields<T, TFields>;
 }
 
-function toField<T extends Objectish, TField extends FieldConfig<T>>(
-	config: TField,
-	schema: ZodType<T>,
-	errorStrategy: RegisterErrorStrategy,
-	translation: (key: string) => string,
-	store: ReturnType<typeof useStore>,
-	family: AtomFamily<T>,
-): FormFieldReturnType<T, TField> {
+type ToFieldOptions<T extends Objectish, TField extends FieldConfig<T>> = {
+	prefix: Array<string | number | symbol>;
+	config: TField;
+	schema: ZodType<T>;
+	errorStrategy: RegisterErrorStrategy;
+	formTranslation: (key: string) => string;
+	store: ReturnType<typeof useStore>;
+	family: AtomFamily<T>;
+	subset: <TPath extends Path<T>>(
+		this: void,
+		path: TPath,
+	) => UseFormResult<PathValue<T, TPath>>;
+	formEvents: FormEvents;
+};
+
+function toField<T extends Objectish, TField extends FieldConfig<T>>({
+	prefix,
+	config,
+	schema,
+	errorStrategy,
+	formTranslation,
+	store,
+	family,
+	subset,
+	formEvents,
+}: ToFieldOptions<T, TField>): FormFieldReturnTypeFromConfig<T, TField> {
 	const path = (isArray(config) ? config : config.path) as Path<T>;
 	const options: Partial<FieldOptions<T, unknown>> = {
 		schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
 		errorStrategy,
-		translation: (part) => translation(['fields', ...path, ...part].join('.')),
+		formEvents,
+		translation: (part) =>
+			formTranslation(
+				[
+					'fields',
+					...prefix,
+					...path,
+					...(typeof part === 'string' ? [part] : part),
+				].join('.'),
+			),
 	};
 	if (!isArray(config) && 'mapping' in config) options.mapping = config.mapping;
-	return toInternalFieldAtom(
-		store,
-		family(path),
-		options as never,
-	) as FormFieldReturnType<T, TField>;
+	const result = subset(path);
+	return {
+		...result,
+		...(toInternalFieldAtom(
+			store,
+			family(path),
+			options as never,
+		) as FormFieldReturnTypeFromConfig<T, TField>),
+	};
 }
 
 function toJsonPointer(path: ReadonlyArray<string | number>) {
@@ -294,15 +387,16 @@ export function useForm<T extends Objectish>(
 				(a, b) => toJsonPointer(a) === toJsonPointer(b),
 			) as AtomFamily<T>;
 
-			const result = buildFormResult<T>(
+			const result = buildFormResult<T>({
+				pathPrefix: [],
 				store,
-				formAtom,
+				atom: formAtom,
 				atomFamily,
-				options.schema,
+				schema: options.schema,
 				formEvents,
-				strategy,
-				options.translation,
-				{
+				errorStrategy: strategy,
+				formTranslation: options.translation,
+				defaultValue: {
 					get current(): T {
 						return formAtom.init;
 					},
@@ -310,18 +404,21 @@ export function useForm<T extends Objectish>(
 						formAtom.init = value;
 					},
 				},
-			);
+			});
 
 			if (!options.fields) return result;
 
-			const fields = buildFormFields<T, FieldsConfig<T>>(
-				options.fields,
-				result.schema,
-				result.errorStrategy,
-				options.translation,
+			const fields = buildFormFields<T, FieldsConfig<T>>({
+				pathPrefix: [],
+				fields: options.fields,
+				schema: result.schema,
+				errorStrategy: result.errorStrategy,
+				translation: options.translation,
 				store,
-				atomFamily,
-			);
+				family: atomFamily,
+				subset: result.subset,
+				formEvents,
+			});
 
 			return {
 				...result,
@@ -343,14 +440,17 @@ export function useFormFields<
 	const store = useStore();
 	return useMemo(
 		() =>
-			buildFormFields<T, TFields>(
+			buildFormFields<T, TFields>({
+				pathPrefix: form.pathPrefix,
 				fields,
-				form.schema,
-				form.errorStrategy,
-				form.translation,
+				schema: form.schema,
+				errorStrategy: form.errorStrategy,
+				translation: form.formTranslation,
 				store,
-				form.atomFamily,
-			),
+				family: form.atomFamily,
+				subset: form.subset,
+				formEvents: form.formEvents,
+			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	);
@@ -449,7 +549,13 @@ function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 	steps: TPath,
 	options: Pick<
 		UseFormResult<T>,
-		'store' | 'atom' | 'atomFamily' | 'schema' | 'defaultValue' | 'translation'
+		| 'pathPrefix'
+		| 'store'
+		| 'atom'
+		| 'atomFamily'
+		| 'schema'
+		| 'defaultValue'
+		| 'formTranslation'
 	>,
 	formEvents: FormEvents,
 	errorStrategy: RegisterErrorStrategy,
@@ -460,16 +566,17 @@ function toFormSubset<T extends Objectish, TPath extends Path<T>>(
 		options.atomFamily([...steps, ...path] as never) as never;
 	const resultDefaultValue = getRefForPath(steps, options.defaultValue);
 
-	return buildFormResult(
-		options.store,
-		resultAtom,
+	return buildFormResult({
+		pathPrefix: [...options.pathPrefix, ...steps],
+		store: options.store,
+		atom: resultAtom,
 		atomFamily,
 		schema,
 		formEvents,
 		errorStrategy,
-		options.translation,
-		resultDefaultValue,
-	);
+		formTranslation: options.formTranslation,
+		defaultValue: resultDefaultValue,
+	});
 }
 
 export function useFormField<T extends Objectish, TPath extends Path<T>>(

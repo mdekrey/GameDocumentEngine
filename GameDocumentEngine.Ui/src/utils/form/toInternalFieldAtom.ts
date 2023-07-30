@@ -41,7 +41,8 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const setValue = (v: TFieldValue) => store.set(formValueAtom, v);
+	const setValue = (v: TFieldValue | ((prev: TFieldValue) => TFieldValue)) =>
+		store.set(formValueAtom, v);
 
 	return {
 		valueAtom: formValueAtom,

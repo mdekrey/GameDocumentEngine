@@ -8,10 +8,7 @@ import { applyPatch, createPatch } from 'rfc6902';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/utils/form/text-field/text-field';
-import {
-	NumberField,
-	integerMapping,
-} from '@/utils/form/number-field/number-field';
+import { NumberField } from '@/utils/form/number-field/number-field';
 
 export function ClockEdit({
 	clock,
@@ -37,8 +34,8 @@ export function ClockEdit({
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<Fieldset>
 				<TextField field={form.fields.name} />
-				<NumberField field={form.fields.current} mapping={integerMapping} />
-				<NumberField field={form.fields.max} mapping={integerMapping} />
+				<NumberField.Integer field={form.fields.current} />
+				<NumberField.Integer field={form.fields.max} />
 				<ButtonRow>
 					<Button type="submit">{t('submit')}</Button>
 				</ButtonRow>

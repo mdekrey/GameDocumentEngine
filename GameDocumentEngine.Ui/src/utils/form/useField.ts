@@ -12,11 +12,11 @@ import { noChange } from './mapAtom';
 export type FieldTranslatablePart =
 	| ['label']
 	| ['description']
-	| ['errors', string];
+	| ['errors', string]
+	| string;
 export type FieldTranslation = (
 	this: void,
 	part: FieldTranslatablePart,
-	otherField?: (string | number)[],
 ) => string;
 
 export type DefaultUseFieldResultFlags = {
@@ -33,7 +33,7 @@ export type UseFieldResult<
 	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
 	valueAtom: PrimitiveAtom<TFieldValue>;
-	setValue(v: TFieldValue): void;
+	setValue(v: TFieldValue | ((prev: TFieldValue) => TFieldValue)): void;
 	getValue(): TFieldValue;
 	errors?: ErrorsAtom;
 	onChange(this: void, v: TFieldValue): void;

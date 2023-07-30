@@ -50,6 +50,29 @@
 						"description": "Gear is limited to what you can carry. Posessions are kept in Lockhaven or another location."
 					},
 					"contacts": { "label": "Contacts" }
+				},
+				"abilities": {
+					"nature": {
+						"label": "Mouse Nature",
+						"current": {
+							"label": "Current Nature Rating"
+						},
+						"max": {
+							"label": "Max Nature Rating"
+						},
+						"advancement": {
+							"passes": {
+								"label": "Passes with Mouse Nature",
+								"increase": "Add Pass for Mouse Nature",
+								"decrease": "Remove Pass for Mouse Nature"
+							},
+							"fails": {
+								"label": "Failures with Mouse Nature",
+								"increase": "Add Fail for Mouse Nature",
+								"decrease": "Remove Fail for Mouse Nature"
+							}
+						}
+					}
 				}
 			}
 		}

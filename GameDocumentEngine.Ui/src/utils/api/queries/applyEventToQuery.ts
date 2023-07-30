@@ -32,7 +32,6 @@ export async function applyPatchToQuery<T>(
 	const data = queryClient.getQueryData<T>(queryKey);
 	const result = JSON.parse(JSON.stringify(data)) as T;
 	const errors = applyPatch(result, patch);
-	console.log({ queryKey, data, patch, result, errors });
 	if (errors.some((v) => !!v)) {
 		console.error('failed to apply patch', { queryKey, patch, data });
 		await queryClient.invalidateQueries(queryKey);

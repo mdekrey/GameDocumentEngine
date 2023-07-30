@@ -93,7 +93,7 @@ export function CreateInvite({
 						<CheckboxField.Contents>
 							<ErrorsList
 								errors={form.fields.uses.errors}
-								translations={(p) => t(`fields.uses.${p.join('.')}`)}
+								translations={form.fields.uses.translation}
 							/>
 						</CheckboxField.Contents>
 					</CheckboxField>

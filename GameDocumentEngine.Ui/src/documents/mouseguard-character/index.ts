@@ -12,7 +12,7 @@ defineDocument('MouseGuard-Character', {
 		skills: [],
 		conditions: {},
 		abilities: {
-			nature: { current: 0, max: 0, advancement: { passes: 0, fails: 0 } },
+			nature: { current: 1, max: 1, advancement: { passes: 0, fails: 0 } },
 			will: { rating: 0, advancement: { passes: 0, fails: 0 } },
 			health: { rating: 0, advancement: { passes: 0, fails: 0 } },
 			resources: { rating: 0, advancement: { passes: 0, fails: 0 } },

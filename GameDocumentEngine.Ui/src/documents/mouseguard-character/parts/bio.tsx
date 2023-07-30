@@ -1,9 +1,6 @@
 import { CharacterDocument } from '../character-types';
 import { UseFormResult, useFormFields } from '@/utils/form/useForm';
-import {
-	NumberField,
-	undefinedOrIntegerMapping,
-} from '@/utils/form/number-field/number-field';
+import { NumberField } from '@/utils/form/number-field/number-field';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { TextField } from '@/utils/form/text-field/text-field';
 
@@ -25,7 +22,7 @@ export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
 		<div className="grid grid-cols-2 gap-2">
 			<Fieldset>
 				<TextField field={fields.name} />
-				<NumberField field={fields.age} mapping={undefinedOrIntegerMapping} />
+				<NumberField.UndefinedOrInteger field={fields.age} />
 				<TextField.AllowUndefined field={fields.home} />
 				<TextField.AllowUndefined field={fields.furColor} />
 				<TextField.AllowUndefined field={fields.guardRank} />
