@@ -36,12 +36,13 @@ services.Configure<ForwardedHeadersOptions>(options =>
 	options.ForwardedHeaders = ForwardedHeaders.All;
 });
 
-if (builder.Environment.IsProduction() && builder.Configuration["DataProduction:AzureKeyVault"] is string keyUri)
+if (builder.Environment.IsProduction() &&
+	builder.Configuration["DataProtection:AzureKeyVault"] is string keyUri &&
+	builder.Configuration["DataProtection:AzureBlobStorage"] is string blobUri)
 {
 	services
 		.AddDataProtection()
-		//TODO: .PersistKeysToAzureBlobStorage(new Uri("<blobUriWithSasToken>"))
-		.PersistKeysToFileSystem(new DirectoryInfo("/etc/keys"))
+		.PersistKeysToAzureBlobStorage(new Uri(blobUri))
 		.ProtectKeysWithAzureKeyVault(new Uri(keyUri), new DefaultAzureCredential());
 }
 

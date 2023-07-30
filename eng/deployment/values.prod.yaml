@@ -31,8 +31,10 @@ podspec:
       secretKeyRef:
         name: vtt-dekrey-net-env
         key: Postgres__ConnectionString
-  - name: DataProduction__AzureKeyVault
+  - name: DataProtection__AzureKeyVault
     value: https://game-docs-vault.vault.azure.net/keys/gd-data-protection/9b1a3a1f06fb46d3b0e56a7a261699e0
+  - name: DataProtection__AzureBlobStorage
+    value: https://gamedocsstorage.blob.core.windows.net/gde-data-protection/protection-keys
 
 podLabels:
   azure.workload.identity/use: 'true'
