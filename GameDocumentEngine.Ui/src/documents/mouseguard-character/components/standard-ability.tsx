@@ -1,4 +1,5 @@
-import { FormFieldReturnType, useFormFields } from '@/utils/form/useForm';
+import { FormFieldReturnType } from '@/utils/form/useForm';
+import { useFormFields } from '@/utils/form/useFormFields';
 import { TextField } from '@/utils/form/text-field/text-field';
 import { PassFail } from './pass-fail';
 
@@ -34,7 +35,7 @@ export function StandardAbility({
 			</div>
 			<PassFail
 				advancement={fields.advancement}
-				rating={fields.rating.valueAtom}
+				rating={fields.rating.value}
 				padToCount={padToCount}
 			/>
 		</div>

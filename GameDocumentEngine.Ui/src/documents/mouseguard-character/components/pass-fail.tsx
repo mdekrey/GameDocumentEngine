@@ -1,5 +1,5 @@
-import { FormFieldReturnType, useFormFields } from '@/utils/form/useForm';
-import { TextField } from '@/utils/form/text-field/text-field';
+import { FormFieldReturnType } from '@/utils/form/useForm';
+import { useFormFields } from '@/utils/form/useFormFields';
 import { Atom } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTranslation } from 'react-i18next';
@@ -23,10 +23,10 @@ export function PassFail({
 		fails: ['fails'],
 	});
 	const passesUncheckedChecked = useComputedAtom(
-		(get) => get(rating) - get(fields.passes.valueAtom),
+		(get) => get(rating) - get(fields.passes.value),
 	);
 	const failsUncheckedChecked = useComputedAtom(
-		(get) => get(rating) - 1 - get(fields.fails.valueAtom),
+		(get) => get(rating) - 1 - get(fields.fails.value),
 	);
 	const spacing = useComputedAtom((get) => padToCount - get(rating));
 
@@ -34,9 +34,9 @@ export function PassFail({
 		<div className="flex flex-col justify-between">
 			<div className="flex gap-2 items-center">
 				<span>{t('pass-abbrev')}:</span>
-				<TextField.Integer className="block sr-only" field={fields.passes} />
+				{/* TODO: accessible number of passes/fails; a sr-only TextField crashes */}
 				<CheckboxesButton
-					count={fields.passes.valueAtom}
+					count={fields.passes.value}
 					filled
 					title={fields.passes.translation('decrease')}
 					onClick={() => adjust('passes', -1)}
@@ -52,9 +52,8 @@ export function PassFail({
 			</div>
 			<div className="flex gap-2 items-center">
 				<span>{t('fail-abbrev')}:</span>
-				<TextField.Integer className="block sr-only" field={fields.fails} />
 				<CheckboxesButton
-					count={fields.fails.valueAtom}
+					count={fields.fails.value}
 					filled
 					title={fields.fails.translation('decrease')}
 					onClick={() => adjust('fails', -1)}

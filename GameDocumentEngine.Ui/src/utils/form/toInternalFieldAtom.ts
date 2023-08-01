@@ -45,7 +45,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		store.set(formValueAtom, v);
 
 	return {
-		valueAtom: formValueAtom,
+		value: formValueAtom,
 		setValue,
 		getValue: () => store.get(formValueAtom),
 		errors,

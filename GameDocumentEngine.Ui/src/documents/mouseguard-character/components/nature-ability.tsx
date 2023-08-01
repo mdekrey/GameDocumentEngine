@@ -1,4 +1,5 @@
-import { FormFieldReturnType, useFormFields } from '@/utils/form/useForm';
+import { FormFieldReturnType } from '@/utils/form/useForm';
+import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { TextField } from '@/utils/form/text-field/text-field';
 import { PassFail } from './pass-fail';
@@ -37,7 +38,7 @@ export function NatureAbility({
 			</div>
 			<PassFail
 				advancement={fields.advancement}
-				rating={fields.max.valueAtom}
+				rating={fields.max.value}
 				padToCount={6}
 			/>
 		</div>

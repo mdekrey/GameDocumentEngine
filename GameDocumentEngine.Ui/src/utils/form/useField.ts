@@ -32,14 +32,17 @@ export type UseFieldResult<
 	TFieldValue,
 	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
-	valueAtom: PrimitiveAtom<TFieldValue>;
+	value: PrimitiveAtom<TFieldValue>;
 	setValue(v: TFieldValue | ((prev: TFieldValue) => TFieldValue)): void;
 	getValue(): TFieldValue;
 	errors?: ErrorsAtom;
 	onChange(this: void, v: TFieldValue): void;
 	onBlur(this: void): void;
 	htmlProps: ToHtmlProps<TFieldValue>;
-} & IfTrueThenProp<TFlags['hasErrors'], { errors: ErrorsAtom }> &
+} & IfTrueThenProp<
+	TFlags['hasErrors'],
+	{ schema: ZodType<TFieldValue>; errors: ErrorsAtom }
+> &
 	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
 
 export type ToHtmlInputProps<TInputValue> = TInputValue extends string

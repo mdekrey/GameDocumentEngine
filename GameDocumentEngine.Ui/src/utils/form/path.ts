@@ -92,3 +92,4 @@ export type PathValue<T, P extends Path<T> | ArrayPath<T>> = T extends any
 			: never
 		: never
 	: never;
+export type AnyPath = ReadonlyArray<string | number>;

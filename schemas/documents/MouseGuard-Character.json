@@ -22,7 +22,7 @@
 		"rewards": { "$ref": "#/$defs/rewards" },
 		"skills": {
 			"type": "array",
-			"items": { "$ref": "#/$defs/skill" },
+			"items": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/skill" }] },
 			"maxLength": 24
 		},
 		"traits": { "$ref": "#/$defs/traits" },
@@ -62,14 +62,6 @@
 			"required": ["rating", "advancement"],
 			"properties": {
 				"rating": { "type": "integer", "minimum": 1, "maximum": 10 },
-				"advancement": { "$ref": "#/$defs/passesAndFails" }
-			}
-		},
-		"advanceable-skill": {
-			"type": "object",
-			"required": ["rating", "advancement"],
-			"properties": {
-				"rating": { "type": "integer", "minimum": 0, "maximum": 6 },
 				"advancement": { "$ref": "#/$defs/passesAndFails" }
 			}
 		},
@@ -134,16 +126,13 @@
 			}
 		},
 		"skill": {
-			"allOf": [
-				{
-					"type": "object",
-					"required": ["name"],
-					"properties": {
-						"name": { "type": "string" }
-					}
-				},
-				{ "$ref": "#/$defs/advanceable-skill" }
-			]
+			"type": "object",
+			"required": ["name", "rating", "advancement"],
+			"properties": {
+				"name": { "type": "string" },
+				"rating": { "type": "integer", "minimum": 0, "maximum": 6 },
+				"advancement": { "$ref": "#/$defs/passesAndFails" }
+			}
 		},
 		"traits": {
 			"type": "array",

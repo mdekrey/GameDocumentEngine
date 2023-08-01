@@ -72,9 +72,10 @@ export function CharacterSheet({
 				},
 				currentValue,
 			);
-			onUpdateDocument((prev) => {
-				applyPatch(prev, ops);
-			});
+			if (ops.length > 0)
+				onUpdateDocument((prev) => {
+					applyPatch(prev, ops);
+				});
 		},
 		[character, onUpdateDocument],
 	);

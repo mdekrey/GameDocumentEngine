@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Atom, atom, useStore } from 'jotai';
 import React, { MutableRefObject, useMemo } from 'react';
-import { ZodError, ZodType, ZodTypeAny } from 'zod';
-import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
-import { Path, PathValue } from './path';
-import { applyPatches, produceWithPatches, Patch, Objectish } from 'immer';
+import { ZodError, ZodType } from 'zod';
+import { StandardWritableAtom } from './StandardWritableAtom';
+import { AnyPath, Path, PathValue } from './path';
+import { applyPatches, Patch, Objectish } from 'immer';
 import {
-	FieldMapping,
 	FieldOptions,
+	FieldMapping,
 	UseFieldResult,
 	UseFieldResultFlags,
 	useFieldAtom,
@@ -15,7 +15,7 @@ import {
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { createTriggeredErrorsAtom } from './createErrorsAtom';
 import type { Loadable } from 'jotai/vanilla/utils/loadable';
-import { AnyArray, isArray } from './arrays';
+import { AnyArray } from './arrays';
 import {
 	ErrorsStrategy,
 	RegisterErrorStrategy,
@@ -23,32 +23,16 @@ import {
 } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
 import { atomFamily as createAtomFamily } from 'jotai/utils';
-
-export type UnmappedFieldConfig<
-	T extends Objectish,
-	TPath extends Path<T> = Path<T>,
-> = {
-	path: TPath;
-	mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;
-};
-export type MappedFieldConfig<
-	T extends Objectish,
-	TPath extends Path<T> = Path<T>,
-	TValue = PathValue<T, TPath>,
-> = {
-	path: TPath;
-	mapping: FieldMapping<PathValue<T, TPath>, TValue>;
-};
-
-export type FieldConfig<T extends Objectish> =
-	| Path<T>
-	| UnmappedFieldConfig<T, Path<T>>
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| MappedFieldConfig<T, Path<T>, any>;
-
-export type FieldsConfig<T extends Objectish> = {
-	[field: string]: FieldConfig<T> | ((...args: AnyArray) => FieldConfig<T>);
-};
+import { getZodSchemaForPath } from './getZodSchemaForPath';
+import {
+	FieldConfig,
+	FieldsConfig,
+	TypedFieldConfigObject,
+	FieldConfigToType,
+	toConfigObject,
+} from './field-config-types';
+import { getValueAtPath, getAtomForPath } from './getAtomForPath';
+import { mapAtom, noChange } from './mapAtom';
 
 export type ConfiguredFormField<
 	TValue,
@@ -63,7 +47,7 @@ type DefaultFormFieldResultFlags = {
 	hasTranslations: true;
 };
 type FlagsForFormFieldConfig<
-	T extends Objectish,
+	T,
 	// keeping the type param for future use
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	TFieldConfig extends FieldConfig<T>,
@@ -76,29 +60,17 @@ type FlagsForFormFieldConfig<
 export type FormFieldReturnType<
 	T,
 	TFlags extends UseFieldResultFlags = DefaultFormFieldResultFlags,
-> = UseFieldResult<T, TFlags> &
-	(T extends Objectish ? UseFormResult<T> : object);
+> = UseFieldResult<T, TFlags> & UseFormResult<T>;
 
-export type FormFieldReturnTypeFromConfig<
-	T extends Objectish,
+type FormFieldReturnTypeFromConfig<
+	T,
 	TFieldConfig extends FieldConfig<T>,
-> = TFieldConfig extends Path<T>
-	? FormFieldReturnType<
-			PathValue<T, TFieldConfig>,
-			FlagsForFormFieldConfig<T, TFieldConfig>
-	  >
-	: TFieldConfig extends MappedFieldConfig<T, infer TPath, infer TValue>
-	? UseFieldResult<TValue, FlagsForFormFieldConfig<T, TFieldConfig>> &
-			UseFormResult<PathValue<T, TPath>>
-	: TFieldConfig extends UnmappedFieldConfig<T, infer TPath>
-	? UseFieldResult<
-			PathValue<T, TPath>,
-			FlagsForFormFieldConfig<T, TFieldConfig>
-	  > &
-			UseFormResult<PathValue<T, TPath>>
-	: never;
+> = FormFieldReturnType<
+	FieldConfigToType<T, TFieldConfig>,
+	FlagsForFormFieldConfig<T, TFieldConfig>
+>;
 
-export type FormFields<T extends Objectish, TFields extends FieldsConfig<T>> = {
+export type FormFields<T, TFields extends FieldsConfig<T>> = {
 	[K in keyof TFields]: TFields[K] extends FieldConfig<T>
 		? FormFieldReturnTypeFromConfig<T, TFields[K]>
 		: TFields[K] extends (...args: infer TArgs) => infer TReturn
@@ -108,26 +80,23 @@ export type FormFields<T extends Objectish, TFields extends FieldsConfig<T>> = {
 		: never;
 };
 
-export type FormOptions<T extends Objectish> = {
+export type FormOptions<T> = {
 	schema: ZodType<T>;
 	defaultValue: T;
 	translation: (field: string) => string;
 	preSubmit?: ErrorsStrategy;
 	postSubmit?: ErrorsStrategy;
 };
-export type FormFieldsOptions<
-	T extends Objectish,
-	TFields extends FieldsConfig<T>,
-> = {
+export type FormFieldsOptions<T, TFields extends FieldsConfig<T>> = {
 	fields: TFields;
 };
 
-export type AtomFamily<T extends Objectish> = <TPath extends Path<T>>(
+export type AtomFamily<T> = <TPath extends Path<T>>(
 	path: TPath,
 ) => StandardWritableAtom<PathValue<T, TPath>>;
 
-export type UseFormResult<T extends Objectish> = {
-	pathPrefix: Array<string | number | symbol>;
+export interface UseFormResult<T> {
+	pathPrefix: AnyPath;
 	store: ReturnType<typeof useStore>;
 	atom: StandardWritableAtom<T>;
 	atomFamily: AtomFamily<T>;
@@ -138,21 +107,17 @@ export type UseFormResult<T extends Objectish> = {
 	formTranslation: (field: string) => string;
 	field<TPath extends Path<T>>(
 		path: TPath,
-	): FormFieldReturnTypeFromConfig<T, TPath>;
+	): FormFieldReturnType<PathValue<T, TPath>, DefaultFormFieldResultFlags>;
 	updateAllErrors(this: void): void;
 
 	get(this: void): T;
 	set(this: void, value: T | ((prevValue: T) => T)): void;
-	subset<TPath extends Path<T>>(
-		this: void,
-		path: TPath,
-	): UseFormResult<PathValue<T, TPath>>;
 	handleSubmit(
 		this: void,
 		callback: (value: T) => void | Promise<void>,
 	): (ev?: React.SyntheticEvent<unknown>) => void;
 	errorStrategy: RegisterErrorStrategy;
-};
+}
 
 export type UseFieldsResult<
 	T extends Objectish,
@@ -161,8 +126,14 @@ export type UseFieldsResult<
 	fields: FormFields<T, TFields>;
 };
 
-type BuildFormResultOptions<T extends Objectish> = {
-	pathPrefix: Array<string | number | symbol>;
+export type UseFormResultWithFields<
+	T,
+	TFields extends FieldsConfig<T> = Record<never, never>,
+> = UseFormResult<T> &
+	(T extends Objectish ? UseFieldsResult<T, TFields> : object);
+
+type BuildFormResultOptions<T> = {
+	pathPrefix: AnyPath;
 	store: ReturnType<typeof useStore>;
 	atom: StandardWritableAtom<T>;
 	atomFamily: AtomFamily<T>;
@@ -173,7 +144,7 @@ type BuildFormResultOptions<T extends Objectish> = {
 	defaultValue: MutableRefObject<T>;
 };
 
-function buildFormResult<T extends Objectish>({
+function buildFormResult<T>({
 	pathPrefix,
 	store,
 	atom,
@@ -186,50 +157,30 @@ function buildFormResult<T extends Objectish>({
 }: BuildFormResultOptions<T>): UseFormResult<T> {
 	const [errors, trigger] = createTriggeredErrorsAtom(atom, schema);
 	errorStrategy(formEvents, () => store.set(trigger));
-	const subset = (path: Path<T>) =>
-		toFormSubset(
-			path,
-			{
-				pathPrefix,
-				store,
-				atom,
-				atomFamily,
-				schema,
-				defaultValue,
-				formTranslation,
-			},
-			formEvents,
-			errorStrategy,
-		);
-	return {
+	const formContext: FormResultContext<T> = {
 		pathPrefix,
-		defaultValue,
-		store,
-		atom,
-		atomFamily,
 		schema,
-		errors,
+		errorStrategy,
+		formTranslation,
+		store,
+		atomFamily,
+		defaultValue,
 		formEvents,
-		field(path) {
-			return toField({
-				prefix: pathPrefix,
-				config: path,
-				schema,
-				errorStrategy,
-				formTranslation,
-				store,
-				family: atomFamily,
-				subset,
-				formEvents,
-			});
+	};
+	return {
+		...formContext,
+		atom,
+		errors,
+		field<TPath extends Path<T>>(
+			path: TPath,
+		): FormFieldReturnType<PathValue<T, TPath>, DefaultFormFieldResultFlags> {
+			return toField<T, TPath, PathValue<T, TPath>>({ path }, formContext);
 		},
 		updateAllErrors() {
 			formEvents.dispatchEvent(FormEvents.UpdateAllErrors);
 		},
 		get: () => store.get(atom),
 		set: (value: T) => store.set(atom, value),
-		formTranslation,
-		subset,
 		handleSubmit: (callback) => async (event) => {
 			formEvents.dispatchEvent(FormEvents.Submit);
 			event?.preventDefault();
@@ -240,137 +191,148 @@ function buildFormResult<T extends Objectish>({
 			}
 			await callback(errorsResult.data);
 		},
-		errorStrategy,
 	};
 }
 
-type BuildFormFieldsOptions<
-	T extends Objectish,
-	TFields extends FieldsConfig<T> = Record<never, never>,
-> = {
-	pathPrefix: Array<string | number | symbol>;
-	fields: TFields;
-	schema: ZodType<T>;
-	errorStrategy: RegisterErrorStrategy;
-	translation: (key: string) => string;
-	store: ReturnType<typeof useStore>;
-	family: AtomFamily<T>;
-	subset: <TPath extends Path<T>>(
-		this: void,
-		path: TPath,
-	) => UseFormResult<PathValue<T, TPath>>;
-	formEvents: FormEvents;
-};
+type FormResultContext<T> = Pick<
+	UseFormResult<T>,
+	| 'pathPrefix'
+	| 'schema'
+	| 'errorStrategy'
+	| 'formTranslation'
+	| 'store'
+	| 'atomFamily'
+	| 'defaultValue'
+	| 'formEvents'
+>;
 
-function buildFormFields<
-	T extends Objectish,
+export function buildFormFields<
+	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
->({
-	pathPrefix,
-	fields,
-	schema,
-	errorStrategy,
-	translation,
-	store,
-	family,
-	subset,
-	formEvents,
-}: BuildFormFieldsOptions<T, TFields>) {
-	const params = {
-		prefix: pathPrefix,
-		schema,
-		errorStrategy,
-		formTranslation: translation,
-		store,
-		family,
-		subset,
-		formEvents,
-	};
+>(fields: TFields, params: FormResultContext<T>): FormFields<T, TFields> {
 	return Object.fromEntries(
 		Object.entries(fields).map(([field, config]) => {
 			return [
 				field,
 				typeof config === 'function'
-					? (...args: AnyArray) =>
-							toField<T, FieldConfig<T>>({ config: config(args), ...params })
-					: toField({ config, ...params }),
+					? (...args: AnyArray) => innerToField(config(args))
+					: innerToField(config),
 			];
 		}),
-	) as FormFields<T, TFields>;
+	) as never as FormFields<T, TFields>;
+
+	function innerToField(config: FieldConfig<T>) {
+		return toField<T, Path<T>, unknown>(
+			toConfigObject<T, unknown, FieldConfig<T, unknown>>(
+				config,
+			) as TypedFieldConfigObject<T, Path<T>, unknown>,
+			params,
+		);
+	}
 }
 
-type ToFieldOptions<T extends Objectish, TField extends FieldConfig<T>> = {
-	prefix: Array<string | number | symbol>;
-	config: TField;
-	schema: ZodType<T>;
-	errorStrategy: RegisterErrorStrategy;
-	formTranslation: (key: string) => string;
-	store: ReturnType<typeof useStore>;
-	family: AtomFamily<T>;
-	subset: <TPath extends Path<T>>(
-		this: void,
-		path: TPath,
-	) => UseFormResult<PathValue<T, TPath>>;
-	formEvents: FormEvents;
-};
-
-function toField<T extends Objectish, TField extends FieldConfig<T>>({
-	prefix,
-	config,
-	schema,
-	errorStrategy,
-	formTranslation,
-	store,
-	family,
-	subset,
-	formEvents,
-}: ToFieldOptions<T, TField>): FormFieldReturnTypeFromConfig<T, TField> {
-	const path = (isArray(config) ? config : config.path) as Path<T>;
-	const options: Partial<FieldOptions<T, unknown>> = {
-		schema: getZodSchemaForPath(path, schema) as ZodTypeAny,
-		errorStrategy,
-		formEvents,
+function toField<T, TPath extends Path<T>, TValue>(
+	config: TypedFieldConfigObject<T, TPath, TValue>,
+	context: FormResultContext<T>,
+): FormFieldReturnType<TValue, DefaultFormFieldResultFlags> {
+	const result = toFormSubset<T, Path<T>, TValue>(config, context);
+	const options: Partial<FieldOptions<PathValue<T, TPath>, TValue>> = {
+		mapping: config.mapping,
+		schema: getZodSchemaForPath(config.path, context.schema),
+		errorStrategy: context.errorStrategy,
+		formEvents: context.formEvents,
 		translation: (part) =>
-			formTranslation(
+			context.formTranslation(
 				[
 					'fields',
-					...prefix,
-					...path,
+					...context.pathPrefix,
+					...(config.path as AnyPath),
 					...(typeof part === 'string' ? [part] : part),
 				].join('.'),
 			),
 	};
-	if (!isArray(config) && 'mapping' in config) options.mapping = config.mapping;
-	const result = subset(path);
+	const unmappedAtom = context.atomFamily(config.path as Path<T>);
+	const fieldResult = toInternalFieldAtom<unknown, TValue>(
+		context.store,
+		unmappedAtom as StandardWritableAtom<unknown>,
+		options,
+	) as UseFieldResult<TValue, DefaultFormFieldResultFlags>;
+
+	// TODO: use config.schema
 	return {
 		...result,
-		...(toInternalFieldAtom(
-			store,
-			family(path),
-			options as never,
-		) as FormFieldReturnTypeFromConfig<T, TField>),
+		...fieldResult,
 	};
 }
 
-function toJsonPointer(path: ReadonlyArray<string | number>) {
-	return path.map((v) => `${v}`.replace('~', '~0').replace('/', '~1'));
+function toFormSubset<T, TPath extends Path<T>, TValue>(
+	config: TypedFieldConfigObject<T, TPath, TValue>,
+	options: FormResultContext<T>,
+): UseFormResult<TValue> {
+	const schema: ZodType<TValue> =
+		config?.schema ??
+		(getZodSchemaForPath(config.path, options.schema) as ZodType<TValue>);
+	const unmappedAtom = options.atomFamily(config.path);
+	const mapping = config.mapping as
+		| undefined
+		| FieldMapping<PathValue<T, TPath>, TValue>;
+	const resultAtom = mapping
+		? mapAtom<PathValue<T, TPath>, TValue>(
+				unmappedAtom,
+				mapping.toForm,
+				mapping.fromForm,
+		  )
+		: (unmappedAtom as StandardWritableAtom<TValue>);
+	const atomFamily = createPathAtomFamily(resultAtom);
+	// options.atomFamily([...path, ...nextPath] as never) as never;
+	const resultDefaultValue = getRefForPath(config, options.defaultValue);
+
+	return buildFormResult<TValue>({
+		pathPrefix: [...options.pathPrefix, ...(config.path as AnyPath)],
+		store: options.store,
+		atom: resultAtom,
+		atomFamily,
+		schema,
+		formEvents: options.formEvents,
+		errorStrategy: options.errorStrategy,
+		formTranslation: options.formTranslation,
+		defaultValue: resultDefaultValue,
+	});
 }
 
-export function useForm<T extends Objectish>(
-	options: FormOptions<T>,
-): UseFormResult<T>;
+function toJsonPointer<T>(path: Path<T>): string;
+function toJsonPointer(path: AnyPath): string;
+function toJsonPointer(path: AnyPath) {
+	return path
+		.map((v) => `${v}`.replace('~', '~0').replace('/', '~1'))
+		.join('/');
+}
+
+function createPathAtomFamily<T>(
+	formAtom: StandardWritableAtom<T>,
+): AtomFamily<T> {
+	return createAtomFamily<Path<T>, StandardWritableAtom<unknown>>(
+		(path) => getAtomForPath(path, formAtom) as StandardWritableAtom<unknown>,
+		(a, b) => toJsonPointer(a) === toJsonPointer(b),
+	) as AtomFamily<T>;
+}
+
+export function useForm<T>(options: FormOptions<T>): UseFormResult<T>;
 export function useForm<
 	T extends Objectish,
 	const TFields extends FieldsConfig<T>,
 >(
 	options: FormOptions<T> & FormFieldsOptions<T, TFields>,
 ): UseFormResult<T> & UseFieldsResult<T, TFields>;
-export function useForm<T extends Objectish>(
-	options: FormOptions<T> & Partial<FormFieldsOptions<T, FieldsConfig<T>>>,
-): UseFormResult<T> & Partial<UseFieldsResult<T, FieldsConfig<T>>> {
+export function useForm<T>(
+	options: FormOptions<T> &
+		(T extends Objectish
+			? Partial<FormFieldsOptions<T, FieldsConfig<T>>>
+			: object),
+): UseFormResultWithFields<T, FieldsConfig<T>> {
 	const store = useStore();
 	return useMemo(
-		() => {
+		(): UseFormResultWithFields<T> => {
 			const formEvents = new FormEvents();
 			const strategy = errorsStrategy(
 				options.preSubmit ?? 'onSubmit',
@@ -378,14 +340,16 @@ export function useForm<T extends Objectish>(
 				formEvents,
 			);
 			const formAtom = atom(options.defaultValue);
-			const atomFamily = createAtomFamily<
-				Path<T>,
-				StandardWritableAtom<unknown>
-			>(
-				(path) =>
-					getAtomForPath(path, formAtom) as StandardWritableAtom<unknown>,
-				(a, b) => toJsonPointer(a) === toJsonPointer(b),
-			) as AtomFamily<T>;
+			const atomFamily = createPathAtomFamily(formAtom);
+
+			const defaultValue = {
+				get current(): T {
+					return formAtom.init;
+				},
+				set current(value) {
+					formAtom.init = value;
+				},
+			};
 
 			const result = buildFormResult<T>({
 				pathPrefix: [],
@@ -396,187 +360,72 @@ export function useForm<T extends Objectish>(
 				formEvents,
 				errorStrategy: strategy,
 				formTranslation: options.translation,
-				defaultValue: {
-					get current(): T {
-						return formAtom.init;
-					},
-					set current(value) {
-						formAtom.init = value;
-					},
-				},
+				defaultValue,
 			});
 
-			if (!options.fields) return result;
+			if (!('fields' in options) || !options.fields)
+				return result as UseFormResultWithFields<T>;
 
-			const fields = buildFormFields<T, FieldsConfig<T>>({
+			const fields = buildFormFields(options.fields, {
 				pathPrefix: [],
-				fields: options.fields,
 				schema: result.schema,
 				errorStrategy: result.errorStrategy,
-				translation: options.translation,
+				formTranslation: options.translation,
 				store,
-				family: atomFamily,
-				subset: result.subset,
+				atomFamily,
 				formEvents,
+				defaultValue,
 			});
 
 			return {
 				...result,
 				fields,
-			};
+				// TODO: why does this need to be cast?
+			} as never as UseFormResultWithFields<T, FieldsConfig<T>>;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	);
 }
 
-export function useFormFields<
-	T extends Objectish,
-	const TFields extends FieldsConfig<T>,
->(
-	form: UseFormResult<T>,
-	fields: TFields,
-): UseFieldsResult<T, TFields>['fields'] {
-	const store = useStore();
-	return useMemo(
-		() =>
-			buildFormFields<T, TFields>({
-				pathPrefix: form.pathPrefix,
-				fields,
-				schema: form.schema,
-				errorStrategy: form.errorStrategy,
-				translation: form.formTranslation,
-				store,
-				family: form.atomFamily,
-				subset: form.subset,
-				formEvents: form.formEvents,
-			}),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
-	);
-}
-
-function getZodSchemaForPath<T, TPath extends Path<T>>(
-	steps: TPath,
-	schema: ZodType<T>,
-): ZodType<PathValue<T, TPath>> {
-	return (steps as ReadonlyArray<string | number>).reduce(
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-		(prev, next) => doStep(next, prev),
-		schema,
-	) as ZodType<PathValue<T, TPath>>;
-
-	function doStep(step: string | number, current: ZodTypeAny): ZodTypeAny {
-		if ('shape' in current) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			return (current.shape as never)[step] ?? current._def.catchall;
-		} else if ('element' in current) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-			return (current as any).element;
-		} else {
-			console.error('during', { steps, schema }, 'unable to continue at', {
-				step,
-				current,
-			});
-			throw new Error('Unable to walk zod path; see console');
-		}
-	}
-}
-
-function getAtomForPath<T extends Objectish, TPath extends Path<T>>(
-	steps: TPath,
-	source: StandardWritableAtom<T>,
-) {
-	type TOut = PathValue<T, TPath>;
-
-	const getPathValue = (input: T) =>
-		(steps as ReadonlyArray<string | number>).reduce(
-			(prev, next) => (prev as never)[next],
-			input as unknown,
-		) as PathValue<T, TPath>;
-	const resultAtom = atom(
-		(get): PathValue<T, TPath> => getPathValue(get(source)),
-		(_get, set, effect: TOut | SetStateAction<TOut>) =>
-			set(source, (prev) => {
-				// 'val' is added and removed here to handle `undefined` returns.
-				// If `undefined` is returned, immer assumes the Draft (`d`) is
-				// modified, losing track of the `undefined`. This necessitates
-				// the `.slice(1)` below.
-				const patches: Patch[] =
-					typeof effect === 'function'
-						? produceWithPatches<{ val: PathValue<T, TPath> }>(
-								{ val: getPathValue(prev) },
-								(d) => {
-									d.val = (effect as SetStateAction<TOut>)(
-										d.val as TOut,
-									) as never;
-								},
-						  )[1]
-						: [{ op: 'replace', path: [], value: effect }];
-				const finalPatches = patches.map(
-					(patch): Patch => ({
-						...patch,
-						path: [...steps, ...patch.path.slice(1)],
-					}),
-				);
-				return applyPatches(prev, finalPatches);
-			}),
-	);
-	return resultAtom;
-}
-
-function getRefForPath<T extends Objectish, TPath extends Path<T>>(
-	steps: TPath,
+function getRefForPath<T, TPath extends Path<T>, TValue>(
+	config: TypedFieldConfigObject<T, TPath, TValue>,
 	source: React.MutableRefObject<T>,
-): React.MutableRefObject<PathValue<T, TPath>> {
+): React.MutableRefObject<TValue> {
+	const mapping = config.mapping as FieldMapping<PathValue<T, TPath>, TValue>;
 	const getPathValue = () =>
-		(steps as ReadonlyArray<string | number>).reduce(
-			(prev, next) => (prev as never)[next],
-			source.current as unknown,
-		) as PathValue<T, TPath>;
-	return {
+		getValueAtPath<T, TPath>(config.path)(source.current);
+
+	const unmapped = {
 		get current() {
 			return getPathValue();
 		},
 		set current(value) {
-			const patches: Patch[] = [{ op: 'replace', path: [...steps], value }];
-			applyPatches(getPathValue(), patches);
+			const patches: Patch[] = [
+				{ op: 'replace', path: [...(config.path as AnyPath)], value },
+			];
+			applyPatches(getPathValue() as Objectish, patches);
 		},
 	};
-}
-
-function toFormSubset<T extends Objectish, TPath extends Path<T>>(
-	steps: TPath,
-	options: Pick<
-		UseFormResult<T>,
-		| 'pathPrefix'
-		| 'store'
-		| 'atom'
-		| 'atomFamily'
-		| 'schema'
-		| 'defaultValue'
-		| 'formTranslation'
-	>,
-	formEvents: FormEvents,
-	errorStrategy: RegisterErrorStrategy,
-): UseFormResult<PathValue<T, TPath>> {
-	const schema = getZodSchemaForPath(steps, options.schema);
-	const resultAtom = getAtomForPath(steps, options.atom);
-	const atomFamily: AtomFamily<PathValue<T, TPath>> = (path) =>
-		options.atomFamily([...steps, ...path] as never) as never;
-	const resultDefaultValue = getRefForPath(steps, options.defaultValue);
-
-	return buildFormResult({
-		pathPrefix: [...options.pathPrefix, ...steps],
-		store: options.store,
-		atom: resultAtom,
-		atomFamily,
-		schema,
-		formEvents,
-		errorStrategy,
-		formTranslation: options.formTranslation,
-		defaultValue: resultDefaultValue,
-	});
+	return mapping
+		? {
+				get current() {
+					return mapping.toForm(unmapped.current);
+				},
+				set current(value) {
+					const actualValue = mapping.fromForm(value);
+					if (actualValue === noChange) return;
+					const patches: Patch[] = [
+						{
+							op: 'replace',
+							path: [...(config.path as AnyPath)],
+							value: actualValue,
+						},
+					];
+					applyPatches(getPathValue() as Objectish, patches);
+				},
+		  }
+		: (unmapped as React.MutableRefObject<TValue>);
 }
 
 export function useFormField<T extends Objectish, TPath extends Path<T>>(
