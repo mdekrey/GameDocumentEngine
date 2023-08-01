@@ -1,4 +1,4 @@
-import { ErrorsList } from '@/utils/form/errors/errors-list';
+import { ErrorsList } from '@/utils/form-fields/jotai/errors/errors-list';
 import { Field } from '@/utils/form-fields/field/field';
 import { SelectInput } from '@/utils/form-fields/select-input/select-input';
 import { UseFieldResult } from '@/utils/form/useField';

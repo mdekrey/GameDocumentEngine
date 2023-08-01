@@ -1,4 +1,4 @@
-import { ErrorsList } from '../../form/errors/errors-list';
+import { ErrorsList } from '../jotai/errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from '../text-input/text-input';
 import { FieldMapping, UseFieldResult } from '../../form/useField';

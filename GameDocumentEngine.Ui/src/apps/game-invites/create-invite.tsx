@@ -8,7 +8,7 @@ import { queries } from '@/utils/api/queries';
 import { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
 import { Field } from '@/utils/form-fields/field/field';
-import { ErrorsList } from '@/utils/form/errors/errors-list';
+import { ErrorsList } from '@/utils/form-fields/jotai/errors/errors-list';
 import { TextInput } from '@/utils/form-fields/text-input/text-input';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { Atom, useAtomValue } from 'jotai';

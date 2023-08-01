@@ -6,7 +6,7 @@ import { produceWithPatches } from 'immer';
 import { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { ErrorsList } from '../../utils/form/errors/errors-list';
+import { ErrorsList } from '../../utils/form-fields/jotai/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
