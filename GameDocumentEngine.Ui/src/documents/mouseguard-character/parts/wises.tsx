@@ -4,7 +4,7 @@ import { CharacterDocument, Wise, wiseSchema } from '../character-types';
 import { TextField } from '@/utils/form-fields/text-field/text-field';
 import { FieldMapping } from '@/utils/form/useField';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { CheckboxField } from '@/utils/form-fields/checkbox-input/checkbox-field';
+import { CheckboxLayout } from '@/utils/form-fields/checkbox-input/checkbox-layout';
 
 const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 	toForm: (v) =>
@@ -63,11 +63,11 @@ export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
 			<TextField labelClassName="sr-only" field={fields.name} />
-			<CheckboxField {...fields.pass.htmlProps.asCheckbox()}>
-				<CheckboxField.Label>
+			<CheckboxLayout {...fields.pass.htmlProps.asCheckbox()}>
+				<CheckboxLayout.Label>
 					{fields.pass.translation('label')}
-				</CheckboxField.Label>
-			</CheckboxField>
+				</CheckboxLayout.Label>
+			</CheckboxLayout>
 		</div>
 	);
 }

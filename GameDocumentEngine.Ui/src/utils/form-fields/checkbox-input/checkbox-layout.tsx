@@ -1,11 +1,11 @@
 import { withSlots } from 'react-slot-component';
 import { twMerge } from 'tailwind-merge';
-import { CheckboxFieldProps } from '../../form/useField';
+import { CheckboxHtmlProps } from '../../form/useField';
 import { CheckboxInput } from './checkbox-input';
 
-export type FieldProps = CheckboxFieldProps;
+export type LayoutProps = CheckboxHtmlProps;
 
-export type FieldSlots = {
+export type LayoutSlots = {
 	Label: {
 		className?: string;
 		children?: React.ReactNode;
@@ -16,11 +16,11 @@ export type FieldSlots = {
 	};
 };
 
-export const CheckboxField = withSlots<FieldSlots, FieldProps>(
+export const CheckboxLayout = withSlots<LayoutSlots, LayoutProps>(
 	({ slotProps, ...checkboxProps }) => {
 		const { className: labelClassName, children: labelChildren } =
 			slotProps.Label ?? {};
-		if (!labelChildren) throw new Error('No label provided for field');
+		if (!labelChildren) throw new Error('No label provided for layout');
 		const { className: contentsClassName, children: contentsChildren } =
 			slotProps.Contents ?? {};
 
@@ -43,4 +43,4 @@ export const CheckboxField = withSlots<FieldSlots, FieldProps>(
 		);
 	},
 );
-CheckboxField.displayName = 'CheckboxField';
+CheckboxLayout.displayName = 'CheckboxLayout';

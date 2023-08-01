@@ -6,10 +6,10 @@ import {
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
 import {
-	CheckboxFieldProps,
+	CheckboxHtmlProps,
 	FieldMapping,
 	FieldOptions,
-	InputFieldProps,
+	InputHtmlProps,
 	ToHtmlInputProps,
 	ToHtmlProps,
 	UseFieldResult,
@@ -82,7 +82,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 
 		const toInput = function toInput(
 			mapping?: FieldMapping<TFieldValue, string>,
-		): InputFieldProps {
+		): InputHtmlProps {
 			const htmlAtom = mappedAtom(mapping);
 			return toInputTextField(
 				(v) => store.set(htmlAtom, v),
@@ -93,7 +93,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		} as ToHtmlInputProps<TFieldValue> as ToHtmlProps<TFieldValue>;
 		toInput.asCheckbox = function asCheckbox(
 			mapping?: FieldMapping<TFieldValue, boolean>,
-		): CheckboxFieldProps {
+		): CheckboxHtmlProps {
 			const htmlAtom = mappedAtom(mapping);
 			return toInputCheckboxField(
 				(v) => store.set(htmlAtom, v),
@@ -112,7 +112,7 @@ function toInputTextField(
 	getValue: () => string,
 	atom: StandardWritableAtom<string>,
 	fieldEvents: FieldEvents,
-): InputFieldProps {
+): InputHtmlProps {
 	return {
 		defaultValue: atom,
 		onChange: (ev) => {
@@ -131,7 +131,7 @@ function toInputCheckboxField(
 	getValue: () => boolean,
 	atom: StandardWritableAtom<boolean>,
 	fieldEvents: FieldEvents,
-): CheckboxFieldProps {
+): CheckboxHtmlProps {
 	return {
 		defaultChecked: atom,
 		onChange: (ev) => {

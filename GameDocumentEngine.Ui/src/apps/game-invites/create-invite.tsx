@@ -13,7 +13,7 @@ import { TextInput } from '@/utils/form-fields/text-input/text-input';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { Atom, useAtomValue } from 'jotai';
 import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
-import { CheckboxField } from '@/utils/form-fields/checkbox-input/checkbox-field';
+import { CheckboxLayout } from '@/utils/form-fields/checkbox-input/checkbox-layout';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/utils/form-fields/select-field/select-field';
 import { GameTypeScripts } from '@/utils/api/queries/game-types';
@@ -89,17 +89,17 @@ export function CreateInvite({
 					>
 						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
 					</SelectField>
-					<CheckboxField {...form.fields.isUnlimited.htmlProps.asCheckbox()}>
-						<CheckboxField.Label>
+					<CheckboxLayout {...form.fields.isUnlimited.htmlProps.asCheckbox()}>
+						<CheckboxLayout.Label>
 							{form.fields.isUnlimited.translation('label')}
-						</CheckboxField.Label>
-						<CheckboxField.Contents>
+						</CheckboxLayout.Label>
+						<CheckboxLayout.Contents>
 							<ErrorsList
 								errors={form.fields.uses.errors}
 								translations={form.fields.uses.translation}
 							/>
-						</CheckboxField.Contents>
-					</CheckboxField>
+						</CheckboxLayout.Contents>
+					</CheckboxLayout>
 					<NumberOfUses field={form.fields.uses} disabled={disableUsesAtom} />
 				</Fieldset>
 

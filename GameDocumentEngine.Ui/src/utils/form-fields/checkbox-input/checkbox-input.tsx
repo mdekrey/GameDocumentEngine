@@ -5,6 +5,5 @@ export function CheckboxInput({
 	className,
 	...props
 }: React.ComponentProps<typeof JotaiInput>) {
-	console.log(props);
 	return <JotaiInput className={className} type={type} {...props} />;
 }
