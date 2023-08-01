@@ -173,6 +173,45 @@
 							}
 						}
 					}
+				},
+				"skills": {
+					"name": {
+						"label": "Name of new skill"
+					},
+					"rating": {
+						"label": "Skill rating"
+					},
+					"advancement": {
+						"passes": {
+							"decrease": "Remove a passed skill test",
+							"increase": "Passed a skill test"
+						},
+						"fails": {
+							"decrease": "Remove a failed skill test",
+							"increase": "Failed a skill test"
+						}
+					}
+				},
+				"wises": {
+					"name": {
+						"label": "Name of wise"
+					},
+					"pass": {
+						"label": "Pass",
+						"title": "Used wise on a passed test"
+					},
+					"fail": {
+						"label": "Fail",
+						"title": "Used wise on a failed test"
+					},
+					"fate": {
+						"label": "Fate",
+						"title": "Used a fate point to activate wise"
+					},
+					"persona": {
+						"label": "Pers",
+						"title": "Used a persona point to activate wise"
+					}
 				}
 			}
 		}

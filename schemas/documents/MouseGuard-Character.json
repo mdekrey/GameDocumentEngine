@@ -150,17 +150,17 @@
 		},
 		"wises": {
 			"type": "array",
-			"items": { "$ref": "#/$defs/wise" }
+			"items": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/wise" }] }
 		},
 		"wise": {
 			"type": "object",
 			"required": ["name"],
 			"properties": {
 				"name": { "type": "string" },
-				"pass": { "enum": [true] },
-				"fail": { "enum": [true] },
-				"fate": { "enum": [true] },
-				"persona": { "enum": [true] }
+				"pass": { "type": "boolean" },
+				"fail": { "type": "boolean" },
+				"fate": { "type": "boolean" },
+				"persona": { "type": "boolean" }
 			}
 		}
 	}

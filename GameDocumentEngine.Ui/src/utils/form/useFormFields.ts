@@ -16,6 +16,7 @@ export function useFormFields<
 		() =>
 			buildFormFields<T, TFields>(fields, {
 				pathPrefix: form.pathPrefix,
+				translationPathPrefix: form.translationPathPrefix,
 				schema: form.schema,
 				errorStrategy: form.errorStrategy,
 				formTranslation: form.formTranslation,

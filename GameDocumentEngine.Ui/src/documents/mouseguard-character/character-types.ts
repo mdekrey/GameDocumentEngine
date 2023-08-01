@@ -13,9 +13,23 @@ export interface Skill {
 	rating: number;
 	name: string;
 }
+export interface Wise {
+	name: string;
+	pass?: boolean;
+	fail?: boolean;
+	fate?: boolean;
+	persona?: boolean;
+}
 
 export const skillSchema: z.ZodType<Skill> = characterSchema.shape[
 	'skills'
+].element.options.filter(
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	<T>(n: ZodNull | T): n is T => !(n instanceof ZodNull),
+)[0];
+
+export const wiseSchema: z.ZodType<Wise> = characterSchema.shape[
+	'wises'
 ].element.options.filter(
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	<T>(n: ZodNull | T): n is T => !(n instanceof ZodNull),

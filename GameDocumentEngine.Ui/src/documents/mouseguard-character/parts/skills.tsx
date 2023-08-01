@@ -1,7 +1,6 @@
 import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument, Skill, skillSchema } from '../character-types';
-import { useDebugValue } from 'react';
 import { TextField } from '@/utils/form/text-field/text-field';
 import { PassFail } from '../components/pass-fail';
 import { FieldMapping } from '@/utils/form/useField';
@@ -28,9 +27,9 @@ export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 			path: ['details', 'skills', skillIndex],
 			mapping: requiredSkillMapping,
 			schema: skillSchema,
+			translationPath: ['details', 'skills'],
 		}),
 	});
-	useDebugValue({ fields });
 	const natureRating = useComputedAtom(
 		(get) => get(form.atom).details.abilities.nature.max,
 	);
