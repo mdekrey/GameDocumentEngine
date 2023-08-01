@@ -1,5 +1,4 @@
-import { twMerge } from 'tailwind-merge';
-import { JotaiInput } from '../text-input/JotaiInput';
+import { JotaiInput } from '../jotai/input';
 
 export function CheckboxInput({
 	type = 'checkbox',
@@ -7,7 +6,5 @@ export function CheckboxInput({
 	...props
 }: React.ComponentProps<typeof JotaiInput>) {
 	console.log(props);
-	return (
-		<JotaiInput className={twMerge('', className)} type={type} {...props} />
-	);
+	return <JotaiInput className={className} type={type} {...props} />;
 }

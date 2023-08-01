@@ -1,5 +1,5 @@
-import { twMerge } from 'tailwind-merge';
-import { JotaiSelect } from './JotaiSelect';
+import { JotaiSelect } from '../jotai/select';
+import { useTwMerge } from '../jotai/useTwMerge';
 
 export type SelectInputProps<T> = Omit<
 	React.ComponentProps<typeof JotaiSelect>,
@@ -19,7 +19,10 @@ export function SelectInput<T>({
 }: SelectInputProps<T>) {
 	return (
 		<JotaiSelect
-			className={twMerge('px-2 py-2 border-gray-500 border w-full', className)}
+			className={useTwMerge(
+				'px-2 py-2 border-gray-500 border w-full',
+				className,
+			)}
 			{...props}
 		>
 			{items.map((item) => {

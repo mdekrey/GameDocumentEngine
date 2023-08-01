@@ -4,4 +4,5 @@ export const JotaiInput = withSignal('input', {
 	defaultValue: mapProperty('value'),
 	defaultChecked: mapProperty('checked'),
 	disabled: mapProperty('disabled'),
+	className: mapProperty('className'),
 });

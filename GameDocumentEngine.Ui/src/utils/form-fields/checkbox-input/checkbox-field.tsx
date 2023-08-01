@@ -26,7 +26,6 @@ export const CheckboxField = withSlots<FieldSlots, FieldProps>(
 
 		return (
 			<>
-				<span />
 				<label className={twMerge('font-bold md:py-2', labelClassName)}>
 					<CheckboxInput {...checkboxProps} /> {labelChildren}
 					{contentsChildren && (

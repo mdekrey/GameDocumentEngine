@@ -134,7 +134,7 @@ function NumberOfUses({
 			</Field.Label>
 			<Field.Contents>
 				<TextInput
-					disabled={disabled}
+					disabled={disabledAtom}
 					{...field.htmlProps(positiveIntegerMapping)}
 				/>
 				<ErrorsList errors={field.errors} translations={field.translation} />

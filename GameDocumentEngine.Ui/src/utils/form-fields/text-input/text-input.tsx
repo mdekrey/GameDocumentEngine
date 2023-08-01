@@ -1,5 +1,5 @@
-import { twMerge } from 'tailwind-merge';
-import { JotaiInput } from './JotaiInput';
+import { JotaiInput } from '../jotai/input';
+import { useTwMerge } from '../jotai/useTwMerge';
 
 export function TextInput({
 	type = 'text',
@@ -8,7 +8,7 @@ export function TextInput({
 }: React.ComponentProps<typeof JotaiInput>) {
 	return (
 		<JotaiInput
-			className={twMerge(
+			className={useTwMerge(
 				'px-2 py-2 border-gray-500 border w-full',
 				'disabled:text-gray-800 disabled:border-gray-300 disabled:bg-gray200',
 				className,

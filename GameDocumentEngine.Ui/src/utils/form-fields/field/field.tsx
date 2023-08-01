@@ -1,15 +1,19 @@
+import { Atom } from 'jotai';
 import { withSlots } from 'react-slot-component';
-import { twMerge } from 'tailwind-merge';
+import { useTwMerge } from '../jotai/useTwMerge';
+import { JotaiSpan } from '../jotai/span';
+import { JotaiDiv } from '../jotai/div';
+import { JotaiLabel } from '../jotai/label';
 
-export type FieldProps = React.LabelHTMLAttributes<HTMLLabelElement>;
+export type FieldProps = React.ComponentProps<typeof JotaiLabel>;
 
 export type FieldSlots = {
 	Label: {
-		className?: string;
+		className?: string | Atom<string>;
 		children?: React.ReactNode;
 	};
 	Contents: {
-		className?: string;
+		className?: string | Atom<string>;
 		children?: React.ReactNode;
 	};
 };
@@ -22,20 +26,20 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 		const { className: contentsClassName, children: contentsChildren } =
 			slotProps.Contents ?? {};
 
+		const classNameAtom = useTwMerge('contents', className);
+		const labelClassNameAtom = useTwMerge('font-bold md:py-2', labelClassName);
+		const contentsClassNameAtom = useTwMerge(
+			'block flex-grow md:flex-grow-0',
+			contentsClassName,
+		);
+
 		return (
-			<label className={twMerge('contents', className)} {...props}>
-				<span className={twMerge('font-bold md:py-2', labelClassName)}>
-					{labelChildren}
-				</span>
-				<div
-					className={twMerge(
-						'block flex-grow md:flex-grow-0',
-						contentsClassName,
-					)}
-				>
+			<JotaiLabel className={classNameAtom} {...props}>
+				<JotaiSpan className={labelClassNameAtom}>{labelChildren}</JotaiSpan>
+				<JotaiDiv className={contentsClassNameAtom}>
 					{contentsChildren}
-				</div>
-			</label>
+				</JotaiDiv>
+			</JotaiLabel>
 		);
 	},
 );

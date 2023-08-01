@@ -4,6 +4,7 @@ import { TextInput } from '../text-input/text-input';
 import { FieldMapping, UseFieldResult } from '../../form/useField';
 import { MappedFieldProps } from './MappedFieldProps';
 import { noChange } from '../../form/mapAtom';
+import { JotaiLabel } from '../jotai/label';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
 	string | undefined,
@@ -39,7 +40,7 @@ export type TextFieldPersistentProps = {
 	labelClassName?: string;
 	inputClassName?: string;
 	contentsClassName?: string;
-} & React.LabelHTMLAttributes<HTMLLabelElement>;
+} & React.ComponentProps<typeof JotaiLabel>;
 export type TextFieldProps<TValue> = MappedFieldProps<TValue, string> &
 	TextFieldPersistentProps;
 
