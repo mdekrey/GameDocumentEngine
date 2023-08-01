@@ -66,6 +66,10 @@ export function CreateInvite({
 		fields: {
 			uses: ['uses'],
 			role: ['role'],
+			isUnlimited: {
+				path: ['uses'],
+				translationPathPrefix: ['isUnlimited'],
+			},
 		},
 	});
 
@@ -85,10 +89,12 @@ export function CreateInvite({
 						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
 					</SelectField>
 					<CheckboxField
-						{...form.fields.uses.htmlProps.asCheckbox(unlimitedCheckboxMapping)}
+						{...form.fields.isUnlimited.htmlProps.asCheckbox(
+							unlimitedCheckboxMapping,
+						)}
 					>
 						<CheckboxField.Label>
-							{t('fields.isUnlimited.label')}
+							{form.fields.isUnlimited.translation('label')}
 						</CheckboxField.Label>
 						<CheckboxField.Contents>
 							<ErrorsList

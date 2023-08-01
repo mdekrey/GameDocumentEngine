@@ -10,7 +10,6 @@ import {
 	FieldMapping,
 	UseFieldResult,
 	UseFieldResultFlags,
-	useFieldAtom,
 } from './useField';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { createTriggeredErrorsAtom } from './createErrorsAtom';
@@ -438,13 +437,4 @@ function getRefForPath<T, TPath extends Path<T>, TValue>(
 				},
 		  }
 		: (unmapped as React.MutableRefObject<TValue>);
-}
-
-export function useFormField<T extends Objectish, TPath extends Path<T>>(
-	steps: TPath,
-	options: UseFormResult<T>,
-) {
-	return useFieldAtom(options.atomFamily(steps), {
-		schema: getZodSchemaForPath(steps, options.schema),
-	});
 }
