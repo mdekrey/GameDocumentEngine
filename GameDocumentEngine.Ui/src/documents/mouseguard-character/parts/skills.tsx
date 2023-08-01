@@ -23,12 +23,13 @@ const requiredSkillMapping: FieldMapping<Skill | null, Skill> = {
 
 export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {
-		skills: (skillIndex: number) => ({
-			path: ['details', 'skills', skillIndex],
-			mapping: requiredSkillMapping,
-			schema: skillSchema,
-			translationPath: ['details', 'skills'],
-		}),
+		skills: (skillIndex: number) =>
+			({
+				path: ['details', 'skills', skillIndex],
+				mapping: requiredSkillMapping,
+				schema: skillSchema,
+				translationPath: ['details', 'skills'],
+			}) as const,
 	});
 	const natureRating = useComputedAtom(
 		(get) => get(form.atom).details.abilities.nature.max,

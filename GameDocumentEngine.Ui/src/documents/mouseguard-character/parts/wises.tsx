@@ -15,12 +15,13 @@ const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 
 export function Wises({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {
-		wises: (wiseIndex: number) => ({
-			path: ['details', 'wises', wiseIndex],
-			mapping: requiredWiseMapping,
-			schema: wiseSchema,
-			translationPath: ['details', 'wises'],
-		}),
+		wises: (wiseIndex: number) =>
+			({
+				path: ['details', 'wises', wiseIndex],
+				mapping: requiredWiseMapping,
+				schema: wiseSchema,
+				translationPath: ['details', 'wises'],
+			}) as const,
 	});
 
 	return (
