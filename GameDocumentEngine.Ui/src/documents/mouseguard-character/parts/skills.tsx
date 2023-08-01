@@ -6,7 +6,9 @@ import { TextField } from '@/utils/form/text-field/text-field';
 import { PassFail } from '../components/pass-fail';
 import { FieldMapping } from '@/utils/form/useField';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { Atom } from 'jotai';
+import { Atom, useAtomValue } from 'jotai';
+import { Fieldset } from '@/utils/form/fieldset/fieldset';
+import { HiXMark } from 'react-icons/hi2';
 
 const requiredSkillMapping: FieldMapping<Skill | null, Skill> = {
 	toForm: (v) =>
@@ -34,19 +36,37 @@ export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 	);
 
 	return (
-		<>
-			{Array(24)
-				.fill(0)
-				.map((_, index) => (
-					<Skill
-						key={index}
-						skill={fields.skills(index)}
-						natureRating={natureRating}
-					/>
-				))}
-		</>
+		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
+			<Fieldset>
+				{Array(12)
+					.fill(0)
+					.map((_, index) => (
+						<Skill
+							key={index}
+							skill={fields.skills(index)}
+							natureRating={natureRating}
+						/>
+					))}
+			</Fieldset>
+			<Fieldset>
+				{Array(12)
+					.fill(0)
+					.map((_, index) => (
+						<Skill
+							key={index}
+							skill={fields.skills(index + 12)}
+							natureRating={natureRating}
+						/>
+					))}
+			</Fieldset>
+		</div>
 	);
 }
+
+const skillNameMapping: FieldMapping<string, string> = {
+	toForm: (v) => (v.length ? `${v[0].toUpperCase()}${v.substring(1)}` : v),
+	fromForm: (v) => v.toLowerCase(),
+};
 
 export function Skill({
 	skill,
@@ -56,7 +76,7 @@ export function Skill({
 	natureRating: Atom<number>;
 }) {
 	const fields = useFormFields(skill, {
-		name: ['name'],
+		name: { path: ['name'], mapping: skillNameMapping },
 		rating: ['rating'],
 		advancement: ['advancement'],
 	});
@@ -71,18 +91,46 @@ export function Skill({
 		return temp === 0 ? get(natureRating) : get(fields.rating.value) - 1;
 	});
 
+	const readonlyNameAtom = useComputedAtom((get) => {
+		return get(fields.rating.value) > 0 ||
+			get(fields.advancement.field(['passes']).value) ||
+			get(fields.advancement.field(['fails']).value)
+			? get(fields.name.value)
+			: null;
+	});
+	const readonlyName = useAtomValue(readonlyNameAtom);
+
+	const rating0Atom = useComputedAtom((get) => {
+		return get(fields.rating.value) === 0 &&
+			(get(fields.advancement.field(['passes']).value) ||
+				get(fields.advancement.field(['fails']).value))
+			? true
+			: false;
+	});
+	const isRating0 = useAtomValue(rating0Atom);
+
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
 			<div className="self-center flex-1">
-				<TextField labelClassName="sr-only" field={fields.name} />
+				{readonlyName ? (
+					<span className="inline-block p-2">{readonlyName}</span>
+				) : (
+					<TextField labelClassName="sr-only" field={fields.name} />
+				)}
 			</div>
 			<div className="flex flex-row gap-2 items-center">
-				<TextField.Integer
-					contentsClassName="w-10"
-					labelClassName="sr-only"
-					inputClassName="text-center"
-					field={fields.rating}
-				/>
+				{isRating0 ? (
+					<span className="w-10 text-center">
+						<HiXMark className="w-6 h-6 inline-block" />
+					</span>
+				) : (
+					<TextField.Integer
+						contentsClassName="w-10"
+						labelClassName="sr-only"
+						inputClassName="text-center"
+						field={fields.rating}
+					/>
+				)}
 			</div>
 			<PassFail
 				advancement={fields.advancement}
