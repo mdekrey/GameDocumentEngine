@@ -8,12 +8,14 @@ import { CheckboxesButton } from './checkboxes-button';
 
 export function PassFail({
 	advancement,
-	rating,
+	maxPasses,
+	maxFails,
 	padToCount,
 }: {
 	advancement: FormFieldReturnType<{ passes: number; fails: number }>;
-	rating: Atom<number>;
-	padToCount: number;
+	maxPasses: Atom<number>;
+	maxFails: Atom<number>;
+	padToCount: Atom<number>;
 }) {
 	const { t } = useTranslation('doc-types:MouseGuard-Character', {
 		keyPrefix: 'character-sheet.passes-and-fails',
@@ -23,15 +25,21 @@ export function PassFail({
 		fails: ['fails'],
 	});
 	const passesUncheckedChecked = useComputedAtom(
-		(get) => get(rating) - get(fields.passes.value),
+		(get) => get(maxPasses) - get(fields.passes.value),
 	);
 	const failsUncheckedChecked = useComputedAtom(
-		(get) => get(rating) - 1 - get(fields.fails.value),
+		(get) => get(maxFails) - get(fields.fails.value),
 	);
-	const spacing = useComputedAtom((get) => padToCount - get(rating));
+	const passesSpacing = useComputedAtom(
+		(get) =>
+			get(padToCount) - Math.max(get(maxPasses), get(fields.passes.value)),
+	);
+	const failsSpacing = useComputedAtom(
+		(get) => get(padToCount) - Math.max(get(maxFails), get(fields.fails.value)),
+	);
 
 	return (
-		<div className="flex flex-col justify-between">
+		<div className="flex flex-col justify-between pr-2">
 			<div className="flex gap-2 items-center">
 				<span>{t('pass-abbrev')}:</span>
 				{/* TODO: accessible number of passes/fails; a sr-only TextField crashes */}
@@ -46,9 +54,7 @@ export function PassFail({
 					title={fields.passes.translation('increase')}
 					onClick={() => adjust('passes', 1)}
 				/>
-				<span className="inline-flex gap-2 invisible">
-					<EmptyCirclesFromAtom count={spacing} />
-				</span>
+				<EmptyCirclesFromAtom count={passesSpacing} className="invisible" />
 			</div>
 			<div className="flex gap-2 items-center">
 				<span>{t('fail-abbrev')}:</span>
@@ -63,6 +69,7 @@ export function PassFail({
 					title={fields.fails.translation('increase')}
 					onClick={() => adjust('fails', 1)}
 				/>
+				<EmptyCirclesFromAtom count={failsSpacing} className="invisible" />
 			</div>
 		</div>
 	);

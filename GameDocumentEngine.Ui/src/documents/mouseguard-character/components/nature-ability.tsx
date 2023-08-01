@@ -3,6 +3,10 @@ import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { TextField } from '@/utils/form/text-field/text-field';
 import { PassFail } from './pass-fail';
+import { atom } from 'jotai';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+
+const naturePadding = atom(() => 6);
 
 export function NatureAbility({
 	nature,
@@ -16,6 +20,9 @@ export function NatureAbility({
 		max: ['max'],
 		advancement: ['advancement'],
 	});
+
+	const maxMinusOne = useComputedAtom((get) => get(fields.max.value) - 1);
+
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
 			<div className="text-xl font-bold self-center flex-1">
@@ -38,8 +45,9 @@ export function NatureAbility({
 			</div>
 			<PassFail
 				advancement={fields.advancement}
-				rating={fields.max.value}
-				padToCount={6}
+				maxPasses={fields.max.value}
+				maxFails={maxMinusOne}
+				padToCount={naturePadding}
 			/>
 		</div>
 	);

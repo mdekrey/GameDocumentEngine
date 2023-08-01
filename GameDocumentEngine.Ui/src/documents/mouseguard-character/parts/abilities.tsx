@@ -4,6 +4,10 @@ import { CharacterDocument } from '../character-types';
 import { Fieldset } from '@/utils/form/fieldset/fieldset';
 import { StandardAbility } from '../components/standard-ability';
 import { NatureAbility } from '../components/nature-ability';
+import { atom } from 'jotai';
+
+const willPadding = atom(() => 6);
+const resourcesPadding = atom(() => 10);
 
 export function Abilities({
 	form,
@@ -21,12 +25,18 @@ export function Abilities({
 		<>
 			<Fieldset>
 				<NatureAbility nature={abilities.nature} />
-				<StandardAbility ability={abilities.will} padToCount={6} />
-				<StandardAbility ability={abilities.health} padToCount={6} />
+				<StandardAbility ability={abilities.will} padToCount={willPadding} />
+				<StandardAbility ability={abilities.health} padToCount={willPadding} />
 			</Fieldset>
 			<Fieldset>
-				<StandardAbility ability={abilities.resources} padToCount={10} />
-				<StandardAbility ability={abilities.circles} padToCount={10} />
+				<StandardAbility
+					ability={abilities.resources}
+					padToCount={resourcesPadding}
+				/>
+				<StandardAbility
+					ability={abilities.circles}
+					padToCount={resourcesPadding}
+				/>
 			</Fieldset>
 		</>
 	);

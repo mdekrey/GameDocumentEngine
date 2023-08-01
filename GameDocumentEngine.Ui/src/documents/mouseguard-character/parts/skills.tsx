@@ -5,6 +5,8 @@ import { useDebugValue } from 'react';
 import { TextField } from '@/utils/form/text-field/text-field';
 import { PassFail } from '../components/pass-fail';
 import { FieldMapping } from '@/utils/form/useField';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { Atom } from 'jotai';
 
 const requiredSkillMapping: FieldMapping<Skill | null, Skill> = {
 	toForm: (v) =>
@@ -27,24 +29,48 @@ export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 		}),
 	});
 	useDebugValue({ fields });
+	const natureRating = useComputedAtom(
+		(get) => get(form.atom).details.abilities.nature.max,
+	);
 
 	return (
 		<>
 			{Array(24)
 				.fill(0)
 				.map((_, index) => (
-					<Skill key={index} skill={fields.skills(index)} />
+					<Skill
+						key={index}
+						skill={fields.skills(index)}
+						natureRating={natureRating}
+					/>
 				))}
 		</>
 	);
 }
 
-export function Skill({ skill }: { skill: FormFieldReturnType<Skill> }) {
+export function Skill({
+	skill,
+	natureRating,
+}: {
+	skill: FormFieldReturnType<Skill>;
+	natureRating: Atom<number>;
+}) {
 	const fields = useFormFields(skill, {
 		name: ['name'],
 		rating: ['rating'],
 		advancement: ['advancement'],
 	});
+	const padding = useComputedAtom((get) => Math.max(5, get(natureRating)));
+
+	const maxPasses = useComputedAtom((get) => {
+		const temp = get(fields.rating.value);
+		return temp === 0 ? get(natureRating) : get(fields.rating.value);
+	});
+	const maxFails = useComputedAtom((get) => {
+		const temp = get(fields.rating.value);
+		return temp === 0 ? get(natureRating) : get(fields.rating.value) - 1;
+	});
+
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
 			<div className="self-center flex-1">
@@ -60,8 +86,9 @@ export function Skill({ skill }: { skill: FormFieldReturnType<Skill> }) {
 			</div>
 			<PassFail
 				advancement={fields.advancement}
-				rating={fields.rating.value}
-				padToCount={5}
+				maxPasses={maxPasses}
+				maxFails={maxFails}
+				padToCount={padding}
 			/>
 		</div>
 	);
