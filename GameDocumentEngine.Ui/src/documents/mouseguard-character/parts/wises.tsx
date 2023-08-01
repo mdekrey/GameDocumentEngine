@@ -1,10 +1,10 @@
 import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument, Wise, wiseSchema } from '../character-types';
-import { TextField } from '@/utils/form/text-field/text-field';
+import { TextField } from '@/utils/form-fields/text-field/text-field';
 import { FieldMapping } from '@/utils/form/useField';
-import { Fieldset } from '@/utils/form/fieldset/fieldset';
-import { CheckboxField } from '@/utils/form/checkbox-input/checkbox-field';
+import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { CheckboxField } from '@/utils/form-fields/checkbox-input/checkbox-field';
 
 const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 	toForm: (v) =>

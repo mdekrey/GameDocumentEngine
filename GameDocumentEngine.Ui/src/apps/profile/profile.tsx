@@ -1,5 +1,5 @@
 import { Button } from '@/components/button/button';
-import { Fieldset } from '@/utils/form/fieldset/fieldset';
+import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
@@ -13,7 +13,7 @@ import { ButtonRow } from '@/components/button/button-row';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/utils/form/text-field/text-field';
+import { TextField } from '@/utils/form-fields/text-field/text-field';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();

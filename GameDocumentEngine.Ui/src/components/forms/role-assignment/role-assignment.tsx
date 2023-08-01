@@ -1,9 +1,9 @@
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { ErrorsList } from '@/utils/form/errors/errors-list';
-import { Field } from '@/utils/form/field/field';
-import { Fieldset } from '@/utils/form/fieldset/fieldset';
-import { SelectInput } from '@/utils/form/select-input/select-input';
+import { Field } from '@/utils/form-fields/field/field';
+import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { SelectInput } from '@/utils/form-fields/select-input/select-input';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useForm } from '@/utils/form/useForm';
 import { z } from 'zod';

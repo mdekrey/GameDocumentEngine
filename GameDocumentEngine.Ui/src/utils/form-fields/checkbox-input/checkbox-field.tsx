@@ -1,6 +1,6 @@
 import { withSlots } from 'react-slot-component';
 import { twMerge } from 'tailwind-merge';
-import { CheckboxFieldProps } from '../useField';
+import { CheckboxFieldProps } from '../../form/useField';
 import { CheckboxInput } from './checkbox-input';
 
 export type FieldProps = CheckboxFieldProps;

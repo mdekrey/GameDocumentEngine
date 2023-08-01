@@ -1,6 +1,6 @@
 import { Button } from '@/components/button/button';
-import { Fieldset } from '@/utils/form/fieldset/fieldset';
-import { TextField } from '@/utils/form/text-field/text-field';
+import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { TextField } from '@/utils/form-fields/text-field/text-field';
 import { useForm } from '@/utils/form/useForm';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { ModalContentsProps } from '@/utils/modal/modal-service';

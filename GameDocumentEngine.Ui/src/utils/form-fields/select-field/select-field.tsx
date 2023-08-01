@@ -1,6 +1,6 @@
 import { ErrorsList } from '@/utils/form/errors/errors-list';
-import { Field } from '@/utils/form/field/field';
-import { SelectInput } from '@/utils/form/select-input/select-input';
+import { Field } from '@/utils/form-fields/field/field';
+import { SelectInput } from '@/utils/form-fields/select-input/select-input';
 import { UseFieldResult } from '@/utils/form/useField';
 
 export function SelectField<T>({

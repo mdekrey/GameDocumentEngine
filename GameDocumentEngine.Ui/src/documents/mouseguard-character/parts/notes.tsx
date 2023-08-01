@@ -2,8 +2,8 @@ import { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { useDebugValue } from 'react';
-import { Fieldset } from '@/utils/form/fieldset/fieldset';
-import { TextField } from '@/utils/form/text-field/text-field';
+import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { TextField } from '@/utils/form-fields/text-field/text-field';
 
 export function Notes({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {

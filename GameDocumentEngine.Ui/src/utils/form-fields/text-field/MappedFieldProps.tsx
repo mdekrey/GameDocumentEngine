@@ -1,4 +1,4 @@
-import { FieldMapping, UseFieldResult } from '../useField';
+import { FieldMapping, UseFieldResult } from '../../form/useField';
 
 export type MappedFieldProps<TValue, TTarget> =
 	| {

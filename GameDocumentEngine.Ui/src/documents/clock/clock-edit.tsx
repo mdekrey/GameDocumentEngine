@@ -1,14 +1,14 @@
 import { Updater } from '../defineDocument';
 import { useForm } from '@/utils/form/useForm';
-import { Fieldset } from '@/utils/form/fieldset/fieldset';
+import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
 import { Clock, ClockDocument } from './clock-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/utils/form/text-field/text-field';
-import { NumberField } from '@/utils/form/number-field/number-field';
+import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { NumberField } from '@/utils/form-fields/number-field/number-field';
 
 export function ClockEdit({
 	clock,

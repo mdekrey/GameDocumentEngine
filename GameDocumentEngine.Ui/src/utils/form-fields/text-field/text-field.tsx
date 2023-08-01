@@ -1,9 +1,9 @@
-import { ErrorsList } from '../errors/errors-list';
+import { ErrorsList } from '../../form/errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from '../text-input/text-input';
-import { FieldMapping, UseFieldResult } from '../useField';
+import { FieldMapping, UseFieldResult } from '../../form/useField';
 import { MappedFieldProps } from './MappedFieldProps';
-import { noChange } from '../mapAtom';
+import { noChange } from '../../form/mapAtom';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
 	string | undefined,
