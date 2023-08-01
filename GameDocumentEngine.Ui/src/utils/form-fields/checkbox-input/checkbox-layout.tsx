@@ -16,6 +16,7 @@ export type LayoutSlots = {
 	};
 };
 
+// TODO - change this to CheckboxField and accept MappedFieldProps<TValue, boolean>
 export const CheckboxLayout = withSlots<LayoutSlots, LayoutProps>(
 	({ slotProps, ...checkboxProps }) => {
 		const { className: labelClassName, children: labelChildren } =
