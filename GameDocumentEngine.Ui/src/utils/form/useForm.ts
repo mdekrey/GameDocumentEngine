@@ -240,7 +240,7 @@ function toField<T, TPath extends Path<T>, TValue>(
 	config: TypedFieldConfigObject<T, TPath, TValue>,
 	context: FormResultContext<T>,
 ): FormFieldReturnType<TValue, DefaultFormFieldResultFlags> {
-	const result = toFormSubset<T, Path<T>, TValue>(config, context);
+	const result = toFormSubset<T, TPath, TValue>(config, context);
 	const options: Partial<FieldOptions<PathValue<T, TPath>, TValue>> = {
 		mapping: config.mapping,
 		schema: getZodSchemaForPath(config.path, context.schema),

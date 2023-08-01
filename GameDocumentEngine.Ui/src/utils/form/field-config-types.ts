@@ -42,8 +42,8 @@ export type TypedFieldConfigObject<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FieldConfig<T, TFieldType = any> =
 	| Path<T>
-	// TODO: `Path<T>` here makes the mapping for FieldsConfig need to accept any possible value
-	| TypedFieldConfigObject<T, Path<T>, TFieldType>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	| TypedFieldConfigObject<T, any, TFieldType>;
 
 export type FieldsConfig<T> = {
 	[field: string]: FieldConfig<T> | ((...args: AnyArray) => FieldConfig<T>);
@@ -51,8 +51,7 @@ export type FieldsConfig<T> = {
 
 export type FieldConfigToType<
 	T,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	TFieldConfig extends FieldConfig<T, any>,
+	TFieldConfig extends FieldConfig<T>,
 > = TFieldConfig extends Path<T>
 	? PathValue<T, TFieldConfig>
 	: TFieldConfig extends MappedFieldConfig<T, Path<T>, infer TValue>

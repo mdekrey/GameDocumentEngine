@@ -1,3 +1,5 @@
+import { IfAny } from './type-helpers';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type IsEqual<T1, T2> = T1 extends T2
 	? (<G>() => G extends T1 ? 1 : 2) extends <G>() => G extends T2 ? 1 : 2
@@ -71,25 +73,29 @@ type ArrayPathInternal<T, TraversedTypes = T> = T extends ReadonlyArray<infer V>
 type ArrayPath<T> = T extends any ? ArrayPathInternal<T> : never;
 
 export type Path<T> = T extends any ? PathInternal<T> : never;
-export type PathValue<T, P extends Path<T> | ArrayPath<T>> = T extends any
-	? P extends readonly [infer K]
-		? K extends keyof T
-			? T[K]
-			: K extends ArrayKey
-			? T extends ReadonlyArray<infer V>
-				? V
+export type PathValue<T, P extends Path<T> | ArrayPath<T>> = IfAny<
+	P,
+	any,
+	T extends any
+		? P extends readonly [infer K]
+			? K extends keyof T
+				? T[K]
+				: K extends ArrayKey
+				? T extends ReadonlyArray<infer V>
+					? V
+					: never
 				: never
-			: never
-		: P extends readonly [infer K, ...infer R]
-		? K extends keyof T
-			? R extends Path<T[K]>
-				? PathValue<T[K], R>
-				: T[K]
-			: K extends ArrayKey
-			? T extends ReadonlyArray<infer V>
-				? PathValue<V, R & Path<V>>
+			: P extends readonly [infer K, ...infer R]
+			? K extends keyof T
+				? R extends Path<T[K]>
+					? PathValue<T[K], R>
+					: T[K]
+				: K extends ArrayKey
+				? T extends ReadonlyArray<infer V>
+					? PathValue<V, R & Path<V>>
+					: never
 				: never
 			: never
 		: never
-	: never;
+>;
 export type AnyPath = ReadonlyArray<string | number>;
