@@ -41,6 +41,9 @@ export function DocumentDetails({
 		translation,
 	} = gameType.data.objectTypes[document.data.type];
 
+	// TODO: This is making it impossible to reduce rerenders; need to `useCallback`.
+	// Also, `useMutation` has in-progress states; use them for something, or find a way
+	// to further reduce re-renders here, too.
 	return (
 		<Component
 			gameId={gameId}

@@ -84,11 +84,11 @@
 		"conditions": {
 			"type": "object",
 			"properties": {
-				"hungryThirsty": { "enum": [true] },
-				"angry": { "enum": [true] },
-				"tired": { "enum": [true] },
-				"injured": { "enum": [true] },
-				"sick": { "enum": [true] }
+				"hungryThirsty": { "type": "boolean" },
+				"angry": { "type": "boolean" },
+				"tired": { "type": "boolean" },
+				"injured": { "type": "boolean" },
+				"sick": { "type": "boolean" }
 			}
 		},
 		"notes": {
@@ -136,7 +136,7 @@
 		},
 		"traits": {
 			"type": "array",
-			"items": { "$ref": "#/$defs/trait" }
+			"items": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/trait" }] }
 		},
 		"trait": {
 			"type": "object",

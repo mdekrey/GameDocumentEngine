@@ -4,7 +4,7 @@ import { CharacterDocument, Wise, wiseSchema } from '../character-types';
 import { TextField } from '@/utils/form-fields/text-field/text-field';
 import { FieldMapping } from '@/utils/form/useField';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { CheckboxLayout } from '@/utils/form-fields/checkbox-input/checkbox-layout';
+import { ToggleButtonField } from '@/utils/form-fields/toggle-button/toggle-button-field';
 
 const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 	toForm: (v) =>
@@ -62,12 +62,31 @@ export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
-			<TextField labelClassName="sr-only" field={fields.name} />
-			<CheckboxLayout {...fields.pass.htmlProps.asCheckbox()}>
-				<CheckboxLayout.Label>
-					{fields.pass.translation('label')}
-				</CheckboxLayout.Label>
-			</CheckboxLayout>
+			<TextField
+				labelClassName="sr-only"
+				className="block flex-1"
+				field={fields.name}
+			/>
+			<ToggleButtonField
+				field={fields.pass}
+				pressedContents={fields.pass.translation('label')}
+				unpressedContents={fields.pass.translation('label')}
+			/>
+			<ToggleButtonField
+				field={fields.fail}
+				pressedContents={fields.fail.translation('label')}
+				unpressedContents={fields.fail.translation('label')}
+			/>
+			<ToggleButtonField
+				field={fields.fate}
+				pressedContents={fields.fate.translation('label')}
+				unpressedContents={fields.fate.translation('label')}
+			/>
+			<ToggleButtonField
+				field={fields.persona}
+				pressedContents={fields.persona.translation('label')}
+				unpressedContents={fields.persona.translation('label')}
+			/>
 		</div>
 	);
 }

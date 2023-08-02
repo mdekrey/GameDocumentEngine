@@ -96,7 +96,7 @@ export type AtomFamily<T> = <TPath extends Path<T>>(
 
 export interface UseFormResult<T> {
 	pathPrefix: AnyPath;
-	translationPathPrefix: AnyPath;
+	translationPath: AnyPath;
 	store: ReturnType<typeof useStore>;
 	atom: StandardWritableAtom<T>;
 	atomFamily: AtomFamily<T>;
@@ -134,7 +134,7 @@ export type UseFormResultWithFields<
 
 type BuildFormResultOptions<T> = {
 	pathPrefix: AnyPath;
-	translationPathPrefix: AnyPath;
+	translationPath: AnyPath;
 	store: ReturnType<typeof useStore>;
 	atom: StandardWritableAtom<T>;
 	atomFamily: AtomFamily<T>;
@@ -147,7 +147,7 @@ type BuildFormResultOptions<T> = {
 
 function buildFormResult<T>({
 	pathPrefix,
-	translationPathPrefix,
+	translationPath,
 	store,
 	atom,
 	atomFamily,
@@ -161,7 +161,7 @@ function buildFormResult<T>({
 	errorStrategy(formEvents, () => store.set(trigger));
 	const formContext: FormResultContext<T> = {
 		pathPrefix,
-		translationPathPrefix,
+		translationPath,
 		schema,
 		errorStrategy,
 		formTranslation,
@@ -200,7 +200,7 @@ function buildFormResult<T>({
 type FormResultContext<T> = Pick<
 	UseFormResult<T>,
 	| 'pathPrefix'
-	| 'translationPathPrefix'
+	| 'translationPath'
 	| 'schema'
 	| 'errorStrategy'
 	| 'formTranslation'
@@ -250,7 +250,7 @@ function toField<T, TPath extends Path<T>, TValue>(
 			context.formTranslation(
 				[
 					'fields',
-					...context.translationPathPrefix,
+					...context.translationPath,
 					...(config.translationPath ?? (config.path as AnyPath)),
 					...(typeof part === 'string' ? [part] : part),
 				].join('.'),
@@ -273,7 +273,6 @@ function toFormSubset<T, TPath extends Path<T>, TValue>(
 	config: TypedFieldConfigObject<T, TPath, TValue>,
 	options: FormResultContext<T>,
 ): UseFormResult<TValue> {
-	console.log(config, options);
 	const schema: ZodType<TValue> =
 		config?.schema ??
 		(getZodSchemaForPath(config.path, options.schema) as ZodType<TValue>);
@@ -294,8 +293,8 @@ function toFormSubset<T, TPath extends Path<T>, TValue>(
 
 	return buildFormResult<TValue>({
 		pathPrefix: [...options.pathPrefix, ...(config.path as AnyPath)],
-		translationPathPrefix: [
-			...options.translationPathPrefix,
+		translationPath: [
+			...options.translationPath,
 			...(config.translationPath ?? (config.path as AnyPath)),
 		],
 		store: options.store,
@@ -362,7 +361,7 @@ export function useForm<T>(
 
 			const result = buildFormResult<T>({
 				pathPrefix: [],
-				translationPathPrefix: [],
+				translationPath: [],
 				store,
 				atom: formAtom,
 				atomFamily,
@@ -378,7 +377,7 @@ export function useForm<T>(
 
 			const fields = buildFormFields(options.fields, {
 				pathPrefix: result.pathPrefix,
-				translationPathPrefix: result.translationPathPrefix,
+				translationPath: result.translationPath,
 				schema: result.schema,
 				errorStrategy: result.errorStrategy,
 				formTranslation: options.translation,

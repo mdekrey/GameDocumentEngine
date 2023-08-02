@@ -1,5 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { Modal } from './modal';
+import { useCallback } from 'react';
 
 type Modal = {
 	contents: React.ReactNode;
@@ -39,43 +40,46 @@ function rejectViaBackdrop(props: Pick<ModalContentsProps<never>, 'reject'>) {
 export function useModal() {
 	const setModals = useSetAtom(activeModalStack);
 
-	return async function activate<T, TProps = never>({
-		ModalContents,
-		onBackdropCancel,
-		additional,
-	}: ModalOptions<T, TProps>) {
-		const modal: Modal = {
-			contents: null,
-			id: Math.random(),
-			onBackdropCancel: noop,
-		};
-		try {
-			return await new Promise<T>((resolve, reject) => {
-				const props = { resolve: complete, reject };
-				const allProps: ModalContentsProps<T, TProps> = {
-					additional: additional as [TProps] extends [never]
-						? undefined
-						: TProps,
-					...props,
-				};
-				modal.onBackdropCancel = () =>
-					(onBackdropCancel ?? rejectViaBackdrop)(allProps);
-				modal.contents = <ModalContents {...allProps} />;
-				setModals((modals) => [...modals, modal]);
+	return useCallback(
+		async function activate<T, TProps = never>({
+			ModalContents,
+			onBackdropCancel,
+			additional,
+		}: ModalOptions<T, TProps>) {
+			const modal: Modal = {
+				contents: null,
+				id: Math.random(),
+				onBackdropCancel: noop,
+			};
+			try {
+				return await new Promise<T>((resolve, reject) => {
+					const props = { resolve: complete, reject };
+					const allProps: ModalContentsProps<T, TProps> = {
+						additional: additional as [TProps] extends [never]
+							? undefined
+							: TProps,
+						...props,
+					};
+					modal.onBackdropCancel = () =>
+						(onBackdropCancel ?? rejectViaBackdrop)(allProps);
+					modal.contents = <ModalContents {...allProps} />;
+					setModals((modals) => [...modals, modal]);
 
-				function complete(value: T | PromiseLike<T>) {
-					unmountModal();
-					resolve(value);
-				}
-			});
-		} finally {
-			unmountModal();
-		}
+					function complete(value: T | PromiseLike<T>) {
+						unmountModal();
+						resolve(value);
+					}
+				});
+			} finally {
+				unmountModal();
+			}
 
-		function unmountModal() {
-			setModals((modals) => modals.filter((m) => m !== modal));
-		}
-	};
+			function unmountModal() {
+				setModals((modals) => modals.filter((m) => m !== modal));
+			}
+		},
+		[setModals],
+	);
 }
 
 export function Modals() {

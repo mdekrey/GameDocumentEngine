@@ -198,19 +198,44 @@
 					},
 					"pass": {
 						"label": "Pass",
-						"title": "Used wise on a passed test"
+						"title": "Used wise on a passed test",
+						"not-pressed": "Press to mark a passed test for the wise",
+						"pressed": "Press to remove passed test for the wise"
 					},
 					"fail": {
 						"label": "Fail",
-						"title": "Used wise on a failed test"
+						"title": "Used wise on a failed test",
+						"not-pressed": "Press to mark a failed test for the wise",
+						"pressed": "Press to remove failed test for the wise"
 					},
 					"fate": {
 						"label": "Fate",
-						"title": "Used a fate point to activate wise"
+						"title": "Used a fate point to activate wise",
+						"not-pressed": "Press to mark fate used for the wise",
+						"pressed": "Press to mark fate not used for the wise"
 					},
 					"persona": {
 						"label": "Pers",
-						"title": "Used a persona point to activate wise"
+						"title": "Used a persona point to activate wise",
+						"not-pressed": "Press to mark persona used for the wise",
+						"pressed": "Press to mark persona not used for the wise"
+					}
+				},
+				"conditions": {
+					"hungryThirsty": {
+						"label": "Hungry / Thirsty"
+					},
+					"angry": {
+						"label": "Angry"
+					},
+					"tired": {
+						"label": "Tired"
+					},
+					"injured": {
+						"label": "Injured"
+					},
+					"sick": {
+						"label": "Sick"
 					}
 				}
 			}
