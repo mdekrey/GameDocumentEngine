@@ -49,7 +49,6 @@ export class FieldEvents implements IFieldEvents {
 
 	dispatchEvent(event: FieldEventNames) {
 		this.target.dispatchEvent(new Event(event));
-		console.log(event, this.formEvents);
 		this.formEvents?.dispatchEvent(formEventEquivalents[event]);
 	}
 }
