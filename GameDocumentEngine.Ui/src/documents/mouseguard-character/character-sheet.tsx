@@ -17,7 +17,7 @@ import { Conditions } from './parts/conditions';
 import { FormEvents } from '@/utils/form/events/FormEvents';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { IconLinkButton } from '@/components/button/icon-link-button';
-import { produce } from 'immer';
+import { fixupCharacter } from './fixupCharacter';
 
 export function FullCharacterSheet({
 	document,
@@ -68,30 +68,11 @@ export function CharacterSheet({
 		schema: CharacterDocument,
 		translation: (f) => t(`character-sheet.${f}`),
 	});
-	updateFormDefault(form, character);
+	updateFormDefault(form, character, fixupCharacter);
 
 	const onSubmit = useCallback(
 		function onSubmit(currentValue: CharacterDocument) {
-			const fixedUp = produce(currentValue, (draft) => {
-				while (
-					draft.details.skills.length > 0 &&
-					draft.details.skills[draft.details.skills.length - 1] === null
-				) {
-					draft.details.skills.pop();
-				}
-				while (
-					draft.details.traits.length > 0 &&
-					draft.details.traits[draft.details.traits.length - 1] === null
-				) {
-					draft.details.traits.pop();
-				}
-				while (
-					draft.details.wises.length > 0 &&
-					draft.details.wises[draft.details.wises.length - 1] === null
-				) {
-					draft.details.wises.pop();
-				}
-			});
+			const fixedUp = fixupCharacter(currentValue);
 			const ops = createPatch(
 				{
 					name: character.name,
