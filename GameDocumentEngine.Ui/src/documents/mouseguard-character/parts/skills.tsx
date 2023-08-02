@@ -8,25 +8,30 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { Atom, useAtomValue } from 'jotai';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
 import { HiXMark } from 'react-icons/hi2';
+import { positions } from '../skill-positions';
 
-const requiredSkillMapping: FieldMapping<Skill | null, Skill> = {
+const requiredSkillMappingWithDefaultName = (
+	defaultName: string,
+): FieldMapping<Skill | null, Skill> => ({
 	toForm: (v) =>
-		v ?? { name: '', rating: 0, advancement: { passes: 0, fails: 0 } },
+		v ?? { name: defaultName, rating: 0, advancement: { passes: 0, fails: 0 } },
 	fromForm: (v) =>
 		v.rating === 0 &&
 		v.advancement.passes === 0 &&
 		v.advancement.fails === 0 &&
-		v.name === ''
+		(v.name === '' || v.name === defaultName)
 			? null
 			: v,
-};
+});
 
 export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {
 		skills: (skillIndex: number) =>
 			({
 				path: ['details', 'skills', skillIndex],
-				mapping: requiredSkillMapping,
+				mapping: requiredSkillMappingWithDefaultName(
+					positions[skillIndex] ?? '',
+				),
 				schema: skillSchema,
 				translationPath: ['details', 'skills'],
 			}) as const,

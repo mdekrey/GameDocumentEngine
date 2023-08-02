@@ -4,17 +4,12 @@ import { FullCharacterSheet } from './character-sheet';
 import characterSchema from './schema';
 import { z } from 'zod';
 import en from './en.json';
-import { positions } from './skill-positions';
 
 defineDocument('MouseGuard-Character', {
 	icon: GiSeatedMouse,
 	template: {
 		bio: {},
-		skills: positions.map((name) => ({
-			name: name ?? '',
-			rating: 0,
-			advancement: { passes: 0, fails: 0 },
-		})),
+		skills: [],
 		conditions: {},
 		abilities: {
 			nature: { current: 1, max: 1, advancement: { passes: 0, fails: 0 } },
