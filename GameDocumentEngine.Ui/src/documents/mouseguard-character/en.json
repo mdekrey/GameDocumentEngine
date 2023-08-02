@@ -253,6 +253,20 @@
 					"sick": {
 						"label": "Sick"
 					}
+				},
+				"rewards": {
+					"fate": {
+						"label": "Fate",
+						"description": "One point allows you to reroll any axes (6) as new dice"
+					},
+					"persona": {
+						"label": "Persona",
+						"description": "Add one die per point spent or tap Nature"
+					},
+					"checks": {
+						"label": "Checks",
+						"description": "Spend during player turn"
+					}
 				}
 			}
 		}
