@@ -3,9 +3,9 @@ import { type UseFormResult } from './useForm';
 import { applyPatch, createPatch } from 'rfc6902';
 
 export function updateFormDefault<T extends Objectish>(
-	form: UseFormResult<T>,
+	form: Pick<UseFormResult<T>, 'defaultValue' | 'set' | 'get'>,
 	newValue: T,
-	fixup?: (value: T) => T,
+	fixupFormValues?: (value: T) => T,
 ) {
 	if (form.defaultValue.current !== newValue) {
 		const patch = createPatch(form.defaultValue.current, newValue);
@@ -13,7 +13,7 @@ export function updateFormDefault<T extends Objectish>(
 		form.defaultValue.current = newValue;
 
 		let prev = form.get();
-		if (fixup) prev = fixup(prev);
+		if (fixupFormValues) prev = fixupFormValues(prev);
 
 		// This process prevents changes coming over the network from
 		// repeating local changes, such as adding array elements. Adding array
