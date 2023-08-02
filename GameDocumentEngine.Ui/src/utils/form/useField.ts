@@ -36,7 +36,10 @@ export type UseFieldResult<
 	setValue(v: TFieldValue | ((prev: TFieldValue) => TFieldValue)): void;
 	getValue(): TFieldValue;
 	errors?: ErrorsAtom;
-	onChange(this: void, v: TFieldValue): void;
+	onChange(
+		this: void,
+		v: TFieldValue | ((prev: TFieldValue) => TFieldValue),
+	): void;
 	onBlur(this: void): void;
 	htmlProps: ToHtmlProps<TFieldValue>;
 } & IfTrueThenProp<

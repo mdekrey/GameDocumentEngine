@@ -3,8 +3,7 @@ import { useFormFields } from '@/utils/form/useFormFields';
 import { Atom } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTranslation } from 'react-i18next';
-import { EmptyCirclesFromAtom } from './repeating-icons';
-import { CheckboxesButton } from './checkboxes-button';
+import { CheckboxList } from './CheckboxList';
 
 export function PassFail({
 	advancement,
@@ -24,10 +23,10 @@ export function PassFail({
 		passes: ['passes'],
 		fails: ['fails'],
 	});
-	const passesUncheckedChecked = useComputedAtom(
+	const passesUncheckedCount = useComputedAtom(
 		(get) => get(maxPasses) - get(fields.passes.value),
 	);
-	const failsUncheckedChecked = useComputedAtom(
+	const failsUncheckedCount = useComputedAtom(
 		(get) => get(maxFails) - get(fields.fails.value),
 	);
 	const passesSpacing = useComputedAtom(
@@ -43,33 +42,27 @@ export function PassFail({
 			<div className="flex gap-2 items-center">
 				<span>{t('pass-abbrev')}:</span>
 				{/* TODO: accessible number of passes/fails; a sr-only TextField crashes */}
-				<CheckboxesButton
-					count={fields.passes.value}
-					filled
-					title={fields.passes.translation('decrease')}
-					onClick={() => adjust('passes', -1)}
+				<CheckboxList
+					checkedCount={fields.passes.value}
+					uncheckedCount={passesUncheckedCount}
+					paddingCount={passesSpacing}
+					checkedTitle={fields.passes.translation('decrease')}
+					uncheckedTitle={fields.passes.translation('increase')}
+					onUncheck={() => adjust('passes', -1)}
+					onCheck={() => adjust('passes', 1)}
 				/>
-				<CheckboxesButton
-					count={passesUncheckedChecked}
-					title={fields.passes.translation('increase')}
-					onClick={() => adjust('passes', 1)}
-				/>
-				<EmptyCirclesFromAtom count={passesSpacing} className="invisible" />
 			</div>
 			<div className="flex gap-2 items-center">
 				<span>{t('fail-abbrev')}:</span>
-				<CheckboxesButton
-					count={fields.fails.value}
-					filled
-					title={fields.fails.translation('decrease')}
-					onClick={() => adjust('fails', -1)}
+				<CheckboxList
+					checkedCount={fields.fails.value}
+					uncheckedCount={failsUncheckedCount}
+					paddingCount={failsSpacing}
+					checkedTitle={fields.fails.translation('decrease')}
+					uncheckedTitle={fields.fails.translation('increase')}
+					onUncheck={() => adjust('fails', -1)}
+					onCheck={() => adjust('fails', 1)}
 				/>
-				<CheckboxesButton
-					count={failsUncheckedChecked}
-					title={fields.fails.translation('increase')}
-					onClick={() => adjust('fails', 1)}
-				/>
-				<EmptyCirclesFromAtom count={failsSpacing} className="invisible" />
 			</div>
 		</div>
 	);

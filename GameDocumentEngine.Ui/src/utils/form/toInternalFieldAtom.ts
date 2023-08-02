@@ -50,7 +50,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		getValue: () => store.get(formValueAtom),
 		errors,
 		translation: options.translation,
-		onChange(v: TFieldValue) {
+		onChange(v: TFieldValue | ((prev: TFieldValue) => TFieldValue)) {
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(v);
 		},

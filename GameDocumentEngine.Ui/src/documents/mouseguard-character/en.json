@@ -221,6 +221,22 @@
 						"pressed": "Press to mark persona not used for the wise"
 					}
 				},
+				"traits": {
+					"name": {
+						"label": "Name of trait"
+					},
+					"level": {
+						"current": "Trait level {{level}}",
+						"increase": "Increase trait level",
+						"decrease": "Decrease trait level"
+					},
+					"usedFor": {
+						"label": "Used For",
+						"always": "+1 to all tests",
+						"decrease": "Decrease times trait was used in favor",
+						"increase": "Increase times trait was used in favor"
+					}
+				},
 				"conditions": {
 					"hungryThirsty": {
 						"label": "Hungry / Thirsty"

@@ -20,6 +20,7 @@ export function CheckboxesButton({
 			disabled={value === 0}
 			className="inline-flex gap-2"
 			title={title}
+			aria-label={title}
 			onClick={onClick}
 		>
 			{filled ? (
