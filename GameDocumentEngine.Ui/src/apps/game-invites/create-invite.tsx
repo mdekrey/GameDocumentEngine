@@ -7,17 +7,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { Field } from '@/utils/form-fields/field/field';
-import { ErrorsList } from '@/utils/form-fields/jotai/errors/errors-list';
-import { TextInput } from '@/utils/form-fields/text-input/text-input';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { Atom, useAtomValue } from 'jotai';
-import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
+import { FieldMapping } from '@/utils/form/useField';
 import { CheckboxField } from '@/utils/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/utils/form-fields/select-field/select-field';
 import { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { noChange } from '@/utils/form/mapAtom';
+import { NumberField } from '@/utils/form-fields/number-field/number-field';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -64,7 +61,7 @@ export function CreateInvite({
 		defaultValue: { uses: -1, role: '' },
 		translation: t,
 		fields: {
-			uses: ['uses'],
+			uses: { path: ['uses'], mapping: positiveIntegerMapping },
 			role: ['role'],
 			isUnlimited: {
 				path: ['uses'],
@@ -93,7 +90,7 @@ export function CreateInvite({
 						className="col-span-2"
 						field={form.fields.isUnlimited}
 					/>
-					<NumberOfUses field={form.fields.uses} disabled={disableUsesAtom} />
+					<NumberField field={form.fields.uses} disabled={disableUsesAtom} />
 				</Fieldset>
 
 				<ModalDialogLayout.Buttons>
@@ -110,28 +107,4 @@ export function CreateInvite({
 		await createInvite.mutateAsync(data);
 		resolve(true);
 	}
-}
-
-function NumberOfUses({
-	disabled: disabledAtom,
-	field,
-}: {
-	disabled: Atom<boolean>;
-	field: UseFieldResult<number>;
-}) {
-	const disabled = useAtomValue(disabledAtom);
-	return (
-		<Field>
-			<Field.Label className={disabled ? 'text-gray-500' : ''}>
-				{field.translation(['label'])}
-			</Field.Label>
-			<Field.Contents>
-				<TextInput
-					disabled={disabledAtom}
-					{...field.htmlProps(positiveIntegerMapping)}
-				/>
-				<ErrorsList errors={field.errors} translations={field.translation} />
-			</Field.Contents>
-		</Field>
-	);
 }
