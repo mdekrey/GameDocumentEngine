@@ -5,15 +5,10 @@ import { Link, LinkProps } from 'react-router-dom';
 export function IconLinkButtonComponent({
 	children,
 	className,
-	type,
 	...props
 }: LinkProps & { title: string }) {
 	return (
-		<Link
-			className={twMerge(iconButtonClasses, className)}
-			type={type ?? 'button'}
-			{...props}
-		>
+		<Link className={twMerge(iconButtonClasses, className)} {...props}>
 			{children}
 		</Link>
 	);

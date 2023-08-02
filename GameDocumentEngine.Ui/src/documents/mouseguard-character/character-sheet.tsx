@@ -4,7 +4,7 @@ import { useForm } from '@/utils/form/useForm';
 import { Character, CharacterDocument } from './character-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { IconButton } from '@/components/button/icon-button';
-import { HiOutlineTrash } from 'react-icons/hi2';
+import { HiOutlineTrash, HiOutlineUserGroup } from 'react-icons/hi2';
 import { Bio } from './parts/bio';
 import { Personality } from './parts/personality';
 import { Notes } from './parts/notes';
@@ -16,6 +16,7 @@ import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
 import { FormEvents } from '@/utils/form/events/FormEvents';
 import { updateFormDefault } from '@/utils/form/update-form-default';
+import { IconLinkButton } from '@/components/button/icon-link-button';
 
 export function FullCharacterSheet({
 	document,
@@ -31,12 +32,17 @@ export function FullCharacterSheet({
 
 	return (
 		<>
-			<IconButton.Destructive
-				title={translation('details.delete')}
-				onClick={onDeleteDocument}
-			>
-				<HiOutlineTrash />
-			</IconButton.Destructive>
+			<div className="flex flex-row gap-3">
+				<IconLinkButton title={translation('details.edit-roles')} to="roles">
+					<HiOutlineUserGroup />
+				</IconLinkButton>
+				<IconButton.Destructive
+					title={translation('details.delete')}
+					onClick={onDeleteDocument}
+				>
+					<HiOutlineTrash />
+				</IconButton.Destructive>
+			</div>
 
 			<CharacterSheet
 				character={characterData}

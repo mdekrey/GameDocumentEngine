@@ -11,7 +11,8 @@
 		}
 	},
 	"details": {
-		"delete": "Delete character"
+		"delete": "Delete character",
+		"edit-roles": "Edit roles"
 	},
 	"character-sheet": {
 		"passes-and-fails": {
