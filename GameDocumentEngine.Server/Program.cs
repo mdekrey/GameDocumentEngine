@@ -5,6 +5,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Realtime;
+using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System.Security.AccessControl;
 using System.Security.Claims;
 using System.Text.Json;
@@ -162,6 +165,18 @@ services.AddDbContext<DocumentDbContext>((provider, o) =>
 	o.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
 	 .AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });
+
+services
+	.AddOpenTelemetry()
+	.WithTracing(tracerProviderBuilder =>
+	{
+		tracerProviderBuilder.AddOtlpExporter();
+		tracerProviderBuilder
+			.AddSource(DiagnosticsConfig.ActivitySource.Name)
+			.ConfigureResource(resource => resource
+				.AddService(DiagnosticsConfig.ServiceName))
+			.AddAspNetCoreInstrumentation();
+	});
 
 var app = builder.Build();
 
