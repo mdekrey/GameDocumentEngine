@@ -43,9 +43,9 @@ export function ClockEdit({
 		</form>
 	);
 
-	function onSubmit(currentValue: ClockDocument) {
+	async function onSubmit(currentValue: ClockDocument) {
 		const ops = createPatch(clock, currentValue);
-		onUpdateClock((prev) => {
+		await onUpdateClock((prev) => {
 			applyPatch(prev, ops);
 		});
 	}

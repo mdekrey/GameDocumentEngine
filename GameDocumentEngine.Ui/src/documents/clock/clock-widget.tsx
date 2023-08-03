@@ -99,8 +99,8 @@ function EditModal({
 		<div className="p-6">
 			<ClockEdit
 				clock={clockData}
-				onUpdateClock={(updater) => {
-					onUpdateClock(updater);
+				onUpdateClock={async (updater) => {
+					await onUpdateClock(updater);
 					resolve(false);
 				}}
 			/>
