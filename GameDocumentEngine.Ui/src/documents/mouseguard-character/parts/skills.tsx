@@ -15,13 +15,14 @@ const requiredSkillMappingWithDefaultName = (
 ): FieldMapping<Skill | null, Skill> => ({
 	toForm: (v) =>
 		v ?? { name: defaultName, rating: 0, advancement: { passes: 0, fails: 0 } },
-	fromForm: (v) =>
-		v.rating === 0 &&
-		v.advancement.passes === 0 &&
-		v.advancement.fails === 0 &&
-		(v.name === '' || v.name === defaultName)
+	fromForm: (v) => {
+		return v.rating === 0 &&
+			v.advancement.passes === 0 &&
+			v.advancement.fails === 0 &&
+			(v.name === '' || v.name === defaultName)
 			? null
-			: v,
+			: v;
+	},
 });
 
 export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {

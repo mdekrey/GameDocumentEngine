@@ -15,9 +15,9 @@ import { Traits } from './parts/traits';
 import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
 import { FormEvents } from '@/utils/form/events/FormEvents';
-import { updateFormDefault } from '@/utils/form/update-form-default';
+import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { IconLinkButton } from '@/components/button/icon-link-button';
-import { fixupCharacter } from './fixupCharacter';
+import { characterFixup } from './fixupCharacter';
 
 export function FullCharacterSheet({
 	document,
@@ -64,28 +64,27 @@ export function CharacterSheet({
 	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
 }) {
 	const form = useForm({
-		defaultValue: character,
+		defaultValue: characterFixup.toForm(character),
 		schema: CharacterDocument,
 		translation: (f) => t(`character-sheet.${f}`),
 	});
-	updateFormDefault(form, character, fixupCharacter);
+	updateFormDefaultMapped(form, character, characterFixup);
 
 	const onSubmit = useCallback(
-		function onSubmit(currentValue: CharacterDocument) {
-			const fixedUp = fixupCharacter(currentValue);
-			const ops = createPatch(
-				{
-					name: character.name,
-					details: character.details,
-				},
-				fixedUp,
-			);
-			if (ops.length > 0)
-				onUpdateDocument((prev) => {
-					applyPatch(prev, ops);
-				});
+		async function onSubmit(currentValue: CharacterDocument) {
+			const fixedUp = characterFixup.fromForm(currentValue);
+			await onUpdateDocument((prev) => {
+				const ops = createPatch(
+					{
+						name: prev.name,
+						details: prev.details,
+					},
+					fixedUp,
+				);
+				applyPatch(prev, ops);
+			});
 		},
-		[character, onUpdateDocument],
+		[onUpdateDocument],
 	);
 	useEffect(() => {
 		form.formEvents.addEventListener(FormEvents.AnyBlur, submitOnChange);

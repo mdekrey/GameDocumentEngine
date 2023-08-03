@@ -17,7 +17,7 @@ export type EditableDocumentDetails<T = unknown> = {
 
 export type Updater<T> = (
 	updates: (draft: Draft<EditableDocumentDetails<T>>) => void,
-) => void;
+) => Promise<void>;
 
 export type GameObjectWidgetProps<T = unknown> = {
 	gameId: string;
