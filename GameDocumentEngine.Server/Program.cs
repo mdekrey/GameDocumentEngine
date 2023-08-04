@@ -5,7 +5,6 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Realtime;
-using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Security.AccessControl;
@@ -170,12 +170,20 @@ services
 	.AddOpenTelemetry()
 	.WithTracing(tracerProviderBuilder =>
 	{
+		var name = builder.Configuration["EnvironmentName"]
+			?? $"GameDocsEngine:{builder.Environment.EnvironmentName}";
 		tracerProviderBuilder.AddOtlpExporter();
 		tracerProviderBuilder
-			.AddSource(DiagnosticsConfig.ActivitySource.Name)
-			.ConfigureResource(resource => resource
-				.AddService(DiagnosticsConfig.ServiceName))
-			.AddAspNetCoreInstrumentation();
+			.AddSource(name)
+			.ConfigureResource(resource => resource.AddService(name))
+			.AddAspNetCoreInstrumentation(cfg =>
+			{
+				cfg.RecordException = true;
+			})
+			.AddEntityFrameworkCoreInstrumentation(cfg =>
+			{
+				cfg.SetDbStatementForText = true;
+			});
 	});
 
 var app = builder.Build();

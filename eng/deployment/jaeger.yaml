@@ -1,0 +1,18 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: docs-engine-monitor
+  namespace: game-docs-engine
+spec:
+  strategy: allInOne
+  storage:
+    type: memory
+    options:
+      memory:
+        max-traces: 100000
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: haproxy
+    hosts:
+      - jaeger.vtt.dekrey.net # TODO: I'm not sure if this is a good idea to expose like this...
