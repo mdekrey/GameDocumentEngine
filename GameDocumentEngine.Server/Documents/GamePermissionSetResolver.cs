@@ -37,7 +37,7 @@ public class GamePermissionSetResolver
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId)
 	{
-		var gameUserRecord = await (from gameUser in context.GameUsers
+		var gameUserRecord = await (from gameUser in context.GameUsers.Include(gu => gu.Game)
 									where gameUser.UserId == userId && gameUser.GameId == gameId
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return null;
@@ -46,10 +46,11 @@ public class GamePermissionSetResolver
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId, Guid documentId)
 	{
-		var gameUserRecord = await context.GameUsers.SingleOrDefaultAsync(gu => gu.UserId == userId && gu.GameId == gameId);
+		var gameUserRecord = await context.GameUsers.Include(gu => gu.Game)
+			.Include(gu => gu.Documents.Where(d => d.DocumentId == documentId)).ThenInclude(du => du.Document)
+			.SingleOrDefaultAsync(gu => gu.UserId == userId && gu.GameId == gameId);
 		if (gameUserRecord == null) return null;
-		var documentUserRecord = await context.DocumentUsers.Include(du => du.Document)
-			.SingleOrDefaultAsync(du => du.UserId == userId && du.GameId == gameId && du.DocumentId == documentId);
+		var documentUserRecord = gameUserRecord.Documents.SingleOrDefault(du => du.DocumentId == documentId);
 
 		return await GetPermissions(
 			gameUserRecord,
@@ -79,10 +80,10 @@ public class GamePermissionSetResolver
 			if (!userPermissions.HasPermission(GameSecurity.SeeAnyDocument(gameUser.GameId)))
 				return null;
 
-			return new(UserId: gameUser.UserId, userPermissions);
+			return new(GameUser: gameUser, userPermissions);
 		}
 
-		return new(UserId: gameUser.UserId, userPermissions.Add(documentPermissions));
+		return new(GameUser: gameUser, userPermissions.Add(documentPermissions));
 
 		async Task<PermissionList?> GetDocumentPermissions()
 		{

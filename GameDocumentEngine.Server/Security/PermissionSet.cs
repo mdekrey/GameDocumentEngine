@@ -1,3 +1,5 @@
-﻿namespace GameDocumentEngine.Server.Security;
+﻿using GameDocumentEngine.Server.Documents;
 
-public record PermissionSet(Guid UserId, PermissionList Permissions);
+namespace GameDocumentEngine.Server.Security;
+
+public record PermissionSet(GameUserModel GameUser, PermissionList Permissions);

@@ -120,13 +120,13 @@ public class DocumentController : Api.DocumentControllerBase
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
 		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return GetDocumentActionResult.NotFound();
 
-		var documentUserRecord = await (from documentUser in dbContext.DocumentUsers.Include(du => du.GameUser).Include(du => du.Document)
-										where documentUser.DocumentId == id && documentUser.UserId == User.GetCurrentUserId() && documentUser.GameId == gameId
-										select documentUser)
-			.SingleOrDefaultAsync();
-		if (documentUserRecord == null) return GetDocumentActionResult.NotFound();
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document
+			?? await (from doc in dbContext.Documents
+					  where doc.Id == id
+					  select doc).SingleOrDefaultAsync();
+		if (document == null) return GetDocumentActionResult.NotFound();
 
-		return GetDocumentActionResult.Ok(await ToDocumentDetails(documentUserRecord.Document, permissions));
+		return GetDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
 	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, JsonPatch patchDocumentBody)
@@ -175,19 +175,21 @@ public class DocumentController : Api.DocumentControllerBase
 		if (permissions == null) return UpdateDocumentRoleAssignmentsActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId, id))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
 
-		var document = await dbContext.Documents.Include(d => d.Game).Where(d => d.Id == id && d.GameId == gameId).SingleAsync();
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document
+			?? await dbContext.Documents.Include(d => d.Game).Include(d => d.Players).Where(d => d.Id == id && d.GameId == gameId).SingleAsync();
 
 		var docType = GetDocumentType(document);
 		if (docType == null)
 			return UpdateDocumentRoleAssignmentsActionResult.BadRequest();
 
-		var gameUserRecords = await (from documentUser in dbContext.DocumentUsers
-									 where documentUser.GameId == gameId && documentUser.DocumentId == id
-									 select documentUser).ToListAsync();
+		var gameUserRecords = document.Players
+			?? await (from documentUser in dbContext.DocumentUsers
+					  where documentUser.GameId == gameId && documentUser.DocumentId == id
+					  select documentUser).ToListAsync();
 		foreach (var kvp in updateDocumentRoleAssignmentsBody)
 		{
 			var key = Guid.Parse(kvp.Key);
-			if (key == permissions.UserId)
+			if (key == permissions.GameUser.UserId)
 				// Can't update your own permissions!
 				return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
 			var modifiedUser = gameUserRecords.FirstOrDefault(u => u.UserId == key);

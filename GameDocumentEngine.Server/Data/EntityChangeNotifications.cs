@@ -109,7 +109,7 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 				apiMapper.ToKey(entity),
 				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.BeforeChange),
 				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.AfterChange),
-				user.UserId);
+				user.GameUser.UserId);
 	}
 	protected virtual async Task SendUserChangedNotification(DocumentDbContext context, EntityEntry<TUserEntity> changedEntity)
 	{
@@ -128,10 +128,10 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 		var currentUserId = toUserId(target);
 		var currentUser = new
 		{
-			Old = oldUserPermissions.FirstOrDefault(p => p.UserId == currentUserId),
-			New = newUserPermissions.FirstOrDefault(p => p.UserId == currentUserId),
+			Old = oldUserPermissions.FirstOrDefault(p => p.GameUser.UserId == currentUserId),
+			New = newUserPermissions.FirstOrDefault(p => p.GameUser.UserId == currentUserId),
 		};
-		var otherUsers = newUserPermissions.Where(p => p.UserId != currentUserId);
+		var otherUsers = newUserPermissions.Where(p => p.GameUser.UserId != currentUserId);
 
 		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
 		var key = apiMapper.ToKey(entity);
@@ -155,12 +155,12 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 
 		foreach (var user in otherUsers)
 		{
-			var oldPermissions = oldUserPermissions.FirstOrDefault(p => p.UserId == user.UserId) ?? user;
+			var oldPermissions = oldUserPermissions.FirstOrDefault(p => p.GameUser.UserId == user.GameUser.UserId) ?? user;
 			await changeNotification.SendModifiedNotification(
 				key,
 				await apiMapper.ToApi(context, entity, oldPermissions, DbContextChangeUsage.BeforeChange),
 				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.AfterChange),
-				user.UserId
+				user.GameUser.UserId
 			);
 		}
 	}

@@ -145,7 +145,7 @@ public class GameController : Api.GameControllerBase
 		foreach (var kvp in updateGameRoleAssignmentsBody)
 		{
 			var key = Guid.Parse(kvp.Key);
-			if (key == permissions.UserId)
+			if (key == permissions.GameUser.UserId)
 				// Can't update your own permissions!
 				return UpdateGameRoleAssignmentsActionResult.Forbidden();
 			if (gameUserRecords.FirstOrDefault(u => u.UserId == key) is not GameUserModel modifiedUser)

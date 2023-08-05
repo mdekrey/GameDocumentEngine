@@ -94,6 +94,6 @@ public static class GameSecurity
 	}
 
 	public static PermissionSet ToPermissionSet(this GameUserModel gameUser) =>
-		new PermissionSet(gameUser.UserId, gameUser.ToPermissions());
+		new PermissionSet(gameUser, gameUser.ToPermissions());
 
 }
