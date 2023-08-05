@@ -11,15 +11,15 @@ COPY ["./GameDocumentEngine.sln", "./"]
 COPY ["./Directory.Build.props", "./"]
 COPY ["./global.json", "./"]
 COPY ["./GameDocumentEngine.Server/GameDocumentEngine.Server.csproj", "./GameDocumentEngine.Server/"]
-RUN cd ./GameDocumentEngine.Server/ && dotnet restore
+RUN cd ./GameDocumentEngine.Server/ && dotnet restore --use-current-runtime
 
 WORKDIR /src
 COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Server/ ./GameDocumentEngine.Server/
 COPY .editorconfig .editorconfig
 
-RUN cd ./GameDocumentEngine.Server/ && dotnet build -c Release --no-restore -o /app/build
-RUN cd ./GameDocumentEngine.Server/ && dotnet publish -c Release -o /app/publish -p:SkipUiBuild=true
+RUN cd ./GameDocumentEngine.Server/ && dotnet build -c Release --no-restore --use-current-runtime --self-contained
+RUN cd ./GameDocumentEngine.Server/ && dotnet publish -c Release -p:PublishReadyToRun=true --use-current-runtime --self-contained
 
 FROM node:18-alpine AS build-ui
 WORKDIR /src
@@ -44,7 +44,7 @@ FROM base AS final
 WORKDIR /app
 ARG GITHASH
 ENV BUILD__GITHASH=${GITHASH}
-COPY --from=build-dotnet /app/publish .
+COPY --from=build-dotnet /src/artifacts/bin/GameDocumentEngine.Server/Release/net7.0/linux-x64/publish .
 COPY --from=build-ui /src/GameDocumentEngine.Server/wwwroot ./wwwroot
 
 ENTRYPOINT ["dotnet", "GameDocumentEngine.Server.dll"]

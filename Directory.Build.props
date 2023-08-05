@@ -4,6 +4,7 @@
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<LangVersion>11</LangVersion>
+		<RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
 
 		<SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
 		<RepositoryEngineeringDir>$(SolutionRoot)eng/</RepositoryEngineeringDir>
