@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Security.AccessControl;
@@ -185,6 +186,15 @@ services
 				cfg.SetDbStatementForText = true;
 			});
 	});
+services.Configure<AspNetCoreInstrumentationOptions>(options =>
+{
+	options.Filter = (httpContext) =>
+	{
+		if (httpContext.Request.Path.Value?.StartsWith("/hub") ?? false) return false;
+		return true;
+	};
+});
+
 
 var app = builder.Build();
 
