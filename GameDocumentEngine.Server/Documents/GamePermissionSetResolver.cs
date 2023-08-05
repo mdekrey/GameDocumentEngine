@@ -1,5 +1,6 @@
 ﻿using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Security;
+using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
@@ -37,6 +38,7 @@ public class GamePermissionSetResolver
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId)
 	{
+		using var activity = TracingHelper.StartActivity(nameof(GetPermissions));
 		var gameUserRecord = await (from gameUser in context.GameUsers.Include(gu => gu.Game)
 									where gameUser.UserId == userId && gameUser.GameId == gameId
 									select gameUser).SingleOrDefaultAsync();
@@ -46,6 +48,7 @@ public class GamePermissionSetResolver
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId, Guid documentId)
 	{
+		using var activity = TracingHelper.StartActivity(nameof(GetPermissions));
 		var gameUserRecord = await context.GameUsers.Include(gu => gu.Game)
 			.Include(gu => gu.Documents.Where(d => d.DocumentId == documentId)).ThenInclude(du => du.Document)
 			.SingleOrDefaultAsync(gu => gu.UserId == userId && gu.GameId == gameId);

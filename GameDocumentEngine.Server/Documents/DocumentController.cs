@@ -4,7 +4,9 @@ using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Json;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
+using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
+using Google.Protobuf.WellKnownTypes;
 using Json.More;
 using Json.Patch;
 using Json.Path;
@@ -226,6 +228,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 {
 	public async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
 	{
+		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelApiMapper)}.{nameof(ToApi)}");
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 
 		var documentUsersCollection = dbContext
@@ -277,6 +280,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 
 	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
 	{
+		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelChangeNotifications)}.{nameof(GetUsersFor)}");
 		var documentUserEntries = await context.LoadEntityEntriesAsync<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
 		var gameUserEntries = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.GameId);
 

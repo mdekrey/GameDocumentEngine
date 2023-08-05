@@ -5,6 +5,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Realtime;
+using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -26,7 +27,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var services = builder.Services;
 services.AddHealthChecks();
-services.AddControllers();
+services.AddControllers(config =>
+{
+	config.Filters.Add(new MvcActionFilter());
+});
 services.AddCompressedStaticFiles();
 var signalr = services.AddSignalR();
 if (builder.Configuration["Azure:SignalR:ConnectionString"] != null)
@@ -171,12 +175,15 @@ services
 	.AddOpenTelemetry()
 	.WithTracing(tracerProviderBuilder =>
 	{
-		var name = builder.Configuration["EnvironmentName"]
-			?? $"GameDocsEngine:{builder.Environment.EnvironmentName}";
 		tracerProviderBuilder.AddOtlpExporter();
 		tracerProviderBuilder
-			.AddSource(name)
-			.ConfigureResource(resource => resource.AddService(name))
+			.AddSource(TracingHelper.ActivitySource.Name)
+			.ConfigureResource(resource =>
+				resource.AddService(TracingHelper.ActivitySource.Name, serviceVersion: builder.Configuration["Build:GitHash"] ?? "local")
+				.AddAttributes(new Dictionary<string, object>
+				{
+					{ "deployment.environment", builder.Environment.EnvironmentName }
+				}))
 			.AddAspNetCoreInstrumentation(cfg =>
 			{
 				cfg.RecordException = true;

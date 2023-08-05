@@ -3,7 +3,9 @@ using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
+using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
+using Google.Protobuf.WellKnownTypes;
 using Json.Patch;
 using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
@@ -175,6 +177,7 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 
 	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
 	{
+		using var activity = TracingHelper.StartActivity($"{nameof(GameModelApiMapper)}.{nameof(ToApi)}");
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 
 		var gameUsers = dbContext
@@ -242,6 +245,7 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 
 	public async Task<GameTypeDetails> ToApi(DocumentDbContext dbContext, IGameType gameType)
 	{
+		using var activity = TracingHelper.StartActivity($"{nameof(GameTypeApiMapper)}.{nameof(ToApi)}");
 		return new GameTypeDetails(
 			Key: gameType.Key,
 			UserRoles: GameRoles,
@@ -272,6 +276,7 @@ class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameM
 
 	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, GameModel entity, DbContextChangeUsage changeState)
 	{
+		using var activity = TracingHelper.StartActivity($"{nameof(GameModelChangeNotifications)}.{nameof(GetUsersFor)}");
 		var players = context.Entry(entity).Collection(d => d.Players);
 		await players.LoadAsync();
 
