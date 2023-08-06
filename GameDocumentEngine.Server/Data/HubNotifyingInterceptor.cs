@@ -38,6 +38,8 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 		using Activity? activity = TracingHelper.StartActivity(nameof(NotifyChangesAsync));
 
 		// Note that this assumes nothing in the notifications will change state.
+		// It also assumes saving changes succeeds.
+		// TODO: If saving changes may fail, record notifications and send after success.
 		foreach (var changedEntity in context.ChangeTracker.Entries().ToArray())
 		{
 			if (changedEntity.State == Microsoft.EntityFrameworkCore.EntityState.Unchanged) continue;
