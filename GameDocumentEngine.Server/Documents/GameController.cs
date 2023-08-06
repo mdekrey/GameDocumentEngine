@@ -89,7 +89,8 @@ public class GameController : Api.GameControllerBase
 		if (permissions == null) return GetGameDetailsActionResult.NotFound();
 		if (!permissions.HasPermission(ViewGame(gameId))) return GetGameDetailsActionResult.Forbidden();
 
-		var gameRecord = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+		var gameRecord = permissions.GameUser.Game
+			?? await dbContext.Games.FirstAsync(g => g.Id == gameId);
 		return GetGameDetailsActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, permissions, DbContextChangeUsage.AfterChange));
 	}
 
@@ -101,7 +102,8 @@ public class GameController : Api.GameControllerBase
 		if (permissions == null) return PatchGameActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateGame(gameId))) return PatchGameActionResult.Forbidden();
 
-		var gameRecord = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+		var gameRecord = permissions.GameUser.Game
+			?? await dbContext.Games.FirstAsync(g => g.Id == gameId);
 		if (!patchGameBody.ApplyModelPatch(gameRecord, EditableGameModel.Create, dbContext, out var error))
 			return PatchGameActionResult.BadRequest(error.Message ?? "Unknown error");
 
@@ -124,7 +126,7 @@ public class GameController : Api.GameControllerBase
 		if (!permissions.HasPermission(UpdateGameUserAccess(gameId))) return RemoveUserFromGameActionResult.Forbidden();
 
 		if (userId == User.GetUserIdOrThrow()) return RemoveUserFromGameActionResult.Forbidden();
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers
 									where gameUser.UserId == userId && gameUser.GameId == gameId
 									select gameUser)
 			.SingleOrDefaultAsync();
