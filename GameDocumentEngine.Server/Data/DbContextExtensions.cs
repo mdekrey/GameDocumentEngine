@@ -34,7 +34,7 @@ public static class DbContextExtensions
 		var allEntities = await context.Set<T>().Where(filter).ToArrayAsync();
 
 		var filterFunc = GetCompiledExpression(filter);
-		return context.ChangeTracker.Entries<T>().Where(e => filterFunc(e.Entity)).ToArray();
+		return context.GetEntityEntries(filterFunc).ToArray();
 	}
 	public static EntityEntry<T>[] GetEntityEntries<T>(this DbContext context, Func<T, bool> filter)
 		where T : class

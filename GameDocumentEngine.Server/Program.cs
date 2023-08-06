@@ -144,20 +144,21 @@ services.AddAuthorization(options =>
 services.AddSingleton<GamePermissionSetResolverFactory>();
 services.AddTransient<GamePermissionSetResolver>();
 
-services.AddTransient<IApiMapper<UserModel, UserDetails>, UserModelApiMapper>();
-services.AddTransient<IPermissionedApiMapper<GameModel, GameDetails>, GameModelApiMapper>();
-services.AddTransient<IPermissionedApiMapper<DocumentModel, DocumentDetails>, DocumentModelApiMapper>();
-services.AddTransient<IApiMapper<IGameType, GameTypeDetails>, GameTypeApiMapper>();
-services.AddTransient<IApiChangeNotification<DocumentDetails>, DocumentApiChangeNotification>();
-services.AddTransient<IApiChangeNotification<UserDetails>, UserApiChangeNotification>();
-services.AddTransient<IApiChangeNotification<GameDetails>, GameApiChangeNotification>();
+services.AddScoped<IApiMapper<UserModel, UserDetails>, UserModelApiMapper>();
+services.AddScoped<DocumentUserLoader>();
+services.AddScoped<IPermissionedApiMapper<GameModel, GameDetails>, GameModelApiMapper>();
+services.AddScoped<IPermissionedApiMapper<DocumentModel, DocumentDetails>, DocumentModelApiMapper>();
+services.AddScoped<IApiMapper<IGameType, GameTypeDetails>, GameTypeApiMapper>();
+services.AddScoped<IApiChangeNotification<DocumentDetails>, DocumentApiChangeNotification>();
+services.AddScoped<IApiChangeNotification<UserDetails>, UserApiChangeNotification>();
+services.AddScoped<IApiChangeNotification<GameDetails>, GameApiChangeNotification>();
 
 services.AddHttpContextAccessor();
-services.AddTransient<AuditableInterceptor>();
-services.AddTransient<HubNotifyingInterceptor>();
-services.AddTransient<IEntityChangeNotifications, UserModelChangeNotifications>();
-services.AddTransient<IEntityChangeNotifications, DocumentModelChangeNotifications>();
-services.AddTransient<IEntityChangeNotifications, GameModelChangeNotifications>();
+services.AddScoped<AuditableInterceptor>();
+services.AddScoped<HubNotifyingInterceptor>();
+services.AddScoped<IEntityChangeNotifications, UserModelChangeNotifications>();
+services.AddScoped<IEntityChangeNotifications, DocumentModelChangeNotifications>();
+services.AddScoped<IEntityChangeNotifications, GameModelChangeNotifications>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
 	if (builder.Configuration["Postgres:ConnectionString"] != null)

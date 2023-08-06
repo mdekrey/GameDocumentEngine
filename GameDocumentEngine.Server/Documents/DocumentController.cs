@@ -13,6 +13,7 @@ using Json.Path;
 using Json.Schema;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
@@ -225,17 +226,43 @@ public class DocumentController : Api.DocumentControllerBase
 		documentMapper.ToApi(dbContext, document, permissionSet, DbContextChangeUsage.AfterChange);
 }
 
+class DocumentUserLoader
+{
+	private readonly ISet<DocumentModel> documentsWithLoadedUsers = new HashSet<DocumentModel>();
+
+	public ValueTask EnsureDocumentUsersLoaded(DocumentDbContext dbContext, DocumentModel entity)
+	{
+		if (documentsWithLoadedUsers.Contains(entity)) return ValueTask.CompletedTask;
+		return new ValueTask(LoadDocumentUsers(dbContext, entity));
+	}
+
+	private async Task LoadDocumentUsers(DocumentDbContext dbContext, DocumentModel entity)
+	{
+		await (from gameUser in dbContext.GameUsers
+				.Include(gu => from documentUser in gu.Documents
+							   where documentUser.DocumentId == entity.Id
+							   select documentUser)
+			   where gameUser.GameId == entity.GameId
+			   select gameUser).LoadAsync();
+		documentsWithLoadedUsers.Add(entity);
+	}
+}
+
 class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.DocumentDetails>
 {
+	private readonly DocumentUserLoader userLoader;
+
+	public DocumentModelApiMapper(DocumentUserLoader userLoader)
+	{
+		this.userLoader = userLoader;
+	}
+
 	public async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
 	{
 		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelApiMapper)}.{nameof(ToApi)}");
 		var resultGame = dbContext.Entry(entity).AtState(usage);
 
-		var documentUsersCollection = dbContext
-			.Entry(entity)
-			.Collection(game => game.Players);
-		await documentUsersCollection.Query().LoadAsync();
+		var documentUsersCollection = await LoadDocumentUsers(dbContext, entity);
 
 		// mask parts of document data based on permissions
 		var jsonPaths = permissionSet.Permissions
@@ -263,27 +290,40 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 		);
 	}
 
+	private async Task<CollectionEntry<DocumentModel, DocumentUserModel>> LoadDocumentUsers(DocumentDbContext dbContext, DocumentModel entity)
+	{
+		await userLoader.EnsureDocumentUsersLoaded(dbContext, entity);
+		return dbContext
+			.Entry(entity)
+			.Collection(game => game.Players);
+	}
+
 	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
 }
 
 class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<DocumentModel, DocumentUserModel, Api.DocumentDetails>
 {
+	private readonly DocumentUserLoader userLoader;
 	private readonly GamePermissionSetResolverFactory permissionSetResolverFactory;
 
 	public DocumentModelChangeNotifications(
+		DocumentUserLoader userLoader,
 		IPermissionedApiMapper<DocumentModel, DocumentDetails> apiMapper,
 		IApiChangeNotification<DocumentDetails> changeNotification,
 		GamePermissionSetResolverFactory permissionSetResolverFactory)
 		: base(apiMapper, changeNotification, du => du.UserId, du => du.Document)
 	{
+		this.userLoader = userLoader;
 		this.permissionSetResolverFactory = permissionSetResolverFactory;
 	}
 
 	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
 	{
 		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelChangeNotifications)}.{nameof(GetUsersFor)}");
-		var documentUserEntries = await context.LoadEntityEntriesAsync<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
-		var gameUserEntries = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.GameId);
+
+		await userLoader.EnsureDocumentUsersLoaded(context, entity);
+		var documentUserEntries = context.GetEntityEntries<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
+		var gameUserEntries = context.GetEntityEntries<GameUserModel>(g => g.GameId == entity.GameId);
 
 		var documentUsers = documentUserEntries.AtState(changeState);
 		var gameUsers = gameUserEntries.AtState(changeState);
