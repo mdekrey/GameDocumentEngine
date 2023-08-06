@@ -1,4 +1,5 @@
-﻿using Json.Schema;
+﻿using GameDocumentEngine.Server.Tracing;
+using Json.Schema;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GameDocumentEngine.Server.Documents.Types;
@@ -18,6 +19,7 @@ public class JsonSchemaResolver
 		var key = new SchemaCacheKey(gameObjectType.Key);
 		return await cache.GetOrCreateAsync<JsonSchema>(key, async (entry) =>
 		{
+			using var _ = TracingHelper.StartActivity("Load schema");
 			var resourceName = gameObjectType.SchemaManifestResourceName();
 			using var resourceStream = gameObjectType.GetType().Assembly.GetManifestResourceStream(resourceName);
 			if (resourceStream == null)

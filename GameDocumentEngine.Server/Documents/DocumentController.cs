@@ -149,20 +149,25 @@ public class DocumentController : Api.DocumentControllerBase
 		if (docType == null)
 			return PatchDocumentActionResult.BadRequest("Unknown document type for game");
 
-		if (!patchDocumentBody.ApplyModelPatch(document, EditableDocumentModel.Create, dbContext, out var error))
-			return PatchDocumentActionResult.BadRequest(error.Message ?? "Unknown error");
+		using (TracingHelper.StartActivity("Apply Patch"))
+			if (!patchDocumentBody.ApplyModelPatch(document, EditableDocumentModel.Create, dbContext, out var error))
+				return PatchDocumentActionResult.BadRequest(error.Message ?? "Unknown error");
 
-		var schema = await schemaResolver.GetOrLoadSchema(docType);
-		var results = schema.Evaluate(document.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
-		if (!results.IsValid)
+		using (TracingHelper.StartActivity("Validate final document"))
 		{
-			var errors = results.Errors;
-			if (errors == null)
-				return PatchDocumentActionResult.BadRequest("Unable to verify request");
-			return PatchDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
+			var schema = await schemaResolver.GetOrLoadSchema(docType);
+			var results = schema.Evaluate(document.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
+			if (!results.IsValid)
+			{
+				var errors = results.Errors;
+				if (errors == null)
+					return PatchDocumentActionResult.BadRequest("Unable to verify request");
+				return PatchDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
+			}
 		}
 
-		await dbContext.SaveChangesAsync();
+		using (TracingHelper.StartActivity("Save changes"))
+			await dbContext.SaveChangesAsync();
 
 		return PatchDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
