@@ -21,6 +21,7 @@ using OpenTelemetry.Trace;
 using System.Security.AccessControl;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -190,6 +191,19 @@ services
 			})
 			.AddEntityFrameworkCoreInstrumentation(cfg =>
 			{
+				cfg.EnrichWithIDbCommand = (activity, cmd) =>
+				{
+					if (cmd.CommandType == System.Data.CommandType.Text)
+					{
+						var tables = Regex.Matches(cmd.CommandText, "FROM (?<table>[^( ]+)").Select(m => m.Groups["table"].Value).ToArray();
+						if (tables.Length > 0)
+							activity.DisplayName = string.Join('+', tables) + " on " + (cmd.Connection?.Database ?? activity.DisplayName);
+					}
+					else
+					{
+						activity.DisplayName = cmd.CommandText + " on " + (cmd.Connection?.Database ?? activity.DisplayName);
+					}
+				};
 				cfg.SetDbStatementForText = true;
 			});
 	});
