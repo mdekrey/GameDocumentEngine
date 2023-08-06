@@ -137,7 +137,8 @@ public class DocumentController : Api.DocumentControllerBase
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
 		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return PatchDocumentActionResult.NotFound();
 
-		var document = await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document
+			?? await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
 		// check permissions with patch to see if allowed
 		var jsonPaths = permissions.Permissions.MatchingPermissionsParams(WriteDocumentDetailsPrefix(gameId, id));
 		if (!patchDocumentBody.HasOnlyAllowedPaths(EditableDocumentModel.Create(document), jsonPaths))
