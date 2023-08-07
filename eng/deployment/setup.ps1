@@ -12,7 +12,7 @@ $k8sNamespace='game-docs-engine'
 $k8sServiceAccountName='main-docs-user'
 
 $k8sResourceGroup='DeKreyDotNet'
-$k8sClusterName='TinyKubed'
+$k8sClusterName='MyKubical'
 
 # 1. Ensure OIDC is set up (https://azure.github.io/azure-workload-identity/docs/installation/managed-clusters.html)
 

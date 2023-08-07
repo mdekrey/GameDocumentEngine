@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  azClusterName: TinyKubed
+  azClusterName: MyKubical
   azClusterResourceGroup: DeKreyDotNet
 
   registryLoginServer: 'dekreydotnet.azurecr.io'

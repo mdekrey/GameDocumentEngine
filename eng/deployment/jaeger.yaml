@@ -11,8 +11,27 @@ spec:
       memory:
         max-traces: 100000
   ingress:
-    enabled: true
-    annotations:
-      kubernetes.io/ingress.class: haproxy
-    hosts:
-      - jaeger.vtt.dekrey.net # TODO: I'm not sure if this is a good idea to expose like this...
+    enabled: false
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jaeger-query
+  namespace: game-docs-engine
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+  - host: jaeger.vtt.dekrey.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: docs-engine-monitor-query
+            port:
+              number: 16686
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - jaeger.vtt.dekrey.net
+    secretName: jaeger-tls

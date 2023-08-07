@@ -1,10 +1,10 @@
 replicaCount: 1
 ingress:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
   hosts:
   - host: vttrpg.dekrey.net
   - host: vtt.dekrey.net
+  tls:
+    noSecret: true
 
 serviceAccount:
   create: false
@@ -44,7 +44,7 @@ podLabels:
 resources:
   limits:
     # Reminder: CPU limits are soft, but memory limits are HARD. If memory limits exceed, the pod gets killed.
-    cpu: 100m
+    cpu: 500m
     # This shouldn't go above 100Mi, but it is production, so we let it go a bit more.
     memory: 300Mi
   requests:
