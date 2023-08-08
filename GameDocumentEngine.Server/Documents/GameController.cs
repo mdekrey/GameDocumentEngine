@@ -1,14 +1,10 @@
 ﻿using GameDocumentEngine.Server;
 using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
-using GameDocumentEngine.Server.Realtime;
-using GameDocumentEngine.Server.Security;
-using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Google.Protobuf.WellKnownTypes;
 using Json.Patch;
 using Json.Schema;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -163,149 +159,5 @@ public class GameController : Api.GameControllerBase
 		return UpdateGameRoleAssignmentsActionResult.Ok(
 			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => gu.Role)
 		);
-	}
-}
-
-class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
-{
-	private readonly GameTypes gameTypes;
-	private readonly IApiMapper<IGameType, GameTypeDetails> gameTypeMapper;
-
-	public GameModelApiMapper(GameTypes gameTypes, IApiMapper<IGameType, Api.GameTypeDetails> gameTypeMapper)
-	{
-		this.gameTypes = gameTypes;
-		this.gameTypeMapper = gameTypeMapper;
-	}
-
-	public async Task<GameDetails> ToApi(DocumentDbContext dbContext, GameModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
-	{
-		using var activity = TracingHelper.StartActivity($"{nameof(GameModelApiMapper)}.{nameof(ToApi)}");
-		var resultGame = dbContext.Entry(entity).AtState(usage);
-
-		var gameUsers = dbContext
-			.Entry(entity)
-			.Collection(game => game.Players);
-		// TODO: Consider not including user info in the Game. This causes us to load
-		// a query instead of the collection. Also, we can't use these results because
-		// it only includes active results.
-		// Doing this does work some of the time; it helps with the LoadWithFixupAsync runs.
-		await gameUsers.Query().Include(gu => gu.User).LoadAsync();
-		var gameUserEntries = gameUsers
-			.Entries(dbContext)
-			.AtStateEntries(usage);
-		var userEntries = gameUserEntries
-			.Select(e => e.Reference(gu => gu.User));
-
-		// TODO: https://github.com/mdekrey/GameDocumentEngine/issues/1
-		// I believe this was caused by an issue in EF Core. If an entity is
-		// marked as "Deleted" but later has a query that loads a reference, that
-		// referenced entity is added to the change tracker but not linked on the property.
-		await userEntries.WhenAll(nav => nav.LoadWithFixupAsync());
-
-		var users = userEntries
-			.Select(e => e.TargetEntry ?? throw new InvalidOperationException("LoadWithFixup failed"))
-			.AtState(usage)
-			.ToArray();
-
-		var typeInfo = gameTypes.All.TryGetValue(resultGame.Type, out var gameType)
-			? await gameTypeMapper.ToApi(dbContext, gameType)
-			: throw new NotSupportedException("Unknown game type");
-
-		return ToApi(resultGame, gameUserEntries.AtState(usage), users, typeInfo);
-	}
-
-	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, UserModel[] users, GameTypeDetails typeInfo)
-	{
-		// "original values" game users won't have the 
-		return new GameDetails(Name: game.Name,
-					LastUpdated: game.LastModifiedDate,
-					Permissions: gameUsers.ToDictionary(
-						p => p.UserId.ToString(),
-						p => p.Role
-					),
-					PlayerNames: users.ToDictionary(
-						p => p.Id.ToString(),
-						p => p.Name
-					),
-					Id: game.Id,
-					TypeInfo: typeInfo
-				);
-	}
-
-	public object ToKey(GameModel entity) => entity.Id;
-
-}
-
-class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
-{
-	private readonly GameTypes gameTypes;
-
-	public GameTypeApiMapper(GameTypes gameTypes)
-	{
-		this.gameTypes = gameTypes;
-	}
-
-	public async Task<GameTypeDetails> ToApi(DocumentDbContext dbContext, IGameType gameType)
-	{
-		using var activity = TracingHelper.StartActivity($"{nameof(GameTypeApiMapper)}.{nameof(ToApi)}");
-		return new GameTypeDetails(
-			Key: gameType.Key,
-			UserRoles: GameRoles,
-			ObjectTypes: await Task.WhenAll(
-				gameType.ObjectTypes.Select(async obj => new GameObjectTypeDetails(
-				Key: obj.Key,
-					Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameTypes.ResolveGameObjectScripts))).SelectMany(a => a).Distinct(),
-					// Game types could have different roles eventually; for now, we use a hard-coded set
-					UserRoles: obj.PermissionLevels
-				)))
-		);
-	}
-
-	public Task<GameTypeDetails> ToApiBeforeChanges(DocumentDbContext dbContext, IGameType gameType) =>
-		ToApi(dbContext, gameType);
-
-	public object ToKey(IGameType entity) => entity.Key;
-}
-
-class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameModel, GameUserModel, Api.GameDetails>
-{
-	public GameModelChangeNotifications(
-		IPermissionedApiMapper<GameModel, GameDetails> apiMapper,
-		IApiChangeNotification<GameDetails> changeNotification)
-		: base(apiMapper, changeNotification, du => du.UserId, du => du.Game)
-	{
-	}
-
-	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, GameModel entity, DbContextChangeUsage changeState)
-	{
-		using var activity = TracingHelper.StartActivity($"{nameof(GameModelChangeNotifications)}.{nameof(GetUsersFor)}");
-		var players = context.Entry(entity).Collection(d => d.Players);
-		await players.LoadAsync();
-
-		var gameUsers = await context.LoadEntityEntriesAsync<GameUserModel>(g => g.GameId == entity.Id);
-
-		return gameUsers.AtState(changeState)
-			.Select(GameSecurity.ToPermissionSet);
-	}
-}
-
-class GameApiChangeNotification : IApiChangeNotification<Api.GameDetails>
-{
-	private readonly IHubContext<GameDocumentsHub> hubContext;
-
-	public GameApiChangeNotification(IHubContext<GameDocumentsHub> hubContext)
-	{
-		this.hubContext = hubContext;
-	}
-
-	public async Task SendAddedNotification(object apiKey, GameDetails newApiObject, Guid userId) =>
-		await hubContext.User(userId).SendValue("Game", apiKey, newApiObject);
-
-	public async Task SendDeletedNotification(object apiKey, Guid userId) =>
-		await hubContext.User(userId).SendDeleted("Game", apiKey);
-
-	public async Task SendModifiedNotification(object apiKey, GameDetails oldApiObject, GameDetails newApiObject, Guid userId)
-	{
-		await hubContext.User(userId).SendWithPatch("Game", apiKey, oldApiObject, newApiObject);
 	}
 }

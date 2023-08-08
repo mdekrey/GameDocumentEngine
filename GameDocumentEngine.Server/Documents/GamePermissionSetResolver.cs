@@ -8,19 +8,6 @@ using System.Security.Claims;
 
 namespace GameDocumentEngine.Server.Documents;
 
-public class GamePermissionSetResolverFactory
-{
-	private readonly GameTypes gameTypes;
-
-	public GamePermissionSetResolverFactory(GameTypes gameTypes)
-	{
-		this.gameTypes = gameTypes;
-	}
-
-	public GamePermissionSetResolver Create(Data.DocumentDbContext context) =>
-		new(context, gameTypes);
-}
-
 
 /// <summary>
 /// Do not depend on this directly within DbContext interceptors; it'll get stuck in a recursive loop constructing.

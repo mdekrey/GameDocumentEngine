@@ -2,20 +2,12 @@
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.Json;
-using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Security;
 using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
-using Google.Protobuf.WellKnownTypes;
-using Json.More;
 using Json.Patch;
-using Json.Path;
 using Json.Schema;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
 
 namespace GameDocumentEngine.Server.Documents;
@@ -229,148 +221,4 @@ public class DocumentController : Api.DocumentControllerBase
 
 	private Task<DocumentDetails> ToDocumentDetails(DocumentModel document, PermissionSet permissionSet) =>
 		documentMapper.ToApi(dbContext, document, permissionSet, DbContextChangeUsage.AfterChange);
-}
-
-class DocumentUserLoader
-{
-	private readonly ISet<DocumentModel> documentsWithLoadedUsers = new HashSet<DocumentModel>();
-
-	public ValueTask EnsureDocumentUsersLoaded(DocumentDbContext dbContext, DocumentModel entity)
-	{
-		if (documentsWithLoadedUsers.Contains(entity)) return ValueTask.CompletedTask;
-		return new ValueTask(LoadDocumentUsers(dbContext, entity));
-	}
-
-	private async Task LoadDocumentUsers(DocumentDbContext dbContext, DocumentModel entity)
-	{
-		await (from gameUser in dbContext.GameUsers
-				.Include(gu => from documentUser in gu.Documents
-							   where documentUser.DocumentId == entity.Id
-							   select documentUser)
-			   where gameUser.GameId == entity.GameId
-			   select gameUser).LoadAsync();
-		documentsWithLoadedUsers.Add(entity);
-	}
-}
-
-class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.DocumentDetails>
-{
-	private readonly DocumentUserLoader userLoader;
-
-	public DocumentModelApiMapper(DocumentUserLoader userLoader)
-	{
-		this.userLoader = userLoader;
-	}
-
-	public async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
-	{
-		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelApiMapper)}.{nameof(ToApi)}");
-		var resultGame = dbContext.Entry(entity).AtState(usage);
-
-		var documentUsersCollection = await LoadDocumentUsers(dbContext, entity);
-
-		// mask parts of document data based on permissions
-		var jsonPaths = permissionSet.Permissions
-			.MatchingPermissionsParams(ReadDocumentDetailsPrefix(entity.GameId, entity.Id))
-			.Append("$.details")
-			.ToArray();
-
-		var filtered = JsonSerializer.SerializeToNode(new { details = resultGame.Details })
-				?.FilterNode(jsonPaths)["details"]
-				?? throw new InvalidDataException("Json path excluded details object");
-
-		return new DocumentDetails(
-			GameId: resultGame.GameId,
-			Id: resultGame.Id,
-			Name: resultGame.Name,
-			Type: resultGame.Type,
-			Details: filtered,
-			Permissions: documentUsersCollection
-				.Entries(dbContext)
-				.AtState(usage)
-				.ToDictionary(
-					p => p.UserId.ToString(),
-					p => p.Role
-				)
-		);
-	}
-
-	private async Task<CollectionEntry<DocumentModel, DocumentUserModel>> LoadDocumentUsers(DocumentDbContext dbContext, DocumentModel entity)
-	{
-		await userLoader.EnsureDocumentUsersLoaded(dbContext, entity);
-		return dbContext
-			.Entry(entity)
-			.Collection(game => game.Players);
-	}
-
-	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
-}
-
-class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<DocumentModel, DocumentUserModel, Api.DocumentDetails>
-{
-	private readonly DocumentUserLoader userLoader;
-	private readonly GamePermissionSetResolverFactory permissionSetResolverFactory;
-
-	public DocumentModelChangeNotifications(
-		DocumentUserLoader userLoader,
-		IPermissionedApiMapper<DocumentModel, DocumentDetails> apiMapper,
-		IApiChangeNotification<DocumentDetails> changeNotification,
-		GamePermissionSetResolverFactory permissionSetResolverFactory)
-		: base(apiMapper, changeNotification, du => du.UserId, du => du.Document)
-	{
-		this.userLoader = userLoader;
-		this.permissionSetResolverFactory = permissionSetResolverFactory;
-	}
-
-	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
-	{
-		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelChangeNotifications)}.{nameof(GetUsersFor)}");
-
-		await userLoader.EnsureDocumentUsersLoaded(context, entity);
-		var documentUserEntries = context.GetEntityEntries<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
-		var gameUserEntries = context.GetEntityEntries<GameUserModel>(g => g.GameId == entity.GameId);
-
-		var documentUsers = documentUserEntries.AtState(changeState);
-		var gameUsers = gameUserEntries.AtState(changeState);
-
-		var byUser = (from gameUser in gameUsers
-					  let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
-					  // Document User may not have existed for every user, such as when creating or destroying
-					  where documentUser != null
-					  select new
-					  {
-						  gameUser,
-						  documentUser
-					  }).ToArray();
-
-		var permissionSetResolver = permissionSetResolverFactory.Create(context);
-		var permissions = await byUser
-			.WhenAll(user => permissionSetResolver.GetPermissions(user.gameUser, (entity, user.documentUser)))
-			.Where(ps => ps != null)
-			.Select(ps => ps!)
-			.ToArrayAsync();
-
-		return permissions;
-	}
-}
-
-class DocumentApiChangeNotification : IApiChangeNotification<Api.DocumentDetails>
-{
-	private readonly IHubContext<GameDocumentsHub> hubContext;
-
-	public DocumentApiChangeNotification(IHubContext<GameDocumentsHub> hubContext)
-	{
-		this.hubContext = hubContext;
-	}
-
-	public async Task SendAddedNotification(object apiKey, DocumentDetails newApiObject, Guid userId) =>
-		await hubContext.User(userId).SendValue("Document", apiKey, newApiObject);
-
-	public async Task SendDeletedNotification(object apiKey, Guid userId) =>
-		await hubContext.User(userId).SendDeleted("Document", apiKey);
-
-	public async Task SendModifiedNotification(object apiKey, DocumentDetails oldApiObject, DocumentDetails newApiObject, Guid userId)
-	{
-		await hubContext.User(userId).SendWithPatch("Document", apiKey, oldApiObject, newApiObject);
-	}
 }
