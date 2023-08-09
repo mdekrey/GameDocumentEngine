@@ -216,7 +216,7 @@ services.Configure<AspNetCoreInstrumentationOptions>(options =>
 {
 	options.Filter = (httpContext) =>
 	{
-		if (httpContext.Request.Path.Value == "/") return false;
+		if (httpContext.Request.Path.Value?.StartsWith("/health") ?? false) return false;
 		if (httpContext.Request.Path.Value?.StartsWith("/assets") ?? false) return false;
 		if (httpContext.Request.Path.Value?.StartsWith("/hub") ?? false) return false;
 		return true;

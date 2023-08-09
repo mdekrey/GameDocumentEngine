@@ -15,6 +15,14 @@ image:
   repository: dekreydotnet.azurecr.io/gamedocsengine
 
 podspec:
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
   env:
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
     value: http://docs-engine-monitor-collector:4317
