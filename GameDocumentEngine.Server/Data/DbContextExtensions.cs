@@ -10,32 +10,6 @@ namespace GameDocumentEngine.Server.Data;
 
 public static class DbContextExtensions
 {
-	private static readonly ConditionalWeakTable<object, object> compiledExpressions = new ConditionalWeakTable<object, object>();
-
-	/// <summary>
-	/// Tracks expressions and their compiled equivalents in a weak table; if the
-	/// expression is garbage collected, so is the compiled version.
-	/// </summary>
-	private static Func<T, bool> GetCompiledExpression<T>(Expression<Func<T, bool>> expression)
-	{
-		if (!compiledExpressions.TryGetValue(expression, out var result))
-		{
-			result = expression.Compile();
-			compiledExpressions.Add(expression, result);
-		}
-		return (Func<T, bool>)result;
-	}
-
-	public static async Task<EntityEntry<T>[]> LoadEntityEntriesAsync<T>(this DbContext context, Expression<Func<T, bool>> filter)
-		where T : class
-	{
-		// `allEntities` gets thrown away intentionally; we're just looking to get the
-		// entities from the database into the change tracker
-		var allEntities = await context.Set<T>().Where(filter).ToArrayAsync();
-
-		var filterFunc = GetCompiledExpression(filter);
-		return context.GetEntityEntries(filterFunc).ToArray();
-	}
 	public static EntityEntry<T>[] GetEntityEntries<T>(this DbContext context, Func<T, bool> filter)
 		where T : class
 	{

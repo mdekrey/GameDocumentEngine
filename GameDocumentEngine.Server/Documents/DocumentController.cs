@@ -19,19 +19,22 @@ public class DocumentController : Api.DocumentControllerBase
 	private readonly JsonSchemaResolver schemaResolver;
 	private readonly IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper;
 	private readonly GamePermissionSetResolver permissionSetResolver;
+	private readonly DocumentUserLoader userLoader;
 
 	public DocumentController(
 		Documents.GameTypes allGameTypes,
 		DocumentDbContext dbContext,
 		JsonSchemaResolver schemaResolver,
 		IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper,
-		GamePermissionSetResolver permissionSetResolver)
+		GamePermissionSetResolver permissionSetResolver,
+		DocumentUserLoader userLoader)
 	{
 		this.allGameTypes = allGameTypes;
 		this.dbContext = dbContext;
 		this.schemaResolver = schemaResolver;
 		this.documentMapper = documentMapper;
 		this.permissionSetResolver = permissionSetResolver;
+		this.userLoader = userLoader;
 	}
 
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
@@ -176,8 +179,11 @@ public class DocumentController : Api.DocumentControllerBase
 		if (permissions == null) return UpdateDocumentRoleAssignmentsActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId, id))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
 
-		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document
-			?? await dbContext.Documents.Include(d => d.Game).Include(d => d.Players).Where(d => d.Id == id && d.GameId == gameId).SingleAsync();
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document;
+		if (document == null)
+			document = await dbContext.Documents.Include(d => d.Game).Include(d => d.Players).Where(d => d.Id == id && d.GameId == gameId).SingleAsync();
+		else
+			await userLoader.EnsureDocumentUsersLoaded(dbContext, document);
 
 		var docType = GetDocumentType(document);
 		if (docType == null)
@@ -208,7 +214,6 @@ public class DocumentController : Api.DocumentControllerBase
 			else if (modifiedUser == null)
 			{
 				modifiedUser = new DocumentUserModel { UserId = key, GameId = gameId, DocumentId = id, Role = kvp.Value };
-				dbContext.DocumentUsers.Add(modifiedUser);
 				gameUserRecords.Add(modifiedUser);
 			}
 			else modifiedUser.Role = kvp.Value;

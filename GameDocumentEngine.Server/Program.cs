@@ -157,6 +157,9 @@ services.AddScoped<IApiChangeNotification<GameDetails>, GameApiChangeNotificatio
 services.AddHttpContextAccessor();
 services.AddScoped<AuditableInterceptor>();
 services.AddScoped<HubNotifyingInterceptor>();
+services.AddScoped<IApiChangeDetector, UserModelChangeNotifications>();
+services.AddScoped<IApiChangeDetector, DocumentModelChangeNotifications>();
+services.AddScoped<IApiChangeDetector, GameModelChangeNotifications>();
 services.AddScoped<IEntityChangeNotifications, UserModelChangeNotifications>();
 services.AddScoped<IEntityChangeNotifications, DocumentModelChangeNotifications>();
 services.AddScoped<IEntityChangeNotifications, GameModelChangeNotifications>();

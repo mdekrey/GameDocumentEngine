@@ -30,9 +30,12 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		// a query instead of the collection. Also, we can't use these results because
 		// it only includes active results.
 		// Doing this does work some of the time; it helps with the LoadWithFixupAsync runs.
-		await gameUsers.Query().Include(gu => gu.User).LoadAsync();
-		var gameUserEntries = gameUsers
-			.Entries(dbContext)
+		if (!gameUsers.IsLoaded || gameUsers.Entries(dbContext).Any(gu => !gu.Reference(m => m.User).IsLoaded))
+			await gameUsers.Query().Include(gu => gu.User).LoadAsync();
+
+		var permissionEntries = dbContext.GetEntityEntries<GameUserModel>(gu => gu.GameId == entity.Id);
+
+		var gameUserEntries = permissionEntries
 			.AtStateEntries(usage);
 		var userEntries = gameUserEntries
 			.Select(e => e.Reference(gu => gu.User));

@@ -3,11 +3,12 @@ using GameDocumentEngine.Server.Security;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using PrincipleStudios.OpenApiCodegen.Json.Extensions;
 using System.Linq.Expressions;
 
 namespace GameDocumentEngine.Server.Data;
 
-abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi> : IEntityChangeNotifications
+abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi> : IEntityChangeNotifications, IApiChangeDetector
 	where TEntity : class
 	where TUserEntity : class
 {
@@ -30,78 +31,49 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 
 	public virtual bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is TEntity or TUserEntity;
 
+	public virtual async Task<IEnumerable<EntityEntry>> GetBaseEntities(DocumentDbContext context, EntityEntry changedEntity)
+	{
+		if (changedEntity.Entity is TEntity) return new[] { changedEntity };
+		if (changedEntity.Entity is TUserEntity userEntity)
+		{
+			var targetEntity = await LoadTargetEntity(context, userEntity);
+			return new[] { context.Entry(targetEntity) };
+		}
+		return Enumerable.Empty<EntityEntry>();
+	}
+
+	protected abstract Task<TEntity> LoadTargetEntity(DocumentDbContext context, TUserEntity userEntity);
+
 	public virtual async Task SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{
 		if (changedEntity.Entity is TEntity entity) await SendEntityNotification(context, context.Entry(entity));
-		if (changedEntity.Entity is TUserEntity userEntity) await SendUserChangedNotification(context, context.Entry(userEntity));
 	}
-
 
 	protected virtual async Task SendEntityNotification(DocumentDbContext context, EntityEntry<TEntity> changedEntity)
 	{
 		var entity = changedEntity.Entity;
-		if (changedEntity.State != EntityState.Modified) return;
 
-		var userPermissions = await GetUsersFor(context, entity, DbContextChangeUsage.AfterChange);
+		var oldUserPermissions = changedEntity.State == EntityState.Added
+			? Enumerable.Empty<PermissionSet>()
+			: await GetUsersFor(context, entity, DbContextChangeUsage.BeforeChange);
+		var newUserPermissions = changedEntity.State == EntityState.Deleted
+			? Enumerable.Empty<PermissionSet>()
+			: await GetUsersFor(context, entity, DbContextChangeUsage.AfterChange);
 
-		foreach (var user in userPermissions)
-			await changeNotification.SendModifiedNotification(
+		foreach (var userId in oldUserPermissions.Select(p => p.GameUser.UserId).Union(newUserPermissions.Select(p => p.GameUser.UserId)))
+		{
+			var oldValue = oldUserPermissions.FirstOrDefault(p => p.GameUser.UserId == userId) is PermissionSet oldPermission
+			  ? Optional.Create(await apiMapper.ToApi(context, entity, oldPermission, DbContextChangeUsage.BeforeChange))
+			  : null;
+			var newValue = newUserPermissions.FirstOrDefault(p => p.GameUser.UserId == userId) is PermissionSet newPermission
+			  ? Optional.Create(await apiMapper.ToApi(context, entity, newPermission, DbContextChangeUsage.AfterChange))
+			  : null;
+
+			await changeNotification.SendNotification(
 				apiMapper.ToKey(entity),
-				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.BeforeChange),
-				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.AfterChange),
-				user.GameUser.UserId);
-	}
-	protected virtual async Task SendUserChangedNotification(DocumentDbContext context, EntityEntry<TUserEntity> changedEntity)
-	{
-		var target = changedEntity.Entity;
-		if (target == null)
-			return;
-		var entityReference = context.Entry(target).Reference(toEntity);
-		await entityReference.LoadAsync();
-		var entityEntry = entityReference.TargetEntry
-			?? throw new InvalidOperationException("Could not resolve reference to entity");
-		var entity = entityEntry.Entity;
-
-		var oldUserPermissions = await GetUsersFor(context, entity, DbContextChangeUsage.BeforeChange);
-		var newUserPermissions = await GetUsersFor(context, entity, DbContextChangeUsage.AfterChange);
-
-		var currentUserId = toUserId(target);
-		var currentUser = new
-		{
-			Old = oldUserPermissions.FirstOrDefault(p => p.GameUser.UserId == currentUserId),
-			New = newUserPermissions.FirstOrDefault(p => p.GameUser.UserId == currentUserId),
-		};
-		var otherUsers = newUserPermissions.Where(p => p.GameUser.UserId != currentUserId);
-
-		// treat removing the `target` as deleting the document, adding the 'target' as creating the document, and broadcast changes to others on the document
-		var key = apiMapper.ToKey(entity);
-		if (currentUser.Old != null && currentUser.New == null)
-			await changeNotification.SendDeletedNotification(key, currentUserId);
-		else if (currentUser.Old == null && currentUser.New != null)
-			await changeNotification.SendAddedNotification(
-				key,
-				await apiMapper.ToApi(context, entity, currentUser.New, DbContextChangeUsage.AfterChange),
-				currentUserId
-			);
-		else if (currentUser.Old != null && currentUser.New != null)
-		{
-			await changeNotification.SendModifiedNotification(
-				key,
-				await apiMapper.ToApi(context, entity, currentUser.Old, DbContextChangeUsage.BeforeChange),
-				await apiMapper.ToApi(context, entity, currentUser.New, DbContextChangeUsage.AfterChange),
-				currentUserId
-			);
-		}
-
-		foreach (var user in otherUsers)
-		{
-			var oldPermissions = oldUserPermissions.FirstOrDefault(p => p.GameUser.UserId == user.GameUser.UserId) ?? user;
-			await changeNotification.SendModifiedNotification(
-				key,
-				await apiMapper.ToApi(context, entity, oldPermissions, DbContextChangeUsage.BeforeChange),
-				await apiMapper.ToApi(context, entity, user, DbContextChangeUsage.AfterChange),
-				user.GameUser.UserId
-			);
+				oldValue,
+				newValue,
+				userId);
 		}
 	}
 

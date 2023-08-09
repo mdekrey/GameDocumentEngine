@@ -2,6 +2,7 @@
 using Json.Patch;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json.Linq;
+using PrincipleStudios.OpenApiCodegen.Json.Extensions;
 
 namespace GameDocumentEngine.Server.Api;
 
@@ -10,6 +11,16 @@ interface IApiChangeNotification<TApi>
 	Task SendAddedNotification(object apiKey, TApi newApiObject, Guid userId);
 	Task SendDeletedNotification(object apiKey, Guid userId);
 	Task SendModifiedNotification(object apiKey, TApi oldApiObject, TApi newApiObject, Guid userId);
+	Task SendNotification(object apiKey, Optional<TApi>? maybeOldApiObject, Optional<TApi>? maybeNewApiObject, Guid userId)
+	{
+		return (Old: maybeOldApiObject, New: maybeNewApiObject) switch
+		{
+			(Old: Optional<TApi>.Present { Value: var oldValue }, New: Optional<TApi>.Present { Value: var newValue }) => SendModifiedNotification(apiKey, oldValue, newValue, userId),
+			(Old: Optional<TApi>.Present, New: _) => SendDeletedNotification(apiKey, userId),
+			(Old: _, New: Optional<TApi>.Present { Value: var newValue }) => SendAddedNotification(apiKey, newValue, userId),
+			_ => Task.CompletedTask
+		};
+	}
 
 }
 

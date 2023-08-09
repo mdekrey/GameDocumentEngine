@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GameDocumentEngine.Server.Documents;
 
-class DocumentUserLoader
+public class DocumentUserLoader
 {
 	private readonly ISet<DocumentModel> documentsWithLoadedUsers = new HashSet<DocumentModel>();
 

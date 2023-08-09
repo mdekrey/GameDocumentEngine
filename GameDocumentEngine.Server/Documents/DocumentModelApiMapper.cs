@@ -35,14 +35,18 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 				?.FilterNode(jsonPaths)["details"]
 				?? throw new InvalidDataException("Json path excluded details object");
 
+		// re-scan change detection for users - the `documentUsersCollection` doesn't get deleted items
+		var permissionEntries = from entry in dbContext.ChangeTracker.Entries<DocumentUserModel>()
+								where entry.Entity.GameId == entity.GameId && entry.Entity.DocumentId == entity.Id
+								select entry;
+
 		return new DocumentDetails(
 			GameId: resultGame.GameId,
 			Id: resultGame.Id,
 			Name: resultGame.Name,
 			Type: resultGame.Type,
 			Details: filtered,
-			Permissions: documentUsersCollection
-				.Entries(dbContext)
+			Permissions: permissionEntries
 				.AtState(usage)
 				.ToDictionary(
 					p => p.UserId.ToString(),

@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace GameDocumentEngine.Server.Data;
 
-abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotifications where TEntity : class
+abstract class EntityChangeNotifications<TEntity, TApi> : IApiChangeDetector, IEntityChangeNotifications where TEntity : class
 {
 	protected readonly IApiMapper<TEntity, TApi> apiMapper;
 	private readonly IApiChangeNotification<TApi> changeNotification;
@@ -21,6 +21,12 @@ abstract class EntityChangeNotifications<TEntity, TApi> : IEntityChangeNotificat
 	}
 
 	public virtual bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is TEntity;
+
+	public Task<IEnumerable<EntityEntry>> GetBaseEntities(DocumentDbContext context, EntityEntry changedEntity)
+	{
+		if (changedEntity.Entity is TEntity) return Task.FromResult<IEnumerable<EntityEntry>>(new[] { changedEntity });
+		return Task.FromResult(Enumerable.Empty<EntityEntry>());
+	}
 
 	public virtual async Task SendNotification(Data.DocumentDbContext context, IHubClients clients, EntityEntry changedEntity)
 	{

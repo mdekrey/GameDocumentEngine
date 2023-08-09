@@ -22,6 +22,13 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		this.permissionSetResolverFactory = permissionSetResolverFactory;
 	}
 
+	protected override async Task<DocumentModel> LoadTargetEntity(DocumentDbContext context, DocumentUserModel userEntity)
+	{
+		if (userEntity.Document != null) return userEntity.Document;
+		return context.ChangeTracker.Entries<DocumentModel>().FirstOrDefault(d => d.Entity.Id == userEntity.DocumentId)?.Entity
+			?? await context.Documents.Include(d => d.Players).SingleAsync(d => d.Id == userEntity.DocumentId);
+	}
+
 	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
 	{
 		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelChangeNotifications)}.{nameof(GetUsersFor)}");
