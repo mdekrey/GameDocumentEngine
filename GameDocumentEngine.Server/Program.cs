@@ -82,7 +82,7 @@ services
 		googleOptions.Events.
 			OnRedirectToAuthorizationEndpoint = context =>
 			{
-				if (context.Request.Path.Value == "/login")
+				if (context.Request.Path.Value == "/login" || context.Request.Path.StartsWithSegments("/invitations"))
 					return originalOnRedirectToAuthorizationEndpoint(context);
 
 				context.Response.StatusCode = 401;
@@ -137,6 +137,7 @@ services.AddAuthorization(options =>
 	options.AddPolicy("AuthenticatedUser", builder =>
 	{
 		builder.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
+		builder.AddAuthenticationSchemes(GoogleDefaults.AuthenticationScheme);
 		builder.RequireAuthenticatedUser();
 	});
 });
