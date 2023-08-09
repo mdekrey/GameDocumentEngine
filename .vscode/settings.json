@@ -57,5 +57,6 @@
 	},
 	"dataworkspace.excludedProjects": [
 		"GameDocumentEngine.Db/GameDocumentEngine.Db/GameDocumentEngine.Db.sqlproj"
-	]
+	],
+	"dotnet.defaultSolution": "GameDocumentEngine.sln"
 }
