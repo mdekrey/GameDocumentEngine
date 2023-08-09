@@ -10,7 +10,6 @@ Dockerfile
 /GameDocumentEngine.Server/obj
 /GameDocumentEngine.Server/wwwroot
 /GameDocumentEngine.Server/setup.ps1
-/GameDocumentEngine.Db
 
 **/*.user
 **/.env
