@@ -74,6 +74,9 @@ export function DocumentDetails({
 	async function handleUpdate(
 		recipe: (draft: Draft<EditableDocumentDetails>) => void,
 	) {
+		// TODO - while this waits for the previous  update to be completed, I
+		// think there's still an issue with setting/unsetting the same value
+		// quickly (like pass/fails on the Mouse Guard character).
 		await docDetailsUpdatePromiseRef.current;
 		const latestDocData =
 			queryClient.getQueryData<DocumentDetails>(
