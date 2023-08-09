@@ -59,11 +59,7 @@ export function RoleAssignment({
 							<Field.Label>{name}</Field.Label>
 
 							<Field.Contents>
-								<SelectInput
-									{...field.htmlProps()}
-									items={roles}
-									valueSelector={(gt) => gt}
-								>
+								<SelectInput {...field.htmlProps.asControlled()} items={roles}>
 									{(gt) =>
 										gt ? (
 											<>{roleTranslations(`roles.${gt}.name`)}</>

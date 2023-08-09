@@ -20,6 +20,7 @@
 			},
 			"type": {
 				"label": "Game type",
+				"not-selected": "Select a game type...",
 				"errors": {
 					"too_small": "Please select a game type."
 				}
@@ -37,6 +38,7 @@
 			},
 			"type": {
 				"label": "Document type",
+				"not-selected": "Select a document type...",
 				"errors": {
 					"too_small": "Please select a document type."
 				}

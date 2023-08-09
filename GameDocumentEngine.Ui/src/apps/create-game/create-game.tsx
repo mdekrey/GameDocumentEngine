@@ -40,11 +40,18 @@ export function CreateGame() {
 					<TextField field={gameForm.field(['name'])} />
 					<SelectField
 						field={gameForm.field(['type'])}
-						items={Object.entries(gameTypesResult.data ?? {})}
+						items={Object.keys(gameTypesResult.data ?? {})}
 						key={gameTypesResult.data ? 1 : 0}
-						valueSelector={(gt) => gt[0]}
 					>
-						{([gt]) => <>{getGameTypeName(gt)}</>}
+						{(gt) =>
+							gt ? (
+								<>{getGameTypeName(gt)}</>
+							) : (
+								<span className="text-gray-500">
+									{gameForm.field(['type']).translation('not-selected')}
+								</span>
+							)
+						}
 					</SelectField>
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>

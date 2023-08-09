@@ -5,6 +5,7 @@ export default {
 		extend: {},
 		zIndex: {
 			normal: 0,
+			dropdown: 5,
 			modalBackground: 10,
 			modalForeground: 20,
 		},

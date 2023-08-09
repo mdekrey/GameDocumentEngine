@@ -43,14 +43,19 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 					<SelectField
 						field={gameForm.field(['type'])}
 						items={
-							gameType.isSuccess
-								? Object.entries(gameType.data.objectTypes)
-								: []
+							gameType.isSuccess ? Object.keys(gameType.data.objectTypes) : []
 						}
 						key={gameType.data ? 1 : 0}
-						valueSelector={([dt]) => dt}
 					>
-						{([, { translation: t }]) => t('name')}
+						{(key) =>
+							gameType.isSuccess && gameType.data.objectTypes[key] ? (
+								gameType.data.objectTypes[key].translation('name')
+							) : (
+								<span className="text-gray-500">
+									{gameForm.field(['type']).translation('not-selected')}
+								</span>
+							)
+						}
 					</SelectField>
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>

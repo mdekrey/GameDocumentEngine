@@ -6,23 +6,17 @@ import { UseFieldResult } from '@/utils/form/useField';
 export function SelectField<T>({
 	field,
 	items,
-	valueSelector,
 	children,
 }: {
-	field: UseFieldResult<string, { hasErrors: true; hasTranslations: true }>;
+	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
 	items: T[];
-	valueSelector: (item: T) => string;
 	children: (item: T) => React.ReactNode;
 }) {
 	return (
 		<Field>
 			<Field.Label>{field.translation(['label'])}</Field.Label>
 			<Field.Contents>
-				<SelectInput
-					items={items}
-					valueSelector={valueSelector}
-					{...field.htmlProps()}
-				>
+				<SelectInput items={items} {...field.htmlProps.asControlled()}>
 					{children}
 				</SelectInput>
 				<ErrorsList errors={field.errors} translations={field.translation} />

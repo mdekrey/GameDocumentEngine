@@ -7,6 +7,7 @@ import {
 } from './createErrorsAtom';
 import {
 	CheckboxHtmlProps,
+	ControlledHtmlProps,
 	FieldMapping,
 	FieldOptions,
 	InputHtmlProps,
@@ -91,6 +92,14 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 				fieldEvents,
 			);
 		} as ToHtmlInputProps<TFieldValue> as ToHtmlProps<TFieldValue>;
+		toInput.asControlled =
+			function asControlled(): ControlledHtmlProps<TFieldValue> {
+				return toControlledField(
+					(v) => store.set(formValueAtom, v),
+					formValueAtom,
+					fieldEvents,
+				);
+			};
 		toInput.asCheckbox = function asCheckbox(
 			mapping?: FieldMapping<TFieldValue, boolean>,
 		): CheckboxHtmlProps {
@@ -105,6 +114,23 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 
 		return toInput;
 	}
+}
+
+function toControlledField<T>(
+	setValue: (v: T) => void,
+	atom: StandardWritableAtom<T>,
+	fieldEvents: FieldEvents,
+): ControlledHtmlProps<T> {
+	return {
+		value: atom,
+		onChange: (ev) => {
+			fieldEvents.dispatchEvent(FieldEvents.Change);
+			setValue(ev.currentTarget.value);
+		},
+		onBlur: () => {
+			fieldEvents.dispatchEvent(FieldEvents.Blur);
+		},
+	};
 }
 
 function toInputTextField(

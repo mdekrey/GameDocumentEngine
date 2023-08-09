@@ -82,7 +82,6 @@ export function CreateInvite({
 					<SelectField
 						field={form.fields.role}
 						items={gameData.typeInfo.userRoles}
-						valueSelector={(dt) => dt}
 					>
 						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
 					</SelectField>

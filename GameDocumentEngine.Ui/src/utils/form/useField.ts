@@ -53,20 +53,30 @@ export type ToHtmlInputProps<TInputValue> = TInputValue extends string
 	: (mapping: FieldMapping<TInputValue, string>) => InputHtmlProps;
 
 export type ToHtmlProps<TInputValue> = ToHtmlInputProps<TInputValue> & {
+	asControlled: () => ControlledHtmlProps<TInputValue>;
 	asCheckbox: TInputValue extends boolean
 		? (mapping?: FieldMapping<TInputValue, boolean>) => CheckboxHtmlProps
 		: (mapping: FieldMapping<TInputValue, boolean>) => CheckboxHtmlProps;
 };
 
+export type CommonEventHandler<TTarget = never> = [TTarget] extends [never]
+	? () => void
+	: (ev: { currentTarget: TTarget }) => void;
+
 export type InputHtmlProps = {
 	defaultValue: Atom<string>;
-	onChange: React.ChangeEventHandler<{ value: string }>;
-	onBlur: React.FocusEventHandler<{ value: string }>;
+	onChange: CommonEventHandler<{ value: string }>;
+	onBlur: CommonEventHandler<{ value: string }>;
+};
+export type ControlledHtmlProps<T> = {
+	value: StandardWritableAtom<T>;
+	onChange: CommonEventHandler<{ value: T }>;
+	onBlur: CommonEventHandler;
 };
 export type CheckboxHtmlProps = {
 	defaultChecked: Atom<boolean>;
-	onChange: React.ChangeEventHandler<{ checked: boolean }>;
-	onBlur: React.FocusEventHandler<{ checked: boolean }>;
+	onChange: CommonEventHandler<{ checked: boolean }>;
+	onBlur: CommonEventHandler<{ checked: boolean }>;
 };
 
 export type FieldMapping<TValue, TFormFieldValue> = {

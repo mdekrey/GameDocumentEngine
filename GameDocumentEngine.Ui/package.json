@@ -21,6 +21,7 @@
 		"test": "echo 'TODO'"
 	},
 	"dependencies": {
+		"@headlessui/react": "^1.7.16",
 		"@microsoft/signalr": "^7.0.9",
 		"@principlestudios/openapi-codegen-typescript": "^0.6.2",
 		"@principlestudios/openapi-codegen-typescript-fetch": "^0.6.1",
@@ -41,7 +42,6 @@
 		"ts-node": "^10.9.1"
 	},
 	"devDependencies": {
-		"lefthook": "1.4.8",
 		"@principlestudios/jotai-react-signals": "^0.4.1",
 		"@types/node": "^20.4.0",
 		"@types/react": "^18.2.14",
@@ -55,6 +55,7 @@
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"immer": "^10.0.2",
 		"jotai": "^2.2.2",
+		"lefthook": "1.4.8",
 		"postcss": "^8.4.25",
 		"prettier": "^3.0.0",
 		"react": "^18.2.0",
