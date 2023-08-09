@@ -83,7 +83,13 @@ export function CreateInvite({
 						field={form.fields.role}
 						items={gameData.typeInfo.userRoles}
 					>
-						{(dt) => <>{gameType.translation?.(`roles.${dt}.name`)}</>}
+						{(dt) =>
+							dt ? (
+								<>{gameType.translation?.(`roles.${dt}.name`)}</>
+							) : (
+								form.fields.role.translation('not-selected')
+							)
+						}
 					</SelectField>
 					<CheckboxField
 						className="col-span-2"

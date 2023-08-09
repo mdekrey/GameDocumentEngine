@@ -113,6 +113,7 @@
 		"fields": {
 			"role": {
 				"label": "Initial role",
+				"not-selected": "Select a role...",
 				"errors": {
 					"custom": "Please select a player role."
 				}
