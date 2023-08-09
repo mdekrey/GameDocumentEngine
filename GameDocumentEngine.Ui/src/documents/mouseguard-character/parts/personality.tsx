@@ -3,7 +3,7 @@ import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { useDebugValue } from 'react';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { TextareaField } from '@/utils/form-fields/textarea-field/textarea-field';
 
 export function Personality({
 	form,
@@ -18,9 +18,9 @@ export function Personality({
 	useDebugValue(fields);
 	return (
 		<Fieldset>
-			<TextField.AllowUndefined field={fields.belief} />
-			<TextField.AllowUndefined field={fields.goal} />
-			<TextField.AllowUndefined field={fields.instinct} />
+			<TextareaField.AllowUndefined field={fields.belief} />
+			<TextareaField.AllowUndefined field={fields.goal} />
+			<TextareaField.AllowUndefined field={fields.instinct} />
 		</Fieldset>
 	);
 }

@@ -20,7 +20,16 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 	public async Task<GameTypeDetails> ToApi(DocumentDbContext dbContext, IGameType gameType)
 	{
 		using var activity = TracingHelper.StartActivity($"{nameof(GameTypeApiMapper)}.{nameof(ToApi)}");
+		return await GetGameTypeFromCache(gameType);
+	}
+
+	private async Task<GameTypeDetails> GetGameTypeFromCache(IGameType gameType)
+	{
+#if DEBUG
+		return await CreateGameTypeDetails(gameType);
+#else
 		return await memoryCache.GetOrCreateAsync(new GameTypeKey(gameType.Key), async _ => await CreateGameTypeDetails(gameType)) ?? throw new InvalidOperationException("Could not load from cache");
+#endif
 	}
 
 	private async Task<GameTypeDetails> CreateGameTypeDetails(IGameType gameType)
@@ -29,12 +38,19 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 					Key: gameType.Key,
 					UserRoles: GameRoles,
 					ObjectTypes: await Task.WhenAll(
-						gameType.ObjectTypes.Select(async obj =>
-							await memoryCache.GetOrCreateAsync(new GameObjectTypeKey(obj.Key), async _ => await CreateGameObjectTypeDetails(gameType, obj))
-								?? throw new InvalidOperationException("Could not load from cache")
-						)
+						gameType.ObjectTypes.Select(obj => GetGameObjectTypeFromCache(gameType, obj))
 					)
 				);
+	}
+
+	private async Task<GameObjectTypeDetails> GetGameObjectTypeFromCache(IGameType gameType, IGameObjectType obj)
+	{
+#if DEBUG
+		return await CreateGameObjectTypeDetails(gameType, obj);
+#else
+		return await memoryCache.GetOrCreateAsync(new GameObjectTypeKey(obj.Key), async _ => await CreateGameObjectTypeDetails(gameType, obj))
+										?? throw new InvalidOperationException("Could not load from cache");
+#endif
 	}
 
 	private async Task<GameObjectTypeDetails> CreateGameObjectTypeDetails(IGameType gameType, IGameObjectType obj)

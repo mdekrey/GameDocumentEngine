@@ -2,7 +2,7 @@ import { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { TextareaField } from '@/utils/form-fields/textarea-field/textarea-field';
 
 export function Notes({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {
@@ -11,9 +11,8 @@ export function Notes({ form }: { form: UseFormResult<CharacterDocument> }) {
 	});
 	return (
 		<Fieldset>
-			{/* TODO: use a text area here instead */}
-			<TextField.AllowUndefined field={fields.equipment} description />
-			<TextField.AllowUndefined field={fields.contacts} />
+			<TextareaField.AllowUndefined field={fields.equipment} description />
+			<TextareaField.AllowUndefined field={fields.contacts} />
 		</Fieldset>
 	);
 }
