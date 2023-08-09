@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.10 AS base
 WORKDIR /app
 
 ENV ASPNETCORE_URLS=http://+:80
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:7.0.400 AS build-dotnet
 WORKDIR /src
 
 COPY ./eng/ ./eng/
