@@ -1,29 +1,49 @@
-function FullPageModalContainer({ children }: { children: React.ReactNode }) {
+import { Transition } from '@headlessui/react';
+import { useAsAtom } from '@principlestudios/jotai-react-signals';
+import { Atom, useAtomValue } from 'jotai';
+import { Fragment, useState } from 'react';
+
+function FullPageModalContainer({
+	children,
+	show,
+	onReadyToUnmount,
+}: {
+	children: React.ReactNode;
+	show?: Atom<boolean>;
+	onReadyToUnmount?: () => void;
+}) {
+	const [isShowing, setIsShowing] = useState(false);
+	const shouldShow = useAtomValue(useAsAtom(show ?? true));
+	if (shouldShow != isShowing) setTimeout(() => setIsShowing(shouldShow), 0);
+
 	return (
-		<div
-			className="relative z-modalBackground"
-			aria-labelledby="modal-title"
-			role="dialog"
-			aria-modal="true"
-		>
-			{children}
-		</div>
+		<Transition show={isShowing} as={Fragment} afterLeave={onReadyToUnmount}>
+			<div
+				className="relative z-modalBackground"
+				aria-labelledby="modal-title"
+				role="dialog"
+				aria-modal="true"
+			>
+				{children}
+			</div>
+		</Transition>
 	);
 }
 
 function ModalBackdrop() {
-	/*
-	Background backdrop, show/hide based on modal state.
-
-	Entering: "ease-out duration-300"
-		From: "opacity-0"
-		To: "opacity-100"
-	Leaving: "ease-in duration-200"
-		From: "opacity-100"
-		To: "opacity-0"
-	*/
 	return (
-		<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+		<Transition.Child
+			appear
+			as={Fragment}
+			enter="ease-out duration-300"
+			enterFrom="opacity-0"
+			enterTo="opacity-100"
+			leave="ease-in duration-200"
+			leaveFrom="opacity-100"
+			leaveTo="opacity-0"
+		>
+			<div className="fixed inset-0 bg-black bg-opacity-25 transition-opacity" />
+		</Transition.Child>
 	);
 }
 
@@ -40,22 +60,22 @@ function ModalPanel({
 				className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
 				onClick={() => onCancel?.()}
 			>
-				{/*
-				Modal panel, show/hide based on modal state.
-
-				Entering: "ease-out duration-300"
-					From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-					To: "opacity-100 translate-y-0 sm:scale-100"
-				Leaving: "ease-in duration-200"
-					From: "opacity-100 translate-y-0 sm:scale-100"
-					To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-			*/}
-				<div
-					className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
-					onClick={(ev) => ev.stopPropagation()}
+				<Transition.Child
+					as={Fragment}
+					enter="ease-out duration-300"
+					enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+					enterTo="opacity-100 translate-y-0 sm:scale-100"
+					leave="ease-in duration-200"
+					leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+					leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 				>
-					{children}
-				</div>
+					<div
+						className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+						onClick={(ev) => ev.stopPropagation()}
+					>
+						{children}
+					</div>
+				</Transition.Child>
 			</div>
 		</div>
 	);
@@ -63,13 +83,17 @@ function ModalPanel({
 
 export function Modal({
 	children,
+	show,
 	onBackdropCancel,
+	onReadyToUnmount,
 }: {
 	children: React.ReactNode;
+	show?: Atom<boolean>;
+	onReadyToUnmount?: () => void;
 	onBackdropCancel?: () => void;
 }) {
 	return (
-		<FullPageModalContainer>
+		<FullPageModalContainer show={show} onReadyToUnmount={onReadyToUnmount}>
 			<ModalBackdrop />
 
 			<ModalPanel onCancel={onBackdropCancel}>{children}</ModalPanel>

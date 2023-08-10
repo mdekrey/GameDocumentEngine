@@ -1,11 +1,13 @@
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { Atom, atom, useAtomValue, useSetAtom, useStore } from 'jotai';
 import { Modal } from './modal';
 import { useCallback } from 'react';
 
 type Modal = {
 	contents: React.ReactNode;
 	id: React.Key;
+	shouldShow: Atom<boolean>;
 	onBackdropCancel: () => void;
+	onReadyToUnmount: () => void;
 };
 
 const activeModalStack = atom<Modal[]>([]);
@@ -38,6 +40,7 @@ function rejectViaBackdrop(props: Pick<ModalContentsProps<never>, 'reject'>) {
 }
 
 export function useModal() {
+	const store = useStore();
 	const setModals = useSetAtom(activeModalStack);
 
 	return useCallback(
@@ -46,11 +49,17 @@ export function useModal() {
 			onBackdropCancel,
 			additional,
 		}: ModalOptions<T, TProps>) {
+			const shouldShow = atom(true);
 			const modal: Modal = {
 				contents: null,
 				id: Math.random(),
+				shouldShow,
+				onReadyToUnmount: noop,
 				onBackdropCancel: noop,
 			};
+			const modalFinished = new Promise<void>((resolve) => {
+				modal.onReadyToUnmount = resolve;
+			});
 			try {
 				return await new Promise<T>((resolve, reject) => {
 					const props = { resolve: complete, reject };
@@ -75,10 +84,13 @@ export function useModal() {
 			}
 
 			function unmountModal() {
-				setModals((modals) => modals.filter((m) => m !== modal));
+				store.set(shouldShow, false);
+				modalFinished.finally(() =>
+					setModals((modals) => modals.filter((m) => m !== modal)),
+				);
 			}
 		},
-		[setModals],
+		[store, setModals],
 	);
 }
 
@@ -87,11 +99,18 @@ export function Modals() {
 
 	return (
 		<>
-			{modals.map(({ contents, id, onBackdropCancel }) => (
-				<Modal key={id} onBackdropCancel={onBackdropCancel}>
-					{contents}
-				</Modal>
-			))}
+			{modals.map(
+				({ contents, id, shouldShow, onBackdropCancel, onReadyToUnmount }) => (
+					<Modal
+						key={id}
+						onBackdropCancel={onBackdropCancel}
+						show={shouldShow}
+						onReadyToUnmount={onReadyToUnmount}
+					>
+						{contents}
+					</Modal>
+				),
+			)}
 		</>
 	);
 }
