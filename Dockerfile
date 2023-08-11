@@ -37,7 +37,7 @@ COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/
 
 RUN cd ./GameDocumentEngine.Ui/ && npm run build
 
-WORKDIR /src/GameDocumentEngine.Ui/dist
+WORKDIR /src/GameDocumentEngine.Server/wwwroot
 RUN find . -type f -not -regex ".*\.\(avif\|jpg\|jpeg\|gif\|png\|webp\|mp4\|webm\)" -exec gzip -k "{}" \; -exec brotli -k "{}" \;
 
 FROM base AS final
@@ -45,6 +45,6 @@ WORKDIR /app
 ARG GITHASH
 ENV BUILD__GITHASH=${GITHASH}
 COPY --from=build-dotnet /src/artifacts/bin/GameDocumentEngine.Server/Release/net7.0/linux-x64/publish .
-COPY --from=build-ui /src/GameDocumentEngine.Ui/dist /GameDocumentEngine.Ui/dist
+COPY --from=build-ui /src/GameDocumentEngine.Server/wwwroot ./wwwroot
 
 ENTRYPOINT ["dotnet", "GameDocumentEngine.Server.dll"]

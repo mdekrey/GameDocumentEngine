@@ -34,6 +34,7 @@ console.log(nodeModulesRoot);
 export default defineConfig({
 	plugins: [react(), splitVendorChunkPlugin()],
 	build: {
+		outDir: '../GameDocumentEngine.Server/wwwroot',
 		rollupOptions: {
 			input: ['./index.html', ...globSync('./src/documents/*/index.ts')],
 			output: {
