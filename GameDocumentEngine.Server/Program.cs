@@ -23,7 +23,11 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+	Args = args,
+	WebRootPath = "../GameDocumentEngine.Ui/dist"
+});
 
 // Add services to the container.
 var services = builder.Services;
