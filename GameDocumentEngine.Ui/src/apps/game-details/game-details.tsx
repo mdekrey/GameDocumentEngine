@@ -14,6 +14,7 @@ import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { useTranslation } from 'react-i18next';
+import { GameObjects } from './game-objects';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
@@ -60,6 +61,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 					<HiOutlineTrash />
 				</IconButton.Destructive>
 			</div>
+			<GameObjects gameId={gameId} />
 			<h2 className="text-lg font-bold">{t('heading-users')}</h2>
 			<ul className="list-disc ml-8">
 				{Object.entries(gameDetails.playerNames).map(([id, name]) => (
