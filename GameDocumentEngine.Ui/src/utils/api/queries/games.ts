@@ -59,7 +59,7 @@ export const getGameDetails = (gameId: string) => ({
 	},
 });
 
-export async function invalidateGame(
+export async function handleGameUpdateEvent(
 	queryClient: QueryClient,
 	event: EntityChangedProps<string, GameDetails>,
 ) {

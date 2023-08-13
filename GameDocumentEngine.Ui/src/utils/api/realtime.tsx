@@ -2,9 +2,9 @@ import { createContext, useContext, useEffect, useMemo } from 'react';
 import { createRealtimeApiConnection } from './realtime.signalr';
 import type { HubConnection } from '@microsoft/signalr';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { invalidateCurrentUser } from './queries/user';
-import { invalidateDocument } from './queries/document';
-import { invalidateGame } from './queries/games';
+import { handleUserUpdateEvent } from './queries/user';
+import { handleDocumentUpdateEvent } from './queries/document';
+import { handleGameUpdateEvent } from './queries/games';
 
 type RealtimeApiConnection = {
 	connection: HubConnection;
@@ -84,9 +84,9 @@ function createRealtimeApi(
 	api: RealtimeApiConnection,
 	queryClient: QueryClient,
 ): RealtimeApi {
-	apiOn(api, queryClient, 'User', invalidateCurrentUser);
-	apiOn(api, queryClient, 'Game', invalidateGame);
-	apiOn(api, queryClient, 'Document', invalidateDocument);
+	apiOn(api, queryClient, 'User', handleUserUpdateEvent);
+	apiOn(api, queryClient, 'Game', handleGameUpdateEvent);
+	apiOn(api, queryClient, 'Document', handleDocumentUpdateEvent);
 
 	return {
 		connectionPromise: api.connectionPromise,

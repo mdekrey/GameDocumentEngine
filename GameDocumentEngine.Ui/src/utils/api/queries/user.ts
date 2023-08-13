@@ -14,7 +14,7 @@ export const getCurrentUser = {
 	},
 };
 
-export async function invalidateCurrentUser(
+export async function handleUserUpdateEvent(
 	queryClient: QueryClient,
 	event: EntityChangedProps<string, UserDetails>,
 ) {

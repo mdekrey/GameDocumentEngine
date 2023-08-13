@@ -34,7 +34,7 @@ export const getDocument = (gameId: string, documentId: string) => {
 	return result;
 };
 
-export async function invalidateDocument(
+export async function handleDocumentUpdateEvent(
 	queryClient: QueryClient,
 	event: EntityChangedProps<{ gameId: string; id: string }, DocumentDetails>,
 ) {
