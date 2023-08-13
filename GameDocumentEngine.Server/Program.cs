@@ -225,6 +225,9 @@ if (app.Environment.IsDevelopment())
 app.UseHealthChecks("/health");
 app.UseDefaultFiles();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseCompressedStaticFiles(new StaticFileOptions
 {
 	OnPrepareResponse = ctx =>
@@ -241,9 +244,6 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 			};
 	}
 });
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<GameDocumentsHub>("/hub");
