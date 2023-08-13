@@ -25,6 +25,7 @@ public class GameDocumentsHub : Hub
 	{
 		if (Context.User?.GetCurrentUserId() is not Guid userId)
 		{
+			// Shouldn't happen due to Authorize policy above
 			Context.Abort();
 			return;
 		}

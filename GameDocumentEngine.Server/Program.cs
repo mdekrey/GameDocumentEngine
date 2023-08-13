@@ -78,16 +78,6 @@ services
 		googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? throw new InvalidOperationException("Google client not configured");
 		googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? throw new InvalidOperationException("Google client not configured");
 
-		var originalOnRedirectToAuthorizationEndpoint = googleOptions.Events.OnRedirectToAuthorizationEndpoint;
-		googleOptions.Events.
-			OnRedirectToAuthorizationEndpoint = context =>
-			{
-				if (context.Request.Path.Value == "/login" || context.Request.Path.StartsWithSegments("/invitations"))
-					return originalOnRedirectToAuthorizationEndpoint(context);
-
-				context.Response.StatusCode = 401;
-				return Task.CompletedTask;
-			};
 		var originalOnCreatingTicket = googleOptions.Events.OnCreatingTicket;
 		googleOptions.Events.
 			OnCreatingTicket = async context =>
@@ -137,7 +127,6 @@ services.AddAuthorization(options =>
 	options.AddPolicy("AuthenticatedUser", builder =>
 	{
 		builder.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
-		builder.AddAuthenticationSchemes(GoogleDefaults.AuthenticationScheme);
 		builder.RequireAuthenticatedUser();
 	});
 });
@@ -240,6 +229,10 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 {
 	OnPrepareResponse = ctx =>
 	{
+		if (ctx.Context.User.Identity?.IsAuthenticated is not true)
+		{
+			ctx.Context.ChallengeAsync();
+		}
 		ctx.Context.Response.GetTypedHeaders().CacheControl =
 			new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
 			{
