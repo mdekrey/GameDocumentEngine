@@ -23,7 +23,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["src/*"]
-		}
+		},
+
+		"types": ["vite/client", "vite-plugin-pwa/info", "vite-plugin-pwa/react"]
 	},
 	"include": ["src"],
 	"references": []

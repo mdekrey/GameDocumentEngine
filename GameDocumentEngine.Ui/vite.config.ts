@@ -2,6 +2,7 @@ import { defineConfig, splitVendorChunkPlugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import { globSync } from 'glob';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const commonDependencies: [string, string][] = [
 	// ['react/', 'react'],
@@ -32,9 +33,23 @@ console.log(nodeModulesRoot);
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [react(), splitVendorChunkPlugin()],
+	plugins: [
+		react(),
+		splitVendorChunkPlugin(),
+		VitePWA({
+			registerType: 'autoUpdate',
+			strategies: 'injectManifest',
+			srcDir: 'src',
+			filename: 'vtt-sw.ts',
+			manifest: {
+				name: 'vtt',
+				short_name: 'vtt',
+			},
+		}),
+	],
 	build: {
 		outDir: '../GameDocumentEngine.Server/wwwroot',
+		emptyOutDir: true,
 		rollupOptions: {
 			input: ['./index.html', ...globSync('./src/documents/*/index.ts')],
 			output: {

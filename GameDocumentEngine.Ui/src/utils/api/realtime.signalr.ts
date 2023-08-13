@@ -14,7 +14,7 @@ function any<T>(promises: Array<Promise<T>>) {
 
 export function getConnection(signal: AbortSignal) {
 	const hub = new HubConnectionBuilder()
-		.withUrl('/hub')
+		.withUrl(new URL('/hub', self.location.href).toString())
 		.withAutomaticReconnect()
 		.configureLogging(LogLevel.Information)
 		.build();
