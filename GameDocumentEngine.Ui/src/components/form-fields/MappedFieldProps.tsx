@@ -1,4 +1,4 @@
-import { FieldMapping, UseFieldResult } from '../form/useField';
+import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 
 // TODO: consider not allowing mappings, since useFormFields works well
 export type MappedFieldProps<TValue, TTarget> =

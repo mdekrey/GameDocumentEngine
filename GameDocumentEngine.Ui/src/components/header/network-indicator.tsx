@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { HubConnectionState } from '@microsoft/signalr';
-import { JotaiDiv } from '@/utils/form-fields/jotai/div';
+import { JotaiDiv } from '@/components/form-fields/jotai/div';
 import { IconButton } from '../button/icon-button';
 import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
 import { useRef, useEffect, useCallback } from 'react';

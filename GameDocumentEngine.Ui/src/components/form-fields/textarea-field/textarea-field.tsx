@@ -1,7 +1,7 @@
 import { ErrorsList } from '../jotai/errors/errors-list';
 import { Field } from '../field/field';
 import { TextareaInput } from './textarea-input';
-import { FieldMapping, UseFieldResult } from '../../form/useField';
+import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import { MappedFieldProps } from '../MappedFieldProps';
 import { JotaiLabel } from '../jotai/label';
 import { Atom } from 'jotai';

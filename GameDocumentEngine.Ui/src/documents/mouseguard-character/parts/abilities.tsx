@@ -1,7 +1,7 @@
 import { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
-import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { StandardAbility } from '../components/standard-ability';
 import { NatureAbility } from '../components/nature-ability';
 import { atom } from 'jotai';

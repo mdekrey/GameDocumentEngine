@@ -1,9 +1,9 @@
 import { ErrorsList } from '../jotai/errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from '../text-input/text-input';
-import { FieldMapping, UseFieldResult } from '../../form/useField';
+import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import { MappedFieldProps } from '../MappedFieldProps';
-import { noChange } from '../../form/mapAtom';
+import { noChange } from '@/utils/form/mapAtom';
 import { JotaiLabel } from '../jotai/label';
 import { Atom } from 'jotai';
 import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';

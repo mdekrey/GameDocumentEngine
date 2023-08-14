@@ -1,10 +1,10 @@
 import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument, Wise, wiseSchema } from '../character-types';
-import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-field/text-field';
 import { FieldMapping } from '@/utils/form/useField';
-import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { ToggleButtonField } from '@/utils/form-fields/toggle-button/toggle-button-field';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
 
 const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 	toForm: (v) =>

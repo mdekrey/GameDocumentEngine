@@ -1,9 +1,9 @@
 import { CharacterDocument } from '../character-types';
 import { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { NumberField } from '@/utils/form-fields/number-field/number-field';
-import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
-import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { NumberField } from '@/components/form-fields/number-field/number-field';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import { TextField } from '@/components/form-fields/text-field/text-field';
 
 export function Bio({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {

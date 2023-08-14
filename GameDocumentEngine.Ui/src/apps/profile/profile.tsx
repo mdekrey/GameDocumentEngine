@@ -1,19 +1,19 @@
 import { Button } from '@/components/button/button';
-import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { ErrorsList } from '../../utils/form-fields/jotai/errors/errors-list';
+import { ErrorsList } from '@/components/form-fields/jotai/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-field/text-field';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();

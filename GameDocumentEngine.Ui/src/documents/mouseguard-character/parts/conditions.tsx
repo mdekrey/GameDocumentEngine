@@ -5,7 +5,7 @@ import { useDebugValue } from 'react';
 import {
 	CheckboxField,
 	undefinedAsFalseMapping,
-} from '@/utils/form-fields/checkbox-input/checkbox-field';
+} from '@/components/form-fields/checkbox-input/checkbox-field';
 
 export function Conditions({
 	form,

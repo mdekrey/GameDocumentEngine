@@ -1,6 +1,6 @@
-import { ErrorsList } from '@/utils/form-fields/jotai/errors/errors-list';
-import { Field } from '@/utils/form-fields/field/field';
-import { SelectInput } from '@/utils/form-fields/select-input/select-input';
+import { ErrorsList } from '@/components/form-fields/jotai/errors/errors-list';
+import { Field } from '@/components/form-fields/field/field';
+import { SelectInput } from '@/components/form-fields/select-input/select-input';
 import { UseFieldResult } from '@/utils/form/useField';
 
 export function SelectField<T>({

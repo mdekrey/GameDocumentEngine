@@ -6,15 +6,15 @@ import { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { GameDetails } from '@/api/models/GameDetails';
-import { Fieldset } from '@/utils/form-fields/fieldset/fieldset';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { FieldMapping } from '@/utils/form/useField';
-import { CheckboxField } from '@/utils/form-fields/checkbox-input/checkbox-field';
+import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
-import { SelectField } from '@/utils/form-fields/select-field/select-field';
+import { SelectField } from '@/components/form-fields/select-field/select-field';
 import { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { noChange } from '@/utils/form/mapAtom';
-import { NumberField } from '@/utils/form-fields/number-field/number-field';
+import { NumberField } from '@/components/form-fields/number-field/number-field';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),

@@ -1,7 +1,7 @@
 import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument, Trait, traitSchema } from '../character-types';
-import { TextField } from '@/utils/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-field/text-field';
 import { FieldMapping } from '@/utils/form/useField';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { Atom, useAtomValue } from 'jotai';
