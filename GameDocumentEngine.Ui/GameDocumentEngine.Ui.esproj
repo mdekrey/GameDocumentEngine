@@ -6,6 +6,8 @@
 	<Import Project="$(RepositoryEngineeringDir)npm.targets" />
 
 	<ItemGroup>
+		<Compile Include="vite.config.ts" />
+		<Compile Include="public/**/*" />
 		<Compile Remove="src/**/stories/**/*;src/**/*.stories.*" />
 
 		<ZodInput Include="$(SolutionRoot)/schemas/documents/*.json"/>
