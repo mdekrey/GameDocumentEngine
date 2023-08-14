@@ -38,24 +38,28 @@ const destructiveSecondary = toClassName(
 	<a className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-gray-200 outline-red-700" />,
 );
 
+const allThemes = {
+	Destructive: [destructive],
+	Save: [save],
+	Secondary: [secondary],
+	DestructiveSecondary: [destructiveSecondary],
+} satisfies Record<string, [className: string]>;
+
+export type ButtonTheme = keyof typeof allThemes;
+export const buttonThemeNames = Object.keys(
+	allThemes,
+) as ReadonlyArray<ButtonTheme>;
+
 export function buttonThemes<TProps extends { className?: string | undefined }>(
 	nameSuffix: string,
 	Component: React.ComponentType<TProps>,
-) {
-	return {
-		Destructive: mergeButton(
-			Component,
-			`Destructive${nameSuffix}`,
-			destructive,
-		),
-		Save: mergeButton(Component, `Save${nameSuffix}`, save),
-		Secondary: mergeButton(Component, `Secondary${nameSuffix}`, secondary),
-		DestructiveSecondary: mergeButton(
-			Component,
-			`DestructiveSecondary${nameSuffix}`,
-			destructiveSecondary,
-		),
-	};
+): Record<ButtonTheme, React.FC<TProps>> {
+	return Object.fromEntries(
+		Object.entries(allThemes).map(([name, [className]]) => [
+			name as ButtonTheme,
+			mergeButton(Component, `${name}${nameSuffix}`, className),
+		]),
+	) as Record<ButtonTheme, React.FC<TProps>>;
 }
 
 export const iconButtonClasses =

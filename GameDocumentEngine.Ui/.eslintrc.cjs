@@ -9,6 +9,7 @@ module.exports = {
 		// disables eslint rules in favor of using prettier separately
 		'prettier',
 		'plugin:react-hooks/recommended',
+		'plugin:storybook/recommended',
 	],
 	rules: {
 		// https://typescript-eslint.io/linting/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
@@ -49,8 +50,7 @@ module.exports = {
 			},
 		},
 		{
-			files: ['**/*.stories.{ts,tsx}'],
-
+			files: ['**/*.stories.{ts,tsx}', '**/stories/**'],
 			rules: {
 				'i18next/no-literal-string': [0],
 			},
