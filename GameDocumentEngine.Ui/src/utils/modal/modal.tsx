@@ -58,7 +58,14 @@ function ModalPanel({
 		<div className="fixed inset-0 z-modalForeground overflow-y-auto">
 			<div
 				className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
-				onClick={() => onCancel?.()}
+				onClick={(ev) => {
+					ev.preventDefault();
+					ev.stopPropagation();
+					if (ev.currentTarget !== ev.target) {
+						return;
+					}
+					onCancel?.();
+				}}
 			>
 				<Transition.Child
 					as={Fragment}

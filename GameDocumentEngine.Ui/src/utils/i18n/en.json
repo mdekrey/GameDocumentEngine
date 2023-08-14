@@ -10,6 +10,20 @@
 			"new-game": "New Game"
 		}
 	},
+	"network": {
+		"signal-disconnected": "Cannot connect to the network",
+		"reconnecting": {
+			"title": "Reconnecting to the network...",
+			"reconnecting-notice": "The connection to the server has been lost. Please wait while we re-establish connectivity.",
+			"dismiss": "Dismiss"
+		},
+		"disconnected": {
+			"title": "Server connection lost",
+			"lost-connection-notice": "The connection to the server has been lost. Select 'reconnect' below when network connectivity has been restored.",
+			"reconnect": "Reconnect",
+			"dismiss": "Dismiss"
+		}
+	},
 	"create-game": {
 		"fields": {
 			"name": {

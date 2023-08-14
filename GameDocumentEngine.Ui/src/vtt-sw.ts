@@ -1,5 +1,4 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="webworker" />
+import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { createRealtimeApiConnection } from './utils/api/realtime.signalr';
 import {
@@ -7,13 +6,16 @@ import {
 	MessageFromServiceWorker,
 	MessageFromWindow,
 } from './service-worker/messages';
+import { neverEver } from './utils/never-ever';
+import { HubConnectionState } from '@microsoft/signalr';
 
 declare const self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
+clientsClaim();
 
-const version = 1.1;
+const version = 1;
 
 const { connection, connectionPromise } = createRealtimeApiConnection();
 
@@ -43,7 +45,7 @@ async function sendToAll(message: MessageFromServiceWorker) {
 
 function log(...args: unknown[]) {
 	console.log(`[${new Date().toISOString()}] sw${version}`, ...args);
-	void sendToAll({ type: 'log', args });
+	// void sendToAll({ type: 'log', args });
 }
 
 self.addEventListener('install', function (e) {
@@ -69,10 +71,12 @@ self.addEventListener('activate', (event) => {
 					changeEvent: args[1],
 				});
 			});
-			connection.onclose(() => {
+			connection.onclose((err) => {
+				console.error('onclose', err);
 				void sendToAll(getHubStateMessage());
 			});
-			connection.onreconnecting(() => {
+			connection.onreconnecting((err) => {
+				console.error('onreconnecting', err);
 				void sendToAll(getHubStateMessage());
 			});
 			connection.onreconnected(() => {
@@ -94,6 +98,17 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 	switch (data.type) {
 		case 'requestHubState':
 			sendTo(source, getHubStateMessage());
+			return;
+		case 'requestReconnect':
+			if (connection.state === HubConnectionState.Disconnected) {
+				void connection
+					.start()
+					.finally(() => void sendToAll(getHubStateMessage()));
+				void sendToAll(getHubStateMessage());
+			}
+			break;
+		default:
+			return neverEver(data);
 	}
 }
 

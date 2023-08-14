@@ -27,6 +27,7 @@ export type ModalContentsProps<T, TProps = never> = {
 export type ModalOptions<T, TProps = never> = {
 	ModalContents: (args: ModalContentsProps<T, TProps>) => React.ReactNode;
 	onBackdropCancel?: (args: ModalContentsProps<T, TProps>) => void;
+	abort?: AbortSignal;
 } & Additional<TProps>;
 
 function noop() {
@@ -48,6 +49,7 @@ export function useModal() {
 			ModalContents,
 			onBackdropCancel,
 			additional,
+			abort,
 		}: ModalOptions<T, TProps>) {
 			const shouldShow = atom(true);
 			const modal: Modal = {
@@ -60,6 +62,8 @@ export function useModal() {
 			const modalFinished = new Promise<void>((resolve) => {
 				modal.onReadyToUnmount = resolve;
 			});
+			abort?.addEventListener('abort', unmountModal);
+
 			try {
 				return await new Promise<T>((resolve, reject) => {
 					const props = { resolve: complete, reject };
@@ -84,6 +88,7 @@ export function useModal() {
 			}
 
 			function unmountModal() {
+				abort?.removeEventListener('abort', unmountModal);
 				store.set(shouldShow, false);
 				modalFinished.finally(() =>
 					setModals((modals) => modals.filter((m) => m !== modal)),

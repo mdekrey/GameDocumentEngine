@@ -1,4 +1,8 @@
 <Project Sdk="Microsoft.Build.NoTargets/3.7.0">
+	<PropertyGroup>
+		<NpmBuildScript>node_modules/.bin/vite build</NpmBuildScript>
+		<NpmBuildScript Condition=" '$(Configuration)' == 'Debug' ">node_modules/.bin/vite build --sourcemap --mode development --minify false</NpmBuildScript>
+	</PropertyGroup>
 	<Import Project="$(RepositoryEngineeringDir)npm.targets" />
 
 	<ItemGroup>
@@ -13,7 +17,11 @@
 		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts"/>
 	</Target>
 
-	<Target Name="Generation" BeforeTargets="Build">
+	<Target Name="Generation" BeforeTargets="NodeBuild">
+	</Target>
+
+	<Target Name="TypeCheck" BeforeTargets="NodeBuild" DependsOnTargets="Generation" Condition=" $(Configuration) == 'Release' ">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/tsc"/>
 	</Target>
 
 	<Target Name="_ComputeNodeOutputs" BeforeTargets="NodeBuild">

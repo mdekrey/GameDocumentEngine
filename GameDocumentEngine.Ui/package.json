@@ -4,10 +4,8 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"predev": "npm run generation",
-		"dev": "vite build --watch --sourcemap --mode development --minify false",
-		"prebuild": "npm run generation",
-		"build": "tsc && vite build",
+		"dev": "dotnet watch build",
+		"build": "dotnet build",
 		"lint": "npm run typecheck && npm run eslint && npm run prettier",
 		"lint:fix": "npm run typecheck && npm run eslint:fix && npm run prettier:fix",
 		"eslint": "eslint \"**/*.{cjs,mjs,js,ts,tsx}\"",
@@ -15,7 +13,6 @@
 		"prettier": "prettier --list-different \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"typecheck": "tsc --noemit",
-		"generation": "dotnet build --no-restore /t:Generation -bl:../artifacts/build.binlog",
 		"test": "echo 'TODO'"
 	},
 	"dependencies": {

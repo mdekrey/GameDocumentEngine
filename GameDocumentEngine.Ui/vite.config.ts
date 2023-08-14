@@ -29,7 +29,6 @@ const commonDependencies: [string, string][] = [
 const nodeModulesRoot = path
 	.resolve(__dirname, 'node_modules')
 	.replace(/\\/g, '/');
-console.log(nodeModulesRoot);
 
 // https://vitejs.dev/config/
 export default defineConfig({

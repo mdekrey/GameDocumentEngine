@@ -7,6 +7,7 @@ import { HiOutlineDocumentText, HiBars3 } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { HeaderMenuLink } from './header-menu-link';
+import { NetworkIndicator } from './network-indicator';
 
 export type MenuTab = {
 	href: string;
@@ -52,7 +53,11 @@ export function Header({ mainItem, menuTabs }: HeaderProps) {
 					))}
 				</div>
 
-				<Menu as="div" className="relative inline-block flex-none ml-auto">
+				<div className="flex-1" />
+
+				<NetworkIndicator />
+
+				<Menu as="div" className="relative inline-block flex-none">
 					<Menu.Button
 						className={twMerge(
 							'block justify-center w-10 h-10 text-center text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700',

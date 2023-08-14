@@ -4,6 +4,9 @@ import { HubConnectionState } from '@microsoft/signalr';
 export type RequestHubStateMessage = {
 	type: 'requestHubState';
 };
+export type RequestReconnectMessage = {
+	type: 'requestReconnect';
+};
 
 export type LogMessage = {
 	type: 'log';
@@ -22,7 +25,9 @@ export type EntityChangedMessage = {
 	changeEvent: EntityChangedProps<unknown, unknown>;
 };
 
-export type MessageFromWindow = RequestHubStateMessage;
+export type MessageFromWindow =
+	| RequestHubStateMessage
+	| RequestReconnectMessage;
 export type MessageFromServiceWorker =
 	| LogMessage
 	| HubStatusMesage

@@ -15,23 +15,28 @@ function mergeButton<TProps extends { className?: string | undefined }>(
 	return result;
 }
 
-const destructive = (
-	(
-		<a className="bg-red-600 text-white focus:bg-red-500 hover:bg-red-500 outline-black" />
-	).props as JSX.IntrinsicElements['a']
-).className as string;
+function toClassName(elem: JSX.Element) {
+	return (
+		(elem.props as JSX.IntrinsicElements[keyof JSX.IntrinsicElements])
+			.className ?? ''
+	);
+}
 
-const save = (
-	(
-		<a className="bg-green-600 text-white focus:bg-green-500 hover:bg-green-500 outline-black" />
-	).props as JSX.IntrinsicElements['a']
-).className as string;
+const destructive = toClassName(
+	<a className="bg-red-600 text-white focus:bg-red-500 hover:bg-red-500 outline-black" />,
+);
 
-const secondary = (
-	(
-		<a className="bg-white text-gray-900 focus:bg-gray-50 hover:bg-gray-50 outline-gray-300" />
-	).props as JSX.IntrinsicElements['a']
-).className as string;
+const save = toClassName(
+	<a className="bg-green-600 text-white focus:bg-green-500 hover:bg-green-500 outline-black" />,
+);
+
+const secondary = toClassName(
+	<a className="bg-white text-gray-900 focus:bg-gray-50 hover:bg-gray-50 outline-gray-300" />,
+);
+
+const destructiveSecondary = toClassName(
+	<a className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-gray-200 outline-red-700" />,
+);
 
 export function buttonThemes<TProps extends { className?: string | undefined }>(
 	nameSuffix: string,
@@ -45,6 +50,11 @@ export function buttonThemes<TProps extends { className?: string | undefined }>(
 		),
 		Save: mergeButton(Component, `Save${nameSuffix}`, save),
 		Secondary: mergeButton(Component, `Secondary${nameSuffix}`, secondary),
+		DestructiveSecondary: mergeButton(
+			Component,
+			`DestructiveSecondary${nameSuffix}`,
+			destructiveSecondary,
+		),
 	};
 }
 

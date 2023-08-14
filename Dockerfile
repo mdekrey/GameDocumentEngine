@@ -25,17 +25,19 @@ FROM node:18-alpine AS build-ui
 WORKDIR /src
 # brotli is added for the `brotli` compression below
 # OpenAPI Codegeneration is using dotnet7-runtime
-RUN apk add --no-cache brotli dotnet7-runtime
+RUN apk add --no-cache brotli dotnet7-sdk
 
 COPY ./eng/ ./eng/
 COPY ["./GameDocumentEngine.Ui/package.json", "./GameDocumentEngine.Ui/"]
 COPY ["./GameDocumentEngine.Ui/package-lock.json", "./GameDocumentEngine.Ui/"]
-RUN cd ./GameDocumentEngine.Ui/ && npm ci
+COPY ["./GameDocumentEngine.Ui/GameDocumentEngine.Ui.esproj", "./GameDocumentEngine.Ui/"]
+COPY ["./Directory.Build.props", "./"]
+RUN cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
 
 COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/
 
-RUN cd ./GameDocumentEngine.Ui/ && npm run build
+RUN cd ./GameDocumentEngine.Ui/ && dotnet build -p:Configuration=Release
 
 WORKDIR /src/GameDocumentEngine.Server/wwwroot
 RUN find . -type f -not -regex ".*\.\(avif\|jpg\|jpeg\|gif\|png\|webp\|mp4\|webm\)" -exec gzip -k "{}" \; -exec brotli -k "{}" \;
