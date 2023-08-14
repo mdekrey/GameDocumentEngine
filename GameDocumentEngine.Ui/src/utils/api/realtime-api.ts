@@ -16,6 +16,10 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 
 	registerSW({
 		onRegisteredSW() {
+			if (!navigator.serviceWorker?.controller) {
+				// After a hard refresh, sometimes the `controller` doesn't load
+				window.location.reload();
+			}
 			navigator.serviceWorker?.addEventListener('message', (event) => {
 				void handleServiceMessage(event.data as MessageFromServiceWorker);
 			});
