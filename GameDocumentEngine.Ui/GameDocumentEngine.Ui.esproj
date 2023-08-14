@@ -1,5 +1,21 @@
 <Project Sdk="Microsoft.Build.NoTargets/3.7.0">
 	<Import Project="$(RepositoryEngineeringDir)npm.targets" />
+
+	<ItemGroup>
+		<ZodInput Include="$(SolutionRoot)/schemas/documents/*.json"/>
+	</ItemGroup>
+
+	<Target Name="GenerateApi" BeforeTargets="Generation" Inputs="$(SolutionRoot)schemas\api.yaml" Outputs="src/api/.gitignore">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml"/>
+	</Target>
+
+	<Target Name="GenerateZod" BeforeTargets="Generation" Inputs="@(ZodInput)" Outputs="@(ZodInput->'$(ProjectDir)/src/documents/%(filename)/schema.ts')">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts"/>
+	</Target>
+
+	<Target Name="Generation" BeforeTargets="Build">
+	</Target>
+
 	<Target Name="_ComputeNodeOutputs" BeforeTargets="NodeBuild">
 		<ItemGroup>
 			<CompileConfig Include="tsconfig*.json" />

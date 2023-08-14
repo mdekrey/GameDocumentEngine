@@ -14,7 +14,6 @@ import { GameDetails } from './apps/game-details/game-details';
 import { GetParams } from './utils/routing/getParams';
 import { CreateDocument } from './apps/documents/create-document/create-document';
 import { DocumentDetails } from './apps/documents/details/doc-details';
-import { RealtimeApiProvider } from './utils/api/realtime';
 import { GameEdit } from './apps/game-edit/game-edit';
 import { GameInvites } from './apps/game-invites/game-invites';
 import { GameRoles } from './apps/game-roles/game-roles';
@@ -89,11 +88,9 @@ function App() {
 
 function AppProviders() {
 	return (
-		<RealtimeApiProvider>
-			<HashRouter future={{ v7_startTransition: true }}>
-				<App />
-			</HashRouter>
-		</RealtimeApiProvider>
+		<HashRouter future={{ v7_startTransition: true }}>
+			<App />
+		</HashRouter>
 	);
 }
 

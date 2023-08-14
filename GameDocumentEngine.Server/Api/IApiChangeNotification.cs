@@ -29,17 +29,17 @@ static class ApiChangeNotification
 	public static IClientProxy User<THub>(this IHubContext<THub> context, Guid userId) where THub : Hub =>
 		context.Clients.Group(GroupNames.UserDirect(userId));
 
-	public static Task SendValue<TApi>(this IClientProxy target, string eventName, object key, TApi value) =>
-		target.SendAsync(eventName, new { key, value });
-	public static Task SendWithoutValue(this IClientProxy target, string eventName, object key) =>
-		target.SendAsync(eventName, new { key });
-	public static Task SendDeleted(this IClientProxy target, string eventName, object key) =>
-		target.SendAsync(eventName, new { key, removed = true });
-	public static Task SendWithPatch<TApi>(this IClientProxy target, string eventName, object key, TApi oldApiObject, TApi newApiObject)
+	public static Task SendValue<TApi>(this IClientProxy target, string typeName, object key, TApi value) =>
+		target.SendAsync("EntityChanged", typeName, new { key, value });
+	public static Task SendWithoutValue(this IClientProxy target, string typeName, object key) =>
+		target.SendAsync("EntityChanged", typeName, new { key });
+	public static Task SendDeleted(this IClientProxy target, string typeName, object key) =>
+		target.SendAsync("EntityChanged", typeName, new { key, removed = true });
+	public static Task SendWithPatch<TApi>(this IClientProxy target, string typeName, object key, TApi oldApiObject, TApi newApiObject)
 	{
 		var patch = PatchExtensions.CreatePatch(oldApiObject, newApiObject);
 		if (patch.Operations.Count > 0)
-			return target.SendAsync(eventName, new { key, patch });
+			return target.SendAsync("EntityChanged", typeName, new { key, patch });
 		return Task.CompletedTask;
 	}
 }

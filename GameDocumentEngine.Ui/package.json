@@ -15,9 +15,7 @@
 		"prettier": "prettier --list-different \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
 		"typecheck": "tsc --noemit",
-		"generation": "npm run generate-api && npm run generate-zod",
-		"generate-api": "openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml",
-		"generate-zod": "ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts",
+		"generation": "dotnet build --no-restore /t:Generation -bl:../artifacts/build.binlog",
 		"test": "echo 'TODO'"
 	},
 	"dependencies": {
