@@ -232,7 +232,7 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 {
 	OnPrepareResponse = ctx =>
 	{
-		if (ctx.Context.User.Identity?.IsAuthenticated is not true)
+		if (ctx.Context.User.Identity?.IsAuthenticated is not true && ctx.Context.Request.Path.ToString().EndsWith("/index.html"))
 		{
 			ctx.Context.ChallengeAsync();
 		}

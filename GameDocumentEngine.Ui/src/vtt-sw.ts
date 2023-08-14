@@ -61,7 +61,7 @@ self.addEventListener('activate', (event) => {
 		(async () => {
 			log('activating');
 			await self.clients.claim();
-			log(connection, connection.state);
+			log('connection', connection.state);
 			connection.on('EntityChanged', (...args) => {
 				void sendToAll({
 					type: 'entity',
