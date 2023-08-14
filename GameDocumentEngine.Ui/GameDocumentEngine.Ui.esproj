@@ -6,7 +6,12 @@
 	<Import Project="$(RepositoryEngineeringDir)npm.targets" />
 
 	<ItemGroup>
+		<Compile Remove="src/**/stories/**/*;src/**/*.stories.*" />
+
 		<ZodInput Include="$(SolutionRoot)/schemas/documents/*.json"/>
+
+		<CompileOutputs Include="$(SolutionRoot)/GameDocumentEngine.Server/wwwroot/index.html" />
+		<CompileOutputs Include="$(SolutionRoot)/GameDocumentEngine.Server/wwwroot/**/*" />
 	</ItemGroup>
 
 	<Target Name="GenerateApi" BeforeTargets="Generation" Inputs="$(SolutionRoot)schemas\api.yaml" Outputs="src/api/.gitignore">

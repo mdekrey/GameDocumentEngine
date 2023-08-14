@@ -51,13 +51,13 @@ export const buttonThemeNames = Object.keys(
 ) as ReadonlyArray<ButtonTheme>;
 
 export function buttonThemes<TProps extends { className?: string | undefined }>(
-	nameSuffix: string,
+	componentName: string,
 	Component: React.ComponentType<TProps>,
 ): Record<ButtonTheme, React.FC<TProps>> {
 	return Object.fromEntries(
 		Object.entries(allThemes).map(([name, [className]]) => [
 			name as ButtonTheme,
-			mergeButton(Component, `${name}${nameSuffix}`, className),
+			mergeButton(Component, `${componentName}.${name}`, className),
 		]),
 	) as Record<ButtonTheme, React.FC<TProps>>;
 }

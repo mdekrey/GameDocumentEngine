@@ -16,7 +16,7 @@ function ButtonStory({
 
 const meta = {
 	title: 'Components/Button',
-	component: ButtonStory,
+	component: Button,
 	parameters: {
 		layout: 'centered',
 	},
@@ -24,11 +24,13 @@ const meta = {
 	argTypes: {
 		disabled: { control: { type: 'boolean' } },
 		theme: { options: allThemes, control: { type: 'select' } },
+		onClick: { type: 'function' },
 	},
 	args: {
 		disabled: false,
 		children: 'Button',
 	},
+	render: ButtonStory,
 } satisfies Meta<typeof ButtonStory>;
 
 export default meta;

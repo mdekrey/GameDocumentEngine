@@ -16,15 +16,14 @@
         <CompileConfig Include="package.json" />
         <CompileConfig Include="package-lock.json" />
 
-        <NpmPackagedFiles Include="@(Compile->'$(ProjectDir)/lib/%(filename).js');@(Compile->'$(ProjectDir)/lib/%(filename).d.ts')" />
-        <NpmPackagedFiles Include="@(CompileConfig)" />
+        <NpmPackagedFiles Condition=" '$(NpmPackagedFiles)' == '' " Include="@(CompileConfig)" />
 
         <PackageReference Include="JsonPeek" Version="1.2.0" PrivateAssets="All" />
     </ItemGroup>
 
     <Target Name="_PrepareClean" BeforeTargets="CoreClean">
         <ItemGroup>
-            <Clean Include="@(Compile->'$(ProjectDir)lib/%(filename).js');@(Compile->'$(ProjectDir)lib/%(filename).d.ts')" />
+            <Clean Include="@(CompileOutputs)" />
         </ItemGroup>
     </Target>
 
@@ -53,9 +52,6 @@
     </Target>
 
     <Target Name="NpmPack" BeforeTargets="Publish" DependsOnTargets="_LoadPackageJson;NodeBuild" Inputs="@(NpmPackagedFiles)" Outputs="$(PackageOutputPath)$(NpmPackageNormalizedName)-$(Version).tgz">
-        <JsonPeek ContentPath="package.json" Query="$.version">
-            <Output TaskParameter="Result" ItemName="OriginalNpmPackageVersion" />
-        </JsonPeek>
         <Exec WorkingDirectory="$(ProjectDir)" Command="npm version $(Version)" IgnoreExitCode="true" />
         <MakeDir Directories="$(PackageOutputPath)"/>
         <Exec WorkingDirectory="$(ProjectDir)" Command="npm pack --pack-destination $(PackageOutputPath)" />

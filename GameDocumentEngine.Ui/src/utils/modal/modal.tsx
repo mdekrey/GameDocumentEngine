@@ -17,7 +17,12 @@ function FullPageModalContainer({
 	if (shouldShow != isShowing) setTimeout(() => setIsShowing(shouldShow), 0);
 
 	return (
-		<Transition show={isShowing} as={Fragment} afterLeave={onReadyToUnmount}>
+		<Transition
+			appear
+			show={isShowing}
+			as={Fragment}
+			afterLeave={onReadyToUnmount}
+		>
 			<div
 				className="relative z-modalBackground"
 				aria-labelledby="modal-title"
@@ -33,7 +38,6 @@ function FullPageModalContainer({
 function ModalBackdrop() {
 	return (
 		<Transition.Child
-			appear
 			as={Fragment}
 			enter="ease-out duration-300"
 			enterFrom="opacity-0"

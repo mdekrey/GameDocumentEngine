@@ -1,5 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
+import {
+	HiPlus,
+	HiLink,
+	HiOutlineTrash,
+	HiXMark,
+	HiArrowRight,
+	HiSignal,
+	HiSignalSlash,
+	HiOutlineCog,
+	HiOutlineUserGroup,
+	HiCheck,
+	HiChevronUpDown,
+	HiOutlineExclamationTriangle,
+} from 'react-icons/hi2';
 
 import { IconButton } from './icon-button';
 import { buttonThemeNames, ButtonTheme } from './buttonThemes';
@@ -12,6 +25,14 @@ const icons = {
 	HiLink,
 	HiOutlineTrash,
 	HiXMark,
+	HiArrowRight,
+	HiSignal,
+	HiSignalSlash,
+	HiOutlineCog,
+	HiOutlineUserGroup,
+	HiCheck,
+	HiChevronUpDown,
+	HiOutlineExclamationTriangle,
 };
 
 function IconButtonStory({
@@ -35,16 +56,19 @@ function IconButtonStory({
 
 const meta = {
 	title: 'Components/Icon Button',
-	component: IconButtonStory,
+	component: IconButton,
+	render: IconButtonStory,
 	parameters: {
 		layout: 'centered',
 	},
 	tags: ['autodocs'],
 	argTypes: {
+		disabled: { control: { type: 'boolean' } },
 		icon: { options: Object.keys(icons), control: { type: 'select' } },
 		theme: { options: allThemes, control: { type: 'select' } },
 	},
 	args: {
+		disabled: false,
 		icon: 'HiPlus',
 		title: 'Button Title',
 	},
