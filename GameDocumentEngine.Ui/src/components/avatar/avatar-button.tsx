@@ -19,7 +19,7 @@ export const AvatarButton = forwardRef(function AvatarButton(
 	return (
 		<button
 			className={twMerge(
-				'inline-block rounded-full w-10 h-10 outline-blue-700 transition-colors',
+				'inline-block rounded-md w-10 h-10 outline-blue-700 transition-colors',
 				disabled && 'opacity-20',
 				className,
 			)}

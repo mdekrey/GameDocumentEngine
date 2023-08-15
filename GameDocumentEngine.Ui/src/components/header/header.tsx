@@ -28,7 +28,7 @@ export function Header({
 
 	return (
 		<>
-			<div className="fixed w-full bg-brand-dark text-brand-white shadow-sm flex flex-row items-center gap-4 h-12 p-1">
+			<div className="fixed w-full bg-layout-nav-top text-brand-white shadow-sm flex flex-row items-center gap-4 h-12 p-1">
 				<MenuTabDisplay
 					href="#/"
 					label={t('header.app-title')}

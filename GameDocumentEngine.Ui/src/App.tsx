@@ -12,6 +12,8 @@ import { GameEdit } from './apps/game-edit/game-edit';
 import { GameInvites } from './apps/game-invites/game-invites';
 import { GameRoles } from './apps/game-roles/game-roles';
 import { DocumentRoles } from './apps/documents/document-roles/document-roles';
+import { useNetworkIndicator } from '@/components/network/useNetworkIndicator';
+import { useHeader } from '@/components/header/useHeaderMenuItems';
 
 import '@/utils/i18n/setup';
 
@@ -37,9 +39,11 @@ function App() {
 	// const result = useQuery(
 	// 	gameMatch ? queries.getGameDetails(gameMatch.params.gameId ?? '') : {},
 	// );
+	const networkIndicator = useNetworkIndicator();
+	const header = useHeader();
 
 	return (
-		<Layout>
+		<Layout {...header} {...networkIndicator}>
 			<Routes>
 				<Route path="profile/" Component={Profile} />
 				<Route path="game/:gameId" Component={withGameId(GameDetails)} />

@@ -1,6 +1,6 @@
 import { Menu } from '@headlessui/react';
 import type { IconType } from 'react-icons';
-import { HeaderMenuLink } from './header-menu-link';
+import { MenuLink } from './menu-link';
 import { forwardRef } from 'react';
 
 export type MenuItemsConfiguration = {
@@ -29,14 +29,14 @@ export const MenuItems = forwardRef(function MenuItems(
 	return (
 		<Menu.Items
 			ref={ref}
-			className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-brand-dark shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+			className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-700 rounded-md bg-layout-nav-top shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
 		>
 			{menuItems.itemGroups.map((g) => (
 				<div className="p-1" key={g.name}>
 					{g.items.map((item, index) => (
-						<HeaderMenuLink key={index} href={item.href} icon={item.icon}>
+						<MenuLink key={index} href={item.href} icon={item.icon}>
 							{item.label}
-						</HeaderMenuLink>
+						</MenuLink>
 					))}
 				</div>
 			))}
