@@ -1,12 +1,6 @@
 import { Layout } from '@/components/layout/layout';
 
-import {
-	HashRouter,
-	Navigate,
-	Route,
-	Routes,
-	useMatch,
-} from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Profile } from '@/apps/profile/profile';
 import { CreateGame } from './apps/create-game/create-game';
 import { ListGames } from './apps/list-games/list-games';
@@ -20,8 +14,6 @@ import { GameRoles } from './apps/game-roles/game-roles';
 import { DocumentRoles } from './apps/documents/document-roles/document-roles';
 
 import '@/utils/i18n/setup';
-import { useQuery } from '@tanstack/react-query';
-import { queries } from './utils/api/queries';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -41,21 +33,13 @@ const withGameId = withParamsValue('gameId');
 const withDocumentId = withParamsValue('documentId');
 
 function App() {
-	const gameMatch = useMatch('game/:gameId');
-	const result = useQuery(
-		gameMatch ? queries.getGameDetails(gameMatch.params.gameId ?? '') : {},
-	);
+	// const gameMatch = useMatch('game/:gameId');
+	// const result = useQuery(
+	// 	gameMatch ? queries.getGameDetails(gameMatch.params.gameId ?? '') : {},
+	// );
 
 	return (
 		<Layout>
-			{result.isSuccess && (
-				<Layout.MenuTabs
-					mainItem={{
-						href: `#/game/${result.data.id}`,
-						label: result.data.name,
-					}}
-				/>
-			)}
 			<Routes>
 				<Route path="profile/" Component={Profile} />
 				<Route path="game/:gameId" Component={withGameId(GameDetails)} />

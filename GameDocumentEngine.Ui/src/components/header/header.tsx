@@ -1,29 +1,25 @@
 import { Fragment } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-import { HiOutlineDocumentText } from 'react-icons/hi2';
+import type { IconType } from 'react-icons';
+import { HiHome } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
-import { HeaderMenuLink } from './header-menu-link';
 import {
 	NetworkIndicator,
 	NetworkIndicatorProps,
 } from '../network/network-indicator';
 import { AvatarButton } from '../avatar/avatar-button';
 import { UserDetails } from '@/api/models/UserDetails';
-
-export type MenuTab = {
-	href: string;
-	label: string;
-};
+import { MenuItems, MenuItemsConfiguration } from '../menu-items/menu-items';
 
 export type HeaderProps = {
-	mainItem?: MenuTab;
+	menuItems: MenuItemsConfiguration;
 	user?: UserDetails;
 } & NetworkIndicatorProps;
 
 export function Header({
-	mainItem,
+	menuItems,
 	user,
 	connectionState,
 	onReconnect,
@@ -36,21 +32,11 @@ export function Header({
 				<MenuTabDisplay
 					href="#/"
 					label={t('header.app-title')}
-					icon={HiOutlineDocumentText}
+					icon={HiHome}
 					labelClassName="font-bold"
 				>
-					{!mainItem && t('header.app-title')}
+					{t('header.app-title')}
 				</MenuTabDisplay>
-
-				{mainItem && (
-					<MenuTabDisplay
-						href={mainItem.href}
-						label={mainItem.label}
-						labelClassName="font-bold"
-					>
-						{mainItem.label}
-					</MenuTabDisplay>
-				)}
 
 				<div className="flex-1" />
 
@@ -76,16 +62,7 @@ export function Header({
 						leaveFrom="transform opacity-100 scale-100"
 						leaveTo="transform opacity-0 scale-95"
 					>
-						<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-							<div className="p-1">
-								<HeaderMenuLink href="#/game">
-									{t('menu.select-game')}
-								</HeaderMenuLink>
-								<HeaderMenuLink href="#/profile">
-									{t('menu.edit-profile', { name: user?.name })}
-								</HeaderMenuLink>
-							</div>
-						</Menu.Items>
+						<MenuItems menuItems={menuItems} />
 					</Transition>
 				</Menu>
 			</div>
@@ -104,7 +81,7 @@ function MenuTabDisplay({
 	href: string;
 	label: string;
 	children?: React.ReactNode;
-	icon?: typeof HiOutlineDocumentText;
+	icon?: IconType;
 	labelClassName?: string;
 }) {
 	return (
