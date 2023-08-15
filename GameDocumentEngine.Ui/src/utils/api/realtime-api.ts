@@ -72,8 +72,8 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 
 export interface RealtimeApi {
 	readonly connectionState$: Atom<HubConnectionState>;
-	reconnect(): Promise<void>;
-	sendServiceMessage(message: MessageFromWindow): void;
+	reconnect(this: void): Promise<void>;
+	sendServiceMessage(this: void, message: MessageFromWindow): void;
 }
 
 const context = createContext<RealtimeApi | null>(null);

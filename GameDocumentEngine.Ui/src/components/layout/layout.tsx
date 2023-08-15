@@ -1,5 +1,5 @@
 import { withSlots } from 'react-slot-component';
-import { Header, MenuTab } from '../header/header';
+import { HeaderContainer, MenuTab } from '../header/header';
 import { Modals } from '@/utils/modal/modal-service';
 
 export type LayoutProps = { children?: React.ReactNode };
@@ -15,7 +15,7 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(
 	({ children, slotProps }) => {
 		return (
 			<div className="w-full h-full flex flex-col">
-				<Header
+				<HeaderContainer
 					mainItem={slotProps.MenuTabs?.mainItem}
 					menuTabs={slotProps.MenuTabs?.items}
 				/>

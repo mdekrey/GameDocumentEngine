@@ -10,6 +10,15 @@ void i18n.init({
 	lng: 'en', // if you're using a language detector, do not define the lng option
 	fallbackLng: 'en',
 
+	missingKeyHandler(languages, namespace, key, fallbackValue) {
+		console.warn('missing translation', {
+			languages,
+			namespace,
+			key,
+			fallbackValue,
+		});
+	},
+
 	interpolation: {
 		escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
 	},

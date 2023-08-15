@@ -3,7 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { SelectField } from './select-field';
 import { useField } from '@/utils/form/useField';
 import { z } from 'zod';
-import { flyoutHeight, formFieldDecorator } from '../stories/field-decorator';
+import { formFieldDecorator } from '../stories/field-decorator';
+import { flyoutHeight } from '@/utils/stories/flyoutHeight';
 
 const meta = {
 	title: 'Components/Form/Select Field',

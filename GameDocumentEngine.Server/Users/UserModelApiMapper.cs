@@ -16,9 +16,20 @@ class UserModelApiMapper : IApiMapper<UserModel, Api.UserDetails>
 	{
 		return new Api.UserDetails(
 					Id: entity.Id,
-					Name: entity.Name
+					Name: entity.Name,
+					ProfilePhoto: $"https://www.gravatar.com/avatar/{ToMD5(entity.EmailAddress.Trim().ToLowerInvariant())}?s=128"
 				);
 	}
 
 	public object ToKey(UserModel entity) => entity.Id;
+
+	private static string ToMD5(string input)
+	{
+		// Use input string to calculate MD5 hash
+		using var md5 = System.Security.Cryptography.MD5.Create();
+		var inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+		var hashBytes = md5.ComputeHash(inputBytes);
+
+		return Convert.ToHexString(hashBytes).ToLowerInvariant();
+	}
 }

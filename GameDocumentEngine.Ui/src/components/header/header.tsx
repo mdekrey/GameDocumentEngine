@@ -3,29 +3,60 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-import { HiOutlineDocumentText, HiBars3 } from 'react-icons/hi2';
+import { HiOutlineDocumentText } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { HeaderMenuLink } from './header-menu-link';
-import { NetworkIndicator } from './network-indicator';
+import {
+	NetworkIndicator,
+	NetworkIndicatorProps,
+} from '../network/network-indicator';
+import { useNetworkIndicator } from '../network/useNetworkIndicator';
+import { AvatarButton } from '../avatar/avatar-button';
+import { UserDetails } from '@/api/models/UserDetails';
 
 export type MenuTab = {
 	href: string;
 	label: string;
 };
 
-export type HeaderProps = {
+export type HeaderContainerProps = {
 	mainItem?: MenuTab;
 	menuTabs?: MenuTab[];
 };
 
-export function Header({ mainItem, menuTabs }: HeaderProps) {
-	const { t } = useTranslation(['layout']);
+export type HeaderProps = {
+	mainItem?: MenuTab;
+	menuTabs?: MenuTab[];
+	user?: UserDetails;
+} & NetworkIndicatorProps;
+
+export function HeaderContainer({ mainItem, menuTabs }: HeaderProps) {
 	const userQuery = useQuery(queries.getCurrentUser);
+	const networkIndicator = useNetworkIndicator();
+
+	return (
+		<Header
+			{...networkIndicator}
+			mainItem={mainItem}
+			menuTabs={menuTabs}
+			user={userQuery.data}
+		/>
+	);
+}
+
+export function Header({
+	mainItem,
+	menuTabs,
+	user,
+	connectionState,
+	onReconnect,
+}: HeaderProps) {
+	const { t } = useTranslation(['layout']);
 
 	return (
 		<>
-			<div className="fixed w-full bg-white border-b border-gray-300 shadow-sm flex flex-row items-center gap-4 h-20 px-6">
+			<div className="fixed w-full bg-white border-b border-gray-300 shadow-sm flex flex-row items-center gap-4 h-12 p-1">
 				<MenuTabDisplay
 					href="#/"
 					label={t('header.app-title')}
@@ -55,17 +86,18 @@ export function Header({ mainItem, menuTabs }: HeaderProps) {
 
 				<div className="flex-1" />
 
-				<NetworkIndicator />
+				<NetworkIndicator
+					connectionState={connectionState}
+					onReconnect={onReconnect}
+				/>
 
-				<Menu as="div" className="relative inline-block flex-none">
+				<Menu as="div" className="relative block flex-none">
 					<Menu.Button
-						className={twMerge(
-							'block justify-center w-10 h-10 text-center text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700',
-						)}
+						className="block"
+						as={AvatarButton}
+						user={user}
 						title={t('header.menu')}
-					>
-						<HiBars3 className="inline-block h-8 w-8" />
-					</Menu.Button>
+					/>
 
 					<Transition
 						as={Fragment}
@@ -82,14 +114,14 @@ export function Header({ mainItem, menuTabs }: HeaderProps) {
 									{t('menu.select-game')}
 								</HeaderMenuLink>
 								<HeaderMenuLink href="#/profile">
-									{t('menu.edit-profile', { name: userQuery.data?.name })}
+									{t('menu.edit-profile', { name: user?.name })}
 								</HeaderMenuLink>
 							</div>
 						</Menu.Items>
 					</Transition>
 				</Menu>
 			</div>
-			<div className="h-20 flex-shrink-0" />
+			<div className="h-12 flex-shrink-0" />
 		</>
 	);
 }
