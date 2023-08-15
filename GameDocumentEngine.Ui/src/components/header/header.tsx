@@ -1,5 +1,3 @@
-import { queries } from '@/utils/api/queries';
-import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -11,7 +9,6 @@ import {
 	NetworkIndicator,
 	NetworkIndicatorProps,
 } from '../network/network-indicator';
-import { useNetworkIndicator } from '../network/useNetworkIndicator';
 import { AvatarButton } from '../avatar/avatar-button';
 import { UserDetails } from '@/api/models/UserDetails';
 
@@ -20,34 +17,13 @@ export type MenuTab = {
 	label: string;
 };
 
-export type HeaderContainerProps = {
-	mainItem?: MenuTab;
-	menuTabs?: MenuTab[];
-};
-
 export type HeaderProps = {
 	mainItem?: MenuTab;
-	menuTabs?: MenuTab[];
 	user?: UserDetails;
 } & NetworkIndicatorProps;
 
-export function HeaderContainer({ mainItem, menuTabs }: HeaderProps) {
-	const userQuery = useQuery(queries.getCurrentUser);
-	const networkIndicator = useNetworkIndicator();
-
-	return (
-		<Header
-			{...networkIndicator}
-			mainItem={mainItem}
-			menuTabs={menuTabs}
-			user={userQuery.data}
-		/>
-	);
-}
-
 export function Header({
 	mainItem,
-	menuTabs,
 	user,
 	connectionState,
 	onReconnect,
@@ -56,7 +32,7 @@ export function Header({
 
 	return (
 		<>
-			<div className="fixed w-full bg-white border-b border-gray-300 shadow-sm flex flex-row items-center gap-4 h-12 p-1">
+			<div className="fixed w-full bg-brand-dark text-brand-white shadow-sm flex flex-row items-center gap-4 h-12 p-1">
 				<MenuTabDisplay
 					href="#/"
 					label={t('header.app-title')}
@@ -75,14 +51,6 @@ export function Header({
 						{mainItem.label}
 					</MenuTabDisplay>
 				)}
-
-				<div className="hidden md:contents">
-					{menuTabs?.map(({ href, label }) => (
-						<MenuTabDisplay label={label} href={href} key={href}>
-							{label}
-						</MenuTabDisplay>
-					))}
-				</div>
 
 				<div className="flex-1" />
 
@@ -109,7 +77,7 @@ export function Header({
 						leaveTo="transform opacity-0 scale-95"
 					>
 						<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-							<div className="px-1 py-1 ">
+							<div className="p-1">
 								<HeaderMenuLink href="#/game">
 									{t('menu.select-game')}
 								</HeaderMenuLink>

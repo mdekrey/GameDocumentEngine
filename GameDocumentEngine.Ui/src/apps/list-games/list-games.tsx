@@ -1,6 +1,5 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { queries } from '@/utils/api/queries';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { HiArrowRight, HiPlus } from 'react-icons/hi2';
@@ -18,7 +17,7 @@ export function ListGames() {
 	}
 
 	return (
-		<NarrowContent>
+		<>
 			<span className="flex flex-row items-center gap-4 mb-4">
 				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
 				<IconLinkButton.Save title={t('new-game')} to={'/create-game'}>
@@ -45,6 +44,6 @@ export function ListGames() {
 			) : (
 				<p className="text-center font-bold">{t('none')}</p>
 			)}
-		</NarrowContent>
+		</>
 	);
 }

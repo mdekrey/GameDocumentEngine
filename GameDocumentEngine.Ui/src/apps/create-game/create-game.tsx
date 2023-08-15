@@ -2,7 +2,6 @@ import { CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-field/text-field';
 import { SelectField } from '@/components/form-fields/select-field/select-field';
@@ -34,7 +33,7 @@ export function CreateGame() {
 	const createGame = useCreateGame();
 
 	return (
-		<NarrowContent>
+		<>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<Fieldset>
 					<TextField field={gameForm.field(['name'])} />
@@ -58,7 +57,7 @@ export function CreateGame() {
 					</ButtonRow>
 				</Fieldset>
 			</form>
-		</NarrowContent>
+		</>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {

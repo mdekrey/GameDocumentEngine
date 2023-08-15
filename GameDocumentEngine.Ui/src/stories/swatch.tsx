@@ -3,7 +3,7 @@ import { allColorNames, colors } from './tailwind-info';
 
 export function Swatches() {
 	return (
-		<div className="sb-unstyled">
+		<div className="sb-unstyled text-gray-400">
 			{allColorNames.map((color) => (
 				<Swatch color={color} key={color} className="m-2" />
 			))}

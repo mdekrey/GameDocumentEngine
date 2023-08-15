@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { useForm } from '@/utils/form/useForm';
 import { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-field/text-field';
@@ -59,11 +58,11 @@ export function GameEdit({ gameId }: { gameId: string }) {
 	updateFormDefault(gameForm, gameData);
 
 	return (
-		<NarrowContent>
+		<>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<GameEditFields {...gameForm.fields} />
 			</form>
-		</NarrowContent>
+		</>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof GameDetails>) {

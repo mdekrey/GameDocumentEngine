@@ -1,7 +1,6 @@
 import '@/utils/api/queries';
 import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { ClockSvg } from './clock-svg';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { IconButton } from '@/components/button/icon-button';
 import {
 	HiOutlineCog,
@@ -30,7 +29,7 @@ export function Clock({
 	const clockData = document.data;
 
 	return (
-		<NarrowContent>
+		<>
 			<div className="flex flex-row gap-3">
 				<span className="font-bold flex-1">{document.data.name}</span>
 				<IconLinkButton title={t('details.edit-roles')} to="roles">
@@ -53,7 +52,7 @@ export function Clock({
 				padding={2}
 				radius={70}
 			/>
-		</NarrowContent>
+		</>
 	);
 
 	function onEdit() {

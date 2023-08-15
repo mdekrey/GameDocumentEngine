@@ -10,7 +10,6 @@ import { ErrorsList } from '@/components/form-fields/jotai/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-field/text-field';
@@ -60,7 +59,7 @@ export function Profile() {
 	updateFormDefault(userForm, userData);
 
 	return (
-		<NarrowContent>
+		<>
 			<form onSubmit={userForm.handleSubmit(onSubmit)}>
 				<ProfileFields {...userForm.fields} />
 				<ErrorsList
@@ -68,7 +67,7 @@ export function Profile() {
 					translations={i18n.getFixedT(null, 'profile', 'fields')}
 				/>
 			</form>
-		</NarrowContent>
+		</>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof UserDetails>) {

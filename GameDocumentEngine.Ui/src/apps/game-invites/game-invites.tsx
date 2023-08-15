@@ -1,6 +1,5 @@
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
@@ -49,7 +48,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const gameType = gameTypeInfo.data;
 
 	return (
-		<NarrowContent>
+		<>
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
 
@@ -118,7 +117,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 					</tr>
 				)}
 			</table>
-		</NarrowContent>
+		</>
 	);
 
 	function createInvite() {

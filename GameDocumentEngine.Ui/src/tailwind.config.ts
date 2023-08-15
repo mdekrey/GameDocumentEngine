@@ -12,6 +12,21 @@ const config: Config = {
 			black: defaultColors.black,
 			white: defaultColors.white,
 
+			brand: {
+				dark: '#020617',
+				white: defaultColors.white,
+			},
+
+			layout: {
+				nav: {
+					top: defaultColors.slate[800],
+					side: defaultColors.slate[700],
+				},
+				action: defaultColors.slate[700],
+				neutral: defaultColors.slate[900],
+				empty: defaultColors.slate[950],
+			},
+
 			'slate-700': defaultColors.slate[700],
 			'slate-800': defaultColors.slate[800],
 			'gray-50': defaultColors.gray[50],

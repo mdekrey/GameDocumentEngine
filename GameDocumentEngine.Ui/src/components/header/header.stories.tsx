@@ -19,6 +19,9 @@ type HeaderProps = {
 const meta = {
 	title: 'Layout/Header',
 	tags: ['autodocs'],
+	parameters: {
+		layout: 'fullscreen',
+	},
 	argTypes: {
 		connectionState: {
 			control: { type: 'select' },

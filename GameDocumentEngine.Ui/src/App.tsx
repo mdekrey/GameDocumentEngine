@@ -54,7 +54,6 @@ function App() {
 						href: `#/game/${result.data.id}`,
 						label: result.data.name,
 					}}
-					items={[]}
 				/>
 			)}
 			<Routes>
