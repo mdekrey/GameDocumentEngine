@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-	@apply bg-layout-empty text-brand-white;
+	@apply bg-slate-950 text-brand-white;
 }
 
 html, body, #root {

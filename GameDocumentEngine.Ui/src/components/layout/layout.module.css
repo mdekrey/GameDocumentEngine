@@ -44,12 +44,12 @@
 }
 
 .main {
-	@apply overflow-auto bg-layout-empty text-white;
+	@apply overflow-auto bg-slate-950 text-white;
 	grid-area: main;
 }
 
 .sidebar {
-	@apply overflow-auto bg-layout-nav-side text-white;
+	@apply overflow-auto bg-slate-700 text-white;
 }
 
 .sidebar-left {
