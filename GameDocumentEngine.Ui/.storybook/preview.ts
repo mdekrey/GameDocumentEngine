@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/react';
 import '@/main.css';
+import './preview.css';
 import '@/utils/i18n/setup';
 import { theme } from './theme';
 
@@ -14,6 +15,7 @@ const preview: Preview = {
 		},
 		docs: {
 			theme,
+			story: { iframeHeight: '300px' },
 		},
 	},
 };

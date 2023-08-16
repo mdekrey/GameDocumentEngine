@@ -4,12 +4,18 @@ import { SelectField } from './select-field';
 import { useField } from '@/utils/form/useField';
 import { z } from 'zod';
 import { formFieldDecorator } from '../stories/field-decorator';
-import { flyoutHeight } from '@/utils/stories/flyoutHeight';
 
 const meta = {
 	title: 'Components/Form/Select Field',
 	component: SelectField,
 	tags: ['autodocs'],
+	parameters: {
+		docs: {
+			story: {
+				inline: false,
+			},
+		},
+	},
 	argTypes: {
 		field: { table: { disable: true } },
 		items: { table: { disable: true } },
@@ -20,7 +26,7 @@ const meta = {
 		items: undefined,
 		children: undefined,
 	},
-	decorators: [formFieldDecorator, flyoutHeight],
+	decorators: [formFieldDecorator],
 	render: function RenderSelectFieldStory(props) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),

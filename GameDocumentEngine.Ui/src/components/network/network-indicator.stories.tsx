@@ -5,7 +5,6 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
 import { useCallback } from 'react';
 import { Modals } from '@/utils/modal/modal-service';
-import { flyoutHeight } from '@/utils/stories/flyoutHeight';
 
 type NetworkIndicatorProps = {
 	connectionState: HubConnectionState;
@@ -14,7 +13,6 @@ type NetworkIndicatorProps = {
 
 const meta = {
 	title: 'Components/NetworkIndicator',
-	tags: ['autodocs'],
 	argTypes: {
 		connectionState: {
 			control: { type: 'select' },
@@ -24,7 +22,6 @@ const meta = {
 	args: {
 		connectionState: HubConnectionState.Connected,
 	},
-	decorators: [flyoutHeight],
 	render: function RenderNetworkIndicatorStory({
 		connectionState,
 		onReconnect,

@@ -5,3 +5,7 @@
 html {
 	@apply bg-layout-empty text-brand-white;
 }
+
+html, body, #root {
+	@apply w-full h-full;
+}

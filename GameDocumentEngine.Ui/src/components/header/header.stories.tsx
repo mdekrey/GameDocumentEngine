@@ -5,7 +5,6 @@ import { getHeaderMenuItems } from './useHeaderMenuItems';
 import { HubConnectionState } from '@microsoft/signalr';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
 import { useCallback } from 'react';
-import { flyoutHeight } from '@/utils/stories/flyoutHeight';
 import { UserDetails } from '@/api/models/UserDetails';
 import { sampleUser } from '@/utils/stories/sample-data';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +20,11 @@ const meta = {
 	tags: ['autodocs'],
 	parameters: {
 		layout: 'fullscreen',
+		docs: {
+			story: {
+				inline: false,
+			},
+		},
 	},
 	argTypes: {
 		connectionState: {
@@ -31,7 +35,6 @@ const meta = {
 	args: {
 		connectionState: HubConnectionState.Connected,
 	},
-	decorators: [flyoutHeight],
 	render: function RenderNetworkIndicatorStory({
 		connectionState,
 		onReconnect,
