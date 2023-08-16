@@ -4,13 +4,15 @@ import { Layout } from './layout';
 import { getHeaderMenuItems } from '../header/useHeaderMenuItems';
 import { HubConnectionState } from '@microsoft/signalr';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
-import { useCallback } from 'react';
-import { UserDetails } from '@/api/models/UserDetails';
-import { sampleUser } from '@/utils/stories/sample-data';
+import { useCallback, useMemo } from 'react';
+import { randomUser } from '@/utils/stories/sample-data';
 import { useTranslation } from 'react-i18next';
+import { LoremBlock } from '@/utils/stories/sample-components';
 
 type HeaderProps = {
-	user?: UserDetails;
+	hasUser: boolean;
+	hasLeftSidebar: boolean;
+	hasRightSidebar: boolean;
 	connectionState: HubConnectionState;
 	onReconnect?: () => void;
 };
@@ -34,12 +36,19 @@ const meta = {
 	},
 	args: {
 		connectionState: HubConnectionState.Connected,
+		hasUser: true,
+		hasLeftSidebar: true,
+		hasRightSidebar: true,
 	},
 	render: function RenderNetworkIndicatorStory({
 		connectionState,
 		onReconnect,
+		hasUser,
+		hasLeftSidebar,
+		hasRightSidebar,
 		...props
 	}) {
+		const user = useMemo(() => (hasUser ? randomUser() : undefined), [hasUser]);
 		const { t } = useTranslation(['layout']);
 		const connectionState$ = useAsAtom(connectionState);
 		const reconnect = useCallback(async () => {
@@ -50,9 +59,28 @@ const meta = {
 			<Layout
 				connectionState={connectionState$}
 				onReconnect={reconnect}
-				menuItems={getHeaderMenuItems(t, props.user)}
+				menuItems={getHeaderMenuItems(t, user)}
+				user={user}
 				{...props}
-			/>
+			>
+				{hasLeftSidebar ? (
+					<Layout.LeftSidebar>
+						<div className="m-4">
+							<LoremBlock />
+						</div>
+					</Layout.LeftSidebar>
+				) : null}
+				{hasRightSidebar ? (
+					<Layout.RightSidebar>
+						<div className="m-4">
+							<LoremBlock />
+						</div>
+					</Layout.RightSidebar>
+				) : null}
+				<div className="m-4">
+					<LoremBlock sentenceCount={8} paragraphCount={10} />
+				</div>
+			</Layout>
 		);
 	},
 } satisfies Meta<HeaderProps>;
@@ -61,11 +89,11 @@ type Story = StoryObj<typeof meta>;
 export default meta;
 
 export const Default: Story = {
-	args: {
-		user: sampleUser,
-	},
+	args: {},
 };
 
 export const NoUser: Story = {
-	args: {},
+	args: {
+		hasUser: false,
+	},
 };

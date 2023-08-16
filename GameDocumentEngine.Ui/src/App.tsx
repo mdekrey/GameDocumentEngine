@@ -60,13 +60,25 @@ const mainRoute: RouteObject[] = [
 	{ path: '/', element: <Navigate to="/game" /> },
 ];
 
+function GameSidebar({ gameId }: { gameId: string }) {
+	return <>{gameId}</>;
+}
+
+const leftSidebarRoute: RouteObject[] = [
+	{ path: 'game/:gameId', Component: withGameId(GameSidebar) },
+];
+
 function App() {
 	const networkIndicator = useNetworkIndicator();
 	const header = useHeader();
+	const leftSidebar = useRoutes(leftSidebarRoute);
 
 	return (
 		<Layout {...header} {...networkIndicator}>
 			{useRoutes(mainRoute)}
+			{leftSidebar ? (
+				<Layout.LeftSidebar>{leftSidebar}</Layout.LeftSidebar>
+			) : null}
 		</Layout>
 	);
 }

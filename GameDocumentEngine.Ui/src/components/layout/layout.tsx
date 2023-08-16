@@ -1,36 +1,34 @@
-import { Header, HeaderProps } from '../header/header';
+import { withSlots } from 'react-slot-component';
 import { Modals } from '@/utils/modal/modal-service';
+import { Header, HeaderProps } from '../header/header';
 import { NetworkIndicatorProps } from '../network/network-indicator';
 import styles from './layout.module.css';
-import {
-	useAsAtom,
-	useComputedAtom,
-} from '@principlestudios/jotai-react-signals';
-import { JotaiDiv } from '../form-fields/jotai/div';
 
 export type LayoutProps = { children?: React.ReactNode } & HeaderProps &
 	NetworkIndicatorProps;
 
-export function Layout({
+export type LayoutSlots = {
+	LeftSidebar: {
+		children: React.ReactNode;
+	};
+	RightSidebar: {
+		children: React.ReactNode;
+	};
+};
+
+export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 	children,
 	menuItems,
 	user,
 	connectionState,
 	onReconnect,
-}: LayoutProps) {
-	const showLeftDrawer = useAsAtom(true);
-	const leftDrawer = useComputedAtom((get) =>
-		get(showLeftDrawer) ? 'true' : 'false',
-	);
-	const showRightDrawer = useAsAtom(true);
-	const rightDrawer = useComputedAtom((get) =>
-		get(showRightDrawer) ? 'true' : 'false',
-	);
+	slotProps,
+}) {
 	return (
-		<JotaiDiv
+		<div
 			className={styles.layout}
-			data-left-drawer={leftDrawer}
-			data-right-drawer={rightDrawer}
+			data-left-drawer={slotProps.LeftSidebar ? true : false}
+			data-right-drawer={slotProps.RightSidebar ? true : false}
 		>
 			<Header
 				menuItems={menuItems}
@@ -39,10 +37,14 @@ export function Layout({
 				onReconnect={onReconnect}
 				className={styles.header}
 			/>
-			<section className={styles['sidebar-left']}></section>
+			<section className={styles['sidebar-left']}>
+				{slotProps.LeftSidebar?.children}
+			</section>
 			<main className={styles.main}>{children}</main>
-			<section className={styles['sidebar-right']}></section>
+			<section className={styles['sidebar-right']}>
+				{slotProps.RightSidebar?.children}
+			</section>
 			<Modals />
-		</JotaiDiv>
+		</div>
 	);
-}
+});

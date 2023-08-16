@@ -1,4 +1,4 @@
-import tailwindConfig from '../tailwind.config';
+import tailwindConfig from '../../tailwind.config';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
 

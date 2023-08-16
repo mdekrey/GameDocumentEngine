@@ -9,3 +9,22 @@ html {
 html, body, #root {
 	@apply w-full h-full;
 }
+
+::-webkit-scrollbar {
+	@apply w-2;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	@apply bg-brand-dark shadow-inner shadow-brand-white/25;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	@apply transition-colors bg-slate-800 rounded-sm;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	@apply bg-slate-700;
+}
