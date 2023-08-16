@@ -13,22 +13,32 @@ import { AvatarButton } from '../avatar/avatar-button';
 import { UserDetails } from '@/api/models/UserDetails';
 import { MenuItems, MenuItemsConfiguration } from '../menu-items/menu-items';
 
+export type HeaderLayoutProps = {
+	className?: string;
+};
+
 export type HeaderProps = {
 	menuItems: MenuItemsConfiguration;
 	user?: UserDetails;
 } & NetworkIndicatorProps;
 
 export function Header({
+	className,
 	menuItems,
 	user,
 	connectionState,
 	onReconnect,
-}: HeaderProps) {
+}: HeaderProps & HeaderLayoutProps) {
 	const { t } = useTranslation(['layout']);
 
 	return (
 		<>
-			<div className="fixed w-full bg-layout-nav-top text-brand-white shadow-sm flex flex-row items-center gap-4 h-12 p-1">
+			<div
+				className={twMerge(
+					'fixed w-full bg-layout-nav-top text-brand-white shadow-sm flex flex-row items-center gap-4 h-12 p-1',
+					className,
+				)}
+			>
 				<MenuTabDisplay
 					href="#/"
 					label={t('header.app-title')}
@@ -66,7 +76,7 @@ export function Header({
 					</Transition>
 				</Menu>
 			</div>
-			<div className="h-12 flex-shrink-0" />
+			<div className={twMerge('h-12 flex-shrink-0', className)} />
 		</>
 	);
 }
