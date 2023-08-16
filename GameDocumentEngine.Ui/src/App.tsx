@@ -1,6 +1,6 @@
 import { Layout } from '@/components/layout/layout';
 
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, useRoutes, RouteObject } from 'react-router-dom';
 import { Profile } from '@/apps/profile/profile';
 import { CreateGame } from './apps/create-game/create-game';
 import { ListGames } from './apps/list-games/list-games';
@@ -34,41 +34,39 @@ function withParamsValue<const T extends string>(prop: T) {
 const withGameId = withParamsValue('gameId');
 const withDocumentId = withParamsValue('documentId');
 
+const mainRoute: RouteObject[] = [
+	{ path: 'profile/', Component: Profile },
+	{ path: 'game/:gameId', Component: withGameId(GameDetails) },
+	{ path: 'game/:gameId/edit', Component: withGameId(GameEdit) },
+	{ path: 'game/:gameId/roles', Component: withGameId(GameRoles) },
+	{
+		path: 'game/:gameId/invites',
+		Component: withGameId(GameInvites),
+	},
+	{
+		path: 'game/:gameId/create-document',
+		Component: withGameId(CreateDocument),
+	},
+	{
+		path: 'game/:gameId/document/:documentId',
+		Component: withDocumentId(withGameId(DocumentDetails)),
+	},
+	{
+		path: 'game/:gameId/document/:documentId/roles',
+		Component: withDocumentId(withGameId(DocumentRoles)),
+	},
+	{ path: 'game/', Component: ListGames },
+	{ path: 'create-game/', Component: CreateGame },
+	{ path: '/', element: <Navigate to="/game" /> },
+];
+
 function App() {
-	// const gameMatch = useMatch('game/:gameId');
-	// const result = useQuery(
-	// 	gameMatch ? queries.getGameDetails(gameMatch.params.gameId ?? '') : {},
-	// );
 	const networkIndicator = useNetworkIndicator();
 	const header = useHeader();
 
 	return (
 		<Layout {...header} {...networkIndicator}>
-			<Routes>
-				<Route path="profile/" Component={Profile} />
-				<Route path="game/:gameId" Component={withGameId(GameDetails)} />
-				<Route path="game/:gameId/edit" Component={withGameId(GameEdit)} />
-				<Route path="game/:gameId/roles" Component={withGameId(GameRoles)} />
-				<Route
-					path="game/:gameId/invites"
-					Component={withGameId(GameInvites)}
-				/>
-				<Route
-					path="game/:gameId/create-document"
-					Component={withGameId(CreateDocument)}
-				/>
-				<Route
-					path="game/:gameId/document/:documentId"
-					Component={withDocumentId(withGameId(DocumentDetails))}
-				/>
-				<Route
-					path="game/:gameId/document/:documentId/roles"
-					Component={withDocumentId(withGameId(DocumentRoles))}
-				/>
-				<Route path="game/" Component={ListGames} />
-				<Route path="create-game/" Component={CreateGame} />
-				<Route path="/" element={<Navigate to="/game" />} />
-			</Routes>
+			{useRoutes(mainRoute)}
 		</Layout>
 	);
 }
