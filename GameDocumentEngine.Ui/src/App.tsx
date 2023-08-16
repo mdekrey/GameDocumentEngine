@@ -16,6 +16,7 @@ import { useNetworkIndicator } from '@/components/network/useNetworkIndicator';
 import { useHeader } from '@/components/header/useHeaderMenuItems';
 
 import '@/utils/i18n/setup';
+import { GameObjects } from './apps/game-details/game-objects';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -60,12 +61,8 @@ const mainRoute: RouteObject[] = [
 	{ path: '/', element: <Navigate to="/game" /> },
 ];
 
-function GameSidebar({ gameId }: { gameId: string }) {
-	return <>{gameId}</>;
-}
-
 const leftSidebarRoute: RouteObject[] = [
-	{ path: 'game/:gameId', Component: withGameId(GameSidebar) },
+	{ path: 'game/:gameId/*', Component: withGameId(GameObjects) },
 ];
 
 function App() {
