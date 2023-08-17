@@ -39,10 +39,9 @@ const config: Config = {
 			'green-500': defaultColors.green[500],
 			'green-600': defaultColors.green[600],
 			'green-800': defaultColors.green[800],
+			'blue-500': defaultColors.blue[500],
 			'blue-700': defaultColors.blue[700],
 			'blue-950': defaultColors.blue[950],
-			'indigo-500': defaultColors.indigo[500],
-			'violet-500': defaultColors.violet[500],
 		},
 		extend: {},
 		zIndex: {
