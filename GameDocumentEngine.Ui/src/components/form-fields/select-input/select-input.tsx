@@ -45,13 +45,13 @@ export function SelectInput<T>({
 					<Listbox.Button
 						className={twMerge(
 							'relative w-full',
-							'cursor-default border-gray-500 border bg-slate-900 text-brand-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm',
+							'cursor-default border-slate-500 border bg-slate-900 text-brand-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm',
 						)}
 					>
 						<span className="block truncate">{children(selected)}</span>
 						<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
 							<HiChevronUpDown
-								className="h-5 w-5 text-gray-400"
+								className="h-5 w-5 text-slate-400"
 								aria-hidden="true"
 							/>
 						</span>
@@ -74,7 +74,9 @@ export function SelectInput<T>({
 									key={personIdx}
 									className={({ active }) =>
 										`relative cursor-default select-none py-2 pl-10 pr-4 ${
-											active ? 'bg-slate-900 text-brand-white' : 'text-gray-100'
+											active
+												? 'bg-slate-900 text-brand-white'
+												: 'text-slate-100'
 										}`
 									}
 									value={item}

@@ -39,7 +39,7 @@ export function TextareaField<T>(props: TextareaFieldProps<T>) {
 	} = props;
 	const disablableLabelClassName = useTwMerge(
 		useComputedAtom((get) =>
-			(isAtom(disabled) ? get(disabled) : disabled) ? 'text-gray-500' : '',
+			(isAtom(disabled) ? get(disabled) : disabled) ? 'text-slate-500' : '',
 		),
 		labelClassName,
 	);

@@ -16,7 +16,7 @@ export function DisconnectedModal({
 			<ModalAlertLayout.Icon>
 				<ModalAlertIcon icon={HiSignalSlash} />
 			</ModalAlertLayout.Icon>
-			<p className="text-sm text-gray-500">{t('lost-connection-notice')}</p>
+			<p className="text-sm text-slate-500">{t('lost-connection-notice')}</p>
 			<ModalAlertLayout.Buttons>
 				<Button.Save onClick={onReconnect}>{t('reconnect')}</Button.Save>
 				<Button.Secondary onClick={() => reject('Dismissed')}>

@@ -3,7 +3,7 @@ import { fontSizes, fontFamilies } from './info';
 
 export function FontSizes() {
 	return (
-		<div className="sb-unstyled text-gray-400">
+		<div className="sb-unstyled text-slate-400">
 			{Object.entries(fontSizes).map(([sizeName, sizeAttributes]) => (
 				<FontDemo
 					fontName={sizeName}
@@ -18,7 +18,7 @@ export function FontSizes() {
 
 export function FontFamilies() {
 	return (
-		<div className="sb-unstyled text-gray-400">
+		<div className="sb-unstyled text-slate-400">
 			{Object.entries(fontFamilies).map(([familyName, family]) => (
 				<FontDemo
 					fontName={familyName}

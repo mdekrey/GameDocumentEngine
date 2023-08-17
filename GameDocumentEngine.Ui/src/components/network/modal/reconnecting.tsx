@@ -13,7 +13,7 @@ export function ReconnectingModal({ reject }: ModalContentsProps<void>) {
 			<ModalAlertLayout.Icon>
 				<ModalAlertIcon icon={HiSignal} />
 			</ModalAlertLayout.Icon>
-			<p className="text-sm text-gray-500">{t('reconnecting-notice')}</p>
+			<p className="text-sm text-slate-500">{t('reconnecting-notice')}</p>
 			<ModalAlertLayout.Buttons>
 				<Button.Secondary onClick={() => reject('Dismissed')}>
 					{t('dismiss')}

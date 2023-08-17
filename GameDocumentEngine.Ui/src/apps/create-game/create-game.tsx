@@ -46,7 +46,7 @@ export function CreateGame() {
 							gt ? (
 								<>{getGameTypeName(gt)}</>
 							) : (
-								<span className="text-gray-500">
+								<span className="text-slate-500">
 									{gameForm.field(['type']).translation('not-selected')}
 								</span>
 							)

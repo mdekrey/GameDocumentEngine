@@ -34,7 +34,7 @@ export function DeleteGameModal({
 		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
 			<ModalAlertLayout>
 				<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-				<p className="text-sm text-gray-500">
+				<p className="text-sm">
 					<Trans
 						i18nKey="are-you-sure"
 						t={t}
@@ -42,9 +42,7 @@ export function DeleteGameModal({
 						components={[<span className="font-bold" />]}
 					/>
 				</p>
-				<p className="text-sm text-gray-500">
-					{t('please-type-name-to-confirm')}
-				</p>
+				<p className="text-sm">{t('please-type-name-to-confirm')}</p>
 				<Fieldset className="m-0">
 					<TextField field={form.fields.name} />
 				</Fieldset>

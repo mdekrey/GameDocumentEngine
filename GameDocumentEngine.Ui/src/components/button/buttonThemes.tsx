@@ -31,11 +31,11 @@ const save = toClassName(
 );
 
 const secondary = toClassName(
-	<a className="bg-white text-gray-900 focus:bg-gray-50 hover:bg-gray-50 outline-gray-300" />,
+	<a className="bg-white text-slate-900 focus:bg-slate-50 hover:bg-slate-50 outline-slate-300" />,
 );
 
 const destructiveSecondary = toClassName(
-	<a className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-gray-200 outline-red-700" />,
+	<a className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-slate-200 outline-red-700" />,
 );
 
 const allThemes = {

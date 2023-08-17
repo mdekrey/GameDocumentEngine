@@ -3,7 +3,7 @@ import { colors } from './info';
 
 export function Swatches() {
 	return (
-		<div className="sb-unstyled text-gray-400">
+		<div className="sb-unstyled text-slate-400">
 			{Object.entries(colors).map(([colorName, colorValue]) => (
 				<Swatch
 					colorName={colorName}

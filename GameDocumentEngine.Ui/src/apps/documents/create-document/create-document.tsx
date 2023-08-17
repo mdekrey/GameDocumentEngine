@@ -50,7 +50,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 							gameType.isSuccess && gameType.data.objectTypes[key] ? (
 								gameType.data.objectTypes[key].translation('name')
 							) : (
-								<span className="text-gray-500">
+								<span className="text-slate-500">
 									{gameForm.field(['type']).translation('not-selected')}
 								</span>
 							)

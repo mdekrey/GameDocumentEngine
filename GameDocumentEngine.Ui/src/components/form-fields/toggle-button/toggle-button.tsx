@@ -33,7 +33,7 @@ export function ToggleButton({
 		(isAtom(pressed) ? get(pressed) : pressed) ? 'true' : 'false',
 	);
 	const actualClassName = useTwMerge(
-		'p-2 border border-gray-500',
+		'p-2 border border-slate-500',
 		useComputedAtom((get) =>
 			(isAtom(pressed) ? get(pressed) : pressed)
 				? 'bg-brand-white text-slate-800'

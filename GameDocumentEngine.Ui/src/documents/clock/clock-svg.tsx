@@ -48,7 +48,7 @@ export function ClockSvg({
 							totalTicks <= 8 ? 2 : totalTicks <= 20 ? 1 : 0.5,
 						)}
 						className={
-							piece.index < currentTicks ? 'text-gray-700' : 'text-gray-50'
+							piece.index < currentTicks ? 'text-slate-700' : 'text-slate-50'
 						}
 					/>
 				))}

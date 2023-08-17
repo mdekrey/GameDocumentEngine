@@ -24,7 +24,7 @@ const meta = {
 		children: (
 			<ModalAlertLayout>
 				<ModalAlertLayout.Title>Deactivate account</ModalAlertLayout.Title>
-				<p className="text-sm text-gray-500">
+				<p className="text-sm text-slate-500">
 					Are you sure you want to deactivate your account? All of your data
 					will be permanently removed. This action cannot be undone.
 				</p>

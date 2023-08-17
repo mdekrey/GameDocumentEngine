@@ -12,7 +12,7 @@ export function RemoveGameUserModal({
 	return (
 		<ModalAlertLayout>
 			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<p className="text-sm text-gray-500">
+			<p className="text-sm text-slate-500">
 				<Trans
 					i18nKey="are-you-sure"
 					t={t}
