@@ -7,8 +7,8 @@ import { Clock, ClockDocument } from './clock-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/components/form-fields/text-field/text-field';
-import { NumberField } from '@/components/form-fields/number-field/number-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 export function ClockEdit({
 	clock,

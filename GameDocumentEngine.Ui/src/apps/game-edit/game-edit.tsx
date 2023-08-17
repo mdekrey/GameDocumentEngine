@@ -11,7 +11,7 @@ import { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/components/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
 
 function usePatchGame(gameId: string) {
 	const queryClient = useQueryClient();

@@ -11,10 +11,10 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { FieldMapping } from '@/utils/form/useField';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
-import { SelectField } from '@/components/form-fields/select-field/select-field';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { noChange } from '@/utils/form/mapAtom';
-import { NumberField } from '@/components/form-fields/number-field/number-field';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),

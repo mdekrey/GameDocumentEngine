@@ -1,7 +1,7 @@
 import { ErrorsAtom, FieldTranslation } from '@/utils/form/useField';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { HiX } from 'react-icons/hi';
-import { AtomContents } from '../atom-contents';
+import { AtomContents } from '../../jotai/atom-contents';
 
 export function ErrorsList({
 	errors,

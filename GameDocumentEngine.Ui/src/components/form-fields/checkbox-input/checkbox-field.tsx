@@ -1,12 +1,12 @@
 import { Atom } from 'jotai';
 import { withSlots } from 'react-slot-component';
-import { useTwMerge } from '../jotai/useTwMerge';
+import { useTwMerge } from '../../jotai/useTwMerge';
 import { CheckboxInput } from './checkbox-input';
 import { FieldProps } from '../FieldProps';
-import { JotaiLabel } from '../jotai/label';
-import { JotaiDiv } from '../jotai/div';
+import { JotaiLabel } from '../../jotai/label';
+import { JotaiDiv } from '../../jotai/div';
 import { FieldMapping } from '@/utils/form/useField';
-import { ErrorsList } from '../jotai/errors/errors-list';
+import { ErrorsList } from '../errors/errors-list';
 
 export const undefinedAsFalseMapping: FieldMapping<
 	boolean | undefined,

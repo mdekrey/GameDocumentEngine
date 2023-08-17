@@ -3,7 +3,7 @@ import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { useDebugValue } from 'react';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { TextareaField } from '@/components/form-fields/textarea-field/textarea-field';
+import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 
 export function Personality({
 	form,

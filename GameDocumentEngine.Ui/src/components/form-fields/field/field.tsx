@@ -1,9 +1,9 @@
 import { Atom } from 'jotai';
 import { withSlots } from 'react-slot-component';
-import { useTwMerge } from '../jotai/useTwMerge';
-import { JotaiSpan } from '../jotai/span';
-import { JotaiDiv } from '../jotai/div';
-import { JotaiLabel } from '../jotai/label';
+import { useTwMerge } from '../../jotai/useTwMerge';
+import { JotaiSpan } from '../../jotai/span';
+import { JotaiDiv } from '../../jotai/div';
+import { JotaiLabel } from '../../jotai/label';
 
 export type FieldProps = React.ComponentProps<typeof JotaiLabel>;
 

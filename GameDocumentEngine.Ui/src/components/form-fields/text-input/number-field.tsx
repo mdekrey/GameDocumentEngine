@@ -3,7 +3,7 @@ import {
 	applyMappingToTextField,
 	integerMapping,
 	undefinedOrIntegerMapping,
-} from '../text-field/text-field';
+} from './text-field';
 
 export const NumberField = Object.assign(
 	applyPropsToTextField('NumberField', { type: 'number' }),

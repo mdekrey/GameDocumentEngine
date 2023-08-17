@@ -1,17 +1,17 @@
-import { ErrorsList } from '../jotai/errors/errors-list';
+import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextareaInput } from './textarea-input';
 import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import { MappedFieldProps } from '../MappedFieldProps';
-import { JotaiLabel } from '../jotai/label';
+import { JotaiLabel } from '../../jotai/label';
 import { Atom } from 'jotai';
 import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { useTwMerge } from '../jotai/useTwMerge';
+import { useTwMerge } from '../../jotai/useTwMerge';
 import {
 	integerMapping,
 	undefinedAsEmptyStringMapping,
 	undefinedOrIntegerMapping,
-} from '../text-field/text-field';
+} from '../text-input/text-field';
 
 export type TextareaFieldPersistentProps = {
 	description?: boolean;

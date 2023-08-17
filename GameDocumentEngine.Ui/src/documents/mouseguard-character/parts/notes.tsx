@@ -2,7 +2,7 @@ import { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { CharacterDocument } from '../character-types';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { TextareaField } from '@/components/form-fields/textarea-field/textarea-field';
+import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 
 export function Notes({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {

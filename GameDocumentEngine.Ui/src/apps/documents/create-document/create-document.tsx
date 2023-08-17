@@ -9,8 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { ZodType, z } from 'zod';
 import { useGameType } from '../useGameType';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/components/form-fields/text-field/text-field';
-import { SelectField } from '@/components/form-fields/select-field/select-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
 
 function useCreateDocument(gameId: string) {
 	const navigate = useNavigate();

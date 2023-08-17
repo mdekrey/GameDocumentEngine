@@ -6,13 +6,13 @@ import { produceWithPatches } from 'immer';
 import { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { ErrorsList } from '@/components/form-fields/jotai/errors/errors-list';
+import { ErrorsList } from '@/components/form-fields/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
 import { UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/components/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();

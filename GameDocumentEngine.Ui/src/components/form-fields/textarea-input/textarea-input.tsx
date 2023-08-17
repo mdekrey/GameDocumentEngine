@@ -1,5 +1,5 @@
-import { JotaiTextarea } from '../jotai/textarea';
-import { useTwMerge } from '../jotai/useTwMerge';
+import { JotaiTextarea } from '../../jotai/textarea';
+import { useTwMerge } from '../../jotai/useTwMerge';
 
 export function TextareaInput({
 	className,

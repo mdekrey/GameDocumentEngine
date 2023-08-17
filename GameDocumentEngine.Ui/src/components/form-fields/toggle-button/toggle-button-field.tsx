@@ -1,7 +1,7 @@
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { FieldProps } from '../FieldProps';
 import { ToggleButton } from './toggle-button';
-import { AtomContents } from '../jotai/atom-contents';
+import { AtomContents } from '../../jotai/atom-contents';
 import { useStore } from 'jotai';
 
 export type ToggleButtonFieldProps = Pick<

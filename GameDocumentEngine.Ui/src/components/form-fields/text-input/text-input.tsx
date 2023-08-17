@@ -1,5 +1,5 @@
-import { JotaiInput } from '../jotai/input';
-import { useTwMerge } from '../jotai/useTwMerge';
+import { JotaiInput } from '../../jotai/input';
+import { useTwMerge } from '../../jotai/useTwMerge';
 
 export function TextInput({
 	type = 'text',

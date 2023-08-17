@@ -1,13 +1,13 @@
-import { ErrorsList } from '../jotai/errors/errors-list';
+import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
-import { TextInput } from '../text-input/text-input';
+import { TextInput } from './text-input';
 import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import { MappedFieldProps } from '../MappedFieldProps';
 import { noChange } from '@/utils/form/mapAtom';
-import { JotaiLabel } from '../jotai/label';
+import { JotaiLabel } from '../../jotai/label';
 import { Atom } from 'jotai';
 import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { useTwMerge } from '../jotai/useTwMerge';
+import { useTwMerge } from '../../jotai/useTwMerge';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
 	string | undefined,

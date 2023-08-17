@@ -3,7 +3,7 @@ import { HiSignalSlash } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { HubConnectionState } from '@microsoft/signalr';
-import { JotaiDiv } from '@/components/form-fields/jotai/div';
+import { JotaiDiv } from '@/components/jotai/div';
 import { IconButton } from '../button/icon-button';
 import { useModal } from '@/utils/modal/modal-service';
 import { useRef, useEffect, useCallback, memo } from 'react';
