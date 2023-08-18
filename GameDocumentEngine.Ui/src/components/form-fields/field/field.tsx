@@ -27,7 +27,7 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 			slotProps.Contents ?? {};
 
 		const classNameAtom = useTwMerge('contents', className);
-		const labelClassNameAtom = useTwMerge('font-bold md:py-2', labelClassName);
+		const labelClassNameAtom = useTwMerge('font-bold pt-2', labelClassName);
 		const contentsClassNameAtom = useTwMerge(
 			'block flex-grow md:flex-grow-0',
 			contentsClassName,
