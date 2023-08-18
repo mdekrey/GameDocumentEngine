@@ -4,8 +4,8 @@
 	grid-template-rows: auto 1fr;
 	grid-template-columns: 1fr;
 	grid-template-areas: 'header' 'main';
-	--sidebar-left-display: 'none';
-	--sidebar-right-display: 'none';
+	--sidebar-left-display: none;
+	--sidebar-right-display: none;
 	--sidebar-count: 0;
 	--sidebar-size: clamp(200px, 15vw, 360px);
 	--main-col-size: calc(100% - var(--sidebar-count) * (var(--sidebar-size)));
@@ -14,7 +14,7 @@
 @media screen(lg) {
 	.layout[data-left-drawer='true'] {
 		--sidebar-count: 1;
-		--sidebar-left-display: 'initial';
+		--sidebar-left-display: initial;
 	}
 	.layout[data-left-drawer='true'] {
 		grid-template-areas: 'header header' 'left main';
@@ -25,7 +25,7 @@
 @media screen(xl) {
 	.layout[data-right-drawer='true'] {
 		--sidebar-count: 1;
-		--sidebar-right-display: 'initial';
+		--sidebar-right-display: initial;
 	}
 	.layout[data-left-drawer='false'][data-right-drawer='true'] {
 		grid-template-areas: 'header header' 'main right';
