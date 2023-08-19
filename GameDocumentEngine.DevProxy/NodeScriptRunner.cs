@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace GameDocumentEngine.DevProxy;
@@ -11,13 +12,13 @@ namespace GameDocumentEngine.DevProxy;
 /// </summary>
 internal sealed class NodeScriptRunner : IDisposable
 {
-	private Process? _npmProcess;
+	private Process? _process;
 	public EventedStreamReader StdOut { get; }
 	public EventedStreamReader StdErr { get; }
 
 	private static readonly Regex AnsiColorRegex = new Regex("\x001b\\[[0-9;]*m", RegexOptions.None, TimeSpan.FromSeconds(1));
 
-	public NodeScriptRunner(string workingDirectory, string pkgManagerCommand, string arguments, IDictionary<string, string>? envVars, DiagnosticSource diagnosticSource, CancellationToken applicationStoppingToken)
+	public NodeScriptRunner(string workingDirectory, string command, string arguments, IDictionary<string, string>? envVars, DiagnosticSource diagnosticSource, CancellationToken applicationStoppingToken)
 	{
 		if (string.IsNullOrEmpty(workingDirectory))
 		{
@@ -29,12 +30,12 @@ internal sealed class NodeScriptRunner : IDisposable
 			throw new ArgumentException("Cannot be null or empty.", nameof(arguments));
 		}
 
-		if (string.IsNullOrEmpty(pkgManagerCommand))
+		if (string.IsNullOrEmpty(command))
 		{
-			throw new ArgumentException("Cannot be null or empty.", nameof(pkgManagerCommand));
+			throw new ArgumentException("Cannot be null or empty.", nameof(command));
 		}
 
-		var exeToRun = pkgManagerCommand;
+		var exeToRun = command;
 		var completeArguments = arguments;
 		if (OperatingSystem.IsWindows())
 		{
@@ -42,7 +43,7 @@ internal sealed class NodeScriptRunner : IDisposable
 			// directly (except with UseShellExecute=true, but that's no good, because
 			// it prevents capturing stdio). So we need to invoke it via "cmd /c".
 			exeToRun = "cmd";
-			completeArguments = $"/c {pkgManagerCommand} {completeArguments}";
+			completeArguments = $"/c {command} {completeArguments}";
 		}
 
 		var processStartInfo = new ProcessStartInfo(exeToRun)
@@ -52,7 +53,7 @@ internal sealed class NodeScriptRunner : IDisposable
 			RedirectStandardInput = true,
 			RedirectStandardOutput = true,
 			RedirectStandardError = true,
-			WorkingDirectory = workingDirectory
+			WorkingDirectory = workingDirectory,
 		};
 
 		if (envVars != null)
@@ -63,9 +64,9 @@ internal sealed class NodeScriptRunner : IDisposable
 			}
 		}
 
-		_npmProcess = LaunchNodeProcess(processStartInfo, pkgManagerCommand);
-		StdOut = new EventedStreamReader(_npmProcess.StandardOutput);
-		StdErr = new EventedStreamReader(_npmProcess.StandardError);
+		_process = LaunchNodeProcess(processStartInfo, command);
+		StdOut = new EventedStreamReader(_process.StandardOutput);
+		StdErr = new EventedStreamReader(_process.StandardError);
 
 		applicationStoppingToken.Register(((IDisposable)this).Dispose);
 
@@ -77,7 +78,7 @@ internal sealed class NodeScriptRunner : IDisposable
 				new
 				{
 					processStartInfo = processStartInfo,
-					process = _npmProcess
+					process = _process
 				});
 		}
 
@@ -150,10 +151,10 @@ internal sealed class NodeScriptRunner : IDisposable
 
 	void IDisposable.Dispose()
 	{
-		if (_npmProcess != null && !_npmProcess.HasExited)
+		if (_process != null && !_process.HasExited)
 		{
-			_npmProcess.Kill(entireProcessTree: true);
-			_npmProcess = null;
+			_process.Kill(entireProcessTree: true);
+			_process = null;
 		}
 	}
 }

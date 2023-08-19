@@ -58,7 +58,7 @@ internal static class ViteDevelopmentServerMiddleware
 	}
 
 	private static async Task<int> StartCreateViteAppServerAsync(
-		string sourcePath, string originalParameters, string pkgManagerCommand, int portNumber, ILogger logger, DiagnosticSource diagnosticSource, CancellationToken applicationStoppingToken)
+		string sourcePath, string originalParameters, string command, int portNumber, ILogger logger, DiagnosticSource diagnosticSource, CancellationToken applicationStoppingToken)
 	{
 		if (portNumber == default(int))
 		{
@@ -73,7 +73,7 @@ internal static class ViteDevelopmentServerMiddleware
 
 		var envVars = new Dictionary<string, string>();
 		var scriptRunner = new NodeScriptRunner(
-			sourcePath, pkgManagerCommand, parameters, envVars, diagnosticSource, applicationStoppingToken);
+			sourcePath, command, parameters, envVars, diagnosticSource, applicationStoppingToken);
 		scriptRunner.AttachToLogger(logger);
 
 		using (var stdErrReader = new EventedStreamStringReader(scriptRunner.StdErr))
@@ -90,7 +90,7 @@ internal static class ViteDevelopmentServerMiddleware
 			catch (EndOfStreamException ex)
 			{
 				throw new InvalidOperationException(
-					$"The command '{pkgManagerCommand} {parameters}' exited without indicating that the " +
+					$"The command '{command} {parameters}' exited without indicating that the " +
 					"Vite server was listening for requests. The error output was: " +
 					$"{stdErrReader.ReadAsString()}", ex);
 			}

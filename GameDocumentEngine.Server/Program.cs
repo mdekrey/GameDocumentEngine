@@ -257,11 +257,13 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 });
 #endif
 
+#pragma warning disable ASP0014 // Suggest using top level route registrations - this seems to be necessary to prevent the SPA middleware from overwriting controller requests
 app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
 				endpoints.MapHub<GameDocumentsHub>("/hub");
 			});
+#pragma warning restore ASP0014 // Suggest using top level route registrations
 
 // Keep stray POSTs from hitting the SPA middleware
 // Based on a comment in https://github.com/dotnet/aspnetcore/issues/5192
@@ -275,7 +277,7 @@ app.MapWhen(context => context.Request.Method == "GET", (when) =>
 		{
 			spa.Options.SourcePath = "../GameDocumentEngine.Ui";
 
-			spa.UseViteDevelopmentServer("npm", "run serve -- --port {port}");
+			spa.UseViteDevelopmentServer(Path.Combine(Directory.GetCurrentDirectory(), "../GameDocumentEngine.Ui/node_modules/.bin/vite"), "--port {port}");
 		}
 #endif
 	});
