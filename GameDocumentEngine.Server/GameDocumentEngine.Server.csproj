@@ -54,6 +54,15 @@
 	  <ProjectReference Include="..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj" Condition="Exists('..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')"  />
 	</ItemGroup>
 
+	<Target Name="SetupDockerCompose" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+	    <Exec Command="docker ps" ContinueOnError="true" EchoOff="true" StandardOutputImportance="low" StandardErrorImportance="low">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+		<Message Condition="'$(ErrorCode)' != '0'" Text="The docker runtime was not started." />
+	    <Exec WorkingDirectory="$(SolutionRoot)/eng/db" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
+	    <Exec WorkingDirectory="$(SolutionRoot)/eng/jaeger" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
+	</Target>
+
 
 	<Target Name="GetEFProjectMetadata">
 		<MSBuild Condition=" '$(TargetFramework)' == '' " Projects="$(MSBuildProjectFile)" Targets="GetEFProjectMetadata" Properties="TargetFramework=$(TargetFrameworks.Split(';')[0]);EFProjectMetadataFile=$(EFProjectMetadataFile)" />
