@@ -1,5 +1,8 @@
 using Azure.Identity;
 using CompressedStaticFiles;
+#if DEBUG
+using GameDocumentEngine.DevProxy;
+#endif
 using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
@@ -212,6 +215,11 @@ services.Configure<AspNetCoreInstrumentationOptions>(options =>
 	};
 });
 
+services.AddSpaStaticFiles(configuration =>
+{
+	configuration.RootPath = "wwwroot";
+});
+
 
 var app = builder.Build();
 
@@ -225,9 +233,12 @@ if (app.Environment.IsDevelopment())
 app.UseHealthChecks("/health");
 app.UseDefaultFiles();
 
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
+#if !DEBUG
 app.UseCompressedStaticFiles(new StaticFileOptions
 {
 	OnPrepareResponse = ctx =>
@@ -244,9 +255,31 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 			};
 	}
 });
+#endif
 
-app.MapControllers();
-app.MapHub<GameDocumentsHub>("/hub");
+app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+				endpoints.MapHub<GameDocumentsHub>("/hub");
+			});
+
+// Keep stray POSTs from hitting the SPA middleware
+// Based on a comment in https://github.com/dotnet/aspnetcore/issues/5192
+app.MapWhen(context => context.Request.Method == "GET", (when) =>
+{
+	when.UseSpaStaticFiles();
+	when.UseSpa(spa =>
+	{
+#if DEBUG
+		if (app.Environment.IsDevelopment())
+		{
+			spa.Options.SourcePath = "../GameDocumentEngine.Ui";
+
+			spa.UseViteDevelopmentServer("npm", "run serve -- --port {port}");
+		}
+#endif
+	});
+});
 
 if (app.Environment.IsDevelopment())
 	using (var scope = app.Services.CreateScope())
