@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-	@apply bg-slate-950 text-brand-white;
+	@apply bg-slate-950 text-white;
 }
 
 html, body, #root {
@@ -16,7 +16,7 @@ html, body, #root {
 
 /* Track */
 ::-webkit-scrollbar-track {
-	@apply bg-brand-dark shadow-inner shadow-brand-white/25;
+	@apply bg-slate-950 shadow-inner shadow-white/25;
 }
 
 /* Handle */

@@ -3,6 +3,7 @@ import defaultColors from 'tailwindcss/colors';
 
 const config: Config = {
 	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+	darkMode: 'class',
 	theme: {
 		colors: {
 			current: 'currentColor',
@@ -11,11 +12,6 @@ const config: Config = {
 
 			black: defaultColors.black,
 			white: defaultColors.white,
-
-			brand: {
-				dark: defaultColors.slate[950],
-				white: defaultColors.white,
-			},
 
 			'slate-50': defaultColors.slate[50],
 			'slate-100': defaultColors.slate[100],

@@ -44,7 +44,7 @@ export function FontDemo({
 }) {
 	return (
 		<div className={twMerge('flex flex-col gap-1', className)}>
-			<p className="text-brand-white" style={fontValue}>
+			<p className="text-white" style={fontValue}>
 				The quick brown fox jumped over the lazy dog.
 			</p>
 			<span className="text-xs">{fontName}</span>

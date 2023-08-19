@@ -8,6 +8,9 @@ if (!fullConfig.theme) throw new Error('tailwind config failed to parse');
 console.log(fullConfig.theme);
 
 export const colors = flattenColorPalette(fullConfig.theme.colors);
+delete colors.transparent;
+delete colors.current;
+delete colors.inherit;
 
 export const fontFamilies = fullConfig.theme.fontFamily ?? {};
 export const fontSizes = Object.fromEntries(

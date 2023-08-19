@@ -25,7 +25,7 @@ export const ModalAlertLayout = withSlots<
 				<div className="sm:flex sm:items-start">
 					{slotProps.Icon?.children ?? <ModalAlertIcon />}
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-						<h3 className="text-base font-semibold leading-6 text-brand-white">
+						<h3 className="text-base font-semibold leading-6 text-white">
 							{slotProps.Title?.children}
 						</h3>
 						<div className="flex flex-col items-stretch gap-2 mt-2 text-slate-300">

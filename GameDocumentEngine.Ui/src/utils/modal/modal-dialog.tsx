@@ -19,7 +19,7 @@ export const ModalDialogLayout = withSlots<
 		<>
 			<div className="bg-slate-900 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
 				<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-					<h3 className="text-base font-semibold leading-6 text-brand-white">
+					<h3 className="text-base font-semibold leading-6 text-white">
 						{slotProps.Title?.children}
 					</h3>
 					<div className="flex flex-col items-stretch gap-2 mt-2 text-slate-300">

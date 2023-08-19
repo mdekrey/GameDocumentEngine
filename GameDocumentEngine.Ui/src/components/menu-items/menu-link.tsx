@@ -16,9 +16,7 @@ export function MenuLink({
 				<a
 					href={href}
 					className={`${
-						active
-							? 'outline outline-blue-700 text-brand-white'
-							: 'text-brand-white'
+						active ? 'outline outline-blue-700 text-white' : 'text-white'
 					} group flex w-full items-center rounded-md px-2 py-2 text-sm gap-2`}
 				>
 					<span className="w-4 h-4 flex-none">

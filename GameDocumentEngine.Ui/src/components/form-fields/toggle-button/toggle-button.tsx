@@ -36,8 +36,8 @@ export function ToggleButton({
 		'p-2 border border-slate-500',
 		useComputedAtom((get) =>
 			(isAtom(pressed) ? get(pressed) : pressed)
-				? 'bg-brand-white text-slate-800'
-				: 'bg-slate-900 text-brand-white',
+				? 'bg-white text-slate-800'
+				: 'bg-slate-900 text-white',
 		),
 		className,
 	);
