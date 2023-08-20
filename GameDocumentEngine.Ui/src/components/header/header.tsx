@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import type { IconType } from 'react-icons';
-import { HiHome } from 'react-icons/hi2';
+import { HiOutlineClipboardDocumentList } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import {
@@ -34,14 +34,14 @@ export function Header({
 	return (
 		<div
 			className={twMerge(
-				'w-full bg-slate-800 text-white shadow-sm flex flex-row items-center gap-4 h-12 p-1 z-normal',
+				'w-full bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white shadow-sm flex flex-row items-center gap-4 h-12 p-1 z-normal',
 				className,
 			)}
 		>
 			<MenuTabDisplay
 				href="#/"
 				label={t('header.app-title')}
-				icon={HiHome}
+				icon={HiOutlineClipboardDocumentList}
 				className="z-normal"
 				labelClassName="font-bold"
 			>

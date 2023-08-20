@@ -4,6 +4,7 @@ import { ModalContentsProps } from '@/utils/modal/modal-service';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Button } from '../../button/button';
 import { ModalAlertIcon } from '@/utils/modal/alert-icon';
+import { Prose } from '@/components/text/common';
 
 export function ReconnectingModal({ reject }: ModalContentsProps<void>) {
 	const { t } = useTranslation(['network'], { keyPrefix: 'reconnecting' });
@@ -13,7 +14,7 @@ export function ReconnectingModal({ reject }: ModalContentsProps<void>) {
 			<ModalAlertLayout.Icon>
 				<ModalAlertIcon icon={HiSignal} />
 			</ModalAlertLayout.Icon>
-			<p className="text-sm text-slate-500">{t('reconnecting-notice')}</p>
+			<Prose>{t('reconnecting-notice')}</Prose>
 			<ModalAlertLayout.Buttons>
 				<Button.Secondary onClick={() => reject('Dismissed')}>
 					{t('dismiss')}

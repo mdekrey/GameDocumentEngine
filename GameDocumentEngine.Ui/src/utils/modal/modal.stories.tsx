@@ -2,6 +2,7 @@ import { Button } from '@/components/button/button';
 import { ModalAlertLayout } from './alert-layout';
 import { Modal } from './modal';
 import { Meta, StoryObj } from '@storybook/react';
+import { Prose } from '@/components/text/common';
 
 function SampleModal({ children }: React.ComponentProps<typeof Modal>) {
 	return (
@@ -24,10 +25,10 @@ const meta = {
 		children: (
 			<ModalAlertLayout>
 				<ModalAlertLayout.Title>Deactivate account</ModalAlertLayout.Title>
-				<p className="text-sm text-slate-500">
+				<Prose>
 					Are you sure you want to deactivate your account? All of your data
 					will be permanently removed. This action cannot be undone.
-				</p>
+				</Prose>
 				<ModalAlertLayout.Buttons>
 					<Button.Destructive>Deactivate</Button.Destructive>
 					<Button.Secondary>Cancel</Button.Secondary>

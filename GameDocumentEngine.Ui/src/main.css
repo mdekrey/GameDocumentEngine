@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 html {
+	@apply bg-white text-slate-950;
+}
+html.dark {
 	@apply bg-slate-950 text-white;
 }
 
@@ -16,15 +19,24 @@ html, body, #root {
 
 /* Track */
 ::-webkit-scrollbar-track {
-	@apply bg-slate-950 shadow-inner shadow-white/25;
+	@apply shadow-inner;
+	@apply bg-slate-50 shadow-black/25;
+}
+:is(.dark) ::-webkit-scrollbar-track {
+	@apply bg-slate-950 shadow-white/25;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-	@apply transition-colors bg-slate-800 rounded-sm;
+	@apply transition-colors rounded-sm;
+	@apply bg-slate-300;
 }
-
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
+	@apply bg-slate-500;
+}
+:is(.dark) ::-webkit-scrollbar-thumb {
 	@apply bg-slate-700;
+}
+:is(.dark) ::-webkit-scrollbar-thumb:hover {
+	@apply bg-slate-500;
 }

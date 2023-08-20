@@ -44,22 +44,16 @@
 }
 
 .main {
-	@apply overflow-auto bg-slate-950 text-white;
 	grid-area: main;
 }
 
-.sidebar {
-	@apply overflow-auto bg-slate-700 text-white;
-}
 
 .sidebar-left {
-	composes: sidebar;
 	display: var(--sidebar-left-display);
 	grid-area: left;
 }
 
 .sidebar-right {
-	composes: sidebar;
 	display: var(--sidebar-right-display);
 	grid-area: right;
 }

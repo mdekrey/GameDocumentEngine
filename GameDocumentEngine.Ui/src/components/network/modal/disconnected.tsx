@@ -4,6 +4,7 @@ import { ModalContentsProps } from '@/utils/modal/modal-service';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Button } from '../../button/button';
 import { ModalAlertIcon } from '@/utils/modal/alert-icon';
+import { Prose } from '@/components/text/common';
 
 export function DisconnectedModal({
 	reject,
@@ -16,7 +17,7 @@ export function DisconnectedModal({
 			<ModalAlertLayout.Icon>
 				<ModalAlertIcon icon={HiSignalSlash} />
 			</ModalAlertLayout.Icon>
-			<p className="text-sm text-slate-500">{t('lost-connection-notice')}</p>
+			<Prose>{t('lost-connection-notice')}</Prose>
 			<ModalAlertLayout.Buttons>
 				<Button.Save onClick={onReconnect}>{t('reconnect')}</Button.Save>
 				<Button.Secondary onClick={() => reject('Dismissed')}>

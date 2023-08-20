@@ -3,6 +3,7 @@ import { Modals } from '@/utils/modal/modal-service';
 import { Header, HeaderProps } from '../header/header';
 import { NetworkIndicatorProps } from '../network/network-indicator';
 import styles from './layout.module.css';
+import { twMerge } from 'tailwind-merge';
 
 export type LayoutProps = { children?: React.ReactNode } & HeaderProps &
 	NetworkIndicatorProps;
@@ -37,11 +38,34 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 				onReconnect={onReconnect}
 				className={styles.header}
 			/>
-			<section className={styles['sidebar-left']}>
+			<section
+				className={twMerge(
+					styles['sidebar-left'],
+					'overflow-auto bg-slate-700 text-white',
+					'bg-slate-200 text-slate-950',
+					'dark:bg-slate-700 dark:text-white',
+				)}
+			>
 				{slotProps.LeftSidebar?.children}
 			</section>
-			<main className={styles.main}>{children}</main>
-			<section className={styles['sidebar-right']}>
+			<main
+				className={twMerge(
+					styles.main,
+					'overflow-auto',
+					'bg-white text-slate-950',
+					'dark:bg-slate-950 dark:text-white',
+				)}
+			>
+				{children}
+			</main>
+			<section
+				className={twMerge(
+					styles['sidebar-right'],
+					'overflow-auto bg-slate-700 text-white',
+					'bg-slate-200 text-slate-950',
+					'dark:bg-slate-700 dark:text-white',
+				)}
+			>
 				{slotProps.RightSidebar?.children}
 			</section>
 			<Modals />

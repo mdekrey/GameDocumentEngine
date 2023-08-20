@@ -2,3 +2,7 @@
 #storybook-root {
 	@apply w-full h-full;
 }
+
+html.dark .sbdocs {
+	background: none;
+}

@@ -12,7 +12,7 @@ export function DeleteInviteModal({
 	return (
 		<ModalAlertLayout>
 			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<p className="text-sm text-slate-500">
+			<p className="text-sm">
 				<Trans
 					i18nKey="are-you-sure"
 					t={t}
