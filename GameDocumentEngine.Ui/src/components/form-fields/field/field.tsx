@@ -26,8 +26,11 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 		const { className: contentsClassName, children: contentsChildren } =
 			slotProps.Contents ?? {};
 
-		const classNameAtom = useTwMerge('contents', className);
-		const labelClassNameAtom = useTwMerge('font-bold pt-2', labelClassName);
+		const classNameAtom = useTwMerge('group', className);
+		const labelClassNameAtom = useTwMerge(
+			'group-focus-within:font-bold transition-all pt-2',
+			labelClassName,
+		);
 		const contentsClassNameAtom = useTwMerge(
 			'block flex-grow md:flex-grow-0',
 			contentsClassName,

@@ -45,13 +45,19 @@ export function SelectInput<T>({
 					<Listbox.Button
 						className={twMerge(
 							'relative w-full',
-							'cursor-default border-slate-500 border bg-slate-900 text-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm',
+							'cursor-default',
+							'py-2 pl-3 pr-10 ',
+							'border-slate-500 border',
+							'disabled:text-opacity-75 disabled:border-slate-200 dark:disabled:border-slate-800 disabled:bg-slate-500/10',
+							'bg-transparent text-slate-950 dark:text-slate-50',
+							'outline-none ring-2 ring-offset-transparent ring-offset-2 ring-transparent focus:ring-blue-500 transition-all',
+							'text-left sm:text-sm',
 						)}
 					>
 						<span className="block truncate">{children(selected)}</span>
 						<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
 							<HiChevronUpDown
-								className="h-5 w-5 text-slate-400"
+								className="h-5 w-5 text-slate-600 dark:text-slate-400"
 								aria-hidden="true"
 							/>
 						</span>
@@ -65,8 +71,8 @@ export function SelectInput<T>({
 						<Listbox.Options
 							className={twMerge(
 								'absolute mt-1 max-h-60 w-full',
-								'overflow-auto rounded-md border border-black bg-slate-700',
-								'py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-dropdown',
+								'overflow-auto rounded-md border border-white dark:border-black bg-slate-200 dark:bg-slate-800',
+								'py-1 text-base shadow-lg ring-1 ring-white dark:ring-black ring-opacity-5 focus:outline-none sm:text-sm z-dropdown',
 							)}
 						>
 							{items.map((item, personIdx) => (
@@ -74,7 +80,9 @@ export function SelectInput<T>({
 									key={personIdx}
 									className={({ active }) =>
 										`relative cursor-default select-none py-2 pl-10 pr-4 ${
-											active ? 'bg-slate-900 text-white' : 'text-slate-100'
+											active
+												? 'bg-slate-100 text-black dark:bg-slate-900 dark:text-white'
+												: 'text-slate-900 dark:text-slate-100'
 										}`
 									}
 									value={item}
@@ -89,7 +97,7 @@ export function SelectInput<T>({
 												{children(item)}
 											</span>
 											{selected ? (
-												<span className="absolute inset-y-0 left-0 flex items-center pl-3 text-white">
+												<span className="absolute inset-y-0 left-0 flex items-center pl-3 text-black dark:text-white">
 													<HiCheck className="h-5 w-5" aria-hidden="true" />
 												</span>
 											) : null}
