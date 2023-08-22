@@ -21,7 +21,7 @@ export const ModalAlertLayout = withSlots<
 >(function ModalAlertLayout({ children, slotProps }) {
 	return (
 		<>
-			<div className="bg-white dark:bg-slate-900 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+			<div className="bg-slate-100 dark:bg-slate-900 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
 				<div className="sm:flex sm:items-start">
 					{slotProps.Icon?.children ?? <ModalAlertIcon />}
 					<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
@@ -34,7 +34,7 @@ export const ModalAlertLayout = withSlots<
 					</div>
 				</div>
 			</div>
-			<div className="bg-slate-200 dark:bg-slate-700 px-4 py-3 flex flex-col sm:flex-row-reverse sm:px-3 gap-3">
+			<div className="bg-slate-200 dark:bg-slate-800 px-4 py-3 flex flex-col sm:flex-row-reverse sm:px-3 gap-3">
 				{slotProps.Buttons?.children}
 			</div>
 		</>
