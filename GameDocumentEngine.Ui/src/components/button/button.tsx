@@ -17,9 +17,10 @@ const buttonTemplate = elementTemplate<'button'>(
 		)}
 	/>,
 	{
-		mutateProps: ({ className, disabled }) => ({
+		mutateProps: ({ className, disabled, ...rest }) => ({
 			disabled: false,
 			className: twMerge(disabled && 'opacity-20', className),
+			...rest,
 		}),
 	},
 );

@@ -9,9 +9,10 @@ const buttonTemplate = elementTemplate<'button'>(
 	'IconButton',
 	<button type="button" className={twMerge(iconButtonClasses)} />,
 	{
-		mutateProps: ({ className, disabled }) => ({
+		mutateProps: ({ className, disabled, ...rest }) => ({
 			disabled: false,
 			className: twMerge(disabled && 'opacity-20', className),
+			...rest,
 		}),
 	},
 );
