@@ -15,7 +15,7 @@ module.exports = {
 		// https://typescript-eslint.io/linting/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
 		'no-undef': 'off',
 	},
-	ignorePatterns: ['/src/api/**/*'],
+	ignorePatterns: ['/src/api/**/*', '/dist/**/*'],
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
@@ -36,6 +36,7 @@ module.exports = {
 				tsconfigRootDir: __dirname,
 			},
 			rules: {
+				// '@typescript-eslint/consistent-type-imports': 'error',
 				'i18next/no-literal-string': [
 					2,
 					{

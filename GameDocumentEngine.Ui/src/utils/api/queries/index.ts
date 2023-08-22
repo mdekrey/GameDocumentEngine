@@ -1,5 +1,5 @@
 import { getCurrentUser, patchUser } from './user';
-import operations from '@/api/operations';
+import type operations from '@/api/operations';
 import {
 	createGame,
 	deleteGame,

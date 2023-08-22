@@ -5,7 +5,7 @@ import { getHeaderMenuItems } from './useHeaderMenuItems';
 import { HubConnectionState } from '@microsoft/signalr';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
 import { useCallback } from 'react';
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 import { sampleUser } from '@/utils/stories/sample-data';
 import { useTranslation } from 'react-i18next';
 

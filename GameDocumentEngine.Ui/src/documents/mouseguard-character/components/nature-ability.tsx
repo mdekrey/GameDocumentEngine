@@ -1,6 +1,6 @@
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { CharacterDocument } from '../character-types';
+import type { CharacterDocument } from '../character-types';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { PassFail } from './pass-fail';
 import { atom } from 'jotai';

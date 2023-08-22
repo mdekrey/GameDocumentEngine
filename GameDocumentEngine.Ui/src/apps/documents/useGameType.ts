@@ -1,10 +1,12 @@
 import { queries } from '@/utils/api/queries';
+import type {
+	GameTypeScripts} from '@/utils/api/queries/game-types';
 import {
-	GameTypeScripts,
 	getGameTypeScripts,
 } from '@/utils/api/queries/game-types';
+import type {
+	UseQueryResult} from '@tanstack/react-query';
 import {
-	UseQueryResult,
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';

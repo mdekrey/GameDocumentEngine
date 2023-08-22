@@ -7,9 +7,10 @@ import {
 	HiOutlineTrash,
 	HiOutlineUserGroup,
 } from 'react-icons/hi2';
-import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
+import type { ModalContentsProps} from '@/utils/modal/modal-service';
+import { useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
-import { Clock, ClockDocument } from './clock-types';
+import type { Clock, ClockDocument } from './clock-types';
 import { useQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { useMemo } from 'react';

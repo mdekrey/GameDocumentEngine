@@ -1,4 +1,4 @@
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 
 export function Avatar({ user }: { user?: UserDetails }) {
 	return (

@@ -1,4 +1,4 @@
-import { CreateGameDetails } from '@/api/models/CreateGameDetails';
+import { type CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
@@ -9,7 +9,8 @@ import { useForm } from '@/utils/form/useForm';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ZodType, z } from 'zod';
+import type { ZodType } from 'zod';
+import { z } from 'zod';
 
 function useCreateGame() {
 	const navigate = useNavigate();

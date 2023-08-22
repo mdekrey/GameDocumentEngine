@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
-import { GameInvite } from '@/api/models/GameInvite';
+import type { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
 import { useTranslation } from 'react-i18next';
@@ -19,9 +19,13 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const launchModal = useModal();
 	const copyLink = useMutation({
 		mutationFn: async (invitation: GameInvite) => {
+			console.log('copy invite', { invitation });
+			console.log('hello');
 			await navigator.clipboard.writeText(getInviteUrl(invitation));
 		},
 	});
+	console.log(copyLink);
+
 	const queryClient = useQueryClient();
 	const deleteInvite = useMutation(
 		queries.cancelInvitation(queryClient, gameId),

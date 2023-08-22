@@ -4,7 +4,7 @@ import {
 	useComputedAtom,
 	withSignal,
 } from '@principlestudios/jotai-react-signals';
-import { Atom } from 'jotai';
+import type { Atom } from 'jotai';
 import { useTwMerge } from '../../jotai/useTwMerge';
 
 const JotaiToggleButton = withSignal('button', {

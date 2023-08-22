@@ -1,14 +1,15 @@
 import { registerSW } from 'virtual:pwa-register';
-import {
+import type {
 	MessageFromServiceWorker,
 	MessageFromWindow,
 } from '@/service-worker/messages.ts';
 import { HubConnectionState } from '@microsoft/signalr';
 import { handleEntityChanged } from '@/utils/api/handleEntityChanged.tsx';
 import { neverEver } from '@/utils/never-ever.ts';
-import { QueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
-import { Atom, atom, getDefaultStore } from 'jotai';
+import type { Atom} from 'jotai';
+import { atom, getDefaultStore } from 'jotai';
 
 export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 	const store = getDefaultStore();

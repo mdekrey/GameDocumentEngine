@@ -1,4 +1,4 @@
-import { Atom } from 'jotai';
+import type { Atom } from 'jotai';
 import { withSlots } from 'react-slot-component';
 import { useTwMerge } from '../../jotai/useTwMerge';
 import { JotaiSpan } from '../../jotai/span';

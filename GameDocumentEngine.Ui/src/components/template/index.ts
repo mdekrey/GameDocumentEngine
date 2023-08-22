@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 // TODO: Not sure why there's an unsafe return...
-import React, { createElement, forwardRef } from 'react';
+import type React from 'react';
+import { createElement, forwardRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 type AllowedTypes =

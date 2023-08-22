@@ -5,13 +5,15 @@ import type { IconType } from 'react-icons';
 import { HiOutlineClipboardDocumentList } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
+import type {
+	NetworkIndicatorProps} from '../network/network-indicator';
 import {
-	NetworkIndicator,
-	NetworkIndicatorProps,
+	NetworkIndicator
 } from '../network/network-indicator';
 import { AvatarButton } from '../avatar/avatar-button';
-import { UserDetails } from '@/api/models/UserDetails';
-import { MenuItems, MenuItemsConfiguration } from '../menu-items/menu-items';
+import type { UserDetails } from '@/api/models/UserDetails';
+import type { MenuItemsConfiguration } from '../menu-items/menu-items';
+import { MenuItems } from '../menu-items/menu-items';
 
 export type HeaderLayoutProps = {
 	className?: string;

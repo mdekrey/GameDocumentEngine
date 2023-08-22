@@ -1,9 +1,10 @@
-import { Updater } from '../defineDocument';
+import type { Updater } from '../defineDocument';
 import { useForm } from '@/utils/form/useForm';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
-import { Clock, ClockDocument } from './clock-types';
+import type { Clock} from './clock-types';
+import { ClockDocument } from './clock-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';

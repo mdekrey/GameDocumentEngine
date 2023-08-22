@@ -15,7 +15,8 @@ import {
 } from 'react-icons/hi2';
 
 import { IconButton } from './icon-button';
-import { buttonThemeNames, ButtonTheme } from './buttonThemes';
+import type { ButtonTheme } from './buttonThemes';
+import { buttonThemeNames } from './buttonThemes';
 
 type StoryButtonTheme = ButtonTheme | 'Primary';
 const allThemes: StoryButtonTheme[] = ['Primary', ...buttonThemeNames];

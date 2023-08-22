@@ -1,6 +1,6 @@
 import { Button } from '@/components/button/button';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
-import { ModalContentsProps } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { Trans, useTranslation } from 'react-i18next';
 
 export function DeleteInviteModal({

@@ -1,4 +1,5 @@
-import { ZodNull, z } from 'zod';
+import type { z } from 'zod';
+import { ZodNull } from 'zod';
 import { documentSchema } from '../defineDocument';
 import characterSchema from './schema';
 

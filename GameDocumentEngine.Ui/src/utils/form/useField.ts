@@ -1,13 +1,14 @@
-import { Atom, PrimitiveAtom, atom, useStore } from 'jotai';
+import type { Atom, PrimitiveAtom} from 'jotai';
+import { atom, useStore } from 'jotai';
 import { useMemo } from 'react';
-import { ZodError, ZodType } from 'zod';
+import type { ZodError, ZodType } from 'zod';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
-import { StandardWritableAtom } from './StandardWritableAtom';
+import type { StandardWritableAtom } from './StandardWritableAtom';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
-import { RegisterErrorStrategy } from './errorsStrategy';
-import { FormEvents } from './events/FormEvents';
-import { IfTrueThenProp } from './type-helpers';
-import { noChange } from './mapAtom';
+import type { RegisterErrorStrategy } from './errorsStrategy';
+import type { FormEvents } from './events/FormEvents';
+import type { IfTrueThenProp } from './type-helpers';
+import type { noChange } from './mapAtom';
 
 export type FieldTranslatablePart =
 	| ['label']

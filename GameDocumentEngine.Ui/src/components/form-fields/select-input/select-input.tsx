@@ -1,8 +1,9 @@
 import { Fragment } from 'react';
-import { Atom, useAtomValue } from 'jotai';
+import type { Atom} from 'jotai';
+import { useAtomValue } from 'jotai';
 import { twMerge } from 'tailwind-merge';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
-import { ControlledHtmlProps } from '@/utils/form/useField';
+import type { ControlledHtmlProps } from '@/utils/form/useField';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck, HiChevronUpDown } from 'react-icons/hi2';
 

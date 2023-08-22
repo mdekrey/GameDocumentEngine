@@ -1,9 +1,10 @@
 import { HiCheck, HiXMark } from 'react-icons/hi2';
-import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
+import type { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { CharacterDocument, Wise, wiseSchema } from '../character-types';
+import type { CharacterDocument } from '../character-types';
+import { type Wise, wiseSchema } from '../character-types';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form/useField';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
 

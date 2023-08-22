@@ -1,4 +1,4 @@
-import { WritableAtom } from 'jotai';
+import type { WritableAtom } from 'jotai';
 
 export type SetStateAction<T> = (prev: T) => T;
 export type StandardWritableAtom<Value> = WritableAtom<

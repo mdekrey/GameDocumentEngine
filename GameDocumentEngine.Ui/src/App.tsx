@@ -1,6 +1,7 @@
 import { Layout } from '@/components/layout/layout';
 
-import { HashRouter, Navigate, useRoutes, RouteObject } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
+import { HashRouter, Navigate, useRoutes } from 'react-router-dom';
 import { Profile } from '@/apps/profile/profile';
 import { CreateGame } from './apps/create-game/create-game';
 import { ListGames } from './apps/list-games/list-games';

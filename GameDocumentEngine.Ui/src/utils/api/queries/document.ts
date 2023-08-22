@@ -1,10 +1,10 @@
-import { QueryClient, UseMutationOptions } from '@tanstack/react-query';
-import { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
+import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
+import type { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { api } from '../fetch-api';
-import { NavigateFunction } from 'react-router-dom';
-import { DocumentDetails } from '@/api/models/DocumentDetails';
-import { Patch } from 'rfc6902';
-import { EntityChangedProps } from '../EntityChangedProps';
+import type { NavigateFunction } from 'react-router-dom';
+import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { Patch } from 'rfc6902';
+import type { EntityChangedProps } from '../EntityChangedProps';
 import {
 	applyChangeToQuery,
 	applyEventToQuery,

@@ -1,10 +1,10 @@
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextareaInput } from './textarea-input';
-import { FieldMapping, UseFieldResult } from '@/utils/form/useField';
-import { MappedFieldProps } from '../MappedFieldProps';
-import { JotaiLabel } from '../../jotai/label';
-import { Atom } from 'jotai';
+import type { FieldMapping, UseFieldResult } from '@/utils/form/useField';
+import type { MappedFieldProps } from '../MappedFieldProps';
+import type { JotaiLabel } from '../../jotai/label';
+import type { Atom } from 'jotai';
 import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTwMerge } from '../../jotai/useTwMerge';
 import {

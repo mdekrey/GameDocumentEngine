@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { arc, pie, PieArcDatum } from 'd3-shape';
+import type { PieArcDatum } from 'd3-shape';
+import { arc, pie } from 'd3-shape';
 import { useTranslation } from 'react-i18next';
 
 export function ClockSvg({

@@ -1,5 +1,6 @@
-import { ZodNull, ZodType, ZodTypeAny, ZodUnion, ZodUnionOptions } from 'zod';
-import { AnyPath, Path, PathValue } from './path';
+import type { ZodType, ZodTypeAny, ZodUnion, ZodUnionOptions } from 'zod';
+import { ZodNull } from 'zod';
+import type { AnyPath, Path, PathValue } from './path';
 
 export function getZodSchemaForPath<T, TPath extends Path<T>>(
 	steps: TPath,

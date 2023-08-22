@@ -1,4 +1,4 @@
-import { ErrorsAtom, FieldTranslation } from '@/utils/form/useField';
+import type { ErrorsAtom, FieldTranslation } from '@/utils/form/useField';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { HiX } from 'react-icons/hi';
 import { AtomContents } from '../../jotai/atom-contents';

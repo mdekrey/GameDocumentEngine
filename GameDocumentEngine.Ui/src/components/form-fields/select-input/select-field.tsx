@@ -1,7 +1,7 @@
 import { ErrorsList } from '@/components/form-fields/errors/errors-list';
 import { Field } from '@/components/form-fields/field/field';
 import { SelectInput } from '@/components/form-fields/select-input/select-input';
-import { UseFieldResult } from '@/utils/form/useField';
+import type { UseFieldResult } from '@/utils/form/useField';
 
 export function SelectField<T>({
 	field,

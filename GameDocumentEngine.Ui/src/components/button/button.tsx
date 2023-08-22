@@ -1,5 +1,5 @@
 import { twMerge } from 'tailwind-merge';
-import { ButtonTheme } from './buttonThemes';
+import type { ButtonTheme } from './buttonThemes';
 import { elementTemplate } from '../template';
 
 const buttonTemplate = elementTemplate<'button'>(

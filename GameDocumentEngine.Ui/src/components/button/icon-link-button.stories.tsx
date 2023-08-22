@@ -15,8 +15,10 @@ import {
 } from 'react-icons/hi2';
 
 import { IconLinkButton } from './icon-link-button';
-import { buttonThemeNames, ButtonTheme } from './buttonThemes';
-import { Link, MemoryRouter } from 'react-router-dom';
+import type { ButtonTheme } from './buttonThemes';
+import { buttonThemeNames } from './buttonThemes';
+import type { Link} from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 type StoryButtonTheme = ButtonTheme | 'Primary';
 const allThemes: StoryButtonTheme[] = ['Primary', ...buttonThemeNames];

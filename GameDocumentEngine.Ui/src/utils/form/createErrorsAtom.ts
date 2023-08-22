@@ -1,7 +1,8 @@
-import { Atom, WritableAtom, atom } from 'jotai';
+import type { Atom, WritableAtom} from 'jotai';
+import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
-import { ZodError, ZodType } from 'zod';
+import type { ZodError, ZodType } from 'zod';
 
 type MaybeErrors = ZodError | null;
 

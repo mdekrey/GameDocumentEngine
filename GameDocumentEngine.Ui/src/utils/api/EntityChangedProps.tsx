@@ -1,4 +1,4 @@
-import { Patch } from 'rfc6902';
+import type { Patch } from 'rfc6902';
 
 export type EntityChangedProps<TKey = unknown, TEntity = unknown> = {
 	messageId: string;

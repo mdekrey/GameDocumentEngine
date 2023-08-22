@@ -1,7 +1,7 @@
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { createRealtimeApiConnection } from './utils/api/realtime.signalr';
-import {
+import type {
 	HubStatusMesage,
 	MessageFromServiceWorker,
 	MessageFromWindow,

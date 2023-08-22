@@ -1,6 +1,6 @@
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { Atom } from 'jotai';
+import type { Atom } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTranslation } from 'react-i18next';
 import { CheckboxList } from './CheckboxList';

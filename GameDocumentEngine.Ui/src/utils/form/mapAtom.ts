@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
+import type { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
 
 export const noChange = Symbol('field-mapping-no-change');
 

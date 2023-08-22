@@ -3,7 +3,7 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { useForm } from '@/utils/form/useForm';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
-import { ModalContentsProps } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';

@@ -1,10 +1,10 @@
 import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
-import { MenuItemsConfiguration } from '../menu-items/menu-items';
+import type { MenuItemsConfiguration } from '../menu-items/menu-items';
 import { useTranslation } from 'react-i18next';
 import { HiPencil } from 'react-icons/hi2';
-import { TFunction } from 'i18next';
-import { UserDetails } from '@/api/models/UserDetails';
+import type { TFunction } from 'i18next';
+import type { UserDetails } from '@/api/models/UserDetails';
 
 export function useHeader() {
 	const userQuery = useQuery(queries.getCurrentUser);

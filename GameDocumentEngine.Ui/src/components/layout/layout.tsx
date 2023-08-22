@@ -1,7 +1,8 @@
 import { withSlots } from 'react-slot-component';
 import { Modals } from '@/utils/modal/modal-service';
-import { Header, HeaderProps } from '../header/header';
-import { NetworkIndicatorProps } from '../network/network-indicator';
+import type { HeaderProps } from '../header/header';
+import { Header } from '../header/header';
+import type { NetworkIndicatorProps } from '../network/network-indicator';
 import styles from './layout.module.css';
 import { twMerge } from 'tailwind-merge';
 

@@ -1,7 +1,7 @@
 import { type Objectish, produce } from 'immer';
 import { type UseFormResult } from './useForm';
 import { applyPatch, createPatch } from 'rfc6902';
-import { FieldMapping } from './useField';
+import type { FieldMapping } from './useField';
 
 export function updateFormDefault<T extends Objectish>(
 	form: Pick<UseFormResult<T>, 'defaultValue' | 'set' | 'get'>,

@@ -1,4 +1,4 @@
-import { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
+import { type CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
@@ -6,7 +6,8 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useForm } from '@/utils/form/useForm';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ZodType, z } from 'zod';
+import type { ZodType } from 'zod';
+import { z } from 'zod';
 import { useGameType } from '../useGameType';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';

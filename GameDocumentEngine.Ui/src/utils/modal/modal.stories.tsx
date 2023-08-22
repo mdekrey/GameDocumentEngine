@@ -1,7 +1,7 @@
 import { Button } from '@/components/button/button';
 import { ModalAlertLayout } from './alert-layout';
 import { Modal } from './modal';
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { Prose } from '@/components/text/common';
 import { ModalDialogLayout } from './modal-dialog';
 

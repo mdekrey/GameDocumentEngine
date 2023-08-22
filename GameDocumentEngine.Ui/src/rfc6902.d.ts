@@ -1,2 +1,3 @@
+import type { Operation } from 'rfc6902';
 declare global {}
-declare type JsonPatchOperation = import('rfc6902').Operation;
+declare type JsonPatchOperation = Operation;
