@@ -19,8 +19,7 @@ jobs:
     - name: 'Prepare UI for linting'
       working-directory: ./GameDocumentEngine.Ui
       run: |
-        npm ci
-        npm run generation
+        dotnet run build -t:Generation -c:Release
     - name: 'Run full lint'
       working-directory: ./GameDocumentEngine.Ui
       run: |
