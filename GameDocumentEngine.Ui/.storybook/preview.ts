@@ -29,7 +29,15 @@ const preview: Preview & { darkMode: unknown } = {
 			container: (props) => {
 				// workarounds for current state of storybook-dark-mode
 				const isDark = useDarkMode();
-				useEffect(() => () => window.location.reload(), [isDark]);
+				useEffect(
+					() => () => {
+						// channel doesn't work for story iframes
+						if (document.querySelector('iframe')) {
+							window.location.reload();
+						}
+					},
+					[isDark],
+				);
 				const currentProps = {
 					...props,
 					theme: isDark ? themes.dark : themes.light,
