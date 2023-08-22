@@ -132,6 +132,12 @@ services.AddAuthorization(options =>
 		builder.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
 		builder.RequireAuthenticatedUser();
 	});
+	options.AddPolicy("LoginUser", builder =>
+	{
+		builder.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
+		builder.AddAuthenticationSchemes(GoogleDefaults.AuthenticationScheme);
+		builder.RequireAuthenticatedUser();
+	});
 });
 
 services.AddSingleton<GamePermissionSetResolverFactory>();
