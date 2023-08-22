@@ -15,7 +15,7 @@ function ButtonStory({
 }
 
 const meta = {
-	title: 'Components/Button',
+	title: 'Components/Buttons/Button',
 	component: Button,
 	parameters: {
 		layout: 'centered',

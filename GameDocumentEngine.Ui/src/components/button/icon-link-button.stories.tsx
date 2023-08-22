@@ -14,8 +14,9 @@ import {
 	HiOutlineExclamationTriangle,
 } from 'react-icons/hi2';
 
-import { IconButton } from './icon-button';
+import { IconLinkButton } from './icon-link-button';
 import { buttonThemeNames, ButtonTheme } from './buttonThemes';
+import { Link, MemoryRouter } from 'react-router-dom';
 
 type StoryButtonTheme = ButtonTheme | 'Primary';
 const allThemes: StoryButtonTheme[] = ['Primary', ...buttonThemeNames];
@@ -42,31 +43,35 @@ function IconButtonStory({
 }: {
 	theme: ButtonTheme | 'Primary';
 	icon: keyof typeof icons;
-} & JSX.IntrinsicElements['button']) {
-	const Component = theme === 'Primary' ? IconButton : IconButton[theme];
+} & React.ComponentProps<typeof Link>) {
+	const Component =
+		theme === 'Primary' ? IconLinkButton : IconLinkButton[theme];
 	const IconComponent = icons[icon];
 	return (
-		<Component {...props}>
-			<IconComponent />
-		</Component>
+		<MemoryRouter>
+			<div>
+				<Component {...props}>
+					<IconComponent />
+				</Component>
+			</div>
+		</MemoryRouter>
 	);
 }
 
 const meta = {
-	title: 'Components/Buttons/Icon Button',
-	component: IconButton,
+	title: 'Components/Buttons/Icon Link Button',
+	component: IconLinkButton,
 	render: IconButtonStory,
 	parameters: {
 		layout: 'centered',
 	},
 	tags: ['autodocs'],
 	argTypes: {
-		disabled: { control: { type: 'boolean' } },
 		icon: { options: Object.keys(icons), control: { type: 'select' } },
 		theme: { options: allThemes, control: { type: 'select' } },
 	},
 	args: {
-		disabled: false,
+		to: '#',
 		icon: 'HiPlus',
 		title: 'Button Title',
 	},
@@ -91,13 +96,3 @@ export const Destructive = themeStory('Destructive');
 export const Save = themeStory('Save');
 export const Secondary = themeStory('Secondary');
 export const DestructiveSecondary = themeStory('DestructiveSecondary');
-
-export const DisabledPrimary = themeStory('Primary', { disabled: true });
-export const DisabledDestructive = themeStory('Destructive', {
-	disabled: true,
-});
-export const DisabledSave = themeStory('Save', { disabled: true });
-export const DisabledSecondary = themeStory('Secondary', { disabled: true });
-export const DisabledDestructiveSecondary = themeStory('DestructiveSecondary', {
-	disabled: true,
-});

@@ -1,20 +1,11 @@
-import { twMerge } from 'tailwind-merge';
-import { iconButtonClasses, buttonThemes } from './buttonThemes';
-import { Link, LinkProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { iconButtonClasses } from './icon-button';
+import { defaultButtonThemes } from './button';
+import { elementTemplate } from '../template';
 
-export function IconLinkButtonComponent({
-	children,
-	className,
-	...props
-}: LinkProps & { title: string }) {
-	return (
-		<Link className={twMerge(iconButtonClasses, className)} {...props}>
-			{children}
-		</Link>
-	);
-}
-
-export const IconLinkButton = Object.assign(
-	IconLinkButtonComponent,
-	buttonThemes('Button', IconLinkButtonComponent),
+const iconLinkButton = elementTemplate<typeof Link>(
+	'IconLinkButton',
+	<Link to="" className={iconButtonClasses} />,
 );
+
+export const IconLinkButton = iconLinkButton.themed(defaultButtonThemes);

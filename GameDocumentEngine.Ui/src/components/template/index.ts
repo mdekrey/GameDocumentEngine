@@ -1,51 +1,106 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+// TODO: Not sure why there's an unsafe return...
 import React, { createElement, forwardRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-type ElementTemplate<TType extends keyof JSX.IntrinsicElements> = React.FC<
-	JSX.IntrinsicElements[TType]
-> & {
-	extend: (
-		name: string,
-		elem: React.ReactElement<JSX.IntrinsicElements[TType], TType>,
-	) => ElementTemplate<TType>;
+type AllowedTypes =
+	| keyof JSX.IntrinsicElements
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	| React.JSXElementConstructor<any>;
+type PropsOf<TType extends AllowedTypes> =
+	TType extends keyof JSX.IntrinsicElements
+		? JSX.IntrinsicElements[TType]
+		: React.ComponentProps<TType>;
+
+type ReactElementOfType<TType extends AllowedTypes> = React.ReactElement<
+	PropsOf<TType>,
+	TType
+>;
+
+export type ExtendOptions<TType extends AllowedTypes> = {
+	mutateProps?: (props: PropsOf<TType>) => PropsOf<TType>;
 };
-export function template<TType extends keyof JSX.IntrinsicElements>(
+
+type ExtendParams<TType extends AllowedTypes> = [
 	name: string,
-	elem: JSX.Element,
+	elem: ReactElementOfType<TType>,
+	options?: ExtendOptions<TType> | undefined,
+];
+
+export interface ElementTemplate<TType extends AllowedTypes>
+	extends React.FC<PropsOf<TType>> {
+	displayName: string;
+	extend: (...params: ExtendParams<TType>) => ElementTemplate<TType>;
+	themed<TKeys extends string>(
+		this: ElementTemplate<TType>,
+		themes: Record<TKeys, JSX.Element>,
+	): this & Record<TKeys, ElementTemplate<TType>>;
+}
+export function elementTemplate<TType extends AllowedTypes>(
+	...[
+		name,
+		{
+			type,
+			props: { className: defaultClassName, ...defaultProps },
+		},
+		options = {},
+	]: ExtendParams<TType>
 ): ElementTemplate<TType> {
-	const {
-		type,
-		props: { className: defaultClassName, ...defaultProps },
-	} = elem;
+	const mutateProps = options?.mutateProps ?? ((orig) => orig);
 	const base = forwardRef(
-		({ children, className, ...props }: JSX.IntrinsicElements[TType], ref) =>
+		({ children, className, ...props }: PropsOf<TType>, ref) =>
 			createElement(
-				type as TType,
-				{
+				type,
+				mutateProps({
 					...defaultProps,
 					...props,
-					className: twMerge(defaultClassName as string, className),
+					className: twMerge(defaultClassName as string, className as string),
 					ref,
-				},
-				children,
+				} as PropsOf<TType>),
+				children as React.ReactNode,
 			),
-	) as unknown as React.FC<JSX.IntrinsicElements[TType]>;
+	) as unknown as React.FC<PropsOf<TType>>;
 	return Object.assign(base, {
 		displayName: name,
 		extend(
-			name: string,
-			{
-				props: { className, ...props },
-			}: React.ReactElement<JSX.IntrinsicElements[TType], TType>,
+			...[
+				name,
+				{
+					props: { className, ...props },
+				},
+				options = {},
+			]: ExtendParams<TType>
 		) {
-			return template<TType>(
+			return elementTemplate<TType>(
 				name,
 				createElement(type, {
 					...defaultProps,
 					...props,
-					className: twMerge(defaultClassName as string, className),
-				}),
+					className: twMerge(defaultClassName as string, className as string),
+				}) as ReactElementOfType<TType>,
+				{
+					mutateProps: (orig) =>
+						mutateProps(options?.mutateProps?.(orig) ?? orig),
+				},
 			);
+		},
+		themed<TKeys extends string>(
+			this: ElementTemplate<TType>,
+			themes: Record<TKeys, JSX.Element>,
+		) {
+			const result = Object.assign(
+				this,
+				Object.fromEntries(
+					Object.entries<JSX.Element>(themes).map(
+						([name, example]) =>
+							[
+								name as TKeys,
+								this.extend(`${this.displayName}.${name}`, example),
+							] as const,
+					),
+				) as Record<TKeys, ElementTemplate<TType>>,
+			);
+			return result;
 		},
 	});
 }

@@ -1,6 +1,6 @@
-import { template } from '../template';
+import { elementTemplate } from '../template';
 
-export const Prose = template<'p'>(
+export const Prose = elementTemplate<'p'>(
 	'Prose',
 	<p className="text-sm text-slate-700 dark:text-slate-300" />,
 );
