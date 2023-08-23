@@ -16,7 +16,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version-file: ./GameDocumentEngine.Ui/.nvmrc
-    - uses: ./parts/cache.yaml
+    - uses: ./.github/workflows/parts/cache.yaml
     - name: 'Prepare UI for linting'
       working-directory: ./GameDocumentEngine.Ui
       run: |
