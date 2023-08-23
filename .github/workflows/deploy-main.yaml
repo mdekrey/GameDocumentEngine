@@ -35,12 +35,16 @@ jobs:
         docker build . -t $registryLoginServer/$imageName:${{ env.dockerImageTag }} --build-arg GITHASH=${{ github.sha }}
         docker push $registryLoginServer/$imageName:${{ env.dockerImageTag }}
 
-
+  deploy:
+    runs-on: 'ubuntu-latest'
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v1
     # Set the target Azure Kubernetes Service (AKS) cluster.
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - uses: azure/aks-set-context@v2.0
+    - uses: azure/aks-set-context@v3.0
       with:
         cluster-name: ${{ env.azClusterName }}
         resource-group: ${{ env.azClusterResourceGroup }}
