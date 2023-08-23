@@ -8,9 +8,11 @@ export function TextareaInput({
 	return (
 		<JotaiTextarea
 			className={useTwMerge(
-				'px-2 py-2 border-slate-500 border w-full',
-				'disabled:text-opacity-50 disabled:border-slate-800 disabled:bg-slate-800',
-				'bg-slate-900 text-white',
+				'block px-2 py-2 w-full',
+				'border-slate-500 border',
+				'disabled:text-opacity-75 disabled:border-slate-200 dark:disabled:border-slate-800 disabled:bg-slate-500/10',
+				'bg-transparent text-slate-950 dark:text-slate-50',
+				'outline-none ring-2 ring-offset-transparent ring-offset-2 ring-transparent focus:ring-blue-500 transition-all',
 				className,
 			)}
 			{...props}

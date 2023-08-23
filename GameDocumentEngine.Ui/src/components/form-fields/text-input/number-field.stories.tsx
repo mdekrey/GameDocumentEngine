@@ -22,7 +22,7 @@ const meta = {
 	render: function RenderNumberFieldStory(props) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
-			schema: z.string(),
+			schema: z.string().ip(),
 		});
 		return <NumberField {...props} field={myField} />;
 	},

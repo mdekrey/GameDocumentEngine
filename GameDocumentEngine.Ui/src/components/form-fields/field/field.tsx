@@ -31,10 +31,7 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 			'group-focus-within:font-bold transition-all pt-2',
 			labelClassName,
 		);
-		const contentsClassNameAtom = useTwMerge(
-			'block flex-grow md:flex-grow-0',
-			contentsClassName,
-		);
+		const contentsClassNameAtom = useTwMerge('block', contentsClassName);
 
 		return (
 			<JotaiLabel className={classNameAtom} {...props}>

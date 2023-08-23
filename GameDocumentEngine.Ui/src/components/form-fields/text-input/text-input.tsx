@@ -9,7 +9,7 @@ export function TextInput({
 	return (
 		<JotaiInput
 			className={useTwMerge(
-				'px-2 py-2  w-full',
+				'px-2 py-2 w-full',
 				'border-slate-500 border',
 				'disabled:text-opacity-75 disabled:border-slate-200 dark:disabled:border-slate-800 disabled:bg-slate-500/10',
 				'bg-transparent text-slate-950 dark:text-slate-50',

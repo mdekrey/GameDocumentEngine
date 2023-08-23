@@ -30,7 +30,7 @@ const meta = {
 	render: function RenderSelectFieldStory(props) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
-			schema: z.string(),
+			schema: z.string().ip(),
 		});
 		return (
 			<SelectField {...props} field={myField} items={['one', 'two', 'three']}>

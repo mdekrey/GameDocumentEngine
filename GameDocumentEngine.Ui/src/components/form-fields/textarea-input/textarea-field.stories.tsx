@@ -23,7 +23,7 @@ const meta = {
 	render: function RenderTextareaFieldStory(props) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
-			schema: z.string(),
+			schema: z.string().ip(),
 		});
 		return <TextareaField {...props} field={myField} />;
 	},

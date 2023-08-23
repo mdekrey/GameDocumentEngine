@@ -24,7 +24,7 @@ const meta = {
 	render: function RenderTextFieldStory(props) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
-			schema: z.string(),
+			schema: z.string().ip(),
 		});
 		return <TextField {...props} field={myField} />;
 	},

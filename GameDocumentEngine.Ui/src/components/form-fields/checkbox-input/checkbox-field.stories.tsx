@@ -17,7 +17,7 @@ const meta = {
 	render: function RenderCheckboxFieldStory(props) {
 		const myField = useField(false, {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
-			schema: z.boolean(),
+			schema: z.boolean().refine((t) => t),
 		});
 		return <CheckboxField {...props} field={myField} />;
 	},
