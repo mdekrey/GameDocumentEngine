@@ -1,5 +1,8 @@
 using Azure.Identity;
 using CompressedStaticFiles;
+#if DEBUG
+using GameDocumentEngine.DevProxy;
+#endif
 using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
@@ -129,6 +132,12 @@ services.AddAuthorization(options =>
 		builder.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
 		builder.RequireAuthenticatedUser();
 	});
+	options.AddPolicy("LoginUser", builder =>
+	{
+		builder.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
+		builder.AddAuthenticationSchemes(GoogleDefaults.AuthenticationScheme);
+		builder.RequireAuthenticatedUser();
+	});
 });
 
 services.AddSingleton<GamePermissionSetResolverFactory>();
@@ -212,6 +221,15 @@ services.Configure<AspNetCoreInstrumentationOptions>(options =>
 	};
 });
 
+services.AddSpaStaticFiles(configuration =>
+{
+#if DEBUG
+	configuration.RootPath = "../GameDocumentEngine.Ui/dist";
+#else
+	configuration.RootPath = "wwwroot";
+#endif
+});
+
 
 var app = builder.Build();
 
@@ -223,11 +241,14 @@ if (app.Environment.IsDevelopment())
 	app.UseHttpsRedirection();
 }
 app.UseHealthChecks("/health");
-app.UseDefaultFiles();
+app.UseSpaStaticFiles();
+
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+#if !DEBUG
 app.UseCompressedStaticFiles(new StaticFileOptions
 {
 	OnPrepareResponse = ctx =>
@@ -244,9 +265,32 @@ app.UseCompressedStaticFiles(new StaticFileOptions
 			};
 	}
 });
+#endif
 
-app.MapControllers();
-app.MapHub<GameDocumentsHub>("/hub");
+#pragma warning disable ASP0014 // Suggest using top level route registrations - this seems to be necessary to prevent the SPA middleware from overwriting controller requests
+app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+				endpoints.MapHub<GameDocumentsHub>("/hub");
+			});
+#pragma warning restore ASP0014 // Suggest using top level route registrations
+
+// Keep stray POSTs from hitting the SPA middleware
+// Based on a comment in https://github.com/dotnet/aspnetcore/issues/5192
+app.MapWhen(context => context.Request.Method == "GET" || context.Request.Method == "CONNECT", (when) =>
+{
+	when.UseSpa(spa =>
+	{
+#if DEBUG
+		if (app.Environment.IsDevelopment())
+		{
+			spa.Options.SourcePath = "../GameDocumentEngine.Ui";
+
+			spa.UseViteDevelopmentServer(Path.Combine(Directory.GetCurrentDirectory(), "../GameDocumentEngine.Ui/node_modules/.bin/vite"), "--port {port}");
+		}
+#endif
+	});
+});
 
 if (app.Environment.IsDevelopment())
 	using (var scope = app.Services.CreateScope())

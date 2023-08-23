@@ -1,4 +1,4 @@
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 import { faker } from '@faker-js/faker';
 
 export function randomUser(): UserDetails {

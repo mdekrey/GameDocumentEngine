@@ -1,4 +1,5 @@
-import { Atom, useAtomValue } from 'jotai';
+import type { Atom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { EmptyCircles, FilledCircles } from './repeating-icons';
 
 export function CheckboxesButton({

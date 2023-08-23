@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from './button';
-import { buttonThemeNames, ButtonTheme } from './buttonThemes';
+import type { ButtonTheme } from './buttonThemes';
+import { buttonThemeNames } from './buttonThemes';
 
 type StoryButtonTheme = ButtonTheme | 'Primary';
 const allThemes: StoryButtonTheme[] = ['Primary', ...buttonThemeNames];
@@ -15,7 +16,7 @@ function ButtonStory({
 }
 
 const meta = {
-	title: 'Components/Button',
+	title: 'Components/Buttons/Button',
 	component: Button,
 	parameters: {
 		layout: 'centered',

@@ -4,8 +4,9 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "dotnet watch build",
+		"dev": "cd ../GameDocumentEngine.Server && dotnet run",
 		"build": "dotnet build",
+		"serve": "vite",
 		"lint": "npm run typecheck && npm run eslint && npm run prettier",
 		"lint:fix": "npm run typecheck && npm run eslint:fix && npm run prettier:fix",
 		"eslint": "eslint \"**/*.{cjs,mjs,js,ts,tsx}\"",
@@ -71,6 +72,7 @@
 		"postcss": "^8.4.25",
 		"prettier": "^3.0.0",
 		"storybook": "^7.2.3",
+		"storybook-dark-mode": "^3.0.1",
 		"tailwindcss": "^3.3.2",
 		"typescript": "^5.1.6",
 		"vite": "^4.4.9",

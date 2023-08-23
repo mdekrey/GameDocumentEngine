@@ -1,7 +1,11 @@
 import { atom } from 'jotai';
-import { SetStateAction, StandardWritableAtom } from './StandardWritableAtom';
-import { AnyPath, Path, PathValue } from './path';
-import { applyPatches, produceWithPatches, Patch, Objectish } from 'immer';
+import type {
+	SetStateAction,
+	StandardWritableAtom,
+} from './StandardWritableAtom';
+import type { AnyPath, Path, PathValue } from './path';
+import type { Patch, Objectish } from 'immer';
+import { applyPatches, produceWithPatches } from 'immer';
 
 export function getValueAtPath<T, TPath extends Path<T>>(
 	steps: TPath,

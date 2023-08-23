@@ -15,6 +15,7 @@
 		<PackageReference Include="JsonPath.Net" Version="0.6.3" />
 		<PackageReference Include="JsonSchema.Net" Version="4.1.6" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.10" />
 		<PackageReference Include="Microsoft.Azure.SignalR" Version="1.21.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
@@ -49,8 +50,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj" Condition="Exists('..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')" />
+	  <ProjectReference Include="..\GameDocumentEngine.DevProxy\GameDocumentEngine.DevProxy.csproj" Condition=" '$(Configuration)' == 'Debug' " />
+	  <ProjectReference Include="..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj" Condition="Exists('..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')"  />
 	</ItemGroup>
+
+	<Target Name="SetupDockerCompose" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+	    <Exec Command="docker ps" ContinueOnError="true" EchoOff="true" StandardOutputImportance="low" StandardErrorImportance="low">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+		<Message Condition="'$(ErrorCode)' != '0'" Text="The docker runtime was not started." />
+	    <Exec WorkingDirectory="$(SolutionRoot)/eng/db" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
+	    <Exec WorkingDirectory="$(SolutionRoot)/eng/jaeger" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
+	</Target>
 
 
 	<Target Name="GetEFProjectMetadata">

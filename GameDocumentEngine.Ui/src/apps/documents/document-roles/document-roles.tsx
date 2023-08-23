@@ -1,5 +1,4 @@
 import { queries } from '@/utils/api/queries';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +46,7 @@ export function DocumentRoles({
 	const permissions = documentResult.data.permissions;
 
 	return (
-		<NarrowContent>
+		<>
 			<RoleAssignment
 				permissions={permissions}
 				playerNames={gameDetails.playerNames}
@@ -59,7 +58,7 @@ export function DocumentRoles({
 					gameType.data.objectTypes[documentResult.data.type].translation
 				}
 			/>
-		</NarrowContent>
+		</>
 	);
 	function onSaveRoles(roleAssignments: { [userId: string]: string }) {
 		const changed = Object.fromEntries(

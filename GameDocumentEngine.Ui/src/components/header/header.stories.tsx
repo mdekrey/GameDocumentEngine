@@ -1,16 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Header, MenuTab } from './header';
+import { Header } from './header';
+import { getHeaderMenuItems } from './useHeaderMenuItems';
 import { HubConnectionState } from '@microsoft/signalr';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
 import { useCallback } from 'react';
-import { flyoutHeight } from '@/utils/stories/flyoutHeight';
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 import { sampleUser } from '@/utils/stories/sample-data';
+import { useTranslation } from 'react-i18next';
 
 type HeaderProps = {
-	mainItem?: MenuTab;
-	menuTabs?: MenuTab[];
 	user?: UserDetails;
 	connectionState: HubConnectionState;
 	onReconnect?: () => void;
@@ -19,6 +18,14 @@ type HeaderProps = {
 const meta = {
 	title: 'Layout/Header',
 	tags: ['autodocs'],
+	parameters: {
+		layout: 'fullscreen',
+		docs: {
+			story: {
+				inline: false,
+			},
+		},
+	},
 	argTypes: {
 		connectionState: {
 			control: { type: 'select' },
@@ -28,12 +35,12 @@ const meta = {
 	args: {
 		connectionState: HubConnectionState.Connected,
 	},
-	decorators: [flyoutHeight],
 	render: function RenderNetworkIndicatorStory({
 		connectionState,
 		onReconnect,
 		...props
 	}) {
+		const { t } = useTranslation(['layout']);
 		const connectionState$ = useAsAtom(connectionState);
 		const reconnect = useCallback(async () => {
 			onReconnect?.();
@@ -43,6 +50,7 @@ const meta = {
 			<Header
 				connectionState={connectionState$}
 				onReconnect={reconnect}
+				menuItems={getHeaderMenuItems(t, props.user, () => void 0)}
 				{...props}
 			/>
 		);
@@ -53,11 +61,11 @@ type Story = StoryObj<typeof meta>;
 export default meta;
 
 export const Default: Story = {
-	args: {},
-};
-
-export const UserProfile: Story = {
 	args: {
 		user: sampleUser,
 	},
+};
+
+export const NoUser: Story = {
+	args: {},
 };

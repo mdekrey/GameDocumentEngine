@@ -1,4 +1,4 @@
-import { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 
 export function updateDocumentRoleAssignments(

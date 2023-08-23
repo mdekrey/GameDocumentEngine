@@ -1,9 +1,10 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { TextField } from '@/components/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
+import { Prose } from '@/components/text/common';
 import { useForm } from '@/utils/form/useForm';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
-import { ModalContentsProps } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -34,17 +35,15 @@ export function DeleteDocumentModal({
 		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
 			<ModalAlertLayout>
 				<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-				<p className="text-sm text-gray-500">
+				<Prose>
 					<Trans
 						i18nKey="are-you-sure"
 						t={t}
 						values={{ name: originalName }}
 						components={[<span className="font-bold" />]}
 					/>
-				</p>
-				<p className="text-sm text-gray-500">
-					{t('please-type-name-to-confirm')}
-				</p>
+				</Prose>
+				<Prose>{t('please-type-name-to-confirm')}</Prose>
 				<Fieldset className="m-0">
 					<TextField field={form.fields.name} />
 				</Fieldset>

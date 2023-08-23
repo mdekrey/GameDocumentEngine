@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { arc, pie, PieArcDatum } from 'd3-shape';
+import type { PieArcDatum } from 'd3-shape';
+import { arc, pie } from 'd3-shape';
 import { useTranslation } from 'react-i18next';
 
 export function ClockSvg({
@@ -48,7 +49,7 @@ export function ClockSvg({
 							totalTicks <= 8 ? 2 : totalTicks <= 20 ? 1 : 0.5,
 						)}
 						className={
-							piece.index < currentTicks ? 'text-gray-700' : 'text-gray-50'
+							piece.index < currentTicks ? 'text-slate-700' : 'text-slate-50'
 						}
 					/>
 				))}

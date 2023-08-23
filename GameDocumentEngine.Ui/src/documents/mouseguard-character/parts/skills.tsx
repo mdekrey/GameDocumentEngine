@@ -1,11 +1,13 @@
-import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
+import type { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { CharacterDocument, Skill, skillSchema } from '../character-types';
-import { TextField } from '@/components/form-fields/text-field/text-field';
+import type { CharacterDocument } from '../character-types';
+import { type Skill, skillSchema } from '../character-types';
+import { TextField } from '@/components/form-fields/text-input/text-field';
 import { PassFail } from '../components/pass-fail';
-import { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form/useField';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { Atom, useAtomValue } from 'jotai';
+import type { Atom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { HiXMark } from 'react-icons/hi2';
 import { positions } from '../skill-positions';

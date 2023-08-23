@@ -1,8 +1,8 @@
-import { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { i18n } from '@/utils/i18n/setup';
-import { UseQueryResult } from '@tanstack/react-query';
-import { TFunction } from 'i18next';
-import { Draft } from 'immer';
+import type { UseQueryResult } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
+import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { z } from 'zod';
 

@@ -3,17 +3,16 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
-import { UseFieldResult } from '@/utils/form/useField';
+import type { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { ErrorsList } from '@/components/form-fields/jotai/errors/errors-list';
+import { ErrorsList } from '@/components/form-fields/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
-import { UserDetails } from '@/api/models/UserDetails';
+import { type UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/components/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -60,7 +59,7 @@ export function Profile() {
 	updateFormDefault(userForm, userData);
 
 	return (
-		<NarrowContent>
+		<>
 			<form onSubmit={userForm.handleSubmit(onSubmit)}>
 				<ProfileFields {...userForm.fields} />
 				<ErrorsList
@@ -68,7 +67,7 @@ export function Profile() {
 					translations={i18n.getFixedT(null, 'profile', 'fields')}
 				/>
 			</form>
-		</NarrowContent>
+		</>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof UserDetails>) {

@@ -1,5 +1,5 @@
-import { FieldMapping } from '@/utils/form/useField';
-import { CharacterDocument } from './character-types';
+import type { FieldMapping } from '@/utils/form/useField';
+import type { CharacterDocument } from './character-types';
 import { produce } from 'immer';
 
 export const characterFixup = {

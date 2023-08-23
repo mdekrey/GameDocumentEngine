@@ -1,6 +1,7 @@
 import { Button } from '@/components/button/button';
+import { Prose } from '@/components/text/common';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
-import { ModalContentsProps } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { Trans, useTranslation } from 'react-i18next';
 
 export function RemoveGameUserModal({
@@ -12,14 +13,14 @@ export function RemoveGameUserModal({
 	return (
 		<ModalAlertLayout>
 			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<p className="text-sm text-gray-500">
+			<Prose>
 				<Trans
 					i18nKey="are-you-sure"
 					t={t}
 					values={{ name: originalName }}
 					components={[<span className="font-bold" />]}
 				/>
-			</p>
+			</Prose>
 			<ModalAlertLayout.Buttons>
 				<Button.Destructive onClick={() => resolve(true)}>
 					{t('submit')}

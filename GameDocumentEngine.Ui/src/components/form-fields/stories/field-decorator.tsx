@@ -1,4 +1,4 @@
-import { Decorator } from '@storybook/react';
+import type { Decorator } from '@storybook/react';
 import { Fieldset } from '../fieldset/fieldset';
 
 export const formFieldDecorator: Decorator = function formFieldDecorator(

@@ -1,11 +1,11 @@
-import { useStore } from 'jotai';
-import { StandardWritableAtom } from './StandardWritableAtom';
+import type { useStore } from 'jotai';
+import type { StandardWritableAtom } from './StandardWritableAtom';
 import { mapAtom } from './mapAtom';
 import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
-import {
+import type {
 	CheckboxHtmlProps,
 	ControlledHtmlProps,
 	FieldMapping,
@@ -16,8 +16,8 @@ import {
 	UseFieldResult,
 } from './useField';
 import { FieldEvents } from './events/FieldEvents';
-import { RegisterErrorStrategy } from './errorsStrategy';
-import { ZodType } from 'zod';
+import type { RegisterErrorStrategy } from './errorsStrategy';
+import type { ZodType } from 'zod';
 
 export function toInternalFieldAtom<TValue, TFieldValue>(
 	store: ReturnType<typeof useStore>,

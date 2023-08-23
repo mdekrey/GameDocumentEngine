@@ -1,16 +1,16 @@
 import '@/utils/api/queries';
 import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { ClockSvg } from './clock-svg';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { IconButton } from '@/components/button/icon-button';
 import {
 	HiOutlineCog,
 	HiOutlineTrash,
 	HiOutlineUserGroup,
 } from 'react-icons/hi2';
-import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
+import { useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
-import { Clock, ClockDocument } from './clock-types';
+import type { Clock, ClockDocument } from './clock-types';
 import { useQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { useMemo } from 'react';
@@ -30,7 +30,7 @@ export function Clock({
 	const clockData = document.data;
 
 	return (
-		<NarrowContent>
+		<>
 			<div className="flex flex-row gap-3">
 				<span className="font-bold flex-1">{document.data.name}</span>
 				<IconLinkButton title={t('details.edit-roles')} to="roles">
@@ -53,7 +53,7 @@ export function Clock({
 				padding={2}
 				radius={70}
 			/>
-		</NarrowContent>
+		</>
 	);
 
 	function onEdit() {

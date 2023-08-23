@@ -1,6 +1,7 @@
 import { Transition } from '@headlessui/react';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
-import { Atom, useAtomValue } from 'jotai';
+import type { Atom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { Fragment, useState } from 'react';
 
 function FullPageModalContainer({
@@ -81,7 +82,7 @@ function ModalPanel({
 					leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 				>
 					<div
-						className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+						className="relative transform overflow-hidden rounded-lg bg-slate-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
 						onClick={(ev) => ev.stopPropagation()}
 					>
 						{children}

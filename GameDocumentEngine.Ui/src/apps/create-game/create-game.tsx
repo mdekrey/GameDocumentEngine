@@ -1,16 +1,16 @@
-import { CreateGameDetails } from '@/api/models/CreateGameDetails';
+import { type CreateGameDetails } from '@/api/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { TextField } from '@/components/form-fields/text-field/text-field';
-import { SelectField } from '@/components/form-fields/select-field/select-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { useForm } from '@/utils/form/useForm';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ZodType, z } from 'zod';
+import type { ZodType } from 'zod';
+import { z } from 'zod';
 
 function useCreateGame() {
 	const navigate = useNavigate();
@@ -34,7 +34,7 @@ export function CreateGame() {
 	const createGame = useCreateGame();
 
 	return (
-		<NarrowContent>
+		<>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<Fieldset>
 					<TextField field={gameForm.field(['name'])} />
@@ -47,7 +47,7 @@ export function CreateGame() {
 							gt ? (
 								<>{getGameTypeName(gt)}</>
 							) : (
-								<span className="text-gray-500">
+								<span className="text-slate-500">
 									{gameForm.field(['type']).translation('not-selected')}
 								</span>
 							)
@@ -58,7 +58,7 @@ export function CreateGame() {
 					</ButtonRow>
 				</Fieldset>
 			</form>
-		</NarrowContent>
+		</>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {

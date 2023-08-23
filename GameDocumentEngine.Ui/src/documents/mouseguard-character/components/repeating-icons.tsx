@@ -1,6 +1,7 @@
 import { GiPlainCircle, GiCircle } from 'react-icons/gi';
-import { IconType } from 'react-icons';
-import { Atom, useAtomValue } from 'jotai';
+import type { IconType } from 'react-icons';
+import type { Atom } from 'jotai';
+import { useAtomValue } from 'jotai';
 
 function RepeatIcon({
 	className,

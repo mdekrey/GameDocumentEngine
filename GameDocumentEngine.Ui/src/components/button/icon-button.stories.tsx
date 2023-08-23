@@ -15,7 +15,8 @@ import {
 } from 'react-icons/hi2';
 
 import { IconButton } from './icon-button';
-import { buttonThemeNames, ButtonTheme } from './buttonThemes';
+import type { ButtonTheme } from './buttonThemes';
+import { buttonThemeNames } from './buttonThemes';
 
 type StoryButtonTheme = ButtonTheme | 'Primary';
 const allThemes: StoryButtonTheme[] = ['Primary', ...buttonThemeNames];
@@ -39,12 +40,10 @@ function IconButtonStory({
 	theme,
 	icon,
 	...props
-}: { theme: ButtonTheme | 'Primary'; icon: keyof typeof icons } & Omit<
-	JSX.IntrinsicElements['button'],
-	'children'
-> & {
-		title: string;
-	}) {
+}: {
+	theme: ButtonTheme | 'Primary';
+	icon: keyof typeof icons;
+} & JSX.IntrinsicElements['button']) {
 	const Component = theme === 'Primary' ? IconButton : IconButton[theme];
 	const IconComponent = icons[icon];
 	return (
@@ -55,7 +54,7 @@ function IconButtonStory({
 }
 
 const meta = {
-	title: 'Components/Icon Button',
+	title: 'Components/Buttons/Icon Button',
 	component: IconButton,
 	render: IconButtonStory,
 	parameters: {

@@ -1,9 +1,9 @@
-import { GameTypeDetails } from '@/api/models/GameTypeDetails';
-import { QueryClient, UseQueryOptions } from '@tanstack/react-query';
+import type { GameTypeDetails } from '@/api/models/GameTypeDetails';
+import type { QueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
-import { IGameObjectType } from '@/documents/defineDocument';
-import { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
-import { TFunction } from 'i18next';
+import type { IGameObjectType } from '@/documents/defineDocument';
+import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
+import type { TFunction } from 'i18next';
 import { i18n } from '@/utils/i18n/setup';
 
 export function getGameType(

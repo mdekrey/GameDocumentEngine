@@ -2,19 +2,19 @@ import { z } from 'zod';
 import { useForm } from '@/utils/form/useForm';
 import { Button } from '@/components/button/button';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import { ModalContentsProps } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
-import { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form/useField';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
-import { SelectField } from '@/components/form-fields/select-field/select-field';
-import { GameTypeScripts } from '@/utils/api/queries/game-types';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
+import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { noChange } from '@/utils/form/mapAtom';
-import { NumberField } from '@/components/form-fields/number-field/number-field';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),

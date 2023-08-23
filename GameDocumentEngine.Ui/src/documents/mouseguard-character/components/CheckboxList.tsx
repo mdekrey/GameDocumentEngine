@@ -1,4 +1,4 @@
-import { Atom } from 'jotai';
+import type { Atom } from 'jotai';
 import { EmptyCirclesFromAtom } from './repeating-icons';
 import { CheckboxesButton } from './checkboxes-button';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';

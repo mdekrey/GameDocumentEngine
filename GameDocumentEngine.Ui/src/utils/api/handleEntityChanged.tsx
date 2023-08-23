@@ -1,5 +1,5 @@
-import { QueryClient } from '@tanstack/react-query';
-import { EntityChangedProps } from './EntityChangedProps';
+import type { QueryClient } from '@tanstack/react-query';
+import type { EntityChangedProps } from './EntityChangedProps';
 import { handleUserUpdateEvent } from './queries/user';
 import { handleDocumentUpdateEvent } from './queries/document';
 import { handleGameUpdateEvent } from './queries/games';

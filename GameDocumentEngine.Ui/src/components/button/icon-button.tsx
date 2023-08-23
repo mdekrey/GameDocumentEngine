@@ -1,29 +1,20 @@
 import { twMerge } from 'tailwind-merge';
-import { buttonThemes, iconButtonClasses } from './buttonThemes';
+import { defaultButtonThemes } from './button';
+import { elementTemplate } from '../template';
 
-export function IconButtonComponent({
-	children,
-	className,
-	type,
-	disabled,
-	...props
-}: JSX.IntrinsicElements['button'] & { title: string }) {
-	return (
-		<button
-			className={twMerge(
-				iconButtonClasses,
-				disabled && 'opacity-20',
-				className,
-			)}
-			type={type ?? 'button'}
-			{...props}
-		>
-			{children}
-		</button>
-	);
-}
+export const iconButtonClasses =
+	'p-1 text-xl rounded-full flex items-center bg-slate-800 text-white font-bold focus:bg-slate-700 hover:bg-slate-700 outline-blue-700 transition-colors self-center';
 
-export const IconButton = Object.assign(
-	IconButtonComponent,
-	buttonThemes('Button', IconButtonComponent),
+const buttonTemplate = elementTemplate<'button'>(
+	'IconButton',
+	<button type="button" className={twMerge(iconButtonClasses)} />,
+	{
+		mutateProps: ({ className, disabled, ...rest }) => ({
+			disabled: false,
+			className: twMerge(disabled && 'opacity-20', className),
+			...rest,
+		}),
+	},
 );
+
+export const IconButton = buttonTemplate.themed(defaultButtonThemes);

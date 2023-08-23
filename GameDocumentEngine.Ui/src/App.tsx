@@ -1,12 +1,7 @@
 import { Layout } from '@/components/layout/layout';
 
-import {
-	HashRouter,
-	Navigate,
-	Route,
-	Routes,
-	useMatch,
-} from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
+import { HashRouter, Navigate, useRoutes } from 'react-router-dom';
 import { Profile } from '@/apps/profile/profile';
 import { CreateGame } from './apps/create-game/create-game';
 import { ListGames } from './apps/list-games/list-games';
@@ -18,10 +13,11 @@ import { GameEdit } from './apps/game-edit/game-edit';
 import { GameInvites } from './apps/game-invites/game-invites';
 import { GameRoles } from './apps/game-roles/game-roles';
 import { DocumentRoles } from './apps/documents/document-roles/document-roles';
+import { useNetworkIndicator } from '@/components/network/useNetworkIndicator';
+import { useHeader } from '@/components/header/useHeaderMenuItems';
 
 import '@/utils/i18n/setup';
-import { useQuery } from '@tanstack/react-query';
-import { queries } from './utils/api/queries';
+import { GameObjects } from './apps/game-details/game-objects';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -40,48 +36,47 @@ function withParamsValue<const T extends string>(prop: T) {
 const withGameId = withParamsValue('gameId');
 const withDocumentId = withParamsValue('documentId');
 
+const mainRoute: RouteObject[] = [
+	{ path: 'profile/', Component: Profile },
+	{ path: 'game/:gameId', Component: withGameId(GameDetails) },
+	{ path: 'game/:gameId/edit', Component: withGameId(GameEdit) },
+	{ path: 'game/:gameId/roles', Component: withGameId(GameRoles) },
+	{
+		path: 'game/:gameId/invites',
+		Component: withGameId(GameInvites),
+	},
+	{
+		path: 'game/:gameId/create-document',
+		Component: withGameId(CreateDocument),
+	},
+	{
+		path: 'game/:gameId/document/:documentId',
+		Component: withDocumentId(withGameId(DocumentDetails)),
+	},
+	{
+		path: 'game/:gameId/document/:documentId/roles',
+		Component: withDocumentId(withGameId(DocumentRoles)),
+	},
+	{ path: 'game/', Component: ListGames },
+	{ path: 'create-game/', Component: CreateGame },
+	{ path: '/', element: <Navigate to="/game" /> },
+];
+
+const leftSidebarRoute: RouteObject[] = [
+	{ path: 'game/:gameId/*', Component: withGameId(GameObjects) },
+];
+
 function App() {
-	const gameMatch = useMatch('game/:gameId');
-	const result = useQuery(
-		gameMatch ? queries.getGameDetails(gameMatch.params.gameId ?? '') : {},
-	);
+	const networkIndicator = useNetworkIndicator();
+	const header = useHeader();
+	const leftSidebar = useRoutes(leftSidebarRoute);
 
 	return (
-		<Layout>
-			{result.isSuccess && (
-				<Layout.MenuTabs
-					mainItem={{
-						href: `#/game/${result.data.id}`,
-						label: result.data.name,
-					}}
-					items={[]}
-				/>
-			)}
-			<Routes>
-				<Route path="profile/" Component={Profile} />
-				<Route path="game/:gameId" Component={withGameId(GameDetails)} />
-				<Route path="game/:gameId/edit" Component={withGameId(GameEdit)} />
-				<Route path="game/:gameId/roles" Component={withGameId(GameRoles)} />
-				<Route
-					path="game/:gameId/invites"
-					Component={withGameId(GameInvites)}
-				/>
-				<Route
-					path="game/:gameId/create-document"
-					Component={withGameId(CreateDocument)}
-				/>
-				<Route
-					path="game/:gameId/document/:documentId"
-					Component={withDocumentId(withGameId(DocumentDetails))}
-				/>
-				<Route
-					path="game/:gameId/document/:documentId/roles"
-					Component={withDocumentId(withGameId(DocumentRoles))}
-				/>
-				<Route path="game/" Component={ListGames} />
-				<Route path="create-game/" Component={CreateGame} />
-				<Route path="/" element={<Navigate to="/game" />} />
-			</Routes>
+		<Layout {...header} {...networkIndicator}>
+			{useRoutes(mainRoute)}
+			{leftSidebar ? (
+				<Layout.LeftSidebar>{leftSidebar}</Layout.LeftSidebar>
+			) : null}
 		</Layout>
 	);
 }

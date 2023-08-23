@@ -1,10 +1,10 @@
-import { QueryClient, UseMutationOptions } from '@tanstack/react-query';
+import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
-import { NavigateFunction } from 'react-router-dom';
-import { GameDetails } from '@/api/models/GameDetails';
-import { CreateGameDetails } from '@/api/models/CreateGameDetails';
-import { Patch } from 'rfc6902';
-import { EntityChangedProps } from '../EntityChangedProps';
+import type { NavigateFunction } from 'react-router-dom';
+import type { GameDetails } from '@/api/models/GameDetails';
+import type { CreateGameDetails } from '@/api/models/CreateGameDetails';
+import type { Patch } from 'rfc6902';
+import type { EntityChangedProps } from '../EntityChangedProps';
 import {
 	applyChangeToQuery,
 	applyEventToQuery,

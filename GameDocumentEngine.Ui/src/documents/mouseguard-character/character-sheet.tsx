@@ -1,7 +1,8 @@
-import { GameObjectWidgetProps, Updater } from '../defineDocument';
+import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { useCallback, useEffect } from 'react';
 import { useForm } from '@/utils/form/useForm';
-import { Character, CharacterDocument } from './character-types';
+import type { Character } from './character-types';
+import { CharacterDocument } from './character-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { IconButton } from '@/components/button/icon-button';
 import { HiOutlineTrash, HiOutlineUserGroup } from 'react-icons/hi2';

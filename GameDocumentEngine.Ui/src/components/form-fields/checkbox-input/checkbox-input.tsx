@@ -1,4 +1,4 @@
-import { JotaiInput } from '../jotai/input';
+import { JotaiInput } from '../../jotai/input';
 
 export function CheckboxInput({
 	type = 'checkbox',

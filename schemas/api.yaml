@@ -531,7 +531,7 @@ paths:
       x-dotnet-mvc-server-controller: Invitations
       operationId: claimInvitation
       security:
-        - AuthenticatedUser: []
+        - LoginUser: []
       parameters:
       - name: linkId
         in: path
@@ -574,6 +574,10 @@ paths:
 components:
   securitySchemes:
     AuthenticatedUser:
+      type: apiKey
+      in: cookie
+      name: .AspNetCore.Cookies
+    LoginUser:
       type: apiKey
       in: cookie
       name: .AspNetCore.Cookies

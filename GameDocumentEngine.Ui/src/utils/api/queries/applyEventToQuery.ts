@@ -1,7 +1,12 @@
-import { QueryClient, QueryFunction, QueryKey } from '@tanstack/react-query';
-import { Draft, produce } from 'immer';
+import type {
+	QueryClient,
+	QueryFunction,
+	QueryKey,
+} from '@tanstack/react-query';
+import type { Draft } from 'immer';
+import { produce } from 'immer';
 import { applyPatch, type Patch } from 'rfc6902';
-import { EntityChangedProps } from '../EntityChangedProps';
+import type { EntityChangedProps } from '../EntityChangedProps';
 
 /**
  * @returns {undefined|T} Undefined if the cache was invalidated, otherwise the new value of the cache

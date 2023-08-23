@@ -1,7 +1,7 @@
-import { QueryClient, UseMutationOptions } from '@tanstack/react-query';
+import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { type Patch } from 'rfc6902';
 import { api } from '../fetch-api';
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 import { type EntityChangedProps } from '../EntityChangedProps';
 import { applyEventToQuery } from './applyEventToQuery';
 

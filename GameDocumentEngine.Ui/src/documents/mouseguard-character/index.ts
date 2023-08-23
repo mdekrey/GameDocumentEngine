@@ -1,8 +1,8 @@
 import { GiSeatedMouse } from 'react-icons/gi';
 import { defineDocument } from '../defineDocument';
 import { FullCharacterSheet } from './character-sheet';
-import characterSchema from './schema';
-import { z } from 'zod';
+import type characterSchema from './schema';
+import type { z } from 'zod';
 import en from './en.json';
 
 defineDocument('MouseGuard-Character', {

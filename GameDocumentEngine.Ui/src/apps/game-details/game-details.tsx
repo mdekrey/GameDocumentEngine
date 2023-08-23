@@ -1,5 +1,4 @@
 import { queries } from '@/utils/api/queries';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { useModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -14,7 +13,6 @@ import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { useTranslation } from 'react-i18next';
-import { GameObjects } from './game-objects';
 
 function useDeleteGame() {
 	return useMutation(queries.deleteGame);
@@ -42,7 +40,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 	const gameDetails = gameResult.data;
 
 	return (
-		<NarrowContent>
+		<>
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{gameDetails.name}</h1>
 				<IconLinkButton to={`/game/${gameId}/invites`} title={t('add-user')}>
@@ -61,7 +59,6 @@ export function GameDetails({ gameId }: { gameId: string }) {
 					<HiOutlineTrash />
 				</IconButton.Destructive>
 			</div>
-			<GameObjects gameId={gameId} />
 			<h2 className="text-lg font-bold">{t('heading-users')}</h2>
 			<ul className="list-disc ml-8">
 				{Object.entries(gameDetails.playerNames).map(([id, name]) => (
@@ -76,7 +73,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 					</li>
 				))}
 			</ul>
-		</NarrowContent>
+		</>
 	);
 
 	async function onDeleteGame() {

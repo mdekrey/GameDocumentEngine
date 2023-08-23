@@ -3,16 +3,15 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
-import { UseFieldResult } from '@/utils/form/useField';
+import type { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { useForm } from '@/utils/form/useForm';
-import { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
-import { NarrowContent } from '@/utils/containers/narrow-content';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@/components/form-fields/text-field/text-field';
+import { TextField } from '@/components/form-fields/text-input/text-field';
 
 function usePatchGame(gameId: string) {
 	const queryClient = useQueryClient();
@@ -59,11 +58,11 @@ export function GameEdit({ gameId }: { gameId: string }) {
 	updateFormDefault(gameForm, gameData);
 
 	return (
-		<NarrowContent>
+		<>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
 				<GameEditFields {...gameForm.fields} />
 			</form>
-		</NarrowContent>
+		</>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof GameDetails>) {

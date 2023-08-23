@@ -1,9 +1,9 @@
-import { Atom } from 'jotai';
+import type { Atom } from 'jotai';
 import { withSlots } from 'react-slot-component';
-import { useTwMerge } from '../jotai/useTwMerge';
-import { JotaiSpan } from '../jotai/span';
-import { JotaiDiv } from '../jotai/div';
-import { JotaiLabel } from '../jotai/label';
+import { useTwMerge } from '../../jotai/useTwMerge';
+import { JotaiSpan } from '../../jotai/span';
+import { JotaiDiv } from '../../jotai/div';
+import { JotaiLabel } from '../../jotai/label';
 
 export type FieldProps = React.ComponentProps<typeof JotaiLabel>;
 
@@ -26,8 +26,11 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 		const { className: contentsClassName, children: contentsChildren } =
 			slotProps.Contents ?? {};
 
-		const classNameAtom = useTwMerge('contents', className);
-		const labelClassNameAtom = useTwMerge('font-bold md:py-2', labelClassName);
+		const classNameAtom = useTwMerge('group', className);
+		const labelClassNameAtom = useTwMerge(
+			'group-focus-within:font-bold transition-all pt-2',
+			labelClassName,
+		);
 		const contentsClassNameAtom = useTwMerge(
 			'block flex-grow md:flex-grow-0',
 			contentsClassName,

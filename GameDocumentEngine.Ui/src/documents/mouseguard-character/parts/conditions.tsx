@@ -1,6 +1,6 @@
-import { UseFormResult } from '@/utils/form/useForm';
+import type { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { CharacterDocument } from '../character-types';
+import type { CharacterDocument } from '../character-types';
 import { useDebugValue } from 'react';
 import {
 	CheckboxField,

@@ -1,7 +1,8 @@
-import { AnyArray, isArray } from './arrays';
-import { ZodType } from 'zod';
-import { AnyPath, Path, PathValue } from './path';
-import { FieldMapping } from './useField';
+import type { AnyArray } from './arrays';
+import { isArray } from './arrays';
+import type { ZodType } from 'zod';
+import type { AnyPath, Path, PathValue } from './path';
+import type { FieldMapping } from './useField';
 
 export type UnmappedFieldConfig<T, TPath extends Path<T> = Path<T>> = {
 	path: TPath;

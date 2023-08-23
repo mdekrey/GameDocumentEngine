@@ -1,8 +1,10 @@
-import { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
+import { HiCheck, HiXMark } from 'react-icons/hi2';
+import type { FormFieldReturnType, UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { CharacterDocument, Wise, wiseSchema } from '../character-types';
-import { TextField } from '@/components/form-fields/text-field/text-field';
-import { FieldMapping } from '@/utils/form/useField';
+import type { CharacterDocument } from '../character-types';
+import { type Wise, wiseSchema } from '../character-types';
+import { TextField } from '@/components/form-fields/text-input/text-field';
+import type { FieldMapping } from '@/utils/form/useField';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
 
@@ -67,26 +69,30 @@ export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 				className="block flex-1"
 				field={fields.name}
 			/>
-			<ToggleButtonField
-				field={fields.pass}
-				pressedContents={fields.pass.translation('label')}
-				unpressedContents={fields.pass.translation('label')}
-			/>
-			<ToggleButtonField
-				field={fields.fail}
-				pressedContents={fields.fail.translation('label')}
-				unpressedContents={fields.fail.translation('label')}
-			/>
-			<ToggleButtonField
-				field={fields.fate}
-				pressedContents={fields.fate.translation('label')}
-				unpressedContents={fields.fate.translation('label')}
-			/>
-			<ToggleButtonField
-				field={fields.persona}
-				pressedContents={fields.persona.translation('label')}
-				unpressedContents={fields.persona.translation('label')}
-			/>
+			<WiseToggleButton field={fields.pass} />
+			<WiseToggleButton field={fields.fail} />
+			<WiseToggleButton field={fields.fate} />
+			<WiseToggleButton field={fields.persona} />
 		</div>
+	);
+}
+
+function WiseToggleButton({ field }: { field: FormFieldReturnType<boolean> }) {
+	return (
+		<ToggleButtonField
+			field={field}
+			pressedContents={
+				<span className="flex flex-row gap-2 items-center">
+					<HiCheck />
+					{field.translation('label')}
+				</span>
+			}
+			unpressedContents={
+				<span className="flex flex-row gap-2 items-center">
+					<HiXMark />
+					{field.translation('label')}
+				</span>
+			}
+		/>
 	);
 }

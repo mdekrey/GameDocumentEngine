@@ -1,5 +1,5 @@
-import { EntityChangedProps } from '@/utils/api/EntityChangedProps';
-import { HubConnectionState } from '@microsoft/signalr';
+import type { EntityChangedProps } from '@/utils/api/EntityChangedProps';
+import type { HubConnectionState } from '@microsoft/signalr';
 
 export type RequestHubStateMessage = {
 	type: 'requestHubState';

@@ -4,8 +4,8 @@ import {
 	useComputedAtom,
 	withSignal,
 } from '@principlestudios/jotai-react-signals';
-import { Atom } from 'jotai';
-import { useTwMerge } from '../jotai/useTwMerge';
+import type { Atom } from 'jotai';
+import { useTwMerge } from '../../jotai/useTwMerge';
 
 const JotaiToggleButton = withSignal('button', {
 	className: mapProperty('className'),
@@ -33,11 +33,11 @@ export function ToggleButton({
 		(isAtom(pressed) ? get(pressed) : pressed) ? 'true' : 'false',
 	);
 	const actualClassName = useTwMerge(
-		'p-2 border border-gray-500',
+		'p-2 border border-slate-500',
 		useComputedAtom((get) =>
 			(isAtom(pressed) ? get(pressed) : pressed)
-				? 'bg-gray-500 text-white'
-				: 'bg-white text-black',
+				? 'bg-white text-slate-800'
+				: 'bg-slate-900 text-white',
 		),
 		className,
 	);

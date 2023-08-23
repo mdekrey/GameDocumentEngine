@@ -1,28 +1,75 @@
 import { withSlots } from 'react-slot-component';
-import { HeaderContainer, MenuTab } from '../header/header';
 import { Modals } from '@/utils/modal/modal-service';
+import type { HeaderProps } from '../header/header';
+import { Header } from '../header/header';
+import type { NetworkIndicatorProps } from '../network/network-indicator';
+import styles from './layout.module.css';
+import { twMerge } from 'tailwind-merge';
 
-export type LayoutProps = { children?: React.ReactNode };
+export type LayoutProps = { children?: React.ReactNode } & HeaderProps &
+	NetworkIndicatorProps;
 
 export type LayoutSlots = {
-	MenuTabs: {
-		mainItem: MenuTab;
-		items: MenuTab[];
+	LeftSidebar: {
+		children: React.ReactNode;
+	};
+	RightSidebar: {
+		children: React.ReactNode;
 	};
 };
 
-export const Layout = withSlots<LayoutSlots, LayoutProps>(
-	({ children, slotProps }) => {
-		return (
-			<div className="w-full h-full flex flex-col">
-				<HeaderContainer
-					mainItem={slotProps.MenuTabs?.mainItem}
-					menuTabs={slotProps.MenuTabs?.items}
-				/>
-				<main className="overflow-auto flex-1">{children}</main>
-				<Modals />
-			</div>
-		);
-	},
-);
-Layout.displayName = 'Layout';
+export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
+	children,
+	menuItems,
+	user,
+	connectionState,
+	onReconnect,
+	slotProps,
+}) {
+	return (
+		<div
+			className={styles.layout}
+			data-left-drawer={slotProps.LeftSidebar ? true : false}
+			data-right-drawer={slotProps.RightSidebar ? true : false}
+		>
+			<Header
+				menuItems={menuItems}
+				user={user}
+				connectionState={connectionState}
+				onReconnect={onReconnect}
+				className={styles.header}
+			/>
+			<section
+				className={twMerge(
+					styles['sidebar-left'],
+					'overflow-auto bg-slate-700 text-white',
+					'bg-slate-200 text-slate-950',
+					'dark:bg-slate-700 dark:text-white',
+				)}
+			>
+				{slotProps.LeftSidebar?.children}
+			</section>
+			<main
+				className={twMerge(
+					styles.main,
+					'overflow-auto',
+					'bg-white text-slate-950',
+					'dark:bg-slate-950 dark:text-white',
+				)}
+			>
+				{children}
+			</main>
+			<section
+				className={twMerge(
+					styles['sidebar-right'],
+					'overflow-auto bg-slate-700 text-white',
+					'bg-slate-200 text-slate-950',
+					'dark:bg-slate-700 dark:text-white',
+				)}
+			>
+				{slotProps.RightSidebar?.children}
+			</section>
+			<Modals />
+		</div>
+	);
+});
