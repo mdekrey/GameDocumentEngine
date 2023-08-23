@@ -1,6 +1,6 @@
 name: 'NuGet and NPM Cache'
 description: 'Caches NuGet and NPM for this repository'
-inputs:
+inputs: {}
 outputs: {}
 runs:
   using: 'composite'

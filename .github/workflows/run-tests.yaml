@@ -19,7 +19,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version-file: ./GameDocumentEngine.Ui/.nvmrc
-    - uses: ./.github/workflows/parts/cache.yaml
+    - uses: ./.github/workflows/parts/cache/
     - name: 'Run tests'
       run: |
         dotnet test
