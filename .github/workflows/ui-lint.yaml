@@ -13,16 +13,13 @@ jobs:
     - uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '6.0.x'
-    - uses: actions/setup-dotnet@v3
-      with:
-        global-json-file: global.json
     - uses: actions/setup-node@v3
       with:
         node-version-file: ./GameDocumentEngine.Ui/.nvmrc
     - name: 'Prepare UI for linting'
       working-directory: ./GameDocumentEngine.Ui
       run: |
-        dotnet run build -t:Generation -c:Release
+        dotnet build -t:Generation -c:Release
     - name: 'Run full lint'
       working-directory: ./GameDocumentEngine.Ui
       run: |
