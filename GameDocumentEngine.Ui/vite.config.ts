@@ -44,6 +44,10 @@ export default defineConfig({
 				name: 'vtt',
 				short_name: 'vtt',
 			},
+			devOptions: {
+				enabled: true,
+				type: 'module',
+			},
 		}),
 	],
 	build: {
@@ -79,6 +83,11 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'),
+		},
+	},
+	server: {
+		hmr: {
+			path: '/.vite/hmr',
 		},
 	},
 });

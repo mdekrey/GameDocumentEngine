@@ -59,7 +59,7 @@ const meta = {
 			<Layout
 				connectionState={connectionState$}
 				onReconnect={reconnect}
-				menuItems={getHeaderMenuItems(t, user)}
+				menuItems={getHeaderMenuItems(t, user, () => void 0)}
 				user={user}
 				{...props}
 			>

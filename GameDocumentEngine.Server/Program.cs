@@ -223,7 +223,11 @@ services.Configure<AspNetCoreInstrumentationOptions>(options =>
 
 services.AddSpaStaticFiles(configuration =>
 {
+#if DEBUG
+	configuration.RootPath = "../GameDocumentEngine.Ui/dist";
+#else
 	configuration.RootPath = "wwwroot";
+#endif
 });
 
 
@@ -237,7 +241,7 @@ if (app.Environment.IsDevelopment())
 	app.UseHttpsRedirection();
 }
 app.UseHealthChecks("/health");
-app.UseDefaultFiles();
+app.UseSpaStaticFiles();
 
 app.UseRouting();
 
@@ -273,9 +277,8 @@ app.UseEndpoints(endpoints =>
 
 // Keep stray POSTs from hitting the SPA middleware
 // Based on a comment in https://github.com/dotnet/aspnetcore/issues/5192
-app.MapWhen(context => context.Request.Method == "GET", (when) =>
+app.MapWhen(context => context.Request.Method == "GET" || context.Request.Method == "CONNECT", (when) =>
 {
-	when.UseSpaStaticFiles();
 	when.UseSpa(spa =>
 	{
 #if DEBUG
