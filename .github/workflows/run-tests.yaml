@@ -12,10 +12,14 @@ jobs:
         lfs: true
     - uses: actions/setup-dotnet@v3
       with:
+        dotnet-version: '6.0.x'
+    - uses: actions/setup-dotnet@v3
+      with:
         global-json-file: global.json
     - uses: actions/setup-node@v3
       with:
         node-version-file: ./GameDocumentEngine.Ui/.nvmrc
+    - uses: ./parts/cache.yaml
     - name: 'Run tests'
       run: |
         dotnet test
