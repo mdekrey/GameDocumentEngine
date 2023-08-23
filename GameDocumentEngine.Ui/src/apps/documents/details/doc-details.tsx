@@ -2,7 +2,7 @@ import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { queries } from '@/utils/api/queries';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useGameType } from '../useGameType';
-import type { Draft} from 'immer';
+import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { EditableDocumentDetails } from '@/documents/defineDocument';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';

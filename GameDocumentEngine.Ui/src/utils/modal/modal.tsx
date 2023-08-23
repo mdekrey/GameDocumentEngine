@@ -1,6 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { Fragment, useState } from 'react';
 

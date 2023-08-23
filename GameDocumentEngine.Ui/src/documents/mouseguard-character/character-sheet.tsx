@@ -1,7 +1,7 @@
 import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { useCallback, useEffect } from 'react';
 import { useForm } from '@/utils/form/useForm';
-import type { Character} from './character-types';
+import type { Character } from './character-types';
 import { CharacterDocument } from './character-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { IconButton } from '@/components/button/icon-button';

@@ -1,4 +1,4 @@
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 
 export function AtomContents({

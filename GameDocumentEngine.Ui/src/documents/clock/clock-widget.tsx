@@ -7,7 +7,7 @@ import {
 	HiOutlineTrash,
 	HiOutlineUserGroup,
 } from 'react-icons/hi2';
-import type { ModalContentsProps} from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
 import type { Clock, ClockDocument } from './clock-types';

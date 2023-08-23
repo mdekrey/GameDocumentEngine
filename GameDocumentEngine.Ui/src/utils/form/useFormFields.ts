@@ -1,7 +1,7 @@
 import { useStore } from 'jotai';
 import { useMemo } from 'react';
 import type { Objectish } from 'immer';
-import type { UseFormResult, UseFieldsResult} from './useForm';
+import type { UseFormResult, UseFieldsResult } from './useForm';
 import { buildFormFields } from './useForm';
 import type { FieldsConfig } from './field-config-types';
 

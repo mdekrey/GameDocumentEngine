@@ -5,11 +5,8 @@ import type { IconType } from 'react-icons';
 import { HiOutlineClipboardDocumentList } from 'react-icons/hi2';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
-import type {
-	NetworkIndicatorProps} from '../network/network-indicator';
-import {
-	NetworkIndicator
-} from '../network/network-indicator';
+import type { NetworkIndicatorProps } from '../network/network-indicator';
+import { NetworkIndicator } from '../network/network-indicator';
 import { AvatarButton } from '../avatar/avatar-button';
 import type { UserDetails } from '@/api/models/UserDetails';
 import type { MenuItemsConfiguration } from '../menu-items/menu-items';

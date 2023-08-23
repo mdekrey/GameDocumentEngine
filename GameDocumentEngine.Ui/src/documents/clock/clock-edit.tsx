@@ -3,7 +3,7 @@ import { useForm } from '@/utils/form/useForm';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
-import type { Clock} from './clock-types';
+import type { Clock } from './clock-types';
 import { ClockDocument } from './clock-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { updateFormDefault } from '@/utils/form/update-form-default';

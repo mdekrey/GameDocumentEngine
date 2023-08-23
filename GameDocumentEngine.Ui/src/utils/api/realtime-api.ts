@@ -8,7 +8,7 @@ import { handleEntityChanged } from '@/utils/api/handleEntityChanged.tsx';
 import { neverEver } from '@/utils/never-ever.ts';
 import type { QueryClient } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { atom, getDefaultStore } from 'jotai';
 
 export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {

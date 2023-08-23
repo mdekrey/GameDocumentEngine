@@ -17,7 +17,7 @@ import {
 import { IconLinkButton } from './icon-link-button';
 import type { ButtonTheme } from './buttonThemes';
 import { buttonThemeNames } from './buttonThemes';
-import type { Link} from 'react-router-dom';
+import type { Link } from 'react-router-dom';
 import { MemoryRouter } from 'react-router-dom';
 
 type StoryButtonTheme = ButtonTheme | 'Primary';

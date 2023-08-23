@@ -7,7 +7,7 @@ import { JotaiDiv } from '@/components/jotai/div';
 import { IconButton } from '../button/icon-button';
 import { useModal } from '@/utils/modal/modal-service';
 import { useRef, useEffect, useCallback, memo } from 'react';
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { useStore } from 'jotai';
 import { DisconnectedModal } from './modal/disconnected';
 import { ReconnectingModal } from './modal/reconnecting';

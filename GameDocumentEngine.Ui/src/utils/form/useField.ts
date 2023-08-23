@@ -1,4 +1,4 @@
-import type { Atom, PrimitiveAtom} from 'jotai';
+import type { Atom, PrimitiveAtom } from 'jotai';
 import { atom, useStore } from 'jotai';
 import { useMemo } from 'react';
 import type { ZodError, ZodType } from 'zod';

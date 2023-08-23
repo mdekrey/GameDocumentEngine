@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { twMerge } from 'tailwind-merge';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';

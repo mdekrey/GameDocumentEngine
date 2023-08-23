@@ -1,4 +1,4 @@
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { atom, useAtomValue, useSetAtom, useStore } from 'jotai';
 import { Modal } from './modal';
 import { useCallback } from 'react';

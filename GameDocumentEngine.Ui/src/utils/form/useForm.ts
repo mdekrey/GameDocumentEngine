@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import type { Atom} from 'jotai';
+import type { Atom } from 'jotai';
 import { atom, useStore } from 'jotai';
-import type { MutableRefObject} from 'react';
+import type { MutableRefObject } from 'react';
 import type React from 'react';
 import { useMemo } from 'react';
 import type { ZodError, ZodType } from 'zod';
@@ -19,12 +19,8 @@ import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { createTriggeredErrorsAtom } from './createErrorsAtom';
 import type { Loadable } from 'jotai/vanilla/utils/loadable';
 import type { AnyArray } from './arrays';
-import type {
-	ErrorsStrategy,
-	RegisterErrorStrategy} from './errorsStrategy';
-import {
-	errorsStrategy,
-} from './errorsStrategy';
+import type { ErrorsStrategy, RegisterErrorStrategy } from './errorsStrategy';
+import { errorsStrategy } from './errorsStrategy';
 import { FormEvents } from './events/FormEvents';
 import { atomFamily as createAtomFamily } from 'jotai/utils';
 import { getZodSchemaForPath } from './getZodSchemaForPath';
@@ -32,10 +28,9 @@ import type {
 	FieldConfig,
 	FieldsConfig,
 	TypedFieldConfigObject,
-	FieldConfigToType} from './field-config-types';
-import {
-	toConfigObject,
+	FieldConfigToType,
 } from './field-config-types';
+import { toConfigObject } from './field-config-types';
 import { getValueAtPath, getAtomForPath } from './getAtomForPath';
 import { mapAtom, noChange } from './mapAtom';
 

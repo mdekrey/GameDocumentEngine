@@ -1,4 +1,4 @@
-import type { AnyArray} from './arrays';
+import type { AnyArray } from './arrays';
 import { isArray } from './arrays';
 import type { ZodType } from 'zod';
 import type { AnyPath, Path, PathValue } from './path';

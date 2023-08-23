@@ -1,4 +1,4 @@
-import type { Atom, WritableAtom} from 'jotai';
+import type { Atom, WritableAtom } from 'jotai';
 import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
