@@ -5,7 +5,9 @@ import { JotaiSpan } from '../../jotai/span';
 import { JotaiDiv } from '../../jotai/div';
 import { JotaiLabel } from '../../jotai/label';
 
-export type FieldProps = React.ComponentProps<typeof JotaiLabel>;
+export type FieldProps = React.ComponentProps<typeof JotaiLabel> & {
+	noLabel?: boolean;
+};
 
 export type FieldSlots = {
 	Label: {
@@ -19,7 +21,7 @@ export type FieldSlots = {
 };
 
 export const Field = withSlots<FieldSlots, FieldProps>(
-	({ className, slotProps, ...props }) => {
+	({ noLabel, className, slotProps, ...props }) => {
 		const { className: labelClassName, children: labelChildren } =
 			slotProps.Label ?? {};
 		if (!labelChildren) throw new Error('No label provided for field');
@@ -33,13 +35,15 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 		);
 		const contentsClassNameAtom = useTwMerge('block', contentsClassName);
 
+		const Container = noLabel ? JotaiSpan : JotaiLabel;
+
 		return (
-			<JotaiLabel className={classNameAtom} {...props}>
+			<Container className={classNameAtom} {...props}>
 				<JotaiSpan className={labelClassNameAtom}>{labelChildren}</JotaiSpan>
 				<JotaiDiv className={contentsClassNameAtom}>
 					{contentsChildren}
 				</JotaiDiv>
-			</JotaiLabel>
+			</Container>
 		);
 	},
 );

@@ -13,7 +13,7 @@ export function SelectField<T>({
 	children: (item: T) => React.ReactNode;
 }) {
 	return (
-		<Field>
+		<Field noLabel>
 			<Field.Label>{field.translation(['label'])}</Field.Label>
 			<Field.Contents>
 				<SelectInput items={items} {...field.htmlProps.asControlled()}>

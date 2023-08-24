@@ -47,11 +47,13 @@ export function SelectInput<T>({
 						className={twMerge(
 							'relative w-full',
 							'cursor-default',
-							'py-2 pl-3 pr-10 ',
+							'bg-white dark:bg-slate-950',
+							'py-2 pl-3 pr-10',
 							'border-slate-500 border',
 							'disabled:text-opacity-75 disabled:border-slate-200 dark:disabled:border-slate-800 disabled:bg-slate-500/10',
-							'bg-transparent text-slate-950 dark:text-slate-50',
-							'outline-none ring-2 ring-offset-transparent ring-offset-2 ring-transparent focus:ring-blue-500 transition-all',
+							'text-slate-950 dark:text-slate-50',
+							'shadow-md',
+							'outline-none focus-visible:ring-2 ring-offset-transparent ring-offset-2 ring-transparent focus-visible:ring-blue-500 transition-all',
 							'text-left sm:text-sm',
 						)}
 					>
@@ -72,7 +74,7 @@ export function SelectInput<T>({
 						<Listbox.Options
 							className={twMerge(
 								'absolute mt-1 max-h-60 w-full',
-								'overflow-auto rounded-md border border-white dark:border-black bg-slate-200 dark:bg-slate-800',
+								'overflow-auto rounded-md border border-white dark:border-black bg-slate-100 dark:bg-slate-800',
 								'py-1 text-base shadow-lg ring-1 ring-white dark:ring-black ring-opacity-5 focus:outline-none sm:text-sm z-dropdown',
 							)}
 						>
@@ -80,11 +82,12 @@ export function SelectInput<T>({
 								<Listbox.Option
 									key={personIdx}
 									className={({ active }) =>
-										`relative cursor-default select-none py-2 pl-10 pr-4 ${
+										twMerge(
+											`relative cursor-default select-none py-2 pl-10 pr-4`,
 											active
-												? 'bg-slate-100 text-black dark:bg-slate-900 dark:text-white'
-												: 'text-slate-900 dark:text-slate-100'
-										}`
+												? 'bg-white text-black dark:bg-slate-900 dark:text-white ring-1 ring-blue-200 dark:ring-blue-800'
+												: 'text-slate-900 dark:text-slate-100',
+										)
 									}
 									value={item}
 								>
@@ -92,7 +95,7 @@ export function SelectInput<T>({
 										<>
 											<span
 												className={`block truncate ${
-													selected ? 'font-medium' : 'font-normal'
+													selected ? 'font-bold' : 'font-normal'
 												}`}
 											>
 												{children(item)}
