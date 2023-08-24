@@ -22,7 +22,7 @@ export function Abilities({
 		circles: ['details', 'abilities', 'circles'],
 	});
 	return (
-		<>
+		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
 			<Fieldset>
 				<NatureAbility nature={abilities.nature} />
 				<StandardAbility ability={abilities.will} padToCount={willPadding} />
@@ -38,6 +38,6 @@ export function Abilities({
 					padToCount={resourcesPadding}
 				/>
 			</Fieldset>
-		</>
+		</div>
 	);
 }

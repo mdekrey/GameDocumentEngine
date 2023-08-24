@@ -17,7 +17,7 @@ function RepeatIcon({
 			{Array(Math.max(0, value))
 				.fill(0)
 				.map((_, index) => (
-					<Icon key={index} aria-role="img" className={className} />
+					<Icon key={index} role="img" className={className} />
 				))}
 		</>
 	);

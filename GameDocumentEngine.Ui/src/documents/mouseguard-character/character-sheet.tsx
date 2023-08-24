@@ -1,11 +1,17 @@
 import type { GameObjectWidgetProps, Updater } from '../defineDocument';
-import { useCallback, useEffect } from 'react';
-import { useForm } from '@/utils/form/useForm';
+import { useCallback, useEffect, useMemo } from 'react';
+import { UseFormResult, useForm } from '@/utils/form/useForm';
 import type { Character } from './character-types';
 import { CharacterDocument } from './character-types';
 import { applyPatch, createPatch } from 'rfc6902';
 import { IconButton } from '@/components/button/icon-button';
-import { HiOutlineTrash, HiOutlineUserGroup } from 'react-icons/hi2';
+import {
+	HiOutlineTrash,
+	HiOutlineUserGroup,
+	HiOutlineUser,
+	HiOutlineHeart,
+	HiOutlineAcademicCap,
+} from 'react-icons/hi2';
 import { Bio } from './parts/bio';
 import { Personality } from './parts/personality';
 import { Notes } from './parts/notes';
@@ -19,6 +25,8 @@ import { FormEvents } from '@/utils/form/events/FormEvents';
 import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { characterFixup } from './fixupCharacter';
+import { TabConfig, Tabs } from '@/components/tabs/tabs';
+import { Prose } from '@/components/text/common';
 
 export function FullCharacterSheet({
 	document,
@@ -33,7 +41,7 @@ export function FullCharacterSheet({
 	const characterData = document.data;
 
 	return (
-		<>
+		<div className="p-4">
 			<div className="flex flex-row gap-3">
 				<IconLinkButton title={translation('details.edit-roles')} to="roles">
 					<HiOutlineUserGroup />
@@ -51,9 +59,47 @@ export function FullCharacterSheet({
 				translation={translation}
 				onUpdateDocument={onUpdateDocument}
 			/>
-		</>
+		</div>
 	);
 }
+
+const SectionHeader = Prose.extend(
+	'SectionHeader',
+	<p className="text-2xl font-bold my-4 border-b border-slate-700 dark:border-slate-300" />,
+);
+
+type TabContent = React.FC<{
+	form: UseFormResult<CharacterDocument>;
+	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
+}>;
+const BioTab: TabContent = ({ form }) => (
+	<>
+		<Bio form={form} />
+		<Notes form={form} />
+	</>
+);
+const AbilitiesTab: TabContent = ({ form, translation: t }) => {
+	return (
+		<>
+			<Abilities form={form} />
+			<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
+			<Wises form={form} />
+			<SectionHeader>{t('character-sheet.headers.skills')}</SectionHeader>
+			<Skills form={form} />
+			<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
+			<Traits form={form} />
+		</>
+	);
+};
+
+const tabInfo: [id: string, icon: typeof HiOutlineUser, content: TabContent][] =
+	[
+		['bio', HiOutlineUser, BioTab],
+		['personality', HiOutlineHeart, Personality],
+		['abilities', HiOutlineAcademicCap, AbilitiesTab],
+		['rewards', HiOutlineHeart, Rewards],
+		['conditions', HiOutlineHeart, Conditions],
+	];
 
 export function CharacterSheet({
 	character,
@@ -98,20 +144,23 @@ export function CharacterSheet({
 		}
 	}, [form, onUpdateDocument, onSubmit]);
 
+	const tabs = useMemo(
+		(): TabConfig[] =>
+			tabInfo.map(([key, icon, Component]) => ({
+				key,
+				icon,
+				title: t(`character-sheet.tabs.${key}`),
+				content: <Component form={form} translation={t} />,
+			})),
+		[form, t],
+	);
+
 	return (
 		<form
 			onSubmit={form.handleSubmit(onSubmit)}
 			className="flex flex-col gap-2"
 		>
-			<Bio form={form} />
-			<Personality form={form} />
-			<Notes form={form} />
-			<Abilities form={form} />
-			<Wises form={form} />
-			<Skills form={form} />
-			<Traits form={form} />
-			<Rewards form={form} />
-			<Conditions form={form} />
+			<Tabs tabs={tabs} />
 		</form>
 	);
 }

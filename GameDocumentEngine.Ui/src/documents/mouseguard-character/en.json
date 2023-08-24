@@ -15,6 +15,18 @@
 		"edit-roles": "Edit roles"
 	},
 	"character-sheet": {
+		"tabs": {
+			"bio": "Bio",
+			"personality": "Personality",
+			"abilities": "Abilities",
+			"rewards": "Rewards",
+			"conditions": "Conditions"
+		},
+		"headers": {
+			"wises": "Wises",
+			"skills": "Skills",
+			"traits": "Traits"
+		},
 		"passes-and-fails": {
 			"pass-abbrev": "P",
 			"fail-abbrev": "F"

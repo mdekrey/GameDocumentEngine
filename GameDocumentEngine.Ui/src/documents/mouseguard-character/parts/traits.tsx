@@ -27,13 +27,13 @@ export function Traits({ form }: { form: UseFormResult<CharacterDocument> }) {
 	});
 
 	return (
-		<>
+		<div className="flex flex-col gap-2">
 			{Array(5)
 				.fill(0)
 				.map((_, index) => (
 					<Trait key={index} trait={fields.traits(index)} />
 				))}
-		</>
+		</div>
 	);
 }
 
