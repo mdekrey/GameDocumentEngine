@@ -10,6 +10,7 @@ import {
 	HiOutlineUserGroup,
 	HiOutlineUser,
 	HiOutlineHeart,
+	HiOutlineListBullet,
 	HiOutlineAcademicCap,
 } from 'react-icons/hi2';
 import { Bio } from './parts/bio';
@@ -78,27 +79,47 @@ const BioTab: TabContent = ({ form }) => (
 		<Notes form={form} />
 	</>
 );
+const PersonalityTab: TabContent = ({ form, translation: t }) => {
+	return (
+		<>
+			<Personality form={form} />
+			<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
+			<Wises form={form} />
+			<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
+			<Traits form={form} />
+		</>
+	);
+};
 const AbilitiesTab: TabContent = ({ form, translation: t }) => {
 	return (
 		<>
 			<Abilities form={form} />
-			<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
-			<Wises form={form} />
 			<SectionHeader>{t('character-sheet.headers.skills')}</SectionHeader>
 			<Skills form={form} />
-			<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
-			<Traits form={form} />
 		</>
+	);
+};
+const StatusTab: TabContent = ({ form, translation: t }) => {
+	return (
+		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
+			<div>
+				<SectionHeader>{t('character-sheet.headers.rewards')}</SectionHeader>
+				<Rewards form={form} />
+			</div>
+			<div>
+				<SectionHeader>{t('character-sheet.headers.conditions')}</SectionHeader>
+				<Conditions form={form} />
+			</div>
+		</div>
 	);
 };
 
 const tabInfo: [id: string, icon: typeof HiOutlineUser, content: TabContent][] =
 	[
 		['bio', HiOutlineUser, BioTab],
-		['personality', HiOutlineHeart, Personality],
+		['personality', HiOutlineHeart, PersonalityTab],
 		['abilities', HiOutlineAcademicCap, AbilitiesTab],
-		['rewards', HiOutlineHeart, Rewards],
-		['conditions', HiOutlineHeart, Conditions],
+		['status', HiOutlineListBullet, StatusTab],
 	];
 
 export function CharacterSheet({

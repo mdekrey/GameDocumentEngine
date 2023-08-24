@@ -19,13 +19,14 @@
 			"bio": "Bio",
 			"personality": "Personality",
 			"abilities": "Abilities",
-			"rewards": "Rewards",
-			"conditions": "Conditions"
+			"status": "Status"
 		},
 		"headers": {
 			"wises": "Wises",
 			"skills": "Skills",
-			"traits": "Traits"
+			"traits": "Traits",
+			"rewards": "Rewards",
+			"conditions": "Conditions"
 		},
 		"passes-and-fails": {
 			"pass-abbrev": "P",

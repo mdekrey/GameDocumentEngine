@@ -59,8 +59,8 @@ export function Trait({ trait }: { trait: FormFieldReturnType<Trait> }) {
 	const readonlyName = useAtomValue(readonlyNameAtom);
 
 	return (
-		<div className="flex flex-row col-span-2 gap-2">
-			<div className="self-center flex-1">
+		<div className="flex flex-row col-span-2 gap-4">
+			<div className="self-center w-64">
 				{readonlyName ? (
 					<span className="inline-block p-2">{readonlyName}</span>
 				) : (
@@ -88,10 +88,7 @@ export function Trait({ trait }: { trait: FormFieldReturnType<Trait> }) {
 					onClick={toggleLevel(3)}
 				/>
 			</div>
-			<div className="flex flex-row gap-2 items-center">
-				{fields.usedFor.translation('label')}:
-				<TraitUsedFor level={fields.level.value} usedFor={fields.usedFor} />
-			</div>
+			<TraitUsedFor level={fields.level.value} usedFor={fields.usedFor} />
 		</div>
 	);
 
@@ -120,7 +117,7 @@ function TraitLevelButton({
 	return (
 		<button
 			type="button"
-			className="inline-flex items-center"
+			className="inline-flex gap-1 items-center"
 			title={title}
 			aria-label={title}
 			onClick={onClick}
@@ -150,14 +147,17 @@ function TraitUsedFor({
 	return isMaxed ? (
 		<span>{usedFor.translation('always')}</span>
 	) : (
-		<CheckboxList
-			checkedCount={usedFor.value}
-			uncheckedCount={usedForAvailable}
-			paddingCount={0}
-			checkedTitle={usedFor.translation('decrease')}
-			uncheckedTitle={usedFor.translation('increase')}
-			onUncheck={() => usedFor.onChange((v) => v - 1)}
-			onCheck={() => usedFor.onChange((v) => v + 1)}
-		/>
+		<div className="flex flex-row gap-2 items-center">
+			{usedFor.translation('label')}:
+			<CheckboxList
+				checkedCount={usedFor.value}
+				uncheckedCount={usedForAvailable}
+				paddingCount={0}
+				checkedTitle={usedFor.translation('decrease')}
+				uncheckedTitle={usedFor.translation('increase')}
+				onUncheck={() => usedFor.onChange((v) => v - 1)}
+				onCheck={() => usedFor.onChange((v) => v + 1)}
+			/>
+		</div>
 	);
 }
