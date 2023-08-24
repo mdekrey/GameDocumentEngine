@@ -63,16 +63,18 @@ export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 	fields.pass.value;
 
 	return (
-		<div className="flex flex-row col-span-2 gap-2">
+		<div className="flex flex-row flex-wrap gap-2">
 			<TextField
 				labelClassName="sr-only"
-				className="block flex-1"
+				className="block flex-1 min-w-fit w-64"
 				field={fields.name}
 			/>
-			<WiseToggleButton field={fields.pass} />
-			<WiseToggleButton field={fields.fail} />
-			<WiseToggleButton field={fields.fate} />
-			<WiseToggleButton field={fields.persona} />
+			<div className="flex flex-row gap-2 justify-end flex-1">
+				<WiseToggleButton field={fields.pass} />
+				<WiseToggleButton field={fields.fail} />
+				<WiseToggleButton field={fields.fate} />
+				<WiseToggleButton field={fields.persona} />
+			</div>
 		</div>
 	);
 }

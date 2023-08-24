@@ -2,9 +2,8 @@ import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import type { CharacterDocument } from '../character-types';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { PassFail } from './pass-fail';
 import { atom } from 'jotai';
-import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { AbilityLayout } from './ability-layout';
 
 const naturePadding = atom(() => 6);
 
@@ -21,14 +20,14 @@ export function NatureAbility({
 		advancement: ['advancement'],
 	});
 
-	const maxMinusOne = useComputedAtom((get) => get(fields.max.value) - 1);
-
 	return (
-		<div className="flex flex-row col-span-2 gap-2">
-			<div className="text-xl font-bold self-center flex-1">
-				{nature.translation(['label'])}
-			</div>
-			<div className="flex flex-row gap-2 items-center">
+		<AbilityLayout
+			advancement={fields.advancement}
+			baseField={nature}
+			passFailMaxRating={fields.max.value}
+			passFailPadding={naturePadding}
+		>
+			<AbilityLayout.Rating>
 				<TextField.Integer
 					contentsClassName="w-10"
 					labelClassName="sr-only"
@@ -42,13 +41,7 @@ export function NatureAbility({
 					inputClassName="text-center"
 					field={fields.max}
 				/>
-			</div>
-			<PassFail
-				advancement={fields.advancement}
-				maxPasses={fields.max.value}
-				maxFails={maxMinusOne}
-				padToCount={naturePadding}
-			/>
-		</div>
+			</AbilityLayout.Rating>
+		</AbilityLayout>
 	);
 }

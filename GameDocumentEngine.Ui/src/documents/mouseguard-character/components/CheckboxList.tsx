@@ -35,7 +35,7 @@ export function CheckboxList({
 			/>
 			<EmptyCirclesFromAtom
 				count={useAsAtom(paddingCount)}
-				className="invisible"
+				className="invisible hidden sm:block"
 			/>
 		</div>
 	);

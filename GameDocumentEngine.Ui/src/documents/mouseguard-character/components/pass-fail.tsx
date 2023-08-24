@@ -4,17 +4,20 @@ import type { Atom } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTranslation } from 'react-i18next';
 import { CheckboxList } from './CheckboxList';
+import { twMerge } from 'tailwind-merge';
 
 export function PassFail({
 	advancement,
 	maxPasses,
 	maxFails,
 	padToCount,
+	className,
 }: {
 	advancement: FormFieldReturnType<{ passes: number; fails: number }>;
 	maxPasses: Atom<number>;
 	maxFails: Atom<number>;
 	padToCount: Atom<number>;
+	className?: string;
 }) {
 	const { t } = useTranslation('doc-types:MouseGuard-Character', {
 		keyPrefix: 'character-sheet.passes-and-fails',
@@ -38,7 +41,12 @@ export function PassFail({
 	);
 
 	return (
-		<div className="flex flex-col justify-between pr-2">
+		<div
+			className={twMerge(
+				'flex flex-col justify-between items-start',
+				className,
+			)}
+		>
 			<div className="flex gap-2 items-center">
 				<span>{t('pass-abbrev')}:</span>
 				{/* TODO: accessible number of passes/fails; a sr-only TextField crashes */}

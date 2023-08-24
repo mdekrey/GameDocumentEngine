@@ -1,9 +1,8 @@
 import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { PassFail } from './pass-fail';
 import type { Atom } from 'jotai';
-import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { AbilityLayout } from './ability-layout';
 
 export function StandardAbility({
 	ability,
@@ -22,27 +21,22 @@ export function StandardAbility({
 		rating: ['rating'],
 		advancement: ['advancement'],
 	});
-	const ratingMinusOne = useComputedAtom((get) => get(fields.rating.value) - 1);
 
 	return (
-		<div className="flex flex-row col-span-2 gap-2">
-			<div className="text-xl font-bold self-center flex-1">
-				{ability.translation(['label'])}
-			</div>
-			<div className="flex flex-row gap-2 items-center">
+		<AbilityLayout
+			advancement={fields.advancement}
+			baseField={ability}
+			passFailMaxRating={fields.rating.value}
+			passFailPadding={padToCount}
+		>
+			<AbilityLayout.Rating>
 				<TextField.Integer
 					contentsClassName="w-10"
 					labelClassName="sr-only"
 					inputClassName="text-center"
 					field={fields.rating}
 				/>
-			</div>
-			<PassFail
-				advancement={fields.advancement}
-				maxPasses={fields.rating.value}
-				maxFails={ratingMinusOne}
-				padToCount={padToCount}
-			/>
-		</div>
+			</AbilityLayout.Rating>
+		</AbilityLayout>
 	);
 }
