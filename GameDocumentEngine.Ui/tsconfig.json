@@ -32,6 +32,6 @@
 			"vite-plugin-pwa/react"
 		]
 	},
-	"include": ["src"],
+	"include": ["src", "scripts"],
 	"references": []
 }

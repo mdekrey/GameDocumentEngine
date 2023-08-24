@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import { globSync } from 'glob';
 import { VitePWA } from 'vite-plugin-pwa';
+import devManifest from './scripts/vite-plugin-dev-manifest';
 
 const commonDependencies: [string, string][] = [
 	// ['react/', 'react'],
@@ -49,6 +50,7 @@ export default defineConfig({
 				type: 'module',
 			},
 		}),
+		devManifest(),
 	],
 	build: {
 		outDir: '../GameDocumentEngine.Server/wwwroot',

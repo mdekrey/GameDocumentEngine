@@ -11,7 +11,9 @@ import { HubConnectionState } from '@microsoft/signalr';
 
 declare const self: ServiceWorkerGlobalScope;
 
-precacheAndRoute(self.__WB_MANIFEST);
+if (import.meta.env.PROD) {
+	precacheAndRoute(self.__WB_MANIFEST);
+}
 cleanupOutdatedCaches();
 clientsClaim();
 

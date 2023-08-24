@@ -64,6 +64,7 @@ const mainRoute: RouteObject[] = [
 
 const leftSidebarRoute: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameObjects) },
+	{ path: '/', element: null },
 ];
 
 function App() {
