@@ -24,7 +24,6 @@ export type GameObjectWidgetProps<T = unknown> = {
 	documentId: string;
 	document: UseQueryResult<TypedDocumentDetails<T>>;
 	onUpdateDocument: Updater<T>;
-	onDeleteDocument: () => void;
 	translation: TFunction<`doc-types:${string}`, undefined>;
 };
 

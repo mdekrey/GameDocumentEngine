@@ -2,11 +2,7 @@ import '@/utils/api/queries';
 import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { ClockSvg } from './clock-svg';
 import { IconButton } from '@/components/button/icon-button';
-import {
-	HiOutlineCog,
-	HiOutlineTrash,
-	HiOutlineUserGroup,
-} from 'react-icons/hi2';
+import { HiOutlineCog, HiOutlineUserGroup } from 'react-icons/hi2';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
@@ -18,7 +14,6 @@ import { IconLinkButton } from '@/components/button/icon-link-button';
 
 export function Clock({
 	document,
-	onDeleteDocument,
 	onUpdateDocument,
 	translation: t,
 }: GameObjectWidgetProps<Clock>) {
@@ -39,12 +34,6 @@ export function Clock({
 				<IconButton title={t('details.edit')} onClick={onEdit}>
 					<HiOutlineCog />
 				</IconButton>
-				<IconButton.Destructive
-					title={t('details.delete')}
-					onClick={onDeleteDocument}
-				>
-					<HiOutlineTrash />
-				</IconButton.Destructive>
 			</div>
 			<ClockSvg
 				className="self-center"

@@ -1,10 +1,12 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
-import { HiPlus } from 'react-icons/hi2';
+import { HiPlus, HiWrench } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { useGameType } from '../documents/useGameType';
 import { useTranslation } from 'react-i18next';
+import { twMerge } from 'tailwind-merge';
+import styles from './game-objects.module.css';
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
@@ -19,7 +21,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 	}
 
 	return (
-		<>
+		<div className="h-full p-4">
 			<div className="flex flex-row gap-3">
 				<Link to={`/game/${gameId}`} className="flex-1 text-lg font-bold">
 					{gameDetails.data.name}
@@ -31,21 +33,30 @@ export function GameObjects({ gameId }: { gameId: string }) {
 					<HiPlus />
 				</IconLinkButton.Save>
 			</div>
-			<ul>
+			{/* TODO: search? */}
+			<ul className={twMerge(styles.layout, 'mt-4')}>
 				{Object.values(docsResult.data).map((s) => {
 					const Icon = gameType.data.objectTypes[s.type].typeInfo.icon;
 					return (
-						<li key={s.id}>
+						<li key={s.id} className="contents">
 							<Link
 								to={`/game/${gameId}/document/${s.id}`}
-								className="flex flex-row items-center gap-2"
+								className="flex flex-row items-center gap-2 hover:bg-white/25 dark:hover:bg-slate-950/25"
 							>
-								<Icon className="h-5 w-5" /> {s.name}
+								<Icon className="h-5 w-5" />
+								{s.name}
 							</Link>
+
+							<IconLinkButton.Secondary
+								to={`/game/${gameId}/document/${s.id}/settings`}
+								title={t('settings', { name: s.name })}
+							>
+								<HiWrench />
+							</IconLinkButton.Secondary>
 						</li>
 					);
 				})}
 			</ul>
-		</>
+		</div>
 	);
 }

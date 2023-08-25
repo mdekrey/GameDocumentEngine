@@ -4,10 +4,7 @@ import { UseFormResult, useForm } from '@/utils/form/useForm';
 import type { Character } from './character-types';
 import { CharacterDocument } from './character-types';
 import { applyPatch, createPatch } from 'rfc6902';
-import { IconButton } from '@/components/button/icon-button';
 import {
-	HiOutlineTrash,
-	HiOutlineUserGroup,
 	HiOutlineUser,
 	HiOutlineHeart,
 	HiOutlineListBullet,
@@ -24,14 +21,12 @@ import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
 import { FormEvents } from '@/utils/form/events/FormEvents';
 import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
-import { IconLinkButton } from '@/components/button/icon-link-button';
 import { characterFixup } from './fixupCharacter';
 import { TabConfig, Tabs } from '@/components/tabs/tabs';
 import { Prose } from '@/components/text/common';
 
 export function FullCharacterSheet({
 	document,
-	onDeleteDocument,
 	onUpdateDocument,
 	translation,
 }: GameObjectWidgetProps<Character>) {
@@ -43,18 +38,6 @@ export function FullCharacterSheet({
 
 	return (
 		<div className="p-4">
-			<div className="flex flex-row gap-3">
-				<IconLinkButton title={translation('details.edit-roles')} to="roles">
-					<HiOutlineUserGroup />
-				</IconLinkButton>
-				<IconButton.Destructive
-					title={translation('details.delete')}
-					onClick={onDeleteDocument}
-				>
-					<HiOutlineTrash />
-				</IconButton.Destructive>
-			</div>
-
 			<CharacterSheet
 				character={characterData}
 				translation={translation}

@@ -77,9 +77,12 @@
 		"submit": "Delete",
 		"cancel": "Cancel"
 	},
-	"document-roles": {
+	"document-settings": {
+		"configure-roles": "Configure Roles for {{name}}",
 		"no-role": "None",
-		"submit": "Save Changes"
+		"submit": "Save Changes",
+		"danger-zone": "Danger Zone",
+		"delete-document": "Delete {{name}}"
 	},
 	"game-details": {
 		"add-user": "Manage invite links",
@@ -90,7 +93,8 @@
 		"delete-user": "Remove {{name}} from game"
 	},
 	"game-objects": {
-		"create-document": "Create a new document within the game"
+		"create-document": "Create a new document within the game",
+		"settings": "Settings for {{name}}"
 	},
 	"delete-game": {
 		"title": "Delete game",

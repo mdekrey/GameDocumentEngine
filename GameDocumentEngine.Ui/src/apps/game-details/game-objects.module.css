@@ -1,0 +1,4 @@
+.layout {
+	@apply grid gap-2;
+	grid-template-columns: 1fr auto;
+}

@@ -6,9 +6,6 @@ import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { EditableDocumentDetails } from '@/documents/defineDocument';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
-import { useModal } from '@/utils/modal/modal-service';
-import { useNavigate } from 'react-router-dom';
-import { DeleteDocumentModal } from './delete-document-modal';
 import { useRef } from 'react';
 
 export function DocumentDetails({
@@ -21,13 +18,8 @@ export function DocumentDetails({
 	const docDetailsUpdatePromiseRef = useRef<Promise<unknown>>(
 		Promise.resolve(),
 	);
-	const navigate = useNavigate();
-	const launchModal = useModal();
 
 	const queryClient = useQueryClient();
-	const deleteDocument = useMutation(
-		queries.deleteDocument(queryClient, gameId, documentId),
-	);
 	const updateDocument = useMutation(
 		queries.patchDocument(queryClient, gameId, documentId),
 	);
@@ -55,22 +47,10 @@ export function DocumentDetails({
 			gameId={gameId}
 			documentId={documentId}
 			document={document}
-			onDeleteDocument={() => void handleDelete()}
 			onUpdateDocument={handleUpdate}
 			translation={translation}
 		/>
 	);
-
-	async function handleDelete() {
-		const shouldDelete = await launchModal({
-			ModalContents: DeleteDocumentModal,
-			additional: { name: docData.name },
-		}).catch(() => false);
-		if (shouldDelete) {
-			deleteDocument.mutate();
-			navigate(`/game/${gameId}`);
-		}
-	}
 
 	async function handleUpdate(
 		recipe: (draft: Draft<EditableDocumentDetails>) => void,
