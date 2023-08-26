@@ -24,7 +24,8 @@ function Sections({ children }: { children?: React.ReactNode }) {
 
 const SectionHeader = Prose.extend(
 	'SectionHeader',
-	<p className="text-xl font-bold my-4" />,
+	<h2 className="text-xl font-bold my-4" />,
+	{ overrideType: true },
 );
 
 export function DocumentSettings({

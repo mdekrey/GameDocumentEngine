@@ -9,15 +9,15 @@ import { GameDetails } from './apps/game-details/game-details';
 import { GetParams } from './utils/routing/getParams';
 import { CreateDocument } from './apps/documents/create-document/create-document';
 import { DocumentDetails } from './apps/documents/details/doc-details';
-import { GameEdit } from './apps/game-edit/game-edit';
-import { GameInvites } from './apps/game-invites/game-invites';
-import { GameRoles } from './apps/game-roles/game-roles';
+import { GameInvites } from './apps/game-settings/game-invites/game-invites';
 import { DocumentSettings } from './apps/documents/document-settings/document-settings';
 import { useNetworkIndicator } from '@/components/network/useNetworkIndicator';
 import { useHeader } from '@/components/header/useHeaderMenuItems';
 
 import '@/utils/i18n/setup';
 import { GameObjects } from './apps/game-details/game-objects';
+import { GameSubheader } from './apps/game-details/game-subheader';
+import { GameSettings } from './apps/game-settings/game-settings';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -39,8 +39,7 @@ const withDocumentId = withParamsValue('documentId');
 const mainRoute: RouteObject[] = [
 	{ path: 'profile/', Component: Profile },
 	{ path: 'game/:gameId', Component: withGameId(GameDetails) },
-	{ path: 'game/:gameId/edit', Component: withGameId(GameEdit) },
-	{ path: 'game/:gameId/roles', Component: withGameId(GameRoles) },
+	{ path: 'game/:gameId/settings', Component: withGameId(GameSettings) },
 	{
 		path: 'game/:gameId/invites',
 		Component: withGameId(GameInvites),
@@ -67,13 +66,22 @@ const leftSidebarRoute: RouteObject[] = [
 	{ path: '/', element: null },
 ];
 
+const subheaderRoutes: RouteObject[] = [
+	{ path: 'game/:gameId/*', Component: withGameId(GameSubheader) },
+	{ path: '/', element: null },
+];
+
 function App() {
 	const networkIndicator = useNetworkIndicator();
 	const header = useHeader();
+	const subheaderRoute = useRoutes(subheaderRoutes);
 	const leftSidebar = useRoutes(leftSidebarRoute);
 
 	return (
 		<Layout {...header} {...networkIndicator}>
+			{subheaderRoute ? (
+				<Layout.Subheader>{subheaderRoute}</Layout.Subheader>
+			) : null}
 			{useRoutes(mainRoute)}
 			{leftSidebar ? (
 				<Layout.LeftSidebar>{leftSidebar}</Layout.LeftSidebar>

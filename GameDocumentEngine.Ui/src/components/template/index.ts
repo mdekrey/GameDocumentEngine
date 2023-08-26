@@ -19,6 +19,7 @@ type ReactElementOfType<TType extends AllowedTypes> = React.ReactElement<
 >;
 
 export type ExtendOptions<TType extends AllowedTypes> = {
+	overrideType?: boolean;
 	mutateProps?: (props: PropsOf<TType>) => PropsOf<TType>;
 };
 
@@ -44,10 +45,10 @@ export function elementTemplate<TType extends AllowedTypes>(
 			type,
 			props: { className: defaultClassName, ...defaultProps },
 		},
-		options = {},
+		baseOptions = {},
 	]: ExtendParams<TType>
 ): ElementTemplate<TType> {
-	const mutateProps = options?.mutateProps ?? ((orig) => orig);
+	const mutateProps = baseOptions?.mutateProps ?? ((orig) => orig);
 	const base = forwardRef(
 		({ children, className, ...props }: PropsOf<TType>, ref) =>
 			createElement(
@@ -67,6 +68,7 @@ export function elementTemplate<TType extends AllowedTypes>(
 			...[
 				name,
 				{
+					type: myType,
 					props: { className, ...props },
 				},
 				options = {},
@@ -74,7 +76,7 @@ export function elementTemplate<TType extends AllowedTypes>(
 		) {
 			return elementTemplate<TType>(
 				name,
-				createElement(type, {
+				createElement(options.overrideType ? myType : type, {
 					...defaultProps,
 					...props,
 					className: twMerge(defaultClassName as string, className as string),

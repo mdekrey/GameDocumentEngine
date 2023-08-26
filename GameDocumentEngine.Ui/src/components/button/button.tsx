@@ -33,7 +33,7 @@ export const defaultButtonThemes = {
 		<a className="bg-green-600 text-white focus:bg-green-500 hover:bg-green-500 dark:bg-green-600 dark:text-white dark:focus:bg-green-500 dark:hover:bg-green-500" />
 	),
 	Secondary: (
-		<a className="bg-white text-slate-900 focus:bg-slate-50 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:focus:bg-slate-950 dark:hover:bg-slate-950" />
+		<a className="bg-slate-100 text-slate-900 focus:bg-slate-50 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:focus:bg-slate-950 dark:hover:bg-slate-950" />
 	),
 	DestructiveSecondary: (
 		<a className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:focus:bg-red-700 dark:hover:bg-red-700" />

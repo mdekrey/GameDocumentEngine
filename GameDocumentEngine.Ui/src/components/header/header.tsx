@@ -14,6 +14,7 @@ import { MenuItems } from '../menu-items/menu-items';
 
 export type HeaderLayoutProps = {
 	className?: string;
+	children?: React.ReactNode;
 };
 
 export type HeaderProps = {
@@ -27,13 +28,14 @@ export function Header({
 	user,
 	connectionState,
 	onReconnect,
+	children,
 }: HeaderProps & HeaderLayoutProps) {
 	const { t } = useTranslation(['layout']);
 
 	return (
 		<div
 			className={twMerge(
-				'w-full bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white shadow-sm flex flex-row items-center gap-4 h-12 p-1 z-normal',
+				'w-full bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white shadow-sm flex flex-row items-center gap-4 h-12 p-1 z-normal',
 				className,
 			)}
 		>
@@ -41,12 +43,14 @@ export function Header({
 				href="#/"
 				label={t('header.app-title')}
 				icon={HiOutlineClipboardDocumentList}
-				className="z-normal"
+				className="z-normal text-xl"
 				labelClassName="font-bold"
 			>
 				{t('header.app-title')}
 			</MenuTabDisplay>
 
+			<div className="flex-1" />
+			{children}
 			<div className="flex-1" />
 
 			<NetworkIndicator

@@ -84,13 +84,13 @@
 		"danger-zone": "Danger Zone",
 		"delete-document": "Delete {{name}}"
 	},
-	"game-details": {
-		"add-user": "Manage invite links",
-		"manage-users": "Manage users",
-		"edit-game": "Edit the game's details",
-		"delete-game": "Delete the game",
-		"heading-users": "Users",
-		"delete-user": "Remove {{name}} from game"
+	"game-settings": {
+		"configure-details": "Details",
+		"configure-roles": "Manage permissions",
+		"configure-invites": "Manage invite links",
+		"danger-zone": "Danger Zone",
+		"delete-user": "Delete {{name}}",
+		"delete-game": "Delete {{name}}"
 	},
 	"game-objects": {
 		"create-document": "Create a new document within the game",
