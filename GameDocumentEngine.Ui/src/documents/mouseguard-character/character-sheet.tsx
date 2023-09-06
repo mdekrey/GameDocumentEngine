@@ -23,7 +23,7 @@ import { FormEvents } from '@/utils/form/events/FormEvents';
 import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { characterFixup } from './fixupCharacter';
 import { TabConfig, Tabs } from '@/components/tabs/tabs';
-import { Prose } from '@/components/text/common';
+import { Sections, Section, SectionHeader } from '@/components/sections';
 
 export function FullCharacterSheet({
 	document,
@@ -47,53 +47,68 @@ export function FullCharacterSheet({
 	);
 }
 
-const SectionHeader = Prose.extend(
-	'SectionHeader',
-	<p className="text-2xl font-bold my-4 border-b border-slate-700 dark:border-slate-300" />,
-);
-
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
 	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
 }>;
-const BioTab: TabContent = ({ form }) => (
+const BioTab: TabContent = ({ form, translation: t }) => (
 	<>
-		<Bio form={form} />
-		<Notes form={form} />
+		<Section>
+			<SectionHeader>{t('character-sheet.headers.bio')}</SectionHeader>
+			<Bio form={form} />
+		</Section>
+		<Section>
+			<SectionHeader>{t('character-sheet.headers.notes')}</SectionHeader>
+			<Notes form={form} />
+		</Section>
 	</>
 );
 const PersonalityTab: TabContent = ({ form, translation: t }) => {
 	return (
 		<>
-			<Personality form={form} />
-			<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
-			<Wises form={form} />
-			<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
-			<Traits form={form} />
+			<Section>
+				<SectionHeader>
+					{t('character-sheet.headers.personality')}
+				</SectionHeader>
+				<Personality form={form} />
+			</Section>
+			<Section>
+				<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
+				<Wises form={form} />
+			</Section>
+			<Section>
+				<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
+				<Traits form={form} />
+			</Section>
 		</>
 	);
 };
 const AbilitiesTab: TabContent = ({ form, translation: t }) => {
 	return (
-		<>
-			<Abilities form={form} />
-			<SectionHeader>{t('character-sheet.headers.skills')}</SectionHeader>
-			<Skills form={form} />
-		</>
+		<Sections>
+			<Section>
+				<SectionHeader>{t('character-sheet.headers.abilities')}</SectionHeader>
+				<Abilities form={form} />
+			</Section>
+			<Section>
+				<SectionHeader>{t('character-sheet.headers.skills')}</SectionHeader>
+				<Skills form={form} />
+			</Section>
+		</Sections>
 	);
 };
 const StatusTab: TabContent = ({ form, translation: t }) => {
 	return (
-		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
-			<div>
+		<Sections className="md:grid md:grid-cols-2 gap-2">
+			<Section>
 				<SectionHeader>{t('character-sheet.headers.rewards')}</SectionHeader>
 				<Rewards form={form} />
-			</div>
-			<div>
+			</Section>
+			<Section>
 				<SectionHeader>{t('character-sheet.headers.conditions')}</SectionHeader>
 				<Conditions form={form} />
-			</div>
-		</div>
+			</Section>
+		</Sections>
 	);
 };
 

@@ -6,13 +6,13 @@ import { produceWithPatches } from 'immer';
 import type { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { ErrorsList } from '@/components/form-fields/errors/errors-list';
 import { useForm } from '@/utils/form/useForm';
 import { type UserDetails } from '@/api/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
+import { SingleColumnSections } from '@/components/sections';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -36,7 +36,7 @@ const UserDetails = z.object({
 });
 
 export function Profile() {
-	const { t, i18n } = useTranslation(['profile']);
+	const { t } = useTranslation(['profile']);
 	const userForm = useForm({
 		defaultValue: { name: '' },
 		schema: UserDetails,
@@ -59,15 +59,11 @@ export function Profile() {
 	updateFormDefault(userForm, userData);
 
 	return (
-		<>
+		<SingleColumnSections>
 			<form onSubmit={userForm.handleSubmit(onSubmit)}>
 				<ProfileFields {...userForm.fields} />
-				<ErrorsList
-					errors={userForm.errors}
-					translations={i18n.getFixedT(null, 'profile', 'fields')}
-				/>
 			</form>
-		</>
+		</SingleColumnSections>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof UserDetails>) {

@@ -22,8 +22,12 @@
 			"status": "Status"
 		},
 		"headers": {
+			"bio": "Bio",
+			"notes": "Notes",
+			"personality": "Personality",
 			"wises": "Wises",
 			"skills": "Skills",
+			"abilities": "Abilities",
 			"traits": "Traits",
 			"rewards": "Rewards",
 			"conditions": "Conditions"

@@ -1,4 +1,5 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
+import { SingleColumnSections } from '@/components/sections';
 import { queries } from '@/utils/api/queries';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -17,8 +18,8 @@ export function ListGames() {
 	}
 
 	return (
-		<>
-			<span className="flex flex-row items-center gap-4 mb-4">
+		<SingleColumnSections>
+			<span className="flex flex-row items-center gap-4 my-4">
 				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
 				<IconLinkButton.Save title={t('new-game')} to={'/create-game'}>
 					<HiPlus />
@@ -44,6 +45,6 @@ export function ListGames() {
 			) : (
 				<p className="text-center font-bold">{t('none')}</p>
 			)}
-		</>
+		</SingleColumnSections>
 	);
 }
