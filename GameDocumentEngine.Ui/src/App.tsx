@@ -63,12 +63,12 @@ const mainRoute: RouteObject[] = [
 
 const leftSidebarRoute: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameObjects) },
-	{ path: '/', element: null },
+	{ path: '/*', element: null },
 ];
 
 const subheaderRoutes: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameSubheader) },
-	{ path: '/', element: null },
+	{ path: '/*', element: null },
 ];
 
 function App() {
