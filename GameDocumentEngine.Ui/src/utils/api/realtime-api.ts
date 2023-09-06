@@ -11,6 +11,11 @@ import { createContext, useContext } from 'react';
 import type { Atom } from 'jotai';
 import { atom, getDefaultStore } from 'jotai';
 
+const reconnectStates = [
+	HubConnectionState.Connecting,
+	HubConnectionState.Reconnecting,
+];
+
 export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 	const store = getDefaultStore();
 	const connectionState$ = atom(HubConnectionState.Connecting);
@@ -24,9 +29,13 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 			navigator.serviceWorker?.addEventListener('message', (event) => {
 				void handleServiceMessage(event.data as MessageFromServiceWorker);
 			});
-			sendServiceMessage({ type: 'requestHubState' });
+			requestHubState();
 		},
 	});
+
+	function requestHubState() {
+		sendServiceMessage({ type: 'requestHubState' });
+	}
 
 	async function handleServiceMessage(message: MessageFromServiceWorker) {
 		switch (message.type) {
@@ -42,6 +51,9 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 				break;
 			case 'hubState':
 				console.log('hubState', message.state);
+				if (reconnectStates.includes(message.state))
+					setTimeout(requestHubState, 500);
+				if (store.get(connectionState$) === message.state) break;
 				store.set(connectionState$, message.state);
 				if (message.state === HubConnectionState.Connected)
 					await queryClient.invalidateQueries();
