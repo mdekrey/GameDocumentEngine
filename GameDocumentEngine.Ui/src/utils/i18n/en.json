@@ -97,6 +97,7 @@
 		"sidebar-instructions": "Use the sidebar to access and create character sheets, party trackers, and more!"
 	},
 	"game-objects": {
+		"header": "Documents",
 		"create-document": "Create a new document within the game",
 		"settings": "Settings for {{name}}"
 	},

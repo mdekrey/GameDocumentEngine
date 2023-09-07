@@ -24,7 +24,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 		<div className="h-full p-4">
 			<div className="flex flex-row gap-3">
 				<Link to={`/game/${gameId}`} className="flex-1 text-lg font-bold">
-					{gameDetails.data.name}
+					{t('header')}
 				</Link>
 				<IconLinkButton.Save
 					to={`/game/${gameId}/create-document`}
