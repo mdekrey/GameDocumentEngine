@@ -4,6 +4,7 @@ import path from 'node:path';
 import { globSync } from 'glob';
 import { VitePWA } from 'vite-plugin-pwa';
 import devManifest from './scripts/vite-plugin-dev-manifest';
+import svgr from 'vite-plugin-svgr';
 
 const commonDependencies: [string, string][] = [
 	// ['react/', 'react'],
@@ -51,6 +52,7 @@ export default defineConfig({
 			},
 		}),
 		devManifest(),
+		svgr(),
 	],
 	build: {
 		outDir: '../GameDocumentEngine.Server/wwwroot',

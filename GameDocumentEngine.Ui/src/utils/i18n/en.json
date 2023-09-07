@@ -92,6 +92,10 @@
 		"delete-user": "Delete {{name}}",
 		"delete-game": "Delete {{name}}"
 	},
+	"game-details": {
+		"mobile-instructions": "Use the dot menu to access and create character sheets, party trackers, and more!",
+		"sidebar-instructions": "Use the sidebar to access and create character sheets, party trackers, and more!"
+	},
 	"game-objects": {
 		"create-document": "Create a new document within the game",
 		"settings": "Settings for {{name}}"

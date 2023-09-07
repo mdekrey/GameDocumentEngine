@@ -18,7 +18,11 @@ const config: Config = {
 			green: defaultColors.green,
 			blue: defaultColors.blue,
 		},
-		extend: {},
+		extend: {
+			fontFamily: {
+				cursive: '"Brush Script MT", cursive',
+			},
+		},
 		zIndex: {
 			normal: '0',
 			dropdown: '5',

@@ -29,7 +29,8 @@
 			"vite/client",
 			"vite-plugin-pwa/client",
 			"vite-plugin-pwa/info",
-			"vite-plugin-pwa/react"
+			"vite-plugin-pwa/react",
+			"vite-plugin-svgr/client"
 		]
 	},
 	"include": ["src", "scripts"],
