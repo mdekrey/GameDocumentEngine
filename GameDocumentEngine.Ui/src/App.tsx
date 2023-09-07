@@ -68,6 +68,7 @@ const leftSidebarRoute: RouteObject[] = [
 
 const subheaderRoutes: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameSubheader) },
+	// TODO: change header for document subheader
 ];
 
 function App() {

@@ -10,7 +10,7 @@ import { z } from 'zod';
 export const UserRoleAssignment = z.object({}).catchall(z.string());
 
 export type RoleAssignmentProps = {
-	permissions: { [id: string]: string };
+	userRoles: { [id: string]: string };
 	playerNames: { [id: string]: string };
 	roles: string[];
 	defaultRole?: string;
@@ -22,7 +22,7 @@ export type RoleAssignmentProps = {
 };
 
 export function RoleAssignment({
-	permissions,
+	userRoles,
 	playerNames,
 	roles,
 	defaultRole,
@@ -34,10 +34,10 @@ export function RoleAssignment({
 		defaultRole !== undefined
 			? Object.fromEntries(
 					Object.entries(playerNames).map(
-						([key]) => [key, permissions[key] ?? defaultRole] as const,
+						([key]) => [key, userRoles[key] ?? defaultRole] as const,
 					),
 			  )
-			: permissions;
+			: userRoles;
 	const form = useForm({
 		defaultValue: formData,
 		schema: UserRoleAssignment,

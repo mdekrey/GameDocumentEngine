@@ -26,7 +26,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	return (
 		<>
 			<RoleAssignment
-				permissions={gameDetails.permissions}
+				userRoles={gameDetails.userRoles}
 				playerNames={gameDetails.playerNames}
 				roles={gameDetails.typeInfo.userRoles}
 				onSaveRoles={onSaveRoles}
@@ -38,7 +38,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	function onSaveRoles(roleAssignments: { [userId: string]: string }) {
 		const changed = Object.fromEntries(
 			Object.entries(roleAssignments).filter(
-				([key, newValue]) => newValue !== gameDetails.permissions[key],
+				([key, newValue]) => newValue !== gameDetails.userRoles[key],
 			),
 		);
 		updateGameRoleAssignments.mutate(changed);

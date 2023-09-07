@@ -604,7 +604,7 @@ components:
           required:
           - lastUpdated
           - playerNames
-          - permissions
+          - userRoles
           - typeInfo
           - id
           properties:
@@ -613,7 +613,7 @@ components:
             playerNames:
               type: object
               additionalProperties: { type: string }
-            permissions:
+            userRoles:
               type: object
               additionalProperties: { type: string }
             typeInfo:
@@ -674,9 +674,9 @@ components:
         - $ref: '#/components/schemas/BaseDocumentDetails'
         - type: object
           required:
-          - permissions
+          - userRoles
           properties:
-            permissions:
+            userRoles:
               type: object
               additionalProperties: { type: string }
     DocumentSummary:

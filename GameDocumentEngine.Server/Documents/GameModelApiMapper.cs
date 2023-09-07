@@ -63,7 +63,7 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		// "original values" game users won't have the 
 		return new GameDetails(Name: game.Name,
 					LastUpdated: game.LastModifiedDate,
-					Permissions: gameUsers.ToDictionary(
+					UserRoles: gameUsers.ToDictionary(
 						p => p.UserId.ToString(),
 						p => p.Role
 					),

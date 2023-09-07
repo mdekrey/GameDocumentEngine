@@ -46,7 +46,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			Name: resultGame.Name,
 			Type: resultGame.Type,
 			Details: filtered,
-			Permissions: permissionEntries
+			UserRoles: permissionEntries
 				.AtState(usage)
 				.ToDictionary(
 					p => p.UserId.ToString(),

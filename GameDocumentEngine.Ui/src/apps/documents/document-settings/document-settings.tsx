@@ -70,7 +70,7 @@ export function DocumentSettings({
 		return 'Unknown document type';
 	}
 	const actualRoles = ['', ...docType.userRoles];
-	const permissions = documentResult.data.permissions;
+	const userRoles = documentResult.data.userRoles;
 
 	return (
 		<Sections>
@@ -79,7 +79,7 @@ export function DocumentSettings({
 					{t('configure-roles', { name: docData.name })}
 				</SectionHeader>
 				<RoleAssignment
-					permissions={permissions}
+					userRoles={userRoles}
 					playerNames={gameDetails.playerNames}
 					defaultRole=""
 					roles={actualRoles}
@@ -107,7 +107,7 @@ export function DocumentSettings({
 					([key, newValue]) =>
 						[key, newValue === '' ? null : newValue] as const,
 				)
-				.filter(([key, newValue]) => newValue !== (permissions[key] ?? null)),
+				.filter(([key, newValue]) => newValue !== (userRoles[key] ?? null)),
 		);
 		updateDocumentRoleAssignments.mutate(changed);
 	}
