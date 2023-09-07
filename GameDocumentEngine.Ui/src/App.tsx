@@ -63,12 +63,11 @@ const mainRoute: RouteObject[] = [
 
 const leftSidebarRoute: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameObjects) },
-	{ path: '/*', element: null },
+	// while not having a matched route causes a console warning, even if the route gives a null element the `useRoutes` will not return null
 ];
 
 const subheaderRoutes: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameSubheader) },
-	{ path: '/*', element: null },
 ];
 
 function App() {

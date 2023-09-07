@@ -47,9 +47,11 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 				onReconnect={onReconnect}
 				className={styles.header}
 			>
-				<nav className="hidden lg:block max-w-screen-md flex-1 px-4 py-1 bg-slate-100 dark:bg-slate-900 rounded-sm shadow-inner">
-					{slotProps.Subheader?.children}
-				</nav>
+				{slotProps.Subheader && (
+					<nav className="hidden lg:block max-w-screen-md flex-1 px-4 py-1 bg-slate-100 dark:bg-slate-900 rounded-sm shadow-inner">
+						{slotProps.Subheader?.children}
+					</nav>
+				)}
 			</Header>
 
 			{slotProps.Subheader && (
