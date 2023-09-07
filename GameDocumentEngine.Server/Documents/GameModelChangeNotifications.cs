@@ -9,11 +9,15 @@ namespace GameDocumentEngine.Server.Documents;
 
 class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameModel, GameUserModel, Api.GameDetails>
 {
+	private readonly GameTypes gameTypes;
+
 	public GameModelChangeNotifications(
 		IPermissionedApiMapper<GameModel, GameDetails> apiMapper,
-		IApiChangeNotification<GameDetails> changeNotification)
+		IApiChangeNotification<GameDetails> changeNotification,
+		GameTypes gameTypes)
 		: base(apiMapper, changeNotification, du => du.UserId, du => du.Game)
 	{
+		this.gameTypes = gameTypes;
 	}
 
 	public override bool CanHandle(EntityEntry changedEntity)
@@ -52,10 +56,12 @@ class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameM
 		using var activity = TracingHelper.StartActivity($"{nameof(GameModelChangeNotifications)}.{nameof(GetUsersFor)}");
 		var players = context.Entry(entity).Collection(d => d.Players);
 		if (!players.IsLoaded) await players.LoadAsync();
+		if (!gameTypes.All.TryGetValue(entity.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {entity.Type}");
 
 		var gameUsers = context.GetEntityEntries<GameUserModel>(g => g.GameId == entity.Id);
 
 		return gameUsers.AtState(changeState)
-			.Select(GameSecurity.ToPermissionSet);
+			.Select(gameType.ToPermissionSet);
 	}
 }

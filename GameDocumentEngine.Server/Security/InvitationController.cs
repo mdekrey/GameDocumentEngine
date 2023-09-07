@@ -3,25 +3,31 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Users;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
 
 namespace GameDocumentEngine.Server.Security;
 
 public class InvitationController : Api.InvitationsControllerBase
 {
+	private readonly Documents.GameTypes gameTypes;
 	private readonly DocumentDbContext dbContext;
 
-	public InvitationController(Data.DocumentDbContext dbContext)
+	public InvitationController(Documents.GameTypes gameTypes, Data.DocumentDbContext dbContext)
 	{
+		this.gameTypes = gameTypes;
 		this.dbContext = dbContext;
 	}
 
 	protected override async Task<ListInvitationsActionResult> ListInvitations(Guid gameId)
 	{
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
 									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return ListInvitationsActionResult.NotFound();
-		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.ListInvitations(gameId)))
+		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
+
+		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.ListInvitations(gameId)))
 			return ListInvitationsActionResult.Forbidden();
 
 		var invites = await dbContext.Invites.Where(i => i.GameId == gameId).ToArrayAsync();
@@ -31,13 +37,17 @@ public class InvitationController : Api.InvitationsControllerBase
 
 	protected override async Task<CreateInvitationActionResult> CreateInvitation(Guid gameId, CreateInvitationRequest createInvitationBody)
 	{
+		if ((createInvitationBody.Uses != -1 && createInvitationBody.Uses <= 0))
+			return CreateInvitationActionResult.BadRequest();
 		var gameUserRecord = await (from gameUser in dbContext.GameUsers
 									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return CreateInvitationActionResult.NotFound();
-		if ((createInvitationBody.Uses != -1 && createInvitationBody.Uses <= 0) || !GameSecurity.GameRoles.Contains(createInvitationBody.Role))
+		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
+		if (!gameType.Roles.Contains(createInvitationBody.Role))
 			return CreateInvitationActionResult.BadRequest();
-		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.CreateInvitation(gameId, createInvitationBody.Role)))
+		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.CreateInvitation(gameId, createInvitationBody.Role)))
 			return CreateInvitationActionResult.Forbidden();
 
 		var inviteId = string.Join(string.Empty,
@@ -71,11 +81,13 @@ public class InvitationController : Api.InvitationsControllerBase
 		var gameId = invite.GameId;
 		var userId = User.GetCurrentUserId();
 		if (userId == null) return CancelInvitationActionResult.Unauthorized();
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
 									where gameUser.GameId == gameId && gameUser.UserId == userId
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return CancelInvitationActionResult.NotFound();
-		if (!gameUserRecord.ToPermissions().HasPermission(GameSecurity.CancelInvitation(gameId)))
+		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
+		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.CancelInvitation(gameId)))
 			return CancelInvitationActionResult.Forbidden();
 
 		dbContext.Invites.Remove(invite);

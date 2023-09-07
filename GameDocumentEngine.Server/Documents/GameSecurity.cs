@@ -46,54 +46,7 @@ public static class GameSecurity
 	internal static string ReadWriteDocumentDetailsPrefix(Guid gameId, Guid documentId) =>
 		$"{BaseDocument(gameId, documentId)}:details:*";
 
-	public static readonly ImmutableArray<string> GameRoles = new[]
-	{
-		"gm",
-		"asst-gm",
-		"trusted",
-		"player"
-	}.ToImmutableArray();
-
-	public static readonly string DefaultGameRole = "gm";
-
-	public static PermissionList ToPermissions(this GameUserModel gameUser)
-	{
-		switch (gameUser.Role)
-		{
-			case "gm":
-				return PermissionList.From(
-					AnyBasicGamePermission(gameUser.GameId),
-					AnyInvitationPermission(gameUser.GameId),
-					SeeAnyDocument(gameUser.GameId),
-					DeleteAnyDocument(gameUser.GameId),
-					UpdateAnyDocumentUserAccess(gameUser.GameId)
-				);
-			case "asst-gm":
-				return PermissionList.From(
-					ViewGame(gameUser.GameId),
-					UpdateGame(gameUser.GameId),
-					CreateDocument(gameUser.GameId),
-					ListInvitations(gameUser.GameId),
-					CreateInvitation(gameUser.GameId, "asst-gm"),
-					CreateInvitation(gameUser.GameId, "trusted"),
-					CreateInvitation(gameUser.GameId, "player"),
-					CancelInvitation(gameUser.GameId)
-				);
-			case "trusted":
-				return PermissionList.From(
-					ViewGame(gameUser.GameId),
-					CreateDocument(gameUser.GameId)
-				);
-
-			default:
-			case "player":
-				return PermissionList.From(
-					ViewGame(gameUser.GameId)
-				);
-		}
-	}
-
-	public static PermissionSet ToPermissionSet(this GameUserModel gameUser) =>
-		new PermissionSet(gameUser, gameUser.ToPermissions());
+	public static PermissionSet ToPermissionSet(this IGameType gameType, GameUserModel gameUser) =>
+		new PermissionSet(gameUser, gameType.GetPermissions(gameUser.GameId, gameUser.Role));
 
 }

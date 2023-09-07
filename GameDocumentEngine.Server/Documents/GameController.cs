@@ -41,11 +41,11 @@ public class GameController : Api.GameControllerBase
 
 	protected override async Task<CreateGameActionResult> CreateGame(CreateGameDetails createGameBody)
 	{
-		if (!ModelState.IsValid || !gameTypes.All.TryGetValue(createGameBody.Type, out _))
+		if (!ModelState.IsValid || !gameTypes.All.TryGetValue(createGameBody.Type, out var gameType))
 			return CreateGameActionResult.BadRequest();
 
 		var user = await dbContext.GetCurrentUserOrThrow(User);
-		var gameUser = new GameUserModel { User = user, Role = DefaultGameRole };
+		var gameUser = new GameUserModel { User = user, Role = gameType.DefaultNewGameRole };
 		var game = new GameModel
 		{
 			Name = createGameBody.Name,
@@ -54,7 +54,7 @@ public class GameController : Api.GameControllerBase
 		};
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
-		var permissions = gameUser.ToPermissionSet();
+		var permissions = gameType.ToPermissionSet(gameUser);
 		return CreateGameActionResult.Ok(await gameMapper.ToApi(dbContext, game, permissions, DbContextChangeUsage.AfterChange));
 	}
 
@@ -138,6 +138,8 @@ public class GameController : Api.GameControllerBase
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
 		if (permissions == null) return UpdateGameRoleAssignmentsActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateGameUserAccess(gameId))) return UpdateGameRoleAssignmentsActionResult.Forbidden();
+		if (!gameTypes.All.TryGetValue(permissions.GameUser.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {permissions.GameUser.Game.Type}");
 
 		var gameUserRecords = await (from gameUser in dbContext.GameUsers
 									 where gameUser.GameId == gameId
@@ -150,7 +152,7 @@ public class GameController : Api.GameControllerBase
 				return UpdateGameRoleAssignmentsActionResult.Forbidden();
 			if (gameUserRecords.FirstOrDefault(u => u.UserId == key) is not GameUserModel modifiedUser)
 				return UpdateGameRoleAssignmentsActionResult.BadRequest();
-			if (!GameRoles.Contains(kvp.Value))
+			if (!gameType.Roles.Contains(kvp.Value))
 				return UpdateGameRoleAssignmentsActionResult.BadRequest();
 
 			modifiedUser.Role = kvp.Value;

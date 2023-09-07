@@ -30,7 +30,9 @@ public class GamePermissionSetResolver
 									where gameUser.UserId == userId && gameUser.GameId == gameId
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return null;
-		return gameUserRecord.ToPermissionSet();
+		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
+		return gameType.ToPermissionSet(gameUserRecord);
 	}
 
 	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId, Guid documentId)
@@ -51,6 +53,9 @@ public class GamePermissionSetResolver
 
 	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, (DocumentModel Document, DocumentUserModel DocumentUser)? documentUserTuple)
 	{
+		if (!gameTypes.All.TryGetValue(gameUser.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {gameUser.Game.Type}");
+
 		PermissionList? documentPermissions = null;
 		if (documentUserTuple is (var document, var documentUser))
 		{
@@ -63,7 +68,7 @@ public class GamePermissionSetResolver
 				? null
 				: await GetDocumentPermissions();
 		}
-		var userPermissions = gameUser.ToPermissions();
+		var userPermissions = gameType.GetPermissions(gameUser.GameId, gameUser.Role);
 
 		if (documentPermissions == null)
 		{

@@ -36,7 +36,7 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 	{
 		return new GameTypeDetails(
 					Key: gameType.Key,
-					UserRoles: GameRoles,
+					UserRoles: gameType.Roles,
 					ObjectTypes: await Task.WhenAll(
 						gameType.ObjectTypes.Select(obj => GetGameObjectTypeFromCache(gameType, obj))
 					)
