@@ -19,12 +19,9 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const launchModal = useModal();
 	const copyLink = useMutation({
 		mutationFn: async (invitation: GameInvite) => {
-			console.log('copy invite', { invitation });
-			console.log('hello');
 			await navigator.clipboard.writeText(getInviteUrl(invitation));
 		},
 	});
-	console.log(copyLink);
 
 	const queryClient = useQueryClient();
 	const deleteInvite = useMutation(
