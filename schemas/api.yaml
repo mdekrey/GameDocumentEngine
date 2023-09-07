@@ -605,6 +605,7 @@ components:
           - lastUpdated
           - playerNames
           - userRoles
+          - permissions
           - typeInfo
           - id
           properties:
@@ -616,6 +617,7 @@ components:
             userRoles:
               type: object
               additionalProperties: { type: string }
+            permissions: { type: array, items: { type: string} }
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
     GameSummary:
@@ -675,10 +677,12 @@ components:
         - type: object
           required:
           - userRoles
+          - permissions
           properties:
             userRoles:
               type: object
               additionalProperties: { type: string }
+            permissions: { type: array, items: { type: string} }
     DocumentSummary:
       type: object
       required:

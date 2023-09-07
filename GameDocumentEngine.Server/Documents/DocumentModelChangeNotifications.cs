@@ -10,16 +10,19 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 {
 	private readonly DocumentUserLoader userLoader;
 	private readonly GamePermissionSetResolverFactory permissionSetResolverFactory;
+	private readonly GameTypes gameTypes;
 
 	public DocumentModelChangeNotifications(
 		DocumentUserLoader userLoader,
 		IPermissionedApiMapper<DocumentModel, DocumentDetails> apiMapper,
 		IApiChangeNotification<DocumentDetails> changeNotification,
-		GamePermissionSetResolverFactory permissionSetResolverFactory)
+		GamePermissionSetResolverFactory permissionSetResolverFactory,
+		GameTypes gameTypes)
 		: base(apiMapper, changeNotification, du => du.UserId, du => du.Document)
 	{
 		this.userLoader = userLoader;
 		this.permissionSetResolverFactory = permissionSetResolverFactory;
+		this.gameTypes = gameTypes;
 	}
 
 	protected override async Task<DocumentModel> LoadTargetEntity(DocumentDbContext context, DocumentUserModel userEntity)
@@ -34,11 +37,17 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelChangeNotifications)}.{nameof(GetUsersFor)}");
 
 		await userLoader.EnsureDocumentUsersLoaded(context, entity);
+		var gameEntry = context.GetEntityEntries<GameModel>(g => g.Id == entity.GameId).Single();
 		var documentUserEntries = context.GetEntityEntries<DocumentUserModel>(du => du.GameId == entity.GameId && du.DocumentId == entity.Id);
 		var gameUserEntries = context.GetEntityEntries<GameUserModel>(g => g.GameId == entity.GameId);
 
+		var game = gameEntry.AtState(changeState);
 		var documentUsers = documentUserEntries.AtState(changeState);
 		var gameUsers = gameUserEntries.AtState(changeState);
+
+		if (!gameTypes.All.TryGetValue(game.Type, out var gameType))
+			// TODO - consider a null game type
+			throw new InvalidOperationException($"Unknown game type: {game.Type}");
 
 		var byUser = (from gameUser in gameUsers
 					  let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
@@ -52,7 +61,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 
 		var permissionSetResolver = permissionSetResolverFactory.Create(context);
 		var permissions = await byUser
-			.WhenAll(user => permissionSetResolver.GetPermissions(user.gameUser, (entity, user.documentUser)))
+			.WhenAll(user => permissionSetResolver.GetPermissions(user.gameUser, (entity, user.documentUser), gameType))
 			.Where(ps => ps != null)
 			.Select(ps => ps!)
 			.ToArrayAsync();

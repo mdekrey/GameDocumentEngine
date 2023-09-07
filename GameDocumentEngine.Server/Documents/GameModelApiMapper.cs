@@ -55,10 +55,10 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 			? await gameTypeMapper.ToApi(dbContext, gameType)
 			: throw new NotSupportedException("Unknown game type");
 
-		return ToApi(resultGame, gameUserEntries.AtState(usage), users, typeInfo);
+		return ToApi(resultGame, gameUserEntries.AtState(usage), users, typeInfo, permissionSet);
 	}
 
-	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, UserModel[] users, GameTypeDetails typeInfo)
+	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, UserModel[] users, GameTypeDetails typeInfo, PermissionSet permissionSet)
 	{
 		// "original values" game users won't have the 
 		return new GameDetails(Name: game.Name,
@@ -72,7 +72,8 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 						p => p.Name
 					),
 					Id: game.Id,
-					TypeInfo: typeInfo
+					TypeInfo: typeInfo,
+					Permissions: permissionSet.Permissions.Permissions
 				);
 	}
 

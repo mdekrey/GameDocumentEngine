@@ -51,7 +51,8 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 				.ToDictionary(
 					p => p.UserId.ToString(),
 					p => p.Role
-				)
+				),
+			Permissions: permissionSet.Permissions.Permissions
 		);
 	}
 

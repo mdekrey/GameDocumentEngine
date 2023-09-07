@@ -44,18 +44,19 @@ public class GamePermissionSetResolver
 		if (gameUserRecord == null) return null;
 		var documentUserRecord = gameUserRecord.Documents.SingleOrDefault(du => du.DocumentId == documentId);
 
+		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
+			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
+
 		return await GetPermissions(
 			gameUserRecord,
 			documentUserRecord == null
 				? null
-				: (documentUserRecord.Document, documentUserRecord));
+				: (documentUserRecord.Document, documentUserRecord),
+			gameType);
 	}
 
-	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, (DocumentModel Document, DocumentUserModel DocumentUser)? documentUserTuple)
+	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, (DocumentModel Document, DocumentUserModel DocumentUser)? documentUserTuple, IGameType gameType)
 	{
-		if (!gameTypes.All.TryGetValue(gameUser.Game.Type, out var gameType))
-			throw new InvalidOperationException($"Unknown game type: {gameUser.Game.Type}");
-
 		PermissionList? documentPermissions = null;
 		if (documentUserTuple is (var document, var documentUser))
 		{
