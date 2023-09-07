@@ -16,7 +16,7 @@ export function GameDetails({ gameId }: { gameId: string }) {
 	}
 
 	return (
-		<div className="h-40 lg:h-max flex flex-row items-center p-4 gap-8 max-w-screen-md">
+		<div className="min-h-[10rem] lg:h-max flex flex-row items-center p-4 gap-8 max-w-screen-md">
 			<Arrow className="w-40 h-40 rotate-[-30deg] lg:rotate-[-70deg] flex-shrink-0" />
 			<IntroText className="lg:hidden">{t('mobile-instructions')}</IntroText>
 			<IntroText className="hidden lg:block">
