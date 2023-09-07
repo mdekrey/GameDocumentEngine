@@ -20,7 +20,7 @@ const config: Config = {
 		},
 		extend: {
 			fontFamily: {
-				cursive: '"Brush Script MT", cursive',
+				handwriting: ['Permanent Marker', 'sans-serif'],
 			},
 		},
 		zIndex: {

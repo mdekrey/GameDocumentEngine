@@ -7,5 +7,5 @@ export const Prose = elementTemplate<'p'>(
 
 export const IntroText = elementTemplate<'p'>(
 	'IntroText',
-	<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-cursive" />,
+	<p className="text-2xl text-slate-900 dark:text-slate-100 font-handwriting" />,
 );
