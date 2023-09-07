@@ -18,6 +18,7 @@ import '@/utils/i18n/setup';
 import { GameObjects } from './apps/game-details/game-objects';
 import { GameSubheader } from './apps/game-details/game-subheader';
 import { GameSettings } from './apps/game-settings/game-settings';
+import { DocumentSubheader } from './apps/documents/subheader/document-subheader';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -68,7 +69,10 @@ const leftSidebarRoute: RouteObject[] = [
 
 const subheaderRoutes: RouteObject[] = [
 	{ path: 'game/:gameId/*', Component: withGameId(GameSubheader) },
-	// TODO: change header for document subheader
+	{
+		path: 'game/:gameId/document/:documentId/*',
+		Component: withDocumentId(withGameId(DocumentSubheader)),
+	},
 ];
 
 function App() {

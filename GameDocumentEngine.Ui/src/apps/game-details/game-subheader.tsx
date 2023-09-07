@@ -27,6 +27,7 @@ export function GameSubheader({ gameId }: { gameId: string }) {
 				to={`/game/${gameId}/settings`}
 				title={t('edit-game')}
 			>
+				{/* TODO - do we have permissions for this link? */}
 				<HiOutlineCog6Tooth />
 			</IconLinkButton.Secondary>
 		</div>

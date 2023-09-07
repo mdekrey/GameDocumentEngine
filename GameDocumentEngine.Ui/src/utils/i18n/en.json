@@ -96,6 +96,9 @@
 		"mobile-instructions": "Use the dot menu to access and create character sheets, party trackers, and more!",
 		"sidebar-instructions": "Use the sidebar to access and create character sheets, party trackers, and more!"
 	},
+	"document-details": {
+		"settings": "Settings for {{name}}"
+	},
 	"game-objects": {
 		"header": "Documents",
 		"create-document": "Create a new document within the game",
