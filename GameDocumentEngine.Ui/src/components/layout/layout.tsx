@@ -56,7 +56,7 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 				<nav
 					className={twMerge(
 						styles.subheader,
-						'bg-slate w-full bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-sm flex flex-row items-center gap-2 h-12 p-1',
+						'lg:hidden bg-slate w-full bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-sm flex flex-row items-center gap-2 h-12 p-1',
 					)}
 				>
 					{slotProps.LeftSidebar && (
