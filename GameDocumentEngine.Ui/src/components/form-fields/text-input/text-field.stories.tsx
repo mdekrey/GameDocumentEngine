@@ -13,12 +13,14 @@ const meta = {
 		field: { table: { disable: true } },
 		mapping: { table: { disable: true } },
 		disabled: { control: 'boolean' },
+		readOnly: { control: 'boolean' },
 	},
 	args: {
 		type: 'text',
 		description: false,
 		field: undefined,
 		disabled: false,
+		readOnly: false,
 	},
 	decorators: [formFieldDecorator],
 	render: function RenderTextFieldStory(props) {

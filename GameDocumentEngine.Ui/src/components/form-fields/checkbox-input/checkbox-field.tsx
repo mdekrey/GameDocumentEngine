@@ -17,6 +17,7 @@ export const undefinedAsFalseMapping: FieldMapping<
 };
 
 export type CheckboxFieldProps = FieldProps<boolean> & {
+	readOnly?: boolean;
 	className?: string | Atom<string>;
 };
 
@@ -27,7 +28,7 @@ export type CheckboxFieldSlots = {
 };
 
 export const CheckboxField = withSlots<CheckboxFieldSlots, CheckboxFieldProps>(
-	({ slotProps, field, className }) => {
+	({ slotProps, field, className, readOnly }) => {
 		const { className: errorsContainerClassName } =
 			slotProps.ErrorsContainer ?? {};
 
@@ -40,7 +41,10 @@ export const CheckboxField = withSlots<CheckboxFieldSlots, CheckboxFieldProps>(
 		return (
 			<>
 				<JotaiLabel className={classNameAtom}>
-					<CheckboxInput {...field.htmlProps.asCheckbox()} />{' '}
+					<CheckboxInput
+						{...field.htmlProps.asCheckbox()}
+						readOnly={readOnly}
+					/>{' '}
 					{field.translation('label')}
 					<JotaiDiv className={contentsClassNameAtom}>
 						<ErrorsList

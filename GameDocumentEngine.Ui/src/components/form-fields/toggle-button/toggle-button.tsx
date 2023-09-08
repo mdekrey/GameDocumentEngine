@@ -21,6 +21,7 @@ export function ToggleButton({
 	className,
 	onClick,
 	onBlur,
+	readOnly,
 }: {
 	className?: string | Atom<string>;
 	pressed: boolean | Atom<boolean>;
@@ -28,6 +29,7 @@ export function ToggleButton({
 	title: string | Atom<string>;
 	onClick?: React.MouseEventHandler<HTMLButtonElement>;
 	onBlur?: React.FocusEventHandler<HTMLButtonElement>;
+	readOnly?: boolean;
 }) {
 	const ariaPressed = useComputedAtom((get) =>
 		(isAtom(pressed) ? get(pressed) : pressed) ? 'true' : 'false',
@@ -45,11 +47,12 @@ export function ToggleButton({
 		<JotaiToggleButton
 			type="button"
 			className={actualClassName}
-			onClick={onClick}
+			onClick={readOnly ? undefined : onClick}
 			onBlur={onBlur}
 			aria-pressed={ariaPressed}
 			title={title}
 			aria-label={title}
+			aria-readonly={readOnly}
 		>
 			{children}
 		</JotaiToggleButton>

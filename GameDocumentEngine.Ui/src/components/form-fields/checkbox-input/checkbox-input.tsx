@@ -5,5 +5,20 @@ export function CheckboxInput({
 	className,
 	...props
 }: React.ComponentProps<typeof JotaiInput>) {
-	return <JotaiInput className={className} type={type} {...props} />;
+	const readonlyProps: React.ComponentProps<typeof JotaiInput> = props.readOnly
+		? {
+				'aria-readonly': true,
+				onChange: (ev) => {
+					ev.preventDefault();
+				},
+		  }
+		: {};
+	return (
+		<JotaiInput
+			className={className}
+			type={type}
+			{...props}
+			{...readonlyProps}
+		/>
+	);
 }

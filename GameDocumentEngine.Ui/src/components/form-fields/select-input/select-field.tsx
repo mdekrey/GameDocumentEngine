@@ -7,16 +7,23 @@ export function SelectField<T>({
 	field,
 	items,
 	children,
+	readOnly,
 }: {
 	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
 	items: T[];
 	children: (item: T) => React.ReactNode;
+	readOnly?: boolean;
 }) {
+	console.log({ readOnly });
 	return (
 		<Field noLabel>
 			<Field.Label>{field.translation(['label'])}</Field.Label>
 			<Field.Contents>
-				<SelectInput items={items} {...field.htmlProps.asControlled()}>
+				<SelectInput
+					items={items}
+					readOnly={readOnly}
+					{...field.htmlProps.asControlled()}
+				>
 					{children}
 				</SelectInput>
 				<ErrorsList errors={field.errors} translations={field.translation} />

@@ -9,33 +9,31 @@ const meta = {
 	title: 'Components/Form/Select Field',
 	component: SelectField,
 	tags: ['autodocs'],
-	parameters: {
-		docs: {
-			story: {
-				inline: false,
-			},
-		},
-	},
 	argTypes: {
 		field: { table: { disable: true } },
 		items: { table: { disable: true } },
 		children: { table: { disable: true } },
+		readOnly: { control: 'boolean' },
 	},
 	args: {
 		field: undefined,
 		items: undefined,
 		children: undefined,
+		readOnly: false,
 	},
 	decorators: [formFieldDecorator],
 	render: function RenderSelectFieldStory(props) {
+		console.log(props);
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
 			schema: z.string().ip(),
 		});
 		return (
-			<SelectField {...props} field={myField} items={['one', 'two', 'three']}>
-				{(item) => item || <>&nbsp;</>}
-			</SelectField>
+			<div className="h-64">
+				<SelectField {...props} field={myField} items={['one', 'two', 'three']}>
+					{(item) => item || <>&nbsp;</>}
+				</SelectField>
+			</div>
 		);
 	},
 } satisfies Meta<typeof SelectField>;
@@ -44,5 +42,13 @@ type Story = StoryObj<typeof meta>;
 export default meta;
 
 export const Primary: Story = {
-	args: {},
+	args: {
+		readOnly: false,
+	},
+};
+
+export const ReadOnly: Story = {
+	args: {
+		readOnly: true,
+	},
 };

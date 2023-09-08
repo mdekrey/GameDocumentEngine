@@ -10,9 +10,11 @@ const meta = {
 	tags: ['autodocs'],
 	argTypes: {
 		field: { table: { disable: true } },
+		readOnly: { control: 'boolean' },
 	},
 	args: {
 		field: undefined,
+		readOnly: false,
 	},
 	render: function RenderToggleButtonFieldStory(props) {
 		const myField = useField(false, {

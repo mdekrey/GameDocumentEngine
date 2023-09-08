@@ -12,11 +12,13 @@ const meta = {
 	argTypes: {
 		field: { table: { disable: true } },
 		disabled: { control: 'boolean' },
+		readOnly: { control: 'boolean' },
 	},
 	args: {
 		description: false,
 		field: undefined,
 		disabled: false,
+		readOnly: false,
 	},
 	decorators: [formFieldDecorator],
 	render: function RenderNumberFieldStory(props) {

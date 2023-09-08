@@ -44,6 +44,7 @@ export type TextFieldPersistentProps = {
 	inputClassName?: string;
 	contentsClassName?: string;
 	disabled?: boolean | Atom<boolean>;
+	readOnly?: boolean;
 } & React.ComponentProps<typeof JotaiLabel>;
 export type TextFieldProps<TValue> = MappedFieldProps<TValue, string> &
 	TextFieldPersistentProps;
@@ -61,6 +62,7 @@ export function TextField<T>(props: TextFieldProps<T>) {
 		inputClassName,
 		contentsClassName,
 		disabled,
+		readOnly,
 		...fieldProps
 	} = props;
 	const disablableLabelClassName = useTwMerge(
@@ -78,6 +80,7 @@ export function TextField<T>(props: TextFieldProps<T>) {
 				<TextInput
 					type={type}
 					disabled={disabled}
+					readOnly={readOnly}
 					{...htmlProps}
 					className={inputClassName}
 				/>
