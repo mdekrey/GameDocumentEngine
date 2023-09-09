@@ -3,10 +3,12 @@ import { useFormFields } from '@/utils/form/useFormFields';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import type { Atom } from 'jotai';
 import { AbilityLayout } from './ability-layout';
+import { DocumentPointers } from '@/documents/get-document-pointers';
 
 export function StandardAbility({
 	ability,
 	padToCount,
+	writablePointers,
 }: {
 	ability: FormFieldReturnType<{
 		advancement: {
@@ -16,6 +18,7 @@ export function StandardAbility({
 		rating: number;
 	}>;
 	padToCount: Atom<number>;
+	writablePointers: DocumentPointers;
 }) {
 	const fields = useFormFields(ability, {
 		rating: ['rating'],
@@ -28,6 +31,7 @@ export function StandardAbility({
 			baseField={ability}
 			passFailMaxRating={fields.rating.value}
 			passFailPadding={padToCount}
+			readOnly={!writablePointers.contains('rating')}
 		>
 			<AbilityLayout.Rating>
 				<TextField.Integer
@@ -35,6 +39,7 @@ export function StandardAbility({
 					labelClassName="sr-only"
 					inputClassName="text-center"
 					field={fields.rating}
+					readOnly={!writablePointers.contains('rating')}
 				/>
 			</AbilityLayout.Rating>
 		</AbilityLayout>

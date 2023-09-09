@@ -19,6 +19,7 @@ export type TextareaFieldPersistentProps = {
 	inputClassName?: string;
 	contentsClassName?: string;
 	disabled?: boolean | Atom<boolean>;
+	readOnly?: boolean;
 } & React.ComponentProps<typeof JotaiLabel>;
 export type TextareaFieldProps<TValue> = MappedFieldProps<TValue, string> &
 	TextareaFieldPersistentProps;
@@ -35,6 +36,7 @@ export function TextareaField<T>(props: TextareaFieldProps<T>) {
 		inputClassName,
 		contentsClassName,
 		disabled,
+		readOnly,
 		...fieldProps
 	} = props;
 	const disablableLabelClassName = useTwMerge(
@@ -53,6 +55,7 @@ export function TextareaField<T>(props: TextareaFieldProps<T>) {
 					disabled={disabled}
 					{...htmlProps}
 					className={inputClassName}
+					readOnly={readOnly}
 				/>
 				{description && <p className="text-xs italic">{t(['description'])}</p>}
 				<ErrorsList errors={errors} translations={t} />

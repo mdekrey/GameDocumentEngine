@@ -11,6 +11,7 @@ import { useAtomValue } from 'jotai';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { HiXMark } from 'react-icons/hi2';
 import { positions } from '../skill-positions';
+import { DocumentPointers } from '@/documents/get-document-pointers';
 
 const requiredSkillMappingWithDefaultName = (
 	defaultName: string,
@@ -27,7 +28,13 @@ const requiredSkillMappingWithDefaultName = (
 	},
 });
 
-export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
+export function Skills({
+	form,
+	writablePointers,
+}: {
+	form: UseFormResult<CharacterDocument>;
+	writablePointers: DocumentPointers;
+}) {
 	const fields = useFormFields(form, {
 		skills: (skillIndex: number) =>
 			({
@@ -39,6 +46,7 @@ export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 				translationPath: ['details', 'skills'],
 			}) as const,
 	});
+	const skills = writablePointers.navigate('details', 'skills');
 	const natureRating = useComputedAtom(
 		(get) => get(form.atom).details.abilities.nature.max,
 	);
@@ -53,6 +61,7 @@ export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 							key={index}
 							skill={fields.skills(index)}
 							natureRating={natureRating}
+							writablePointers={skills.navigate(index)}
 						/>
 					))}
 			</Fieldset>
@@ -64,6 +73,7 @@ export function Skills({ form }: { form: UseFormResult<CharacterDocument> }) {
 							key={index}
 							skill={fields.skills(index + 12)}
 							natureRating={natureRating}
+							writablePointers={skills.navigate(index + 12)}
 						/>
 					))}
 			</Fieldset>
@@ -79,15 +89,18 @@ const skillNameMapping: FieldMapping<string, string> = {
 export function Skill({
 	skill,
 	natureRating,
+	writablePointers,
 }: {
 	skill: FormFieldReturnType<Skill>;
 	natureRating: Atom<number>;
+	writablePointers: DocumentPointers;
 }) {
 	const fields = useFormFields(skill, {
 		name: { path: ['name'], mapping: skillNameMapping },
 		rating: ['rating'],
 		advancement: ['advancement'],
 	});
+	const hasBasePath = writablePointers.contains();
 	const padding = useComputedAtom((get) => Math.max(5, get(natureRating)));
 
 	const maxPasses = useComputedAtom((get) => {
@@ -120,7 +133,8 @@ export function Skill({
 	return (
 		<div className="flex flex-row col-span-2 gap-2">
 			<div className="self-center flex-1">
-				{readonlyName ? (
+				{readonlyName ||
+				(!hasBasePath && !writablePointers.contains('name')) ? (
 					<span className="inline-block p-2">{readonlyName}</span>
 				) : (
 					<TextField labelClassName="sr-only" field={fields.name} />
@@ -137,6 +151,7 @@ export function Skill({
 						labelClassName="sr-only"
 						inputClassName="text-center"
 						field={fields.rating}
+						readOnly={!hasBasePath && !writablePointers.contains('rating')}
 					/>
 				)}
 			</div>
@@ -145,6 +160,7 @@ export function Skill({
 				maxPasses={maxPasses}
 				maxFails={maxFails}
 				padToCount={padding}
+				readOnly={!hasBasePath && !writablePointers.contains('advancement')}
 			/>
 		</div>
 	);

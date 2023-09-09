@@ -1,16 +1,18 @@
 import type { UseFormResult } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
 import type { CharacterDocument } from '../character-types';
-import { useDebugValue } from 'react';
 import {
 	CheckboxField,
 	undefinedAsFalseMapping,
 } from '@/components/form-fields/checkbox-input/checkbox-field';
+import { DocumentPointers } from '@/documents/get-document-pointers';
 
 export function Conditions({
 	form,
+	writablePointers,
 }: {
 	form: UseFormResult<CharacterDocument>;
+	writablePointers: DocumentPointers;
 }) {
 	const fields = useFormFields(form, {
 		hungryThirsty: {
@@ -34,14 +36,29 @@ export function Conditions({
 			mapping: undefinedAsFalseMapping,
 		},
 	});
-	useDebugValue(fields);
+	const conditions = writablePointers.navigate('details', 'conditions');
 	return (
 		<>
-			<CheckboxField field={fields.hungryThirsty} />
-			<CheckboxField field={fields.angry} />
-			<CheckboxField field={fields.tired} />
-			<CheckboxField field={fields.injured} />
-			<CheckboxField field={fields.sick} />
+			<CheckboxField
+				field={fields.hungryThirsty}
+				readOnly={!conditions.contains('hungryThirsty')}
+			/>
+			<CheckboxField
+				field={fields.angry}
+				readOnly={!conditions.contains('angry')}
+			/>
+			<CheckboxField
+				field={fields.tired}
+				readOnly={!conditions.contains('tired')}
+			/>
+			<CheckboxField
+				field={fields.injured}
+				readOnly={!conditions.contains('injured')}
+			/>
+			<CheckboxField
+				field={fields.sick}
+				readOnly={!conditions.contains('sick')}
+			/>
 		</>
 	);
 }

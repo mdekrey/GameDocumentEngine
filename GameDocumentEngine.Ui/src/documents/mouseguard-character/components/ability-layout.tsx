@@ -17,6 +17,7 @@ export type AbilityLayoutProps = {
 	advancement: FormFieldReturnType<{ passes: number; fails: number }>;
 	passFailPadding: Atom<number>;
 	children?: React.ReactNode;
+	readOnly?: boolean;
 };
 
 export const AbilityLayout = withSlots<AbilityLayoutSlots, AbilityLayoutProps>(
@@ -26,6 +27,7 @@ export const AbilityLayout = withSlots<AbilityLayoutSlots, AbilityLayoutProps>(
 		advancement,
 		slotProps,
 		passFailPadding,
+		readOnly,
 	}) => {
 		const maxFails = useComputedAtom((get) => get(passFailMaxRating) - 1);
 
@@ -55,6 +57,7 @@ export const AbilityLayout = withSlots<AbilityLayoutSlots, AbilityLayoutProps>(
 					maxPasses={passFailMaxRating}
 					maxFails={maxFails}
 					padToCount={passFailPadding}
+					readOnly={readOnly}
 				/>
 			</div>
 		);

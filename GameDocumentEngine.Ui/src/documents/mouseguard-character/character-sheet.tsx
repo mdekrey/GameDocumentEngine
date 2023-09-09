@@ -24,13 +24,24 @@ import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { characterFixup } from './fixupCharacter';
 import { TabConfig, Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
+import {
+	getWritableDocumentPointers,
+	DocumentPointers,
+} from '@/documents/get-document-pointers';
 
 export function FullCharacterSheet({
 	document,
 	onUpdateDocument,
 	translation,
 }: GameObjectWidgetProps<Character>) {
-	if (!document.data) {
+	const writablePointers = useMemo(
+		() =>
+			document.data
+				? getWritableDocumentPointers(document.data, characterFixup.toForm)
+				: null,
+		[document.data],
+	);
+	if (!document.data || !writablePointers) {
 		return 'Loading...';
 	}
 
@@ -39,6 +50,7 @@ export function FullCharacterSheet({
 	return (
 		<div className="p-4">
 			<CharacterSheet
+				writablePointers={writablePointers}
 				character={characterData}
 				translation={translation}
 				onUpdateDocument={onUpdateDocument}
@@ -50,63 +62,72 @@ export function FullCharacterSheet({
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
 	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
+	writablePointers: DocumentPointers;
 }>;
-const BioTab: TabContent = ({ form, translation: t }) => (
+const BioTab: TabContent = ({ form, translation: t, writablePointers }) => (
 	<>
 		<Section>
 			<SectionHeader>{t('character-sheet.headers.bio')}</SectionHeader>
-			<Bio form={form} />
+			<Bio form={form} writablePointers={writablePointers} />
 		</Section>
 		<Section>
 			<SectionHeader>{t('character-sheet.headers.notes')}</SectionHeader>
-			<Notes form={form} />
+			<Notes form={form} writablePointers={writablePointers} />
 		</Section>
 	</>
 );
-const PersonalityTab: TabContent = ({ form, translation: t }) => {
+const PersonalityTab: TabContent = ({
+	form,
+	translation: t,
+	writablePointers,
+}) => {
 	return (
 		<>
 			<Section>
 				<SectionHeader>
 					{t('character-sheet.headers.personality')}
 				</SectionHeader>
-				<Personality form={form} />
+				<Personality form={form} writablePointers={writablePointers} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
-				<Wises form={form} />
+				<Wises form={form} writablePointers={writablePointers} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
-				<Traits form={form} />
+				<Traits form={form} writablePointers={writablePointers} />
 			</Section>
 		</>
 	);
 };
-const AbilitiesTab: TabContent = ({ form, translation: t }) => {
+const AbilitiesTab: TabContent = ({
+	form,
+	translation: t,
+	writablePointers,
+}) => {
 	return (
 		<Sections>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.abilities')}</SectionHeader>
-				<Abilities form={form} />
+				<Abilities form={form} writablePointers={writablePointers} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.skills')}</SectionHeader>
-				<Skills form={form} />
+				<Skills form={form} writablePointers={writablePointers} />
 			</Section>
 		</Sections>
 	);
 };
-const StatusTab: TabContent = ({ form, translation: t }) => {
+const StatusTab: TabContent = ({ form, translation: t, writablePointers }) => {
 	return (
 		<Sections className="md:grid md:grid-cols-2 gap-2">
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.rewards')}</SectionHeader>
-				<Rewards form={form} />
+				<Rewards form={form} writablePointers={writablePointers} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.conditions')}</SectionHeader>
-				<Conditions form={form} />
+				<Conditions form={form} writablePointers={writablePointers} />
 			</Section>
 		</Sections>
 	);
@@ -122,10 +143,12 @@ const tabInfo: [id: string, icon: typeof HiOutlineUser, content: TabContent][] =
 
 export function CharacterSheet({
 	character,
+	writablePointers,
 	onUpdateDocument,
 	translation: t,
 }: {
 	character: CharacterDocument;
+	writablePointers: DocumentPointers;
 	onUpdateDocument: Updater<Character>;
 	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
 }) {
@@ -169,9 +192,15 @@ export function CharacterSheet({
 				key,
 				icon,
 				title: t(`character-sheet.tabs.${key}`),
-				content: <Component form={form} translation={t} />,
+				content: (
+					<Component
+						form={form}
+						translation={t}
+						writablePointers={writablePointers}
+					/>
+				),
 			})),
-		[form, t],
+		[form, t, writablePointers],
 	);
 
 	return (

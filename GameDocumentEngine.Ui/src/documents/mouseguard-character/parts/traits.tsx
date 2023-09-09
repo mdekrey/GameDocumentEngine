@@ -9,13 +9,20 @@ import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { GiPlainCircle, GiCircle } from 'react-icons/gi';
 import { CheckboxList } from '../components/CheckboxList';
+import { DocumentPointers } from '@/documents/get-document-pointers';
 
 const requiredTraitMapping: FieldMapping<Trait | null, Trait> = {
 	toForm: (v) => v ?? { name: '', level: 0, usedFor: 0 },
 	fromForm: (v) => (v.level < 1 && v.usedFor === 0 && v.name === '' ? null : v),
 };
 
-export function Traits({ form }: { form: UseFormResult<CharacterDocument> }) {
+export function Traits({
+	form,
+	writablePointers,
+}: {
+	form: UseFormResult<CharacterDocument>;
+	writablePointers: DocumentPointers;
+}) {
 	const fields = useFormFields(form, {
 		traits: (traitIndex: number) =>
 			({
@@ -25,13 +32,18 @@ export function Traits({ form }: { form: UseFormResult<CharacterDocument> }) {
 				translationPath: ['details', 'traits'],
 			}) as const,
 	});
+	const traits = writablePointers.navigate('details', 'traits');
 
 	return (
 		<div className="flex flex-col gap-2">
 			{Array(5)
 				.fill(0)
 				.map((_, index) => (
-					<Trait key={index} trait={fields.traits(index)} />
+					<Trait
+						key={index}
+						trait={fields.traits(index)}
+						writablePointers={traits.navigate(index)}
+					/>
 				))}
 		</div>
 	);
@@ -42,12 +54,19 @@ const traitNameMapping: FieldMapping<string, string> = {
 	fromForm: (v) => v.toLowerCase(),
 };
 
-export function Trait({ trait }: { trait: FormFieldReturnType<Trait> }) {
+export function Trait({
+	trait,
+	writablePointers,
+}: {
+	trait: FormFieldReturnType<Trait>;
+	writablePointers: DocumentPointers;
+}) {
 	const fields = useFormFields(trait, {
 		name: { path: ['name'], mapping: traitNameMapping },
 		level: ['level'],
 		usedFor: ['usedFor'],
 	});
+	const hasBasePath = writablePointers.contains();
 
 	const level1Checked = useComputedAtom((get) => get(fields.level.value) >= 1);
 	const level2Checked = useComputedAtom((get) => get(fields.level.value) >= 2);
@@ -61,7 +80,8 @@ export function Trait({ trait }: { trait: FormFieldReturnType<Trait> }) {
 	return (
 		<div className="flex flex-row col-span-2 gap-4">
 			<div className="self-center w-64">
-				{readonlyName ? (
+				{readonlyName ||
+				(!hasBasePath && !writablePointers.contains('name')) ? (
 					<span className="inline-block p-2">{readonlyName}</span>
 				) : (
 					<TextField labelClassName="sr-only" field={fields.name} />
@@ -88,12 +108,17 @@ export function Trait({ trait }: { trait: FormFieldReturnType<Trait> }) {
 					onClick={toggleLevel(3)}
 				/>
 			</div>
-			<TraitUsedFor level={fields.level.value} usedFor={fields.usedFor} />
+			<TraitUsedFor
+				level={fields.level.value}
+				usedFor={fields.usedFor}
+				readOnly={!hasBasePath && !writablePointers.contains('usedFor')}
+			/>
 		</div>
 	);
 
 	function toggleLevel(level: number) {
 		return () => {
+			if (!hasBasePath && !writablePointers.contains('level')) return;
 			fields.level.onChange((current) => current + (current < level ? 1 : -1));
 		};
 	}
@@ -132,9 +157,11 @@ function TraitLevelButton({
 function TraitUsedFor({
 	level,
 	usedFor,
+	readOnly,
 }: {
 	level: Atom<number>;
 	usedFor: FormFieldReturnType<number>;
+	readOnly?: boolean;
 }) {
 	const usedForAvailable = useComputedAtom((get) => {
 		const currentLevel = get(level);
@@ -155,8 +182,8 @@ function TraitUsedFor({
 				paddingCount={0}
 				checkedTitle={usedFor.translation('decrease')}
 				uncheckedTitle={usedFor.translation('increase')}
-				onUncheck={() => usedFor.onChange((v) => v - 1)}
-				onCheck={() => usedFor.onChange((v) => v + 1)}
+				onUncheck={() => !readOnly && usedFor.onChange((v) => v - 1)}
+				onCheck={() => !readOnly && usedFor.onChange((v) => v + 1)}
 			/>
 		</div>
 	);

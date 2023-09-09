@@ -12,12 +12,14 @@ export function PassFail({
 	maxFails,
 	padToCount,
 	className,
+	readOnly,
 }: {
 	advancement: FormFieldReturnType<{ passes: number; fails: number }>;
 	maxPasses: Atom<number>;
 	maxFails: Atom<number>;
 	padToCount: Atom<number>;
 	className?: string;
+	readOnly?: boolean;
 }) {
 	const { t } = useTranslation('doc-types:MouseGuard-Character', {
 		keyPrefix: 'character-sheet.passes-and-fails',
@@ -76,6 +78,7 @@ export function PassFail({
 	);
 
 	function adjust(type: keyof typeof fields, modifier: 1 | -1) {
+		if (readOnly) return;
 		fields[type].setValue((prev) => prev + modifier);
 		fields[type].onBlur();
 	}
