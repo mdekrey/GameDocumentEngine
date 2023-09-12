@@ -4,23 +4,31 @@ import { api } from '../fetch-api';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { type EntityChangedProps } from '../EntityChangedProps';
 import { applyEventToQuery } from './applyEventToQuery';
+import type { RealtimeApi } from '../realtime-api';
 
-export const getCurrentUser = {
-	queryKey: ['currentUser'],
+const queryKey = ['currentUser'] as const;
+
+export const getCurrentUser = (realtimeApi: RealtimeApi) => ({
+	queryKey,
 	queryFn: async () => {
 		const response = await api.getCurrentUser();
 		if (response.statusCode !== 200) return Promise.reject(response);
+		realtimeApi.sendServiceMessage({
+			type: 'verifyUser',
+			userId: response.data.id,
+		});
 		return response.data;
 	},
-};
+});
 
 export async function handleUserUpdateEvent(
 	queryClient: QueryClient,
 	event: EntityChangedProps<string, UserDetails>,
+	realtimeApi: RealtimeApi,
 ) {
-	const data = queryClient.getQueryData<UserDetails>(getCurrentUser.queryKey);
+	const data = queryClient.getQueryData<UserDetails>(queryKey);
 	if (data?.id === event.key) {
-		await applyEventToQuery(queryClient, getCurrentUser, event);
+		await applyEventToQuery(queryClient, getCurrentUser(realtimeApi), event);
 	}
 }
 
@@ -37,6 +45,6 @@ export function patchUser(
 				);
 			else throw new Error('Could not save changes');
 		},
-		onError: () => queryClient.invalidateQueries(getCurrentUser.queryKey),
+		onError: () => queryClient.invalidateQueries(queryKey),
 	};
 }

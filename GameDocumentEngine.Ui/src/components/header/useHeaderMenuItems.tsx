@@ -6,9 +6,11 @@ import { HiPencil, HiSun, HiMoon } from 'react-icons/hi2';
 import type { TFunction } from 'i18next';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useEffect, useReducer } from 'react';
+import { useRealtimeApi } from '@/utils/api/realtime-api';
 
 export function useHeader() {
-	const userQuery = useQuery(queries.getCurrentUser);
+	const realtimeApi = useRealtimeApi();
+	const userQuery = useQuery(queries.getCurrentUser(realtimeApi));
 	const { t } = useTranslation(['layout']);
 	const user = userQuery.data;
 	const [, switchMode] = useReducer(

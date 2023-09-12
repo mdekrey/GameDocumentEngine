@@ -13,6 +13,7 @@ import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { SingleColumnSections } from '@/components/sections';
+import { useRealtimeApi } from '@/utils/api/realtime-api';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -46,7 +47,8 @@ export function Profile() {
 		},
 	});
 
-	const userQueryResult = useQuery(queries.getCurrentUser);
+	const realtimeApi = useRealtimeApi();
+	const userQueryResult = useQuery(queries.getCurrentUser(realtimeApi));
 	const saveUser = usePatchUser();
 
 	if (!userQueryResult.isSuccess) {

@@ -10,6 +10,8 @@ import type { QueryClient } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 import type { Atom } from 'jotai';
 import { atom, getDefaultStore } from 'jotai';
+import { queries } from './queries';
+import { UserDetails } from '@/api/models/UserDetails';
 
 const reconnectStates = [
 	HubConnectionState.Connecting,
@@ -33,6 +35,21 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 		},
 	});
 
+	const result: RealtimeApi = {
+		connectionState$,
+		reconnect() {
+			sendServiceMessage({ type: 'requestReconnect' });
+			return new Promise<void>((resolve, reject) => {
+				store.sub(connectionState$, () => {
+					const current = store.get(connectionState$);
+					if (current === HubConnectionState.Connected) resolve();
+					if (current === HubConnectionState.Disconnected) reject();
+				});
+			});
+		},
+		sendServiceMessage,
+	};
+
 	function requestHubState() {
 		sendServiceMessage({ type: 'requestHubState' });
 	}
@@ -47,6 +64,7 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 					queryClient,
 					message.entityName,
 					message.changeEvent,
+					result,
 				);
 				break;
 			case 'hubState':
@@ -58,6 +76,16 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 				if (message.state === HubConnectionState.Connected)
 					await queryClient.invalidateQueries();
 				break;
+			case 'verifyUser':
+				{
+					const queryData = queryClient.getQueryData<UserDetails>(
+						queries.getCurrentUser(result).queryKey,
+					);
+					if (queryData && queryData.id !== message.userId) {
+						window.location.reload();
+					}
+				}
+				break;
 			default:
 				return neverEver(message);
 		}
@@ -67,20 +95,7 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 		navigator.serviceWorker?.controller?.postMessage(message);
 	}
 
-	return {
-		connectionState$,
-		reconnect() {
-			sendServiceMessage({ type: 'requestReconnect' });
-			return new Promise<void>((resolve, reject) => {
-				store.sub(connectionState$, () => {
-					const current = store.get(connectionState$);
-					if (current === HubConnectionState.Connected) resolve();
-					if (current === HubConnectionState.Disconnected) reject();
-				});
-			});
-		},
-		sendServiceMessage,
-	};
+	return result;
 }
 
 export interface RealtimeApi {

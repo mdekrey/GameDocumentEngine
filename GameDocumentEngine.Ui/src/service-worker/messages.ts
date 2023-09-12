@@ -10,6 +10,10 @@ export type RequestReconnectMessage = {
 export type ForceReconnectMessage = {
 	type: 'forceReconnect';
 };
+export type VerifyUserMessage = {
+	type: 'verifyUser';
+	userId: string;
+};
 
 export type LogMessage = {
 	type: 'log';
@@ -31,8 +35,10 @@ export type EntityChangedMessage = {
 export type MessageFromWindow =
 	| RequestHubStateMessage
 	| RequestReconnectMessage
-	| ForceReconnectMessage;
+	| ForceReconnectMessage
+	| VerifyUserMessage;
 export type MessageFromServiceWorker =
 	| LogMessage
 	| HubStatusMesage
-	| EntityChangedMessage;
+	| EntityChangedMessage
+	| VerifyUserMessage;

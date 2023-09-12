@@ -5,6 +5,7 @@ import type {
 	HubStatusMesage,
 	MessageFromServiceWorker,
 	MessageFromWindow,
+	VerifyUserMessage,
 } from './service-worker/messages';
 import { neverEver } from './utils/never-ever';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
@@ -18,8 +19,11 @@ cleanupOutdatedCaches();
 clientsClaim();
 
 const version = 1;
+let userId = '';
+let expectedUserId = '';
 
-const { connection, connectionPromise } = createRealtimeApiConnection();
+const { connection, connectionPromise } =
+	createRealtimeApiConnection(setupConnection);
 
 type SendToFunction = {
 	(client: Client, message: MessageFromServiceWorker): void;
@@ -80,6 +84,14 @@ self.addEventListener('message', (ev) => {
 });
 
 function setupConnection(connection: HubConnection) {
+	connection.off('User');
+	connection.on('User', (incomingUserId: string) => {
+		userId = incomingUserId;
+		if (expectedUserId && userId !== expectedUserId) {
+			// user id mismatch
+			void sendToAll(checkUserId(userId));
+		}
+	});
 	connection.off('EntityChanged');
 	connection.on('EntityChanged', (...args) => {
 		void sendToAll({
@@ -108,26 +120,23 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 			return;
 		case 'requestReconnect':
 			if (connection.state === HubConnectionState.Disconnected) {
+				setupConnection(connection);
 				void connection.start().finally(() => {
-					setupConnection(connection);
 					void sendToAll(getHubStateMessage());
 				});
 				void sendToAll(getHubStateMessage());
 			}
 			break;
 		case 'forceReconnect':
-			// To trigger this, run this in the console:
-			// navigator.serviceWorker?.controller?.postMessage({type: 'forceReconnect' });
-			// This will allow you to see WS communication
-			if (connection.state !== HubConnectionState.Disconnected) {
-				void (async function () {
-					await connection.stop();
-					void connection.start().finally(() => {
-						setupConnection(connection);
-						void sendToAll(getHubStateMessage());
-					});
-					void sendToAll(getHubStateMessage());
-				})();
+			forceReconnect();
+			break;
+		case 'verifyUser':
+			expectedUserId = data.userId;
+			if (
+				connection.state === HubConnectionState.Connected &&
+				data.userId !== userId
+			) {
+				forceReconnect();
 			}
 			break;
 		default:
@@ -135,9 +144,32 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 	}
 }
 
+function forceReconnect() {
+	// To trigger this, run this in the console:
+	// navigator.serviceWorker?.controller?.postMessage({type: 'forceReconnect' });
+	// This will allow you to see WS communication
+	if (connection.state !== HubConnectionState.Disconnected) {
+		void (async function () {
+			await connection.stop();
+			setupConnection(connection);
+			void connection.start().finally(() => {
+				void sendToAll(getHubStateMessage());
+			});
+			void sendToAll(getHubStateMessage());
+		})();
+	}
+}
+
 function getHubStateMessage(): HubStatusMesage {
 	return {
 		type: 'hubState',
 		state: connection.state,
+	};
+}
+
+function checkUserId(userId: string): VerifyUserMessage {
+	return {
+		type: 'verifyUser',
+		userId,
 	};
 }

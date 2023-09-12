@@ -1,4 +1,8 @@
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {
+	HubConnection,
+	HubConnectionBuilder,
+	LogLevel,
+} from '@microsoft/signalr';
 
 function abortPromise(signal: AbortSignal) {
 	return new Promise((_, reject) =>
@@ -12,12 +16,16 @@ function any<T>(promises: Array<Promise<T>>) {
 	);
 }
 
-export function getConnection(signal: AbortSignal) {
+export function getConnection(
+	setup: (connection: HubConnection) => void,
+	signal: AbortSignal,
+) {
 	const hub = new HubConnectionBuilder()
 		.withUrl(new URL('/hub', self.location.href).toString())
 		.withAutomaticReconnect()
 		.configureLogging(LogLevel.Information)
 		.build();
+	setup(hub);
 
 	return [
 		hub,
@@ -33,9 +41,14 @@ export function getConnection(signal: AbortSignal) {
 	] as const;
 }
 
-export function createRealtimeApiConnection() {
+export function createRealtimeApiConnection(
+	setup: (connection: HubConnection) => void,
+) {
 	const cancellation = new AbortController();
-	const [connection, connectionPromise] = getConnection(cancellation.signal);
+	const [connection, connectionPromise] = getConnection(
+		setup,
+		cancellation.signal,
+	);
 
 	return {
 		cancellation,

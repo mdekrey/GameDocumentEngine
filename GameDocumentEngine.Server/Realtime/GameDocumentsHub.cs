@@ -30,6 +30,8 @@ public class GameDocumentsHub : Hub
 			return;
 		}
 
+		await Clients.Caller.SendAsync("User", userId);
+
 		await Groups.AddToGroupAsync(Context.ConnectionId, GroupNames.UserDirect(userId));
 		await Groups.AddToGroupAsync(Context.ConnectionId, GroupNames.User(userId));
 	}
