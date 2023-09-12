@@ -28,6 +28,7 @@ import {
 	getWritableDocumentPointers,
 	DocumentPointers,
 } from '@/documents/get-document-pointers';
+import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 
 export function FullCharacterSheet({
 	document,
@@ -62,72 +63,63 @@ export function FullCharacterSheet({
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
 	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
-	writablePointers: DocumentPointers;
 }>;
-const BioTab: TabContent = ({ form, translation: t, writablePointers }) => (
+const BioTab: TabContent = ({ form, translation: t }) => (
 	<>
 		<Section>
 			<SectionHeader>{t('character-sheet.headers.bio')}</SectionHeader>
-			<Bio form={form} writablePointers={writablePointers} />
+			<Bio form={form} />
 		</Section>
 		<Section>
 			<SectionHeader>{t('character-sheet.headers.notes')}</SectionHeader>
-			<Notes form={form} writablePointers={writablePointers} />
+			<Notes form={form} />
 		</Section>
 	</>
 );
-const PersonalityTab: TabContent = ({
-	form,
-	translation: t,
-	writablePointers,
-}) => {
+const PersonalityTab: TabContent = ({ form, translation: t }) => {
 	return (
 		<>
 			<Section>
 				<SectionHeader>
 					{t('character-sheet.headers.personality')}
 				</SectionHeader>
-				<Personality form={form} writablePointers={writablePointers} />
+				<Personality form={form} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.wises')}</SectionHeader>
-				<Wises form={form} writablePointers={writablePointers} />
+				<Wises form={form} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.traits')}</SectionHeader>
-				<Traits form={form} writablePointers={writablePointers} />
+				<Traits form={form} />
 			</Section>
 		</>
 	);
 };
-const AbilitiesTab: TabContent = ({
-	form,
-	translation: t,
-	writablePointers,
-}) => {
+const AbilitiesTab: TabContent = ({ form, translation: t }) => {
 	return (
 		<Sections>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.abilities')}</SectionHeader>
-				<Abilities form={form} writablePointers={writablePointers} />
+				<Abilities form={form} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.skills')}</SectionHeader>
-				<Skills form={form} writablePointers={writablePointers} />
+				<Skills form={form} />
 			</Section>
 		</Sections>
 	);
 };
-const StatusTab: TabContent = ({ form, translation: t, writablePointers }) => {
+const StatusTab: TabContent = ({ form, translation: t }) => {
 	return (
 		<Sections className="md:grid md:grid-cols-2 gap-2">
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.rewards')}</SectionHeader>
-				<Rewards form={form} writablePointers={writablePointers} />
+				<Rewards form={form} />
 			</Section>
 			<Section>
 				<SectionHeader>{t('character-sheet.headers.conditions')}</SectionHeader>
-				<Conditions form={form} writablePointers={writablePointers} />
+				<Conditions form={form} />
 			</Section>
 		</Sections>
 	);
@@ -156,6 +148,7 @@ export function CharacterSheet({
 		defaultValue: characterFixup.toForm(character),
 		schema: CharacterDocument,
 		translation: (f) => t(`character-sheet.${f}`),
+		readOnly: toReadOnlyFields(writablePointers),
 	});
 	updateFormDefaultMapped(form, character, characterFixup);
 
@@ -192,15 +185,9 @@ export function CharacterSheet({
 				key,
 				icon,
 				title: t(`character-sheet.tabs.${key}`),
-				content: (
-					<Component
-						form={form}
-						translation={t}
-						writablePointers={writablePointers}
-					/>
-				),
+				content: <Component form={form} translation={t} />,
 			})),
-		[form, t, writablePointers],
+		[form, t],
 	);
 
 	return (

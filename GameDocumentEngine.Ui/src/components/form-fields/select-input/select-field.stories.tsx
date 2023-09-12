@@ -4,6 +4,12 @@ import { SelectField } from './select-field';
 import { useField } from '@/utils/form/useField';
 import { z } from 'zod';
 import { formFieldDecorator } from '../stories/field-decorator';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+
+type Props = Omit<React.ComponentProps<typeof SelectField>, 'readOnly'> & {
+	disabled: boolean;
+	readOnly: boolean;
+};
 
 const meta = {
 	title: 'Components/Form/Select Field',
@@ -13,21 +19,25 @@ const meta = {
 		field: { table: { disable: true } },
 		items: { table: { disable: true } },
 		children: { table: { disable: true } },
+		disabled: { control: 'boolean' },
 		readOnly: { control: 'boolean' },
 	},
 	args: {
 		field: undefined,
 		items: undefined,
 		children: undefined,
+		disabled: false,
 		readOnly: false,
 	},
 	decorators: [formFieldDecorator],
-	render: function RenderSelectFieldStory(props) {
-		console.log(props);
+	render: function RenderSelectFieldStory({ readOnly, disabled, ...props }) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
 			schema: z.string().ip(),
+			disabled: useComputedAtom(() => disabled),
+			readOnly: useComputedAtom(() => readOnly),
 		});
+
 		return (
 			<div className="h-64">
 				<SelectField {...props} field={myField} items={['one', 'two', 'three']}>
@@ -36,8 +46,8 @@ const meta = {
 			</div>
 		);
 	},
-} satisfies Meta<typeof SelectField>;
-type Story = StoryObj<typeof meta>;
+} satisfies Meta<Props>;
+type Story = StoryObj<Props>;
 
 export default meta;
 

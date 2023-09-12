@@ -4,6 +4,12 @@ import { NumberField } from './number-field';
 import { useField } from '@/utils/form/useField';
 import { z } from 'zod';
 import { formFieldDecorator } from '../stories/field-decorator';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+
+type Props = React.ComponentProps<typeof NumberField> & {
+	disabled: boolean;
+	readOnly: boolean;
+};
 
 const meta = {
 	title: 'Components/Form/Number Field',
@@ -21,14 +27,20 @@ const meta = {
 		readOnly: false,
 	},
 	decorators: [formFieldDecorator],
-	render: function RenderNumberFieldStory(props) {
+	render: function RenderNumberFieldStory({
+		disabled,
+		readOnly,
+		...props
+	}: Props) {
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
 			schema: z.string().ip(),
+			disabled: useComputedAtom(() => disabled),
+			readOnly: useComputedAtom(() => readOnly),
 		});
 		return <NumberField {...props} field={myField} />;
 	},
-} satisfies Meta<typeof NumberField>;
+} satisfies Meta<Props>;
 type Story = StoryObj<typeof meta>;
 
 export default meta;

@@ -8,6 +8,7 @@ import {
 
 export type DocumentPointers = {
 	pointers: string[];
+	topLevelKeys(): Array<string | number>;
 	contains(...steps: Array<string | number>): boolean;
 	navigate(
 		step: string | number,
@@ -44,6 +45,9 @@ export function getWritableDocumentPointers<T>(
 	function buildDocumentPointers(pointers: string[]): DocumentPointers {
 		return {
 			pointers,
+			topLevelKeys() {
+				return [...new Set(pointers.map((v) => v.split('/')[1]))];
+			},
 			contains(...steps) {
 				const prefix = steps.map((s) => `/${s}`).join('');
 				return pointers.includes(prefix);

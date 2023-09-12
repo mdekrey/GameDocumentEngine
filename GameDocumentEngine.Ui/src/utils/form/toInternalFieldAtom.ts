@@ -1,4 +1,4 @@
-import type { useStore } from 'jotai';
+import { Atom, atom, type useStore } from 'jotai';
 import type { StandardWritableAtom } from './StandardWritableAtom';
 import { mapAtom } from './mapAtom';
 import {
@@ -18,6 +18,10 @@ import type {
 import { FieldEvents } from './events/FieldEvents';
 import type { RegisterErrorStrategy } from './errorsStrategy';
 import type { ZodType } from 'zod';
+
+function toFieldStateAtom(value: boolean | Atom<boolean>) {
+	return typeof value === 'boolean' ? atom(value) : value;
+}
 
 export function toInternalFieldAtom<TValue, TFieldValue>(
 	store: ReturnType<typeof useStore>,
@@ -42,11 +46,18 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const setValue = (v: TFieldValue | ((prev: TFieldValue) => TFieldValue)) =>
+	const disabled = toFieldStateAtom(options.disabled ?? false);
+	const readOnly = toFieldStateAtom(options.readOnly ?? false);
+
+	const setValue = (v: TFieldValue | ((prev: TFieldValue) => TFieldValue)) => {
+		if (store.get(disabled) || store.get(readOnly)) return;
 		store.set(formValueAtom, v);
+	};
 
 	return {
 		value: formValueAtom,
+		disabled,
+		readOnly,
 		setValue,
 		getValue: () => store.get(formValueAtom),
 		errors,
@@ -86,18 +97,24 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		): InputHtmlProps {
 			const htmlAtom = mappedAtom(mapping);
 			return toInputTextField(
+				store,
 				(v) => store.set(htmlAtom, v),
 				() => store.get(htmlAtom),
 				htmlAtom,
 				fieldEvents,
+				disabled,
+				readOnly,
 			);
 		} as ToHtmlInputProps<TFieldValue> as ToHtmlProps<TFieldValue>;
 		toInput.asControlled =
 			function asControlled(): ControlledHtmlProps<TFieldValue> {
 				return toControlledField(
+					store,
 					(v) => store.set(formValueAtom, v),
 					formValueAtom,
 					fieldEvents,
+					disabled,
+					readOnly,
 				);
 			};
 		toInput.asCheckbox = function asCheckbox(
@@ -105,10 +122,13 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		): CheckboxHtmlProps {
 			const htmlAtom = mappedAtom(mapping);
 			return toInputCheckboxField(
+				store,
 				(v) => store.set(htmlAtom, v),
 				() => store.get(htmlAtom),
 				htmlAtom,
 				fieldEvents,
+				disabled,
+				readOnly,
 			);
 		} as ToHtmlProps<TFieldValue>['asCheckbox'];
 
@@ -117,31 +137,41 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 }
 
 function toControlledField<T>(
+	store: ReturnType<typeof useStore>,
 	setValue: (v: T) => void,
 	atom: StandardWritableAtom<T>,
 	fieldEvents: FieldEvents,
+	disabled: Atom<boolean>,
+	readOnly: Atom<boolean>,
 ): ControlledHtmlProps<T> {
 	return {
 		value: atom,
 		onChange: (ev) => {
+			if (store.get(disabled) || store.get(readOnly)) return;
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.value);
 		},
 		onBlur: () => {
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
 		},
+		disabled,
+		readOnly,
 	};
 }
 
 function toInputTextField(
+	store: ReturnType<typeof useStore>,
 	setValue: (v: string) => void,
 	getValue: () => string,
-	atom: StandardWritableAtom<string>,
+	atom: Atom<string>,
 	fieldEvents: FieldEvents,
+	disabled: Atom<boolean>,
+	readOnly: Atom<boolean>,
 ): InputHtmlProps {
 	return {
 		defaultValue: atom,
 		onChange: (ev) => {
+			if (store.get(disabled) || store.get(readOnly)) return;
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.value);
 		},
@@ -149,18 +179,24 @@ function toInputTextField(
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
 			ev.currentTarget.value = getValue();
 		},
+		disabled,
+		readOnly,
 	};
 }
 
 function toInputCheckboxField(
+	store: ReturnType<typeof useStore>,
 	setValue: (v: boolean) => void,
 	getValue: () => boolean,
 	atom: StandardWritableAtom<boolean>,
 	fieldEvents: FieldEvents,
+	disabled: Atom<boolean>,
+	readOnly: Atom<boolean>,
 ): CheckboxHtmlProps {
 	return {
 		defaultChecked: atom,
 		onChange: (ev) => {
+			if (store.get(disabled) || store.get(readOnly)) return;
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.checked);
 		},
@@ -168,5 +204,6 @@ function toInputCheckboxField(
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
 			ev.currentTarget.checked = getValue();
 		},
+		disabled,
 	};
 }

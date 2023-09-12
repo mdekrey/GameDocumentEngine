@@ -7,7 +7,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { FieldMapping } from '@/utils/form/useField';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +60,11 @@ export function CreateInvite({
 		defaultValue: { uses: -1, role: '' },
 		translation: t,
 		fields: {
-			uses: { path: ['uses'], mapping: positiveIntegerMapping },
+			uses: {
+				path: ['uses'],
+				mapping: positiveIntegerMapping,
+				disabled: true,
+			},
 			role: ['role'],
 			isUnlimited: {
 				path: ['uses'],
@@ -70,8 +73,6 @@ export function CreateInvite({
 			},
 		},
 	});
-
-	const disableUsesAtom = useComputedAtom((get) => get(form.atom).uses <= 0);
 
 	return (
 		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
@@ -95,7 +96,7 @@ export function CreateInvite({
 						className="col-span-2"
 						field={form.fields.isUnlimited}
 					/>
-					<NumberField field={form.fields.uses} disabled={disableUsesAtom} />
+					<NumberField field={form.fields.uses} />
 				</Fieldset>
 
 				<ModalDialogLayout.Buttons>

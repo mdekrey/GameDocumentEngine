@@ -32,6 +32,8 @@ export type TypedFieldConfigObject<
 	path: TPath;
 	schema?: ZodType<TValue>;
 	translationPath?: AnyPath;
+	disabled?: boolean;
+	readOnly?: boolean;
 } & ([PathValue<T, TPath>] extends [TValue]
 	? {
 			mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;

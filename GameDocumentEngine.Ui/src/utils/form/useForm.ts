@@ -33,6 +33,12 @@ import type {
 import { toConfigObject } from './field-config-types';
 import { getValueAtPath, getAtomForPath } from './getAtomForPath';
 import { mapAtom, noChange } from './mapAtom';
+import {
+	FieldStateAtom,
+	PerFieldState,
+	toAtomFieldState,
+	walkFieldStateAtom,
+} from './fieldStateTracking';
 
 export type ConfiguredFormField<
 	TValue,
@@ -86,6 +92,8 @@ export type FormOptions<T> = {
 	translation: (field: string) => string;
 	preSubmit?: ErrorsStrategy;
 	postSubmit?: ErrorsStrategy;
+	disabled?: PerFieldState<boolean>;
+	readOnly?: PerFieldState<boolean>;
 };
 export type FormFieldsOptions<T, TFields extends FieldsConfig<T>> = {
 	fields: TFields;
@@ -105,6 +113,8 @@ export interface UseFormResult<T> {
 	errors: Atom<Loadable<ZodError<T> | null>>;
 	formEvents: FormEvents;
 	defaultValue: React.MutableRefObject<T>;
+	disabledFields: FieldStateAtom<boolean>;
+	readOnlyFields: FieldStateAtom<boolean>;
 	formTranslation: (field: string) => string;
 	field<TPath extends Path<T>>(
 		path: TPath,
@@ -131,7 +141,7 @@ export type UseFormResultWithFields<
 	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
 > = UseFormResult<T> &
-	(T extends Objectish ? UseFieldsResult<T, TFields> : object);
+	(T extends Objectish ? UseFieldsResult<T, TFields> : never);
 
 type BuildFormResultOptions<T> = {
 	pathPrefix: AnyPath;
@@ -144,6 +154,8 @@ type BuildFormResultOptions<T> = {
 	errorStrategy: RegisterErrorStrategy;
 	formTranslation: (key: string) => string;
 	defaultValue: MutableRefObject<T>;
+	disabledFields: FieldStateAtom<boolean>;
+	readOnlyFields: FieldStateAtom<boolean>;
 };
 
 function buildFormResult<T>({
@@ -157,6 +169,8 @@ function buildFormResult<T>({
 	errorStrategy,
 	formTranslation,
 	defaultValue,
+	disabledFields,
+	readOnlyFields,
 }: BuildFormResultOptions<T>): UseFormResult<T> {
 	const [errors, trigger] = createTriggeredErrorsAtom(atom, schema);
 	errorStrategy(formEvents, () => store.set(trigger));
@@ -170,6 +184,8 @@ function buildFormResult<T>({
 		atomFamily,
 		defaultValue,
 		formEvents,
+		disabledFields,
+		readOnlyFields,
 	};
 	return {
 		...formContext,
@@ -209,6 +225,8 @@ type FormResultContext<T> = Pick<
 	| 'atomFamily'
 	| 'defaultValue'
 	| 'formEvents'
+	| 'disabledFields'
+	| 'readOnlyFields'
 >;
 
 export function buildFormFields<
@@ -256,6 +274,18 @@ function toField<T, TPath extends Path<T>, TValue>(
 					...(typeof part === 'string' ? [part] : part),
 				].join('.'),
 			),
+		disabled:
+			config.disabled ??
+			(walkFieldStateAtom(
+				context.disabledFields,
+				config.path as AnyPath,
+			) as Atom<boolean>),
+		readOnly:
+			config.readOnly ??
+			(walkFieldStateAtom(
+				context.readOnlyFields,
+				config.path as AnyPath,
+			) as Atom<boolean>),
 	};
 	const unmappedAtom = context.atomFamily(config.path as Path<T>);
 	const fieldResult = toInternalFieldAtom<unknown, TValue>(
@@ -306,6 +336,14 @@ function toFormSubset<T, TPath extends Path<T>, TValue>(
 		errorStrategy: options.errorStrategy,
 		formTranslation: options.formTranslation,
 		defaultValue: resultDefaultValue,
+		disabledFields: walkFieldStateAtom(
+			options.disabledFields,
+			config.path as AnyPath,
+		),
+		readOnlyFields: walkFieldStateAtom(
+			options.readOnlyFields,
+			config.path as AnyPath,
+		),
 	});
 }
 
@@ -337,11 +375,11 @@ export function useForm<T>(
 	options: FormOptions<T> &
 		(T extends Objectish
 			? Partial<FormFieldsOptions<T, FieldsConfig<T>>>
-			: object),
+			: never),
 ): UseFormResultWithFields<T, FieldsConfig<T>> {
 	const store = useStore();
 	return useMemo(
-		(): UseFormResultWithFields<T> => {
+		(): UseFormResultWithFields<T, FieldsConfig<T>> => {
 			const formEvents = new FormEvents();
 			const strategy = errorsStrategy(
 				options.preSubmit ?? 'onSubmit',
@@ -371,28 +409,20 @@ export function useForm<T>(
 				errorStrategy: strategy,
 				formTranslation: options.translation,
 				defaultValue,
+				disabledFields: toAtomFieldState(options.disabled ?? false),
+				readOnlyFields: toAtomFieldState(options.readOnly ?? false),
 			});
 
 			if (!('fields' in options) || !options.fields)
 				return result as UseFormResultWithFields<T>;
 
-			const fields = buildFormFields(options.fields, {
-				pathPrefix: result.pathPrefix,
-				translationPath: result.translationPath,
-				schema: result.schema,
-				errorStrategy: result.errorStrategy,
-				formTranslation: options.translation,
-				store,
-				atomFamily,
-				formEvents,
-				defaultValue,
-			});
+			const fields = buildFormFields(options.fields, result);
 
 			return {
 				...result,
 				fields,
 				// TODO: why does this need to be cast?
-			} as never as UseFormResultWithFields<T, FieldsConfig<T>>;
+			} as UseFormResultWithFields<T, FieldsConfig<T>>;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],

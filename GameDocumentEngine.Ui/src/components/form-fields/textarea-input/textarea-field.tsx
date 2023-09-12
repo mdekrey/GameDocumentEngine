@@ -4,8 +4,7 @@ import { TextareaInput } from './textarea-input';
 import type { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import type { MappedFieldProps } from '../MappedFieldProps';
 import type { JotaiLabel } from '../../jotai/label';
-import type { Atom } from 'jotai';
-import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTwMerge } from '../../jotai/useTwMerge';
 import {
 	integerMapping,
@@ -18,8 +17,6 @@ export type TextareaFieldPersistentProps = {
 	labelClassName?: string;
 	inputClassName?: string;
 	contentsClassName?: string;
-	disabled?: boolean | Atom<boolean>;
-	readOnly?: boolean;
 } & React.ComponentProps<typeof JotaiLabel>;
 export type TextareaFieldProps<TValue> = MappedFieldProps<TValue, string> &
 	TextareaFieldPersistentProps;
@@ -35,14 +32,10 @@ export function TextareaField<T>(props: TextareaFieldProps<T>) {
 		labelClassName,
 		inputClassName,
 		contentsClassName,
-		disabled,
-		readOnly,
 		...fieldProps
 	} = props;
 	const disablableLabelClassName = useTwMerge(
-		useComputedAtom((get) =>
-			(isAtom(disabled) ? get(disabled) : disabled) ? 'text-slate-500' : '',
-		),
+		useComputedAtom((get) => (get(htmlProps.disabled) ? 'text-slate-500' : '')),
 		labelClassName,
 	);
 	return (
@@ -51,12 +44,7 @@ export function TextareaField<T>(props: TextareaFieldProps<T>) {
 				{t(['label'])}
 			</Field.Label>
 			<Field.Contents className={contentsClassName}>
-				<TextareaInput
-					disabled={disabled}
-					{...htmlProps}
-					className={inputClassName}
-					readOnly={readOnly}
-				/>
+				<TextareaInput {...htmlProps} className={inputClassName} />
 				{description && <p className="text-xs italic">{t(['description'])}</p>}
 				<ErrorsList errors={errors} translations={t} />
 			</Field.Contents>

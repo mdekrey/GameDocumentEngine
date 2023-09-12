@@ -34,6 +34,8 @@ export type UseFieldResult<
 	TFlags extends UseFieldResultFlags = DefaultUseFieldResultFlags,
 > = {
 	value: PrimitiveAtom<TFieldValue>;
+	disabled: Atom<boolean>;
+	readOnly: Atom<boolean>;
 	setValue(v: TFieldValue | ((prev: TFieldValue) => TFieldValue)): void;
 	getValue(): TFieldValue;
 	errors?: ErrorsAtom;
@@ -68,16 +70,21 @@ export type InputHtmlProps = {
 	defaultValue: Atom<string>;
 	onChange: CommonEventHandler<{ value: string }>;
 	onBlur: CommonEventHandler<{ value: string }>;
+	disabled: Atom<boolean>;
+	readOnly: Atom<boolean>;
 };
 export type ControlledHtmlProps<T> = {
 	value: StandardWritableAtom<T>;
 	onChange: CommonEventHandler<{ value: T }>;
 	onBlur: CommonEventHandler;
+	disabled: Atom<boolean>;
+	readOnly: Atom<boolean>;
 };
 export type CheckboxHtmlProps = {
 	defaultChecked: Atom<boolean>;
 	onChange: CommonEventHandler<{ checked: boolean }>;
 	onBlur: CommonEventHandler<{ checked: boolean }>;
+	disabled: Atom<boolean>;
 };
 
 export type FieldMapping<TValue, TFormFieldValue> = {
@@ -91,6 +98,8 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
 	translation: FieldTranslation;
+	disabled: boolean | Atom<boolean>;
+	readOnly: boolean | Atom<boolean>;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,

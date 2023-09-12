@@ -5,8 +5,7 @@ import type { FieldMapping, UseFieldResult } from '@/utils/form/useField';
 import type { MappedFieldProps } from '../MappedFieldProps';
 import { noChange } from '@/utils/form/mapAtom';
 import type { JotaiLabel } from '../../jotai/label';
-import type { Atom } from 'jotai';
-import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTwMerge } from '../../jotai/useTwMerge';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
@@ -43,8 +42,6 @@ export type TextFieldPersistentProps = {
 	labelClassName?: string;
 	inputClassName?: string;
 	contentsClassName?: string;
-	disabled?: boolean | Atom<boolean>;
-	readOnly?: boolean;
 } & React.ComponentProps<typeof JotaiLabel>;
 export type TextFieldProps<TValue> = MappedFieldProps<TValue, string> &
 	TextFieldPersistentProps;
@@ -61,14 +58,10 @@ export function TextField<T>(props: TextFieldProps<T>) {
 		labelClassName,
 		inputClassName,
 		contentsClassName,
-		disabled,
-		readOnly,
 		...fieldProps
 	} = props;
 	const disablableLabelClassName = useTwMerge(
-		useComputedAtom((get) =>
-			(isAtom(disabled) ? get(disabled) : disabled) ? 'text-slate-500' : '',
-		),
+		useComputedAtom((get) => (get(htmlProps.disabled) ? 'text-slate-500' : '')),
 		labelClassName,
 	);
 	return (
@@ -77,13 +70,7 @@ export function TextField<T>(props: TextFieldProps<T>) {
 				{t(['label'])}
 			</Field.Label>
 			<Field.Contents className={contentsClassName}>
-				<TextInput
-					type={type}
-					disabled={disabled}
-					readOnly={readOnly}
-					{...htmlProps}
-					className={inputClassName}
-				/>
+				<TextInput type={type} {...htmlProps} className={inputClassName} />
 				{description && <p className="text-xs italic">{t(['description'])}</p>}
 				<ErrorsList errors={errors} translations={t} />
 			</Field.Contents>

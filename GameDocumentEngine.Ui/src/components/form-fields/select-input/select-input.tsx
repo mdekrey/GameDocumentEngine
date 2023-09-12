@@ -8,11 +8,9 @@ import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck, HiChevronUpDown } from 'react-icons/hi2';
 
 export type SelectInputProps<T> = {
-	disabled?: Atom<boolean>;
 	className?: string | Atom<string>;
 	items: T[];
 	children: (item: T) => React.ReactNode;
-	readOnly?: boolean;
 } & ControlledHtmlProps<T>;
 
 export function SelectInput<T>({
@@ -27,7 +25,8 @@ export function SelectInput<T>({
 }: SelectInputProps<T>) {
 	const selected = useAtomValue(useAsAtom(value));
 	const classNameValue = useAtomValue(useAsAtom(className));
-	const disabledValue = useAtomValue(useAsAtom(disabled));
+	const disabledValue = useAtomValue(disabled);
+	const readOnlyValue = useAtomValue(readOnly);
 
 	return (
 		<div
@@ -37,7 +36,7 @@ export function SelectInput<T>({
 				onBlur();
 			}}
 		>
-			{readOnly ? (
+			{readOnlyValue ? (
 				<div
 					className={twMerge(
 						'relative w-full',

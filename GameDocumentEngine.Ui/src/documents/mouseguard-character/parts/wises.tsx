@@ -7,7 +7,6 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import type { FieldMapping } from '@/utils/form/useField';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
-import { DocumentPointers } from '@/documents/get-document-pointers';
 
 const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 	toForm: (v) =>
@@ -16,13 +15,7 @@ const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 		!v.pass && !v.fail && !v.persona && !v.fate && !v.name ? null : v,
 };
 
-export function Wises({
-	form,
-	writablePointers,
-}: {
-	form: UseFormResult<CharacterDocument>;
-	writablePointers: DocumentPointers;
-}) {
+export function Wises({ form }: { form: UseFormResult<CharacterDocument> }) {
 	const fields = useFormFields(form, {
 		wises: (wiseIndex: number) =>
 			({
@@ -32,7 +25,6 @@ export function Wises({
 				translationPath: ['details', 'wises'],
 			}) as const,
 	});
-	const wises = writablePointers.navigate('details', 'wises');
 
 	return (
 		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
@@ -40,22 +32,14 @@ export function Wises({
 				{Array(2)
 					.fill(0)
 					.map((_, index) => (
-						<Wise
-							key={index}
-							wise={fields.wises(index)}
-							writablePointers={wises.navigate(index)}
-						/>
+						<Wise key={index} wise={fields.wises(index)} />
 					))}
 			</Fieldset>
 			<Fieldset>
 				{Array(2)
 					.fill(0)
 					.map((_, index) => (
-						<Wise
-							key={index}
-							wise={fields.wises(index + 2)}
-							writablePointers={wises.navigate(index + 2)}
-						/>
+						<Wise key={index} wise={fields.wises(index + 2)} />
 					))}
 			</Fieldset>
 		</div>
@@ -67,13 +51,7 @@ const optionalToBoolMapping: FieldMapping<boolean | undefined, boolean> = {
 	fromForm: (v) => v || undefined,
 };
 
-export function Wise({
-	wise,
-	writablePointers,
-}: {
-	wise: FormFieldReturnType<Wise>;
-	writablePointers: DocumentPointers;
-}) {
+export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 	const fields = useFormFields(wise, {
 		name: ['name'],
 		pass: { path: ['pass'], mapping: optionalToBoolMapping },
@@ -81,7 +59,6 @@ export function Wise({
 		persona: { path: ['persona'], mapping: optionalToBoolMapping },
 		fate: { path: ['fate'], mapping: optionalToBoolMapping },
 	});
-	const hasBasePath = writablePointers.contains();
 
 	return (
 		<div className="flex flex-row flex-wrap gap-2">
@@ -89,25 +66,12 @@ export function Wise({
 				labelClassName="sr-only"
 				className="block flex-1 min-w-fit w-64"
 				field={fields.name}
-				readOnly={!hasBasePath && !writablePointers.contains('name')}
 			/>
 			<div className="flex flex-row gap-2 justify-end flex-1">
-				<WiseToggleButton
-					field={fields.pass}
-					readOnly={!hasBasePath && !writablePointers.contains('pass')}
-				/>
-				<WiseToggleButton
-					field={fields.fail}
-					readOnly={!hasBasePath && !writablePointers.contains('fail')}
-				/>
-				<WiseToggleButton
-					field={fields.fate}
-					readOnly={!hasBasePath && !writablePointers.contains('fate')}
-				/>
-				<WiseToggleButton
-					field={fields.persona}
-					readOnly={!hasBasePath && !writablePointers.contains('persona')}
-				/>
+				<WiseToggleButton field={fields.pass} />
+				<WiseToggleButton field={fields.fail} />
+				<WiseToggleButton field={fields.fate} />
+				<WiseToggleButton field={fields.persona} />
 			</div>
 		</div>
 	);
