@@ -8,3 +8,12 @@ export function matchPermission(
 	const result = pattern.exec(targetPermission);
 	return !!result;
 }
+
+export function hasPermission(
+	permissionList: string[],
+	targetPermission: string,
+) {
+	return permissionList.some((permissionPattern) =>
+		matchPermission(permissionPattern, targetPermission),
+	);
+}

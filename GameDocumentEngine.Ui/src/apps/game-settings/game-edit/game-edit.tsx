@@ -12,20 +12,30 @@ import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
+import { hasPermission } from '@/utils/security/match-permission';
+import { updateGame } from '@/utils/security/permission-strings';
 
 function usePatchGame(gameId: string) {
 	const queryClient = useQueryClient();
 	return useMutation(queries.patchGame(queryClient, gameId));
 }
 
-export function GameEditFields({ name }: { name: UseFieldResult<string> }) {
+export function GameEditFields({
+	name,
+	canEdit,
+}: {
+	name: UseFieldResult<string>;
+	canEdit: boolean;
+}) {
 	const { t } = useTranslation(['edit-game']);
 	return (
 		<Fieldset>
 			<TextField field={name} />
-			<ButtonRow>
-				<Button type="submit">{t('submit')}</Button>
-			</ButtonRow>
+			{canEdit && (
+				<ButtonRow>
+					<Button type="submit">{t('submit')}</Button>
+				</ButtonRow>
+			)}
 		</Fieldset>
 	);
 }
@@ -56,11 +66,13 @@ export function GameEdit({ gameId }: { gameId: string }) {
 	}
 	const gameData = gameQueryResult.data;
 	updateFormDefault(gameForm, gameData);
+	const canEdit = hasPermission(gameData.permissions, updateGame(gameData.id));
+	gameForm.store.set(gameForm.readOnlyFields, !canEdit);
 
 	return (
 		<>
 			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
-				<GameEditFields {...gameForm.fields} />
+				<GameEditFields {...gameForm.fields} canEdit={canEdit} />
 			</form>
 		</>
 	);

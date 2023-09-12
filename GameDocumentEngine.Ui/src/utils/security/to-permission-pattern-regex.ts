@@ -1,6 +1,10 @@
 const escapedRegexCharacters = /([-[\]{}()*+?.,\\^$|#\s])/g;
 
+const permissionMapping = new Map<string, RegExp>();
+
 export function toPermissionPatternRegex(permissionPattern: string): RegExp {
+	const cached = permissionMapping.get(permissionPattern);
+	if (cached) return cached;
 	const parts = permissionPattern
 		.split('#')[0]
 		.split(':')
@@ -20,5 +24,6 @@ export function toPermissionPatternRegex(permissionPattern: string): RegExp {
 		});
 
 	const result = new RegExp(`^${parts.join(':')}$`);
+	permissionMapping.set(permissionPattern, result);
 	return result;
 }
