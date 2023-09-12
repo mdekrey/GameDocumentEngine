@@ -7,7 +7,7 @@ import type {
 	MessageFromWindow,
 } from './service-worker/messages';
 import { neverEver } from './utils/never-ever';
-import { HubConnectionState } from '@microsoft/signalr';
+import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -66,24 +66,7 @@ self.addEventListener('activate', (event) => {
 			log('activating');
 			await self.clients.claim();
 			log('connection', connection.state);
-			connection.on('EntityChanged', (...args) => {
-				void sendToAll({
-					type: 'entity',
-					entityName: args[0],
-					changeEvent: args[1],
-				});
-			});
-			connection.onclose((err) => {
-				console.error('onclose', err);
-				void sendToAll(getHubStateMessage());
-			});
-			connection.onreconnecting((err) => {
-				console.error('onreconnecting', err);
-				void sendToAll(getHubStateMessage());
-			});
-			connection.onreconnected(() => {
-				void sendToAll(getHubStateMessage());
-			});
+			setupConnection(connection);
 			await connectionPromise;
 			void sendToAll(getHubStateMessage());
 			log('activated');
@@ -96,6 +79,28 @@ self.addEventListener('message', (ev) => {
 	handleMessageFromWindow(ev.source as Client, ev.data as MessageFromWindow);
 });
 
+function setupConnection(connection: HubConnection) {
+	connection.off('EntityChanged');
+	connection.on('EntityChanged', (...args) => {
+		void sendToAll({
+			type: 'entity',
+			entityName: args[0],
+			changeEvent: args[1],
+		});
+	});
+	connection.onclose((err) => {
+		console.error('onclose', err);
+		void sendToAll(getHubStateMessage());
+	});
+	connection.onreconnecting((err) => {
+		console.error('onreconnecting', err);
+		void sendToAll(getHubStateMessage());
+	});
+	connection.onreconnected(() => {
+		void sendToAll(getHubStateMessage());
+	});
+}
+
 function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 	switch (data.type) {
 		case 'requestHubState':
@@ -103,9 +108,10 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 			return;
 		case 'requestReconnect':
 			if (connection.state === HubConnectionState.Disconnected) {
-				void connection
-					.start()
-					.finally(() => void sendToAll(getHubStateMessage()));
+				void connection.start().finally(() => {
+					setupConnection(connection);
+					void sendToAll(getHubStateMessage());
+				});
 				void sendToAll(getHubStateMessage());
 			}
 			break;
@@ -116,9 +122,10 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 			if (connection.state !== HubConnectionState.Disconnected) {
 				void (async function () {
 					await connection.stop();
-					void connection
-						.start()
-						.finally(() => void sendToAll(getHubStateMessage()));
+					void connection.start().finally(() => {
+						setupConnection(connection);
+						void sendToAll(getHubStateMessage());
+					});
 					void sendToAll(getHubStateMessage());
 				})();
 			}
