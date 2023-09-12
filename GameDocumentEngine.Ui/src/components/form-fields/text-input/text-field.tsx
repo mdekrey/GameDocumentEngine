@@ -60,13 +60,13 @@ export function TextField<T>(props: TextFieldProps<T>) {
 		contentsClassName,
 		...fieldProps
 	} = props;
-	const disablableLabelClassName = useTwMerge(
+	const disabledLabelClassName = useTwMerge(
 		useComputedAtom((get) => (get(htmlProps.disabled) ? 'text-slate-500' : '')),
 		labelClassName,
 	);
 	return (
 		<Field {...fieldProps}>
-			<Field.Label className={disablableLabelClassName}>
+			<Field.Label className={disabledLabelClassName}>
 				{t(['label'])}
 			</Field.Label>
 			<Field.Contents className={contentsClassName}>

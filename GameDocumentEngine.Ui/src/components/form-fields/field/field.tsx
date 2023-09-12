@@ -30,7 +30,7 @@ export const Field = withSlots<FieldSlots, FieldProps>(
 
 		const classNameAtom = useTwMerge('group', className);
 		const labelClassNameAtom = useTwMerge(
-			'group-focus-within:font-bold transition-all pt-2',
+			'group-focus-within:font-bold text-sm transition-all pt-2',
 			labelClassName,
 		);
 		const contentsClassNameAtom = useTwMerge('block', contentsClassName);
