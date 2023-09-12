@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
+import { Section, SingleColumnSections } from '@/components/sections';
 
 function useCreateGame() {
 	const navigate = useNavigate();
@@ -34,31 +35,33 @@ export function CreateGame() {
 	const createGame = useCreateGame();
 
 	return (
-		<>
-			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
-				<Fieldset>
-					<TextField field={gameForm.field(['name'])} />
-					<SelectField
-						field={gameForm.field(['type'])}
-						items={Object.keys(gameTypesResult.data ?? {})}
-						key={gameTypesResult.data ? 1 : 0}
-					>
-						{(gt) =>
-							gt ? (
-								<>{getGameTypeName(gt)}</>
-							) : (
-								<span className="text-slate-500">
-									{gameForm.field(['type']).translation('not-selected')}
-								</span>
-							)
-						}
-					</SelectField>
-					<ButtonRow>
-						<Button type="submit">{t('submit')}</Button>
-					</ButtonRow>
-				</Fieldset>
-			</form>
-		</>
+		<SingleColumnSections>
+			<Section>
+				<form onSubmit={gameForm.handleSubmit(onSubmit)}>
+					<Fieldset>
+						<TextField field={gameForm.field(['name'])} />
+						<SelectField
+							field={gameForm.field(['type'])}
+							items={Object.keys(gameTypesResult.data ?? {})}
+							key={gameTypesResult.data ? 1 : 0}
+						>
+							{(gt) =>
+								gt ? (
+									<>{getGameTypeName(gt)}</>
+								) : (
+									<span className="text-slate-500">
+										{gameForm.field(['type']).translation('not-selected')}
+									</span>
+								)
+							}
+						</SelectField>
+						<ButtonRow>
+							<Button type="submit">{t('submit')}</Button>
+						</ButtonRow>
+					</Fieldset>
+				</form>
+			</Section>
+		</SingleColumnSections>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {
