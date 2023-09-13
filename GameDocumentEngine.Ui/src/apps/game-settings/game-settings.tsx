@@ -10,7 +10,7 @@ import {
 	SingleColumnSections,
 } from '@/components/sections';
 import { listInvitations } from '@/utils/security/permission-strings';
-import { hasPermission } from '@/utils/security/match-permission';
+import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	displayDangerZone,
 	GameDangerZone,
@@ -28,10 +28,7 @@ export function GameSettings({ gameId }: { gameId: string }) {
 	}
 
 	const gameDetails = gameResult.data;
-	const showInvites = hasPermission(
-		gameDetails.permissions,
-		listInvitations(gameDetails.id),
-	);
+	const showInvites = hasGamePermission(gameDetails, listInvitations);
 
 	return (
 		<SingleColumnSections>

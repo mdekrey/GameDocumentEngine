@@ -9,7 +9,7 @@ import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
 import { GameDetails } from '@/api/models/GameDetails';
-import { hasPermission } from '@/utils/security/match-permission';
+import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	deleteGame,
 	updateGameUserAccess,
@@ -17,13 +17,10 @@ import {
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 
 function displayRemoveUser(gameDetails: GameDetails) {
-	return hasPermission(
-		gameDetails.permissions,
-		updateGameUserAccess(gameDetails.id),
-	);
+	return hasGamePermission(gameDetails, updateGameUserAccess);
 }
 function displayDeleteGame(gameDetails: GameDetails) {
-	return hasPermission(gameDetails.permissions, deleteGame(gameDetails.id));
+	return hasGamePermission(gameDetails, deleteGame);
 }
 
 export function displayDangerZone(gameDetails: GameDetails) {

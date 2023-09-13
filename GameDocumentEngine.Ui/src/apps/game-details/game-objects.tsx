@@ -5,6 +5,8 @@ import { HiPlus, HiChevronRight } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { useGameType } from '../documents/useGameType';
 import { useTranslation } from 'react-i18next';
+import { hasGamePermission } from '@/utils/security/match-permission';
+import { createDocument } from '@/utils/security/permission-strings';
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
@@ -17,6 +19,8 @@ export function GameObjects({ gameId }: { gameId: string }) {
 	} else if (gameDetails.isError || docsResult.isError || gameType.isError) {
 		return 'Error';
 	}
+
+	const canCreate = hasGamePermission(gameDetails.data, createDocument);
 
 	return (
 		<div className="h-full p-4 flex flex-col gap-2">
@@ -34,12 +38,14 @@ export function GameObjects({ gameId }: { gameId: string }) {
 					<Link to={`/game/${gameId}`} className="flex-1 text-lg font-bold">
 						{t('header')}
 					</Link>
-					<IconLinkButton.Save
-						to={`/game/${gameId}/create-document`}
-						title={t('create-document')}
-					>
-						<HiPlus />
-					</IconLinkButton.Save>
+					{canCreate && (
+						<IconLinkButton.Save
+							to={`/game/${gameId}/create-document`}
+							title={t('create-document')}
+						>
+							<HiPlus />
+						</IconLinkButton.Save>
+					)}
 				</div>
 				{/* TODO: search? */}
 				<ul className={'contents'}>

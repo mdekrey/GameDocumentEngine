@@ -12,7 +12,7 @@ import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { hasPermission } from '@/utils/security/match-permission';
+import { hasGamePermission } from '@/utils/security/match-permission';
 import { updateGame } from '@/utils/security/permission-strings';
 
 function usePatchGame(gameId: string) {
@@ -66,7 +66,7 @@ export function GameEdit({ gameId }: { gameId: string }) {
 	}
 	const gameData = gameQueryResult.data;
 	updateFormDefault(gameForm, gameData);
-	const canEdit = hasPermission(gameData.permissions, updateGame(gameData.id));
+	const canEdit = hasGamePermission(gameData, updateGame);
 	gameForm.store.set(gameForm.readOnlyFields, !canEdit);
 
 	return (
