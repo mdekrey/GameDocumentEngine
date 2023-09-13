@@ -9,6 +9,8 @@ import { useModal } from '@/utils/modal/modal-service';
 import { useGameType } from '../useGameType';
 import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
 import { Prose } from '@/components/text/common';
+import { updateDocumentUserAccess } from '@/utils/security/permission-strings';
+import { hasPermission } from '@/utils/security/match-permission';
 
 function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
@@ -88,6 +90,10 @@ export function DocumentSettings({
 					roleTranslations={
 						gameType.data.objectTypes[documentResult.data.type].translation
 					}
+					allowUpdate={hasPermission(
+						gameDetails.permissions,
+						updateDocumentUserAccess(gameDetails.id, docData.id),
+					)}
 				/>
 			</section>
 			<section className="flex flex-col gap-2">

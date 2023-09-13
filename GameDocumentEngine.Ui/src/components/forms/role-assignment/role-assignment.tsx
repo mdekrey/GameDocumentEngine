@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { ErrorsList } from '@/components/form-fields/errors/errors-list';
@@ -5,7 +7,9 @@ import { Field } from '@/components/form-fields/field/field';
 import { SelectInput } from '@/components/form-fields/select-input/select-input';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useForm } from '@/utils/form/useForm';
-import { z } from 'zod';
+import { queries } from '@/utils/api/queries';
+import { useRealtimeApi } from '@/utils/api/realtime-api';
+import { defaultField } from '@/utils/form/fieldStateTracking';
 
 export const UserRoleAssignment = z.object({}).catchall(z.string());
 
@@ -19,6 +23,7 @@ export type RoleAssignmentProps = {
 	) => void | Promise<void>;
 	roleTranslations: (key: string) => string;
 	translations: (key: string) => string;
+	allowUpdate: boolean;
 };
 
 export function RoleAssignment({
@@ -28,8 +33,11 @@ export function RoleAssignment({
 	defaultRole,
 	onSaveRoles,
 	roleTranslations,
+	allowUpdate,
 	translations: t,
 }: RoleAssignmentProps) {
+	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
+
 	const formData =
 		defaultRole !== undefined
 			? Object.fromEntries(
@@ -45,8 +53,19 @@ export function RoleAssignment({
 		fields: {
 			row: (userId: string) => [userId] as const,
 		},
+		readOnly: !allowUpdate,
 	});
 	updateFormDefault(form, formData);
+	if (userResult.data?.id) {
+		form.store.set(form.readOnlyFields, (prev) => {
+			if (!allowUpdate) return true;
+			if (typeof prev === 'object' && prev[userResult.data.id]) return prev;
+			return {
+				[userResult.data.id]: true,
+				[defaultField]: false,
+			};
+		});
+	}
 
 	return (
 		<form
@@ -77,9 +96,11 @@ export function RoleAssignment({
 					</Field>
 				);
 			})}
-			<ButtonRow>
-				<Button type="submit">{t('submit')}</Button>
-			</ButtonRow>
+			{allowUpdate && (
+				<ButtonRow>
+					<Button type="submit">{t('submit')}</Button>
+				</ButtonRow>
+			)}
 		</form>
 	);
 

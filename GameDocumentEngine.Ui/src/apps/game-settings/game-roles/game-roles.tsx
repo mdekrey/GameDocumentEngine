@@ -2,7 +2,9 @@ import { queries } from '@/utils/api/queries';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { useTranslation } from 'react-i18next';
-import { useGameType } from '../../documents/useGameType';
+import { useGameType } from '@/apps/documents/useGameType';
+import { hasPermission } from '@/utils/security/match-permission';
+import { updateGameUserAccess } from '@/utils/security/permission-strings';
 
 function useUpdateGameRoleAssignments(gameId: string) {
 	return useMutation(queries.updateGameRoleAssignments(gameId));
@@ -31,6 +33,10 @@ export function GameRoles({ gameId }: { gameId: string }) {
 			onSaveRoles={onSaveRoles}
 			roleTranslations={gameType.data.translation}
 			translations={t}
+			allowUpdate={hasPermission(
+				gameDetails.permissions,
+				updateGameUserAccess(gameDetails.id),
+			)}
 		/>
 	);
 	function onSaveRoles(roleAssignments: { [userId: string]: string }) {
