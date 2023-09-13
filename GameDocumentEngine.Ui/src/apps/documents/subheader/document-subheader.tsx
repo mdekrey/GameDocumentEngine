@@ -4,6 +4,7 @@ import { HiOutlineCog6Tooth } from 'react-icons/hi2';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { displayDocumentSettings } from '../document-settings/document-settings';
 
 export function DocumentSubheader({
 	gameId,
@@ -14,11 +15,12 @@ export function DocumentSubheader({
 }) {
 	const { t } = useTranslation(['document-details']);
 	const documentResult = useQuery(queries.getDocument(gameId, documentId));
+	const gameResult = useQuery(queries.getGameDetails(gameId));
 
-	if (documentResult.isLoading) {
+	if (gameResult.isLoading || documentResult.isLoading) {
 		return 'Loading';
 	}
-	if (documentResult.isError) {
+	if (gameResult.isError || documentResult.isError) {
 		return 'An error occurred loading the document.';
 	}
 
@@ -31,13 +33,14 @@ export function DocumentSubheader({
 					{document.name}
 				</Link>
 			</h1>
-			<IconLinkButton.Secondary
-				to={`/game/${gameId}/document/${documentId}/settings`}
-				title={t('settings', { name: document.name })}
-			>
-				{/* TODO - do we have permissions for this link? */}
-				<HiOutlineCog6Tooth />
-			</IconLinkButton.Secondary>
+			{displayDocumentSettings(gameResult.data, document) && (
+				<IconLinkButton.Secondary
+					to={`/game/${gameId}/document/${documentId}/settings`}
+					title={t('settings', { name: document.name })}
+				>
+					<HiOutlineCog6Tooth />
+				</IconLinkButton.Secondary>
+			)}
 		</div>
 	);
 }

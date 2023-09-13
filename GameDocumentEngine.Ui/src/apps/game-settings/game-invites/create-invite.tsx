@@ -14,6 +14,8 @@ import { SelectField } from '@/components/form-fields/select-input/select-field'
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { noChange } from '@/utils/form/mapAtom';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
+import { createInvitation } from '@/utils/security/permission-strings';
+import { hasGamePermission } from '@/utils/security/match-permission';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -74,16 +76,17 @@ export function CreateInvite({
 		},
 	});
 
+	const allowedRoles = gameData.typeInfo.userRoles.filter((role) =>
+		hasGamePermission(gameData, (id) => createInvitation(id, role)),
+	);
+
 	return (
 		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
 			<ModalDialogLayout>
 				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
 
 				<Fieldset>
-					<SelectField
-						field={form.fields.role}
-						items={gameData.typeInfo.userRoles}
-					>
+					<SelectField field={form.fields.role} items={allowedRoles}>
 						{(dt) =>
 							dt ? (
 								<>{gameType.translation?.(`roles.${dt}.name`)}</>

@@ -10,6 +10,11 @@ import { constructUrl as constructClaimInvitation } from '@/api/operations/claim
 import { DeleteInviteModal } from './delete-invite';
 import { useTranslation } from 'react-i18next';
 import { useGameType } from '../../documents/useGameType';
+import { hasGamePermission } from '@/utils/security/match-permission';
+import {
+	createInvitation,
+	cancelInvitation,
+} from '@/utils/security/permission-strings';
 
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
@@ -48,14 +53,20 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const invitations = Object.values(invitationsResult.data);
 	const gameType = gameTypeInfo.data;
 
+	const allowCreate = gameDetails.typeInfo.userRoles.some((role) =>
+		hasGamePermission(gameDetails, (id) => createInvitation(id, role)),
+	);
+	const allowCancel = hasGamePermission(gameDetails, cancelInvitation);
+
 	return (
 		<>
 			<div className="flex flex-row gap-3">
 				<h1 className="text-2xl font-bold flex-1">{t('title')}</h1>
-
-				<IconButton.Save title={t('create-new')} onClick={createInvite}>
-					<HiPlus />
-				</IconButton.Save>
+				{allowCreate && (
+					<IconButton.Save title={t('create-new')} onClick={createInvite}>
+						<HiPlus />
+					</IconButton.Save>
+				)}
 			</div>
 			<table className="gap-3 items-center justify-items-center w-full">
 				<thead>
@@ -104,12 +115,14 @@ export function GameInvites({ gameId }: { gameId: string }) {
 											>
 												<HiLink />
 											</IconButton>
-											<IconButton.Destructive
-												title={t('delete')}
-												onClick={() => void showDeleteInviteModal(invite)}
-											>
-												<HiOutlineTrash />
-											</IconButton.Destructive>
+											{allowCancel && (
+												<IconButton.Destructive
+													title={t('delete')}
+													onClick={() => void showDeleteInviteModal(invite)}
+												>
+													<HiOutlineTrash />
+												</IconButton.Destructive>
+											)}
 										</td>
 									</>
 								)}

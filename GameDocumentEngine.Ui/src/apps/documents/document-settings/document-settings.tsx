@@ -9,8 +9,37 @@ import { useModal } from '@/utils/modal/modal-service';
 import { useGameType } from '../useGameType';
 import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
 import { Prose } from '@/components/text/common';
-import { updateDocumentUserAccess } from '@/utils/security/permission-strings';
+import {
+	deleteDocument,
+	updateDocumentUserAccess,
+} from '@/utils/security/permission-strings';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
+import { DocumentDetails } from '@/api/models/DocumentDetails';
+import { GameDetails } from '@/api/models/GameDetails';
+
+function displayUserPermissions(
+	gameDetails: GameDetails,
+	documentDetails: DocumentDetails,
+) {
+	return hasDocumentPermission(
+		gameDetails,
+		documentDetails,
+		updateDocumentUserAccess,
+	);
+}
+function displayDeleteDocument(
+	gameDetails: GameDetails,
+	documentDetails: DocumentDetails,
+) {
+	return hasDocumentPermission(gameDetails, documentDetails, deleteDocument);
+}
+
+export function displayDocumentSettings(
+	gameDetails: GameDetails,
+	documentDetails: DocumentDetails,
+) {
+	return displayDeleteDocument(gameDetails, documentDetails);
+}
 
 function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
@@ -74,6 +103,8 @@ export function DocumentSettings({
 	const actualRoles = ['', ...docType.userRoles];
 	const userRoles = documentResult.data.userRoles;
 
+	const displayDelete = displayDeleteDocument(gameDetails, docData);
+
 	return (
 		<Sections>
 			<section>
@@ -90,20 +121,18 @@ export function DocumentSettings({
 					roleTranslations={
 						gameType.data.objectTypes[documentResult.data.type].translation
 					}
-					allowUpdate={hasDocumentPermission(
-						gameDetails,
-						docData,
-						updateDocumentUserAccess,
-					)}
+					allowUpdate={displayUserPermissions(gameDetails, docData)}
 				/>
 			</section>
-			<section className="flex flex-col gap-2">
-				<SectionHeader>{t('danger-zone')}</SectionHeader>
-				<Button.Destructive onClick={() => void handleDelete()}>
-					<HiOutlineTrash />
-					{t('delete-document', { name: docData.name })}
-				</Button.Destructive>
-			</section>
+			{displayDelete && (
+				<section className="flex flex-col gap-2">
+					<SectionHeader>{t('danger-zone')}</SectionHeader>
+					<Button.Destructive onClick={() => void handleDelete()}>
+						<HiOutlineTrash />
+						{t('delete-document', { name: docData.name })}
+					</Button.Destructive>
+				</section>
+			)}
 		</Sections>
 	);
 
