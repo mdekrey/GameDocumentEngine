@@ -24,16 +24,14 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	const gameDetails = gameResult.data;
 
 	return (
-		<>
-			<RoleAssignment
-				userRoles={gameDetails.userRoles}
-				playerNames={gameDetails.playerNames}
-				roles={gameDetails.typeInfo.userRoles}
-				onSaveRoles={onSaveRoles}
-				roleTranslations={gameType.data.translation}
-				translations={t}
-			/>
-		</>
+		<RoleAssignment
+			userRoles={gameDetails.userRoles}
+			playerNames={gameDetails.playerNames}
+			roles={gameDetails.typeInfo.userRoles}
+			onSaveRoles={onSaveRoles}
+			roleTranslations={gameType.data.translation}
+			translations={t}
+		/>
 	);
 	function onSaveRoles(roleAssignments: { [userId: string]: string }) {
 		const changed = Object.fromEntries(

@@ -21,7 +21,7 @@ public static class GameSecurity
 	public static string BaseDocument(Guid gameId, Guid documentId) => $"game:{gameId}:document:{documentId}";
 	public static string DeleteDocument(Guid gameId, Guid documentId) => $"{BaseDocument(gameId, documentId)}:delete";
 	public static string UpdateAnyDocumentUserAccess(Guid gameId) => $"game:{gameId}:document:*:change-permissions";
-	public static string UpdateDocumentUserAccess(Guid gameId, Guid documentId) => $"game:{gameId}:document:{documentId}:change-permissions";
+	public static string UpdateDocumentUserAccess(Guid gameId, Guid documentId) => $"{BaseDocument(gameId, documentId)}:change-permissions";
 
 	/// <summary>
 	/// Allows knowledge of the document's existence
