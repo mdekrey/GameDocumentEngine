@@ -12,6 +12,7 @@ import { useGameType } from '../useGameType';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
+import { Section, SingleColumnSections } from '@/components/sections';
 
 function useCreateDocument(gameId: string) {
 	const navigate = useNavigate();
@@ -36,33 +37,35 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	const createDocument = useCreateDocument(gameId);
 
 	return (
-		<>
-			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
-				<Fieldset>
-					<TextField field={gameForm.field(['name'])} />
-					<SelectField
-						field={gameForm.field(['type'])}
-						items={
-							gameType.isSuccess ? Object.keys(gameType.data.objectTypes) : []
-						}
-						key={gameType.data ? 1 : 0}
-					>
-						{(key) =>
-							gameType.isSuccess && gameType.data.objectTypes[key] ? (
-								gameType.data.objectTypes[key].translation('name')
-							) : (
-								<span className="text-slate-500">
-									{gameForm.field(['type']).translation('not-selected')}
-								</span>
-							)
-						}
-					</SelectField>
-					<ButtonRow>
-						<Button type="submit">{t('submit')}</Button>
-					</ButtonRow>
-				</Fieldset>
-			</form>
-		</>
+		<SingleColumnSections>
+			<Section>
+				<form onSubmit={gameForm.handleSubmit(onSubmit)}>
+					<Fieldset>
+						<TextField field={gameForm.field(['name'])} />
+						<SelectField
+							field={gameForm.field(['type'])}
+							items={
+								gameType.isSuccess ? Object.keys(gameType.data.objectTypes) : []
+							}
+							key={gameType.data ? 1 : 0}
+						>
+							{(key) =>
+								gameType.isSuccess && gameType.data.objectTypes[key] ? (
+									gameType.data.objectTypes[key].translation('name')
+								) : (
+									<span className="text-slate-500">
+										{gameForm.field(['type']).translation('not-selected')}
+									</span>
+								)
+							}
+						</SelectField>
+						<ButtonRow>
+							<Button type="submit">{t('submit')}</Button>
+						</ButtonRow>
+					</Fieldset>
+				</form>
+			</Section>
+		</SingleColumnSections>
 	);
 
 	function onSubmit(currentValue: Omit<CreateDocumentDetails, 'details'>) {
