@@ -57,25 +57,29 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const userDetails = userResult.data;
 	return (
 		<>
-			<ul className="list-disc ml-8">
-				{Object.entries(gameDetails.playerNames)
-					.filter(([id]) => id !== userDetails.id)
-					.map(([id, name]) => (
-						<li key={id} className="flex flex-row gap-3 my-3 items-center">
-							{name}
-							<IconButton.Destructive
-								onClick={() => void onDeleteUser(id, name)}
-								title={t('delete-user', { name })}
-							>
-								<HiOutlineTrash />
-							</IconButton.Destructive>
-						</li>
-					))}
-			</ul>
-			<Button.Destructive onClick={() => void onDeleteGame()}>
-				<HiOutlineTrash />
-				{t('delete-game', { name: gameDetails.name })}
-			</Button.Destructive>
+			{displayRemoveUser(gameDetails) && (
+				<ul className="list-disc ml-8">
+					{Object.entries(gameDetails.playerNames)
+						.filter(([id]) => id !== userDetails.id)
+						.map(([id, name]) => (
+							<li key={id} className="flex flex-row gap-3 my-3 items-center">
+								{name}
+								<IconButton.Destructive
+									onClick={() => void onDeleteUser(id, name)}
+									title={t('delete-user', { name })}
+								>
+									<HiOutlineTrash />
+								</IconButton.Destructive>
+							</li>
+						))}
+				</ul>
+			)}
+			{displayDeleteGame(gameDetails) && (
+				<Button.Destructive onClick={() => void onDeleteGame()}>
+					<HiOutlineTrash />
+					{t('delete-game', { name: gameDetails.name })}
+				</Button.Destructive>
+			)}
 		</>
 	);
 
