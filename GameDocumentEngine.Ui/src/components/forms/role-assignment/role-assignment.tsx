@@ -24,6 +24,7 @@ export type RoleAssignmentProps = {
 	roleTranslations: (key: string) => string;
 	translations: (key: string) => string;
 	allowUpdate: boolean;
+	allowUpdateSelf?: boolean;
 };
 
 export function RoleAssignment({
@@ -34,6 +35,7 @@ export function RoleAssignment({
 	onSaveRoles,
 	roleTranslations,
 	allowUpdate,
+	allowUpdateSelf,
 	translations: t,
 }: RoleAssignmentProps) {
 	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
@@ -59,6 +61,7 @@ export function RoleAssignment({
 	if (userResult.data?.id) {
 		form.store.set(form.readOnlyFields, (prev) => {
 			if (!allowUpdate) return true;
+			if (allowUpdateSelf) return false;
 			if (typeof prev === 'object' && prev[userResult.data.id]) return prev;
 			return {
 				[userResult.data.id]: true,

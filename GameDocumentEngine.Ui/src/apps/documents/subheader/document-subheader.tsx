@@ -33,7 +33,7 @@ export function DocumentSubheader({
 					{document.name}
 				</Link>
 			</h1>
-			{displayDocumentSettings(gameResult.data, document) && (
+			{displayDocumentSettings(document) && (
 				<IconLinkButton.Secondary
 					to={`/game/${gameId}/document/${documentId}/settings`}
 					title={t('settings', { name: document.name })}

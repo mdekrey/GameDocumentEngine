@@ -31,12 +31,11 @@ export function hasGamePermission(
 }
 
 export function hasDocumentPermission(
-	gameDetails: GameDetails,
 	documentDetails: DocumentDetails,
 	permissionString: (gameId: string, documentId: string) => string,
 ) {
 	return hasPermission(
-		[...gameDetails.permissions, ...documentDetails.permissions],
-		permissionString(gameDetails.id, documentDetails.id),
+		documentDetails.permissions,
+		permissionString(documentDetails.gameId, documentDetails.id),
 	);
 }

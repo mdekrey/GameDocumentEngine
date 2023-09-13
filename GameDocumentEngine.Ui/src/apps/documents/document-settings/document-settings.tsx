@@ -11,34 +11,29 @@ import { DeleteDocumentModal } from '../document-settings/delete-document-modal'
 import { Prose } from '@/components/text/common';
 import {
 	deleteDocument,
+	updateDocumentAccessForSelf,
 	updateDocumentUserAccess,
 } from '@/utils/security/permission-strings';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
 import { DocumentDetails } from '@/api/models/DocumentDetails';
-import { GameDetails } from '@/api/models/GameDetails';
 
-function displayUserPermissions(
-	gameDetails: GameDetails,
-	documentDetails: DocumentDetails,
-) {
-	return hasDocumentPermission(
-		gameDetails,
-		documentDetails,
-		updateDocumentUserAccess,
+function displayUserPermissions(documentDetails: DocumentDetails) {
+	return hasDocumentPermission(documentDetails, updateDocumentUserAccess);
+}
+function canUpdateOwnPermissions(documentDetails: DocumentDetails) {
+	return hasDocumentPermission(documentDetails, updateDocumentAccessForSelf);
+}
+
+function displayDeleteDocument(documentDetails: DocumentDetails) {
+	return hasDocumentPermission(documentDetails, deleteDocument);
+}
+
+export function displayDocumentSettings(documentDetails: DocumentDetails) {
+	console.log({ documentDetails });
+	return (
+		displayUserPermissions(documentDetails) ||
+		displayDeleteDocument(documentDetails)
 	);
-}
-function displayDeleteDocument(
-	gameDetails: GameDetails,
-	documentDetails: DocumentDetails,
-) {
-	return hasDocumentPermission(gameDetails, documentDetails, deleteDocument);
-}
-
-export function displayDocumentSettings(
-	gameDetails: GameDetails,
-	documentDetails: DocumentDetails,
-) {
-	return displayDeleteDocument(gameDetails, documentDetails);
 }
 
 function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
@@ -103,7 +98,7 @@ export function DocumentSettings({
 	const actualRoles = ['', ...docType.userRoles];
 	const userRoles = documentResult.data.userRoles;
 
-	const displayDelete = displayDeleteDocument(gameDetails, docData);
+	const displayDelete = displayDeleteDocument(docData);
 
 	return (
 		<Sections>
@@ -121,7 +116,8 @@ export function DocumentSettings({
 					roleTranslations={
 						gameType.data.objectTypes[documentResult.data.type].translation
 					}
-					allowUpdate={displayUserPermissions(gameDetails, docData)}
+					allowUpdate={displayUserPermissions(docData)}
+					allowUpdateSelf={canUpdateOwnPermissions(docData)}
 				/>
 			</section>
 			{displayDelete && (

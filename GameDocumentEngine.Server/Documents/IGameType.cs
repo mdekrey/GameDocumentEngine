@@ -31,7 +31,8 @@ public interface IGameType
 					AnyInvitationPermission(gameId),
 					SeeAnyDocument(gameId),
 					DeleteAnyDocument(gameId),
-					UpdateAnyDocumentUserAccess(gameId)
+					UpdateAnyDocumentUserAccess(gameId),
+					UpdateAnyDocumentOwnAccess(gameId)
 				);
 			case "asst-gm":
 				return PermissionList.From(

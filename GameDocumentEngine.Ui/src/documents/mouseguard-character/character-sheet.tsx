@@ -27,6 +27,7 @@ import { Sections, Section, SectionHeader } from '@/components/sections';
 import {
 	getWritableDocumentPointers,
 	DocumentPointers,
+	getReadableDocumentPointers,
 } from '@/documents/get-document-pointers';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 
@@ -35,6 +36,13 @@ export function FullCharacterSheet({
 	onUpdateDocument,
 	translation,
 }: GameObjectWidgetProps<Character>) {
+	const readablePointers = useMemo(
+		() =>
+			document.data
+				? getReadableDocumentPointers(document.data, characterFixup.toForm)
+				: null,
+		[document.data],
+	);
 	const writablePointers = useMemo(
 		() =>
 			document.data
@@ -42,20 +50,23 @@ export function FullCharacterSheet({
 				: null,
 		[document.data],
 	);
-	if (!document.data || !writablePointers) {
+	if (!document.data || !writablePointers || !readablePointers) {
 		return 'Loading...';
 	}
 
 	const characterData = document.data;
+	console.log({ readablePointers });
 
 	return (
 		<div className="p-4">
-			<CharacterSheet
-				writablePointers={writablePointers}
-				character={characterData}
-				translation={translation}
-				onUpdateDocument={onUpdateDocument}
-			/>
+			{readablePointers.pointers.length > 0 && (
+				<CharacterSheet
+					writablePointers={writablePointers}
+					character={characterData}
+					translation={translation}
+					onUpdateDocument={onUpdateDocument}
+				/>
+			)}
 		</div>
 	);
 }

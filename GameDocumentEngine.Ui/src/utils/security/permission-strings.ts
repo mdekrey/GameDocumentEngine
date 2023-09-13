@@ -18,6 +18,10 @@ export const deleteDocument = (gameId: string, documentId: string) =>
 	`${baseDocument(gameId, documentId)}:delete`;
 export const updateDocumentUserAccess = (gameId: string, documentId: string) =>
 	`${baseDocument(gameId, documentId)}:change-permissions`;
+export const updateDocumentAccessForSelf = (
+	gameId: string,
+	documentId: string,
+) => `${baseDocument(gameId, documentId)}:change-my-permissions`;
 
 export const writeDocumentDetailsPrefix = (
 	gameId: string,

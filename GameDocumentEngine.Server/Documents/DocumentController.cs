@@ -178,6 +178,7 @@ public class DocumentController : Api.DocumentControllerBase
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
 		if (permissions == null) return UpdateDocumentRoleAssignmentsActionResult.NotFound();
 		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId, id))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
+		var canUpdateSelf = permissions.HasPermission(UpdateDocumentAccessForSelf(gameId, id));
 
 		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document;
 		if (document == null)
@@ -196,7 +197,7 @@ public class DocumentController : Api.DocumentControllerBase
 		foreach (var kvp in updateDocumentRoleAssignmentsBody)
 		{
 			var key = Guid.Parse(kvp.Key);
-			if (key == permissions.GameUser.UserId)
+			if (key == permissions.GameUser.UserId && !canUpdateSelf)
 				// Can't update your own permissions!
 				return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
 			var modifiedUser = gameUserRecords.FirstOrDefault(u => u.UserId == key);
