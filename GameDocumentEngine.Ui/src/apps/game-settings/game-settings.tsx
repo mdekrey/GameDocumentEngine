@@ -9,12 +9,30 @@ import {
 	SectionHeader,
 	SingleColumnSections,
 } from '@/components/sections';
-import { listInvitations } from '@/utils/security/permission-strings';
+import {
+	listInvitations,
+	updateGame,
+	updateGameUserAccess,
+} from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	displayDangerZone,
 	GameDangerZone,
 } from './game-danger-zone/game-danger-zone';
+import { GameDetails } from '@/api/models/GameDetails';
+
+function displayInvites(gameDetails: GameDetails) {
+	return hasGamePermission(gameDetails, listInvitations);
+}
+
+export function displayGameSettings(gameDetails: GameDetails) {
+	return (
+		hasGamePermission(gameDetails, updateGame) &&
+		hasGamePermission(gameDetails, updateGameUserAccess) &&
+		displayInvites(gameDetails) &&
+		displayDangerZone(gameDetails)
+	);
+}
 
 export function GameSettings({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-settings');
@@ -28,7 +46,7 @@ export function GameSettings({ gameId }: { gameId: string }) {
 	}
 
 	const gameDetails = gameResult.data;
-	const showInvites = hasGamePermission(gameDetails, listInvitations);
+	const showInvites = displayInvites(gameDetails);
 
 	return (
 		<SingleColumnSections>
