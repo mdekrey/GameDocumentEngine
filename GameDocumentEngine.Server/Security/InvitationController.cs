@@ -39,7 +39,7 @@ public class InvitationController : Api.InvitationsControllerBase
 	{
 		if ((createInvitationBody.Uses != -1 && createInvitationBody.Uses <= 0))
 			return CreateInvitationActionResult.BadRequest();
-		var gameUserRecord = await (from gameUser in dbContext.GameUsers
+		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
 									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return CreateInvitationActionResult.NotFound();
