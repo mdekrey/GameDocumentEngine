@@ -14,6 +14,7 @@ import {
 	deleteGame,
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
+import { useRealtimeApi } from '@/utils/api/realtime-api';
 
 function displayRemoveUser(gameDetails: GameDetails) {
 	return hasPermission(
@@ -42,30 +43,34 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const launchModal = useModal();
 	const { t } = useTranslation('game-settings');
 	const gameResult = useQuery(queries.getGameDetails(gameId));
+	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
 
-	if (gameResult.isLoading) {
+	if (gameResult.isLoading || userResult.isLoading) {
 		return 'Loading';
 	}
-	if (!gameResult.isSuccess) {
+	if (!gameResult.isSuccess || !userResult.isSuccess) {
 		return 'An error occurred loading the game.';
 	}
 	const gameDetails = gameResult.data;
+	const userDetails = userResult.data;
 	return (
 		<>
 			<ul className="list-disc ml-8">
-				{Object.entries(gameDetails.playerNames).map(([id, name]) => (
-					<li key={id} className="flex flex-row gap-3 my-3 items-center">
-						{name}
-						<IconButton.Destructive
-							onClick={() => void onDeleteUser(id, name)}
-							title={t('delete-user', { name })}
-						>
-							<HiOutlineTrash />
-						</IconButton.Destructive>
-					</li>
-				))}
+				{Object.entries(gameDetails.playerNames)
+					.filter(([id]) => id !== userDetails.id)
+					.map(([id, name]) => (
+						<li key={id} className="flex flex-row gap-3 my-3 items-center">
+							{name}
+							<IconButton.Destructive
+								onClick={() => void onDeleteUser(id, name)}
+								title={t('delete-user', { name })}
+							>
+								<HiOutlineTrash />
+							</IconButton.Destructive>
+						</li>
+					))}
 			</ul>
 			<Button.Destructive onClick={() => void onDeleteGame()}>
 				<HiOutlineTrash />
