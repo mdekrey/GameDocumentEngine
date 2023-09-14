@@ -15,7 +15,7 @@ import {
 	type EditableDocumentDetails,
 } from '@/documents/defineDocument';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
 import { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form/useForm';
@@ -70,6 +70,12 @@ export function DocumentDetailsForm<T = unknown>({
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
 	updateFormDefaultMapped(form, editable.document, fixup);
+	useEffect(() => {
+		form.store.set(
+			form.readOnlyFields,
+			toReadOnlyFields(editable.writablePointers),
+		);
+	}, [form, editable.writablePointers]);
 
 	const onUpdateDocument = useCallback(
 		async function handleUpdate(
