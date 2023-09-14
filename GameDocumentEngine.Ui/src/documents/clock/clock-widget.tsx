@@ -2,7 +2,7 @@ import '@/utils/api/queries';
 import type { GameObjectWidgetProps, Updater } from '../defineDocument';
 import { ClockSvg } from './clock-svg';
 import { IconButton } from '@/components/button/icon-button';
-import { HiOutlineCog, HiOutlineUserGroup } from 'react-icons/hi2';
+import { HiOutlinePencil } from 'react-icons/hi2';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useModal } from '@/utils/modal/modal-service';
 import { ClockEdit } from './clock-edit';
@@ -10,39 +10,55 @@ import type { Clock, ClockDocument } from './clock-types';
 import { useQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { useMemo } from 'react';
-import { IconLinkButton } from '@/components/button/icon-link-button';
+import { Section, SingleColumnSections } from '@/components/sections';
 
 export function Clock({
 	document,
 	onUpdateDocument,
 	translation: t,
 }: GameObjectWidgetProps<Clock>) {
+	const fixupClockData = useMemo(
+		(): ClockDocument | null =>
+			document.isSuccess
+				? {
+						name: document.data.name,
+						details: document.data.details,
+				  }
+				: null,
+		[document.isSuccess, document.data],
+	);
+
 	const launchModal = useModal();
-	if (!document.data) {
+	if (!document.data || !fixupClockData) {
 		return 'Loading...';
 	}
 
 	const clockData = document.data;
 
 	return (
-		<>
-			<div className="flex flex-row gap-3">
-				<span className="font-bold flex-1">{document.data.name}</span>
-				<IconLinkButton title={t('details.edit-roles')} to="roles">
-					<HiOutlineUserGroup />
-				</IconLinkButton>
-				<IconButton title={t('details.edit')} onClick={onEdit}>
-					<HiOutlineCog />
-				</IconButton>
-			</div>
-			<ClockSvg
-				className="self-center"
-				currentTicks={document.data.details.current}
-				totalTicks={document.data.details.max}
-				padding={2}
-				radius={70}
-			/>
-		</>
+		<SingleColumnSections>
+			<Section>
+				<div className="flex flex-row gap-3">
+					<span className="font-bold flex-1">{document.data.name}</span>
+					<IconButton title={t('details.edit')} onClick={onEdit}>
+						<HiOutlinePencil />
+					</IconButton>
+				</div>
+				<ClockSvg
+					className="self-center mx-auto"
+					currentTicks={document.data.details.current}
+					totalTicks={document.data.details.max}
+					padding={2}
+					radius={70}
+				/>
+			</Section>
+			<Section>
+				<ClockEdit
+					clock={fixupClockData}
+					onUpdateClock={(updater) => onUpdateDocument(updater)}
+				/>
+			</Section>
+		</SingleColumnSections>
 	);
 
 	function onEdit() {
@@ -85,14 +101,12 @@ function EditModal({
 	}
 
 	return (
-		<div className="p-6">
-			<ClockEdit
-				clock={clockData}
-				onUpdateClock={async (updater) => {
-					await onUpdateClock(updater);
-					resolve(false);
-				}}
-			/>
-		</div>
+		<ClockEdit
+			clock={clockData}
+			onUpdateClock={async (updater) => {
+				await onUpdateClock(updater);
+				resolve(false);
+			}}
+		/>
 	);
 }
