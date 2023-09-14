@@ -2,28 +2,34 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"title": "MouseGuard-Conflict",
 	"type": "object",
-	"required": ["type", "skills", "sideA", "sideB"],
+	"required": ["general", "sideA", "sideB"],
 	"properties": {
-		"type": { "type": "string" },
-		"skills": {
+		"general": {
 			"type": "object",
-			"required": ["attack", "defend", "feint", "maneuver"],
+			"required": ["type", "skills"],
 			"properties": {
-				"attack": {
-					"type": "array",
-					"items": { "type": "string", "minItems": 1 }
-				},
-				"defend": {
-					"type": "array",
-					"items": { "type": "string", "minItems": 1 }
-				},
-				"feint": {
-					"type": "array",
-					"items": { "type": "string", "minItems": 1 }
-				},
-				"maneuver": {
-					"type": "array",
-					"items": { "type": "string", "minItems": 1 }
+				"type": { "type": "string" },
+				"skills": {
+					"type": "object",
+					"required": ["attack", "defend", "feint", "maneuver"],
+					"properties": {
+						"attack": {
+							"type": "array",
+							"items": { "type": "string", "minItems": 1 }
+						},
+						"defend": {
+							"type": "array",
+							"items": { "type": "string", "minItems": 1 }
+						},
+						"feint": {
+							"type": "array",
+							"items": { "type": "string", "minItems": 1 }
+						},
+						"maneuver": {
+							"type": "array",
+							"items": { "type": "string", "minItems": 1 }
+						}
+					}
 				}
 			}
 		},

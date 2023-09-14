@@ -9,12 +9,14 @@ import { conflictFixup } from './fixupConflict';
 defineDocument('MouseGuard-Conflict', {
 	icon: GiSwordsEmblem,
 	template: {
-		type: 'Combat',
-		skills: {
-			attack: ['hunter', 'fighter'],
-			defend: ['nature', 'scout'],
-			feint: ['hunter', 'fighter'],
-			maneuver: ['nature', 'scout'],
+		general: {
+			type: 'Combat',
+			skills: {
+				attack: ['hunter', 'fighter'],
+				defend: ['nature', 'scout'],
+				feint: ['hunter', 'fighter'],
+				maneuver: ['nature', 'scout'],
+			},
 		},
 		sideA: {
 			name: 'Side A',

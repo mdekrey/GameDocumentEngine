@@ -10,8 +10,8 @@
 			"permissions": [
 				"view",
 				"details:*#$.name",
-				"details:*#$.details.type",
-				"details:*#$.details.skills..*"
+				"details:*#$.details.general..*",
+				"details:read#$.details..revealed.*"
 			]
 		},
 		"omniscient": {
@@ -21,8 +21,7 @@
 			"permissions": [
 				"view",
 				"details:read#$.name",
-				"details:read#$.details.type",
-				"details:read#$.details.skills..*",
+				"details:read#$.details.general..*",
 				"details:read#$.details..revealed.*"
 			]
 		},
@@ -31,8 +30,7 @@
 			"permissions": [
 				"view",
 				"details:read#$.name",
-				"details:read#$.details.type",
-				"details:read#$.details.skills..*",
+				"details:read#$.details.general..*",
 				"details:*#$.details.sideA..*",
 				"details:read#$.details..revealed.*"
 			]
@@ -41,8 +39,7 @@
 			"permissions": [
 				"view",
 				"details:read#$.name",
-				"details:read#$.details.type",
-				"details:read#$.details.skills..*",
+				"details:read#$.details.general..*",
 				"details:read#$.details.sideA..*",
 				"details:read#$.details..revealed.*"
 			]
@@ -51,8 +48,7 @@
 			"permissions": [
 				"view",
 				"details:read#$.name",
-				"details:read#$.details.type",
-				"details:read#$.details.skills..*",
+				"details:read#$.details.general..*",
 				"details:*#$.details.sideB..*",
 				"details:read#$.details..revealed.*"
 			]
@@ -61,8 +57,7 @@
 			"permissions": [
 				"view",
 				"details:read#$.name",
-				"details:read#$.details.type",
-				"details:read#$.details.skills..*",
+				"details:read#$.details.general..*",
 				"details:read#$.details.sideB..*",
 				"details:read#$.details..revealed.*"
 			]
