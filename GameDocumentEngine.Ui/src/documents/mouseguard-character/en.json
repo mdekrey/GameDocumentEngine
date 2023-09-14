@@ -14,7 +14,7 @@
 		"delete": "Delete character",
 		"edit-roles": "Edit roles"
 	},
-	"document": {
+	"character-sheet": {
 		"tabs": {
 			"bio": "Bio",
 			"personality": "Personality",
@@ -35,7 +35,9 @@
 		"passes-and-fails": {
 			"pass-abbrev": "P",
 			"fail-abbrev": "F"
-		},
+		}
+	},
+	"document": {
 		"fields": {
 			"name": {
 				"label": "Name",
