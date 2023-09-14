@@ -8,7 +8,7 @@ public class MouseGuardGameType : IGameType
 
 	public MouseGuardGameType(IEnumerable<IGameObjectType> gameObjectTypes)
 	{
-		var typeNames = new[] { "Clock", "MouseGuard-Character" };
+		var typeNames = new[] { "Clock", "MouseGuard-Character", "MouseGuard-Conflict" };
 		objectTypes = gameObjectTypes.Where(t => typeNames.Contains(t.Key)).ToArray();
 	}
 

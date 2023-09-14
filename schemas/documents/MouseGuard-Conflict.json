@@ -1,0 +1,66 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "MouseGuard-Conflict",
+	"type": "object",
+	"required": ["type", "skills", "sideA", "sideB"],
+	"properties": {
+		"type": { "type": "string" },
+		"skills": {
+			"type": "object",
+			"required": ["attack", "defend", "feint", "maneuver"],
+			"properties": {
+				"attack": {
+					"type": "array",
+					"items": { "type": "string", "minItems": 1 }
+				},
+				"defend": {
+					"type": "array",
+					"items": { "type": "string", "minItems": 1 }
+				},
+				"feint": {
+					"type": "array",
+					"items": { "type": "string", "minItems": 1 }
+				},
+				"maneuver": {
+					"type": "array",
+					"items": { "type": "string", "minItems": 1 }
+				}
+			}
+		},
+		"sideA": { "$ref": "#/$defs/sideState" },
+		"sideB": { "$ref": "#/$defs/sideState" }
+	},
+
+	"$defs": {
+		"sideState": {
+			"type": "object",
+			"required": ["name", "disposition", "choices"],
+			"properties": {
+				"name": { "type": "string" },
+				"disposition": {
+					"type": "object",
+					"required": ["current", "max"],
+					"properties": {
+						"current": { "type": "integer", "minimum": 0 },
+						"max": { "type": "integer", "minimum": 1 }
+					}
+				},
+				"choices": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/action" },
+					"maxItems": 3
+				},
+				"revealed": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/action" },
+					"minItems": 3,
+					"maxItems": 3
+				}
+			}
+		},
+		"action": {
+			"type": "string",
+			"enum": ["attack", "defend", "feint", "maneuver"]
+		}
+	}
+}

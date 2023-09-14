@@ -7,7 +7,6 @@ public interface IGameObjectType
 	string Key { get; }
 
 	IReadOnlyList<string> PermissionLevels { get; }
-	string DefaultPermissionLevel { get; }
 	string CreatorPermissionLevel { get; }
 
 	/// <summary>

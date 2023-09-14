@@ -59,7 +59,7 @@ export function documentSchema<T>(
 ): z.ZodType<EditableDocumentDetails<T>> {
 	return z.object({
 		name: z.string().nonempty(),
-		details: schema as z.ZodAny,
+		details: schema,
 	}) as z.ZodType<EditableDocumentDetails<T>>;
 }
 

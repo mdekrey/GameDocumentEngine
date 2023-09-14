@@ -3,27 +3,17 @@ import type { GameObjectFormComponent } from '../defineDocument';
 import { ClockSvg } from './clock-svg';
 import { ClockEdit } from './clock-edit';
 import type { Clock } from './clock-types';
-import { useEffect } from 'react';
 import { Section, SingleColumnSections } from '@/components/sections';
-import { FormEvents } from '@/utils/form/events/FormEvents';
 import { AtomContents } from '@/components/jotai/atom-contents';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { useSubmitOnChange } from '../useSubmitOnChange';
 
 export function Clock({
 	form,
 	onSubmit,
 	readablePointers,
 }: GameObjectFormComponent<Clock>) {
-	useEffect(() => {
-		form.formEvents.addEventListener(FormEvents.AnyBlur, submitOnChange);
-		return () => {
-			form.formEvents.removeEventListener(FormEvents.AnyBlur, submitOnChange);
-		};
-
-		function submitOnChange() {
-			form.handleSubmit(onSubmit)();
-		}
-	}, [form, onSubmit]);
+	useSubmitOnChange(form, onSubmit);
 
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>

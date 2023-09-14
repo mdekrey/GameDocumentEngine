@@ -2,7 +2,7 @@ import type {
 	GameObjectFormComponent,
 	GameObjectWidgetProps,
 } from '../defineDocument';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { UseFormResult } from '@/utils/form/useForm';
 import type { Character } from './character-types';
 import { CharacterDocument } from './character-types';
@@ -21,9 +21,9 @@ import { Skills } from './parts/skills';
 import { Traits } from './parts/traits';
 import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
-import { FormEvents } from '@/utils/form/events/FormEvents';
 import { TabConfig, Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
+import { useSubmitOnChange } from '../useSubmitOnChange';
 
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
@@ -103,16 +103,7 @@ export function CharacterSheet({
 	onSubmit,
 	translation: t,
 }: GameObjectFormComponent<Character>) {
-	useEffect(() => {
-		form.formEvents.addEventListener(FormEvents.AnyBlur, submitOnChange);
-		return () => {
-			form.formEvents.removeEventListener(FormEvents.AnyBlur, submitOnChange);
-		};
-
-		function submitOnChange() {
-			form.handleSubmit(onSubmit)();
-		}
-	}, [form, onSubmit]);
+	useSubmitOnChange(form, onSubmit);
 
 	const tabs = useMemo(
 		(): TabConfig[] =>

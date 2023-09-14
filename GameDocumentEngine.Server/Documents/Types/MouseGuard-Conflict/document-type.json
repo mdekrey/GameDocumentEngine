@@ -1,0 +1,71 @@
+{
+	"name": "MouseGuard-Conflict",
+	"script": {
+		"type": "manifest",
+		"path": "src/documents/mouseguard-conflict/index.ts"
+	},
+	"roles": {
+		"organizer": {
+			"creatorDefault": true,
+			"permissions": [
+				"view",
+				"details:*#$.name",
+				"details:*#$.details.type",
+				"details:*#$.details.skills..*"
+			]
+		},
+		"omniscient": {
+			"permissions": ["view", "details:read#$..*"]
+		},
+		"observer": {
+			"permissions": [
+				"view",
+				"details:read#$.name",
+				"details:read#$.details.type",
+				"details:read#$.details.skills..*",
+				"details:read#$.details..revealed.*"
+			]
+		},
+
+		"side-a-captain": {
+			"permissions": [
+				"view",
+				"details:read#$.name",
+				"details:read#$.details.type",
+				"details:read#$.details.skills..*",
+				"details:*#$.details.sideA..*",
+				"details:read#$.details..revealed.*"
+			]
+		},
+		"side-a-member": {
+			"permissions": [
+				"view",
+				"details:read#$.name",
+				"details:read#$.details.type",
+				"details:read#$.details.skills..*",
+				"details:read#$.details.sideA..*",
+				"details:read#$.details..revealed.*"
+			]
+		},
+		"side-b-captain": {
+			"permissions": [
+				"view",
+				"details:read#$.name",
+				"details:read#$.details.type",
+				"details:read#$.details.skills..*",
+				"details:*#$.details.sideB..*",
+				"details:read#$.details..revealed.*"
+			]
+		},
+		"side-b-member": {
+			"permissions": [
+				"view",
+				"details:read#$.name",
+				"details:read#$.details.type",
+				"details:read#$.details.skills..*",
+				"details:read#$.details.sideB..*",
+				"details:read#$.details..revealed.*"
+			]
+		}
+	}
+}

@@ -16,8 +16,6 @@ public class JsonGameObjectType : IGameObjectType
 
 	public IReadOnlyList<string> PermissionLevels => Roles.Keys.ToArray();
 
-	public string DefaultPermissionLevel => Roles.Single(kvp => kvp.Value.IsDefault).Key;
-
 	public string CreatorPermissionLevel => Roles.Single(kvp => kvp.Value.IsCreatorDefault).Key;
 
 	public IEnumerable<string> GetPermissions(Guid gameId, Guid documentId, string role)
@@ -49,9 +47,6 @@ public class JsonGameObjectType : IGameObjectType
 
 	public class JsonGameObjectTypeRole
 	{
-		[JsonPropertyName("default")]
-		public bool IsDefault { get; set; }
-
 		[JsonPropertyName("creatorDefault")]
 		public bool IsCreatorDefault { get; set; }
 
