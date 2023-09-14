@@ -82,7 +82,7 @@ function ModalPanel({
 					leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 				>
 					<div
-						className="relative transform overflow-hidden rounded-lg bg-slate-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+						className="relative transform overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
 						onClick={(ev) => ev.stopPropagation()}
 					>
 						{children}
