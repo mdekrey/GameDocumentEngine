@@ -55,7 +55,6 @@ export function FullCharacterSheet({
 	}
 
 	const characterData = document.data;
-	console.log({ readablePointers });
 
 	return (
 		<div className="p-4">
