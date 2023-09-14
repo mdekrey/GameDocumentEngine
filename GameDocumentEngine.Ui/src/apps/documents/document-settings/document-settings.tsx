@@ -29,7 +29,6 @@ function displayDeleteDocument(documentDetails: DocumentDetails) {
 }
 
 export function displayDocumentSettings(documentDetails: DocumentDetails) {
-	console.log({ documentDetails });
 	return (
 		displayUserPermissions(documentDetails) ||
 		displayDeleteDocument(documentDetails)
