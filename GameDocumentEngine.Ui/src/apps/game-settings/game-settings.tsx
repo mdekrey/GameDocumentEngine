@@ -27,9 +27,9 @@ function displayInvites(gameDetails: GameDetails) {
 
 export function displayGameSettings(gameDetails: GameDetails) {
 	return (
-		hasGamePermission(gameDetails, updateGame) &&
-		hasGamePermission(gameDetails, updateGameUserAccess) &&
-		displayInvites(gameDetails) &&
+		hasGamePermission(gameDetails, updateGame) ||
+		hasGamePermission(gameDetails, updateGameUserAccess) ||
+		displayInvites(gameDetails) ||
 		displayDangerZone(gameDetails)
 	);
 }
