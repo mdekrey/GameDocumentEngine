@@ -1,10 +1,13 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import { FieldMapping } from '@/utils/form/useField';
+import { UseFormResult } from '@/utils/form/useForm';
 import { i18n } from '@/utils/i18n/setup';
-import type { UseQueryResult } from '@tanstack/react-query';
+import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { z } from 'zod';
+import { DocumentPointers } from './get-document-pointers';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
 	details: T;
@@ -22,16 +25,27 @@ export type Updater<T> = (
 export type GameObjectWidgetProps<T = unknown> = {
 	gameId: string;
 	documentId: string;
-	document: UseQueryResult<TypedDocumentDetails<T>>;
+	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
 	onUpdateDocument: Updater<T>;
 	translation: TFunction<`doc-types:${string}`, undefined>;
+};
+
+export type GameObjectFormComponent<T = unknown> = {
+	form: UseFormResult<EditableDocumentDetails<T>>;
+	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
+	translation: TFunction<`doc-types:${string}`, undefined>;
+	readablePointers: DocumentPointers;
+	writablePointers: DocumentPointers;
 };
 
 export type IGameObjectType<T = unknown> = {
 	icon: IconType;
 	template: T;
-	component: React.ComponentType<GameObjectWidgetProps<T>>;
+	component: React.ComponentType<GameObjectFormComponent<T>>;
 	translations: Record<string, Record<string, unknown>>;
+	fixup: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>;
+	schema: z.ZodType<T>;
+	widgets?: Record<string, GameObjectWidgetProps<T>>;
 };
 
 declare global {

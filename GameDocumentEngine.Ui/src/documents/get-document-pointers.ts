@@ -8,6 +8,7 @@ import {
 	EditableDocumentDetails,
 	TypedDocumentDetails,
 } from '@/documents/defineDocument';
+import { FieldMapping } from '@/utils/form/useField';
 
 export type DocumentPointers = {
 	pointers: string[];
@@ -19,17 +20,44 @@ export type DocumentPointers = {
 	): DocumentPointers;
 };
 
-export function getWritableDocumentPointers<T>(
+export function toEditableDetails<T>(
 	target: TypedDocumentDetails<T>,
-	fixup?: (
-		networkValue: EditableDocumentDetails<T>,
-	) => EditableDocumentDetails<T>,
-): DocumentPointers {
+	fixup?: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>,
+) {
 	let editableTarget: EditableDocumentDetails<T> = {
 		name: target.name,
 		details: target.details,
 	};
-	if (fixup) editableTarget = fixup(editableTarget);
+	if (fixup) editableTarget = fixup.toForm(editableTarget);
+	return {
+		document: target,
+		editable: editableTarget,
+		writablePointers: getWritableDocumentPointers(target, editableTarget),
+		readablePointers: getReadableDocumentPointers(target, editableTarget),
+	};
+}
+
+export function toEditable<T>(
+	target: TypedDocumentDetails<T>,
+	fixup?: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>,
+) {
+	let editableTarget: EditableDocumentDetails<T> = {
+		name: target.name,
+		details: target.details,
+	};
+	if (fixup) editableTarget = fixup.toForm(editableTarget);
+	return editableTarget;
+}
+
+type DocumentTarget<T> = Pick<
+	TypedDocumentDetails<T>,
+	'id' | 'gameId' | 'permissions'
+>;
+
+export function getWritableDocumentPointers<T>(
+	target: DocumentTarget<T>,
+	editableTarget: EditableDocumentDetails<T>,
+): DocumentPointers {
 	const pointers = matchingPermissionParams(
 		target.permissions,
 		writeDocumentDetailsPrefix(target.gameId, target.id),
@@ -47,16 +75,9 @@ export function getWritableDocumentPointers<T>(
 }
 
 export function getReadableDocumentPointers<T>(
-	target: TypedDocumentDetails<T>,
-	fixup?: (
-		networkValue: EditableDocumentDetails<T>,
-	) => EditableDocumentDetails<T>,
+	target: DocumentTarget<T>,
+	editableTarget: EditableDocumentDetails<T>,
 ): DocumentPointers {
-	let editableTarget: EditableDocumentDetails<T> = {
-		name: target.name,
-		details: target.details,
-	};
-	if (fixup) editableTarget = fixup(editableTarget);
 	const pointers = matchingPermissionParams(
 		target.permissions,
 		readDocumentDetailsPrefix(target.gameId, target.id),

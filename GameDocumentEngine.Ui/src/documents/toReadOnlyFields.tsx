@@ -13,6 +13,6 @@ export function toReadOnlyFields(
 			.topLevelKeys()
 			.map((key) => [key, toReadOnlyFields(p.navigate(key), `${path}/${key}`)]),
 	);
-	result[defaultField] = p.contains();
+	result[defaultField] = !p.contains();
 	return result;
 }

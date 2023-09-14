@@ -22,7 +22,7 @@
 			"description": "Can see the clock's maximum value, but not the ticks"
 		}
 	},
-	"edit-clock": {
+	"document": {
 		"fields": {
 			"name": {
 				"label": "Name",
@@ -44,8 +44,7 @@
 					}
 				}
 			}
-		},
-		"submit": "Save Changes"
+		}
 	},
 	"view-clock": {
 		"clock-title": "{{current}} of {{max}}"

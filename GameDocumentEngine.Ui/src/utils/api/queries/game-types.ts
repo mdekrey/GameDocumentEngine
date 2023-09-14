@@ -24,8 +24,8 @@ export type GameTypeScripts = {
 	translation: TFunction<`game-types:${string}`, undefined>;
 };
 
-export type GameTypeObjectScripts = {
-	typeInfo: IGameObjectType;
+export type GameTypeObjectScripts<T = unknown> = {
+	typeInfo: IGameObjectType<T>;
 	translation: TFunction<`doc-types:${string}`, undefined>;
 };
 

@@ -1,9 +1,10 @@
 import { GiSeatedMouse } from 'react-icons/gi';
 import { defineDocument } from '../defineDocument';
-import { FullCharacterSheet } from './character-sheet';
-import type characterSchema from './schema';
+import { CharacterSheet } from './character-sheet';
+import characterSchema from './schema';
 import type { z } from 'zod';
 import en from './en.json';
+import { characterFixup } from './fixupCharacter';
 
 defineDocument('MouseGuard-Character', {
 	icon: GiSeatedMouse,
@@ -28,6 +29,8 @@ defineDocument('MouseGuard-Character', {
 		traits: [],
 		wises: [],
 	} satisfies z.infer<typeof characterSchema>,
-	component: FullCharacterSheet,
+	component: CharacterSheet,
+	schema: characterSchema,
 	translations: { en },
+	fixup: characterFixup,
 });

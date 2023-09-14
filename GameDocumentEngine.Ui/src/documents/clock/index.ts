@@ -1,7 +1,7 @@
 import { HiOutlineClock } from 'react-icons/hi2';
 import { defineDocument } from '../defineDocument';
 import { Clock } from './clock-widget';
-import type clockSchema from './schema';
+import clockSchema from './schema';
 import type { z } from 'zod';
 import en from './en.json';
 
@@ -12,5 +12,10 @@ defineDocument('Clock', {
 		max: 6,
 	} satisfies z.infer<typeof clockSchema>,
 	component: Clock,
+	schema: clockSchema,
 	translations: { en },
+	fixup: {
+		toForm: (a) => a,
+		fromForm: (a) => a,
+	},
 });

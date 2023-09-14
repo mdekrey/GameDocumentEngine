@@ -1,9 +1,11 @@
-import type { GameObjectWidgetProps, Updater } from '../defineDocument';
-import { useCallback, useEffect, useMemo } from 'react';
-import { UseFormResult, useForm } from '@/utils/form/useForm';
+import type {
+	GameObjectFormComponent,
+	GameObjectWidgetProps,
+} from '../defineDocument';
+import { useEffect, useMemo } from 'react';
+import { UseFormResult } from '@/utils/form/useForm';
 import type { Character } from './character-types';
 import { CharacterDocument } from './character-types';
-import { applyPatch, createPatch } from 'rfc6902';
 import {
 	HiOutlineUser,
 	HiOutlineHeart,
@@ -20,55 +22,8 @@ import { Traits } from './parts/traits';
 import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
 import { FormEvents } from '@/utils/form/events/FormEvents';
-import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
-import { characterFixup } from './fixupCharacter';
 import { TabConfig, Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
-import {
-	getWritableDocumentPointers,
-	DocumentPointers,
-	getReadableDocumentPointers,
-} from '@/documents/get-document-pointers';
-import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
-
-export function FullCharacterSheet({
-	document,
-	onUpdateDocument,
-	translation,
-}: GameObjectWidgetProps<Character>) {
-	const readablePointers = useMemo(
-		() =>
-			document.data
-				? getReadableDocumentPointers(document.data, characterFixup.toForm)
-				: null,
-		[document.data],
-	);
-	const writablePointers = useMemo(
-		() =>
-			document.data
-				? getWritableDocumentPointers(document.data, characterFixup.toForm)
-				: null,
-		[document.data],
-	);
-	if (!document.data || !writablePointers || !readablePointers) {
-		return 'Loading...';
-	}
-
-	const characterData = document.data;
-
-	return (
-		<div className="p-4">
-			{readablePointers.pointers.length > 0 && (
-				<CharacterSheet
-					writablePointers={writablePointers}
-					character={characterData}
-					translation={translation}
-					onUpdateDocument={onUpdateDocument}
-				/>
-			)}
-		</div>
-	);
-}
 
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
@@ -144,40 +99,10 @@ const tabInfo: [id: string, icon: typeof HiOutlineUser, content: TabContent][] =
 	];
 
 export function CharacterSheet({
-	character,
-	writablePointers,
-	onUpdateDocument,
+	form,
+	onSubmit,
 	translation: t,
-}: {
-	character: CharacterDocument;
-	writablePointers: DocumentPointers;
-	onUpdateDocument: Updater<Character>;
-	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
-}) {
-	const form = useForm({
-		defaultValue: characterFixup.toForm(character),
-		schema: CharacterDocument,
-		translation: (f) => t(`character-sheet.${f}`),
-		readOnly: toReadOnlyFields(writablePointers),
-	});
-	updateFormDefaultMapped(form, character, characterFixup);
-
-	const onSubmit = useCallback(
-		async function onSubmit(currentValue: CharacterDocument) {
-			const fixedUp = characterFixup.fromForm(currentValue);
-			await onUpdateDocument((prev) => {
-				const ops = createPatch(
-					{
-						name: prev.name,
-						details: prev.details,
-					},
-					fixedUp,
-				);
-				applyPatch(prev, ops);
-			});
-		},
-		[onUpdateDocument],
-	);
+}: GameObjectFormComponent<Character>) {
 	useEffect(() => {
 		form.formEvents.addEventListener(FormEvents.AnyBlur, submitOnChange);
 		return () => {
@@ -187,7 +112,7 @@ export function CharacterSheet({
 		function submitOnChange() {
 			form.handleSubmit(onSubmit)();
 		}
-	}, [form, onUpdateDocument, onSubmit]);
+	}, [form, onSubmit]);
 
 	const tabs = useMemo(
 		(): TabConfig[] =>

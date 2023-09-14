@@ -14,7 +14,7 @@
 		"delete": "Delete character",
 		"edit-roles": "Edit roles"
 	},
-	"character-sheet": {
+	"document": {
 		"tabs": {
 			"bio": "Bio",
 			"personality": "Personality",
