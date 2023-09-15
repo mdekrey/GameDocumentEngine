@@ -18,3 +18,5 @@ export interface SideState {
 }
 
 export const sideSchema: z.ZodType<SideState> = conflictSchema.shape['sideA'];
+
+export type ConflictGeneral = ConflictDocument['details']['general'];

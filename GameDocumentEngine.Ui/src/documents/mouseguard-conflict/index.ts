@@ -24,6 +24,7 @@ defineDocument('MouseGuard-Conflict', {
 				current: 1,
 				max: 1,
 			},
+			ready: false,
 			choices: [],
 		},
 		sideB: {
@@ -32,11 +33,13 @@ defineDocument('MouseGuard-Conflict', {
 				current: 1,
 				max: 1,
 			},
+			ready: false,
 			choices: [],
 		},
 	} satisfies z.infer<typeof conflictSchema>,
 	component: ConflictSheet,
-	schema: conflictSchema,
+	// TODO: determine if this should always be deepPartial
+	schema: conflictSchema.deepPartial() as unknown as typeof conflictSchema,
 	translations: { en },
 	fixup: conflictFixup,
 });

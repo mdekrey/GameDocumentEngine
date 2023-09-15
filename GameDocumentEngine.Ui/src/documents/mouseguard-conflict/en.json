@@ -34,5 +34,79 @@
 		"delete": "Delete character",
 		"edit-roles": "Edit roles"
 	},
-	"document": {}
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			},
+			"details": {
+				"general": {
+					"type": {
+						"label": "Type"
+					},
+					"skills": {
+						"attack": {
+							"label": "Attack Skills",
+							"errors": {
+								"too_small": "Specify at least one skill."
+							}
+						},
+						"defend": {
+							"label": "Defend Skills",
+							"errors": {
+								"too_small": "Specify at least one skill."
+							}
+						},
+						"feint": {
+							"label": "Feint Skills",
+							"errors": {
+								"too_small": "Specify at least one skill."
+							}
+						},
+						"maneuver": {
+							"label": "Maneuver Skills",
+							"errors": {
+								"too_small": "Specify at least one skill."
+							}
+						}
+					}
+				},
+				"sideA": {
+					"name": {
+						"label": "Side A Name",
+						"errors": {
+							"too_small": "Please provide a name."
+						}
+					}
+				},
+				"sideB": {
+					"name": {
+						"label": "Side B Name",
+						"errors": {
+							"too_small": "Please provide a name."
+						}
+					}
+				},
+				"side": {
+					"name": {
+						"label": "Your Side's Name",
+						"errors": {
+							"too_small": "Please provide a name."
+						}
+					}
+				}
+			}
+		}
+	},
+	"general": {
+		"skills": {
+			"attack": "Attack Skills",
+			"defend": "Defend Skills",
+			"feint": "Feint Skills",
+			"maneuver": "Maneuver Skills"
+		}
+	}
 }

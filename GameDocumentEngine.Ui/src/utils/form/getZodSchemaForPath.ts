@@ -1,4 +1,10 @@
-import type { ZodType, ZodTypeAny, ZodUnion, ZodUnionOptions } from 'zod';
+import type {
+	ZodOptional,
+	ZodType,
+	ZodTypeAny,
+	ZodUnion,
+	ZodUnionOptions,
+} from 'zod';
 import { ZodNull } from 'zod';
 import type { AnyPath, Path, PathValue } from './path';
 
@@ -38,6 +44,8 @@ export function getZodSchemaForPath(
 					<T>(n: ZodNull | T): n is T => !(n instanceof ZodNull),
 				)[0],
 			);
+		} else if ('innerType' in (current as ZodOptional<ZodTypeAny>)._def) {
+			return doStep(step, (current as ZodOptional<ZodTypeAny>)._def.innerType);
 		} else {
 			console.error('during', { steps, schema }, 'unable to continue at', {
 				step,

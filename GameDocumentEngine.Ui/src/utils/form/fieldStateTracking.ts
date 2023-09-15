@@ -34,6 +34,14 @@ export function walkFieldState<T extends FieldStatePrimitive>(
 	return fieldState;
 }
 
+function ensureValue<T extends FieldStatePrimitive>(
+	fieldState: PerFieldState<T>,
+) {
+	if (typeof fieldState === 'object' && defaultField in fieldState)
+		return fieldState[defaultField];
+	return fieldState;
+}
+
 export function toAtomFieldState<T extends FieldStatePrimitive>(
 	initial: PerFieldState<T>,
 ): FieldStateAtom<T> {
@@ -71,6 +79,27 @@ export function walkFieldStateAtom<T extends FieldStatePrimitive>(
 ): FieldStateAtom<T> {
 	return atom(
 		(get) => walkFieldState(get(fieldState), path),
+		(get, set, action) => {
+			set(
+				fieldState,
+				produce<PerFieldState<T>>((prev) => {
+					return updateFieldState(
+						prev as PerFieldState<T>,
+						path,
+						typeof action === 'function' ? action : () => action,
+					);
+				}),
+			);
+		},
+	);
+}
+
+export function walkFieldStateAtomValue<T extends FieldStatePrimitive>(
+	fieldState: FieldStateAtom<T>,
+	path: AnyPath,
+): FieldStateAtom<T> {
+	return atom(
+		(get) => ensureValue(walkFieldState(get(fieldState), path)),
 		(get, set, action) => {
 			set(
 				fieldState,

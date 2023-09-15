@@ -11,6 +11,9 @@
 				"view",
 				"details:*#$.name",
 				"details:*#$.details.general..*",
+				"details:*#$.details..name",
+				"details:read#$.details..disposition.*",
+				"details:read#$.details..ready",
 				"details:read#$.details..revealed.*"
 			]
 		},
@@ -22,6 +25,9 @@
 				"view",
 				"details:read#$.name",
 				"details:read#$.details.general..*",
+				"details:read#$.details..name",
+				"details:read#$.details..disposition.*",
+				"details:read#$.details..ready",
 				"details:read#$.details..revealed.*"
 			]
 		},
@@ -32,6 +38,9 @@
 				"details:read#$.name",
 				"details:read#$.details.general..*",
 				"details:*#$.details.sideA..*",
+				"details:read#$.details..name",
+				"details:read#$.details..disposition.*",
+				"details:read#$.details..ready",
 				"details:read#$.details..revealed.*"
 			]
 		},
@@ -41,6 +50,9 @@
 				"details:read#$.name",
 				"details:read#$.details.general..*",
 				"details:read#$.details.sideA..*",
+				"details:read#$.details..name",
+				"details:read#$.details..disposition.*",
+				"details:read#$.details..ready",
 				"details:read#$.details..revealed.*"
 			]
 		},
@@ -50,6 +62,9 @@
 				"details:read#$.name",
 				"details:read#$.details.general..*",
 				"details:*#$.details.sideB..*",
+				"details:read#$.details..name",
+				"details:read#$.details..disposition.*",
+				"details:read#$.details..ready",
 				"details:read#$.details..revealed.*"
 			]
 		},
@@ -59,6 +74,9 @@
 				"details:read#$.name",
 				"details:read#$.details.general..*",
 				"details:read#$.details.sideB..*",
+				"details:read#$.details..name",
+				"details:read#$.details..disposition.*",
+				"details:read#$.details..ready",
 				"details:read#$.details..revealed.*"
 			]
 		}

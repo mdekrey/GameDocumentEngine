@@ -15,19 +15,23 @@
 					"properties": {
 						"attack": {
 							"type": "array",
-							"items": { "type": "string", "minItems": 1 }
+							"items": { "type": "string" },
+							"minItems": 1
 						},
 						"defend": {
 							"type": "array",
-							"items": { "type": "string", "minItems": 1 }
+							"items": { "type": "string" },
+							"minItems": 1
 						},
 						"feint": {
 							"type": "array",
-							"items": { "type": "string", "minItems": 1 }
+							"items": { "type": "string" },
+							"minItems": 1
 						},
 						"maneuver": {
 							"type": "array",
-							"items": { "type": "string", "minItems": 1 }
+							"items": { "type": "string" },
+							"minItems": 1
 						}
 					}
 				}
@@ -55,6 +59,9 @@
 					"type": "array",
 					"items": { "$ref": "#/$defs/action" },
 					"maxItems": 3
+				},
+				"ready": {
+					"type": "boolean"
 				},
 				"revealed": {
 					"type": "array",

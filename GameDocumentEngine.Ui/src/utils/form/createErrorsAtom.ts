@@ -29,7 +29,9 @@ export function createTriggeredErrorsAtom<T>(
 		set(
 			errors,
 			(async () => {
-				const parseResult = await schema.safeParseAsync(get(target));
+				const value = get(target);
+				const parseResult = await schema.safeParseAsync(value);
+				console.log(value, parseResult);
 				if (parseResult.success) return null;
 				return parseResult.error;
 			})(),

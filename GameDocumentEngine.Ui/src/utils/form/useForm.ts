@@ -38,6 +38,7 @@ import {
 	PerFieldState,
 	toAtomFieldState,
 	walkFieldStateAtom,
+	walkFieldStateAtomValue,
 } from './fieldStateTracking';
 
 export type ConfiguredFormField<
@@ -276,13 +277,13 @@ function toField<T, TPath extends Path<T>, TValue>(
 			),
 		disabled:
 			config.disabled ??
-			(walkFieldStateAtom(
+			(walkFieldStateAtomValue(
 				context.disabledFields,
 				config.path as AnyPath,
 			) as Atom<boolean>),
 		readOnly:
 			config.readOnly ??
-			(walkFieldStateAtom(
+			(walkFieldStateAtomValue(
 				context.readOnlyFields,
 				config.path as AnyPath,
 			) as Atom<boolean>),
