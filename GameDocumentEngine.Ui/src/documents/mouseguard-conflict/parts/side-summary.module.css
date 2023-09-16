@@ -1,0 +1,41 @@
+.container {
+	composes: flex flex-col from global;
+	max-width: 200px;
+}
+
+.label {
+	composes: text-xs py-0 from global;
+}
+
+.input {
+	composes: text-center p-0 flex-1 from global;
+	-moz-appearance: textfield;
+}
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+.contents {
+	composes: contents from global;
+}
+
+.current {
+	composes: container;
+	@apply absolute text-center text-2xl;
+	top: 15%;
+	bottom: 15%;
+	left: 12%;
+	width: 37%;
+}
+
+.max {
+	composes: container;
+	@apply absolute text-center text-2xl;
+	top: 15%;
+	bottom: 15%;
+	left: 54%;
+	width: 37%;
+}

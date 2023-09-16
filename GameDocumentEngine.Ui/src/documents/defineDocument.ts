@@ -36,6 +36,7 @@ export type GameObjectFormComponent<T = unknown> = {
 	translation: TFunction<`doc-types:${string}`, undefined>;
 	readablePointers: DocumentPointers;
 	writablePointers: DocumentPointers;
+	objectRole: string | undefined;
 };
 
 export type IGameObjectType<T = unknown> = {

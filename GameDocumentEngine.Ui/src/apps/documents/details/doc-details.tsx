@@ -22,6 +22,8 @@ import { useForm } from '@/utils/form/useForm';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { applyPatch, createPatch } from 'rfc6902';
+import { useRealtimeApi } from '@/utils/api/realtime-api';
+import { UserDetails } from '@/api/models/UserDetails';
 
 export function DocumentDetails({
 	gameId,
@@ -30,26 +32,31 @@ export function DocumentDetails({
 	gameId: string;
 	documentId: string;
 }) {
+	const user = useQuery(queries.getCurrentUser(useRealtimeApi()));
 	const document = useQuery(queries.getDocument(gameId, documentId));
 	const gameType = useGameType(gameId);
 
-	if (document.isLoading || gameType.isLoading) {
+	if (user.isLoading || document.isLoading || gameType.isLoading) {
 		return <>Loading...</>;
-	} else if (document.isError || gameType.isError) {
+	} else if (user.isError || document.isError || gameType.isError) {
 		return <>Error while loading...</>;
 	}
 
 	const scripts = gameType.data.objectTypes[document.data.type];
 
-	return <DocumentDetailsForm scripts={scripts} document={document} />;
+	return (
+		<DocumentDetailsForm scripts={scripts} document={document} user={user} />
+	);
 }
 
 export function DocumentDetailsForm<T = unknown>({
 	scripts,
 	document,
+	user,
 }: {
 	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
 	scripts: GameTypeObjectScripts<T>;
+	user: QueryObserverSuccessResult<UserDetails>;
 }) {
 	const docDetailsUpdatePromiseRef = useRef<Promise<unknown>>(
 		Promise.resolve(),
@@ -132,6 +139,7 @@ export function DocumentDetailsForm<T = unknown>({
 					translation={scripts.translation}
 					readablePointers={editable.readablePointers}
 					writablePointers={editable.writablePointers}
+					objectRole={document.data.userRoles[user.data.id]}
 				/>
 			)}
 		</div>

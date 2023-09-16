@@ -1,6 +1,9 @@
 import { Atom, useAtomValue } from 'jotai';
-import { ConflictGeneral } from '../conflict-types';
+import { ConflictDocument, SideState } from '../conflict-types';
 import { TFunction } from 'i18next';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { FormFieldReturnType } from '@/utils/form/useForm';
+import { SideSummary } from './SideSummary';
 
 function skillsList(skills: string[]) {
 	return skills
@@ -9,26 +12,42 @@ function skillsList(skills: string[]) {
 }
 
 export function GeneralDisplay({
-	general,
+	conflictAtom,
 	translation: t,
+	sideA,
+	sideB,
+	isSideBFirst,
 }: {
-	general: Atom<ConflictGeneral>;
+	conflictAtom: Atom<ConflictDocument>;
 	translation: TFunction<`doc-types:${string}`, undefined>;
+	sideA: FormFieldReturnType<SideState>;
+	sideB: FormFieldReturnType<SideState>;
+	isSideBFirst: boolean;
 }) {
-	const generalValue = useAtomValue(general);
+	const skillsValue = useAtomValue(
+		useComputedAtom((get) => get(conflictAtom).details.general.skills),
+	);
+	const firstSide = isSideBFirst ? sideB : sideA;
+	const secondSide = isSideBFirst ? sideA : sideB;
 	return (
-		<dl className="grid grid-cols-2 grid-rows-4 grid-flow-row md:grid-cols-4 md:grid-rows-2 md:grid-flow-col">
-			<dt className="font-bold">{t('general.skills.attack')}</dt>
-			<dd>{skillsList(generalValue.skills.attack)}</dd>
+		<>
+			<dl className="grid grid-cols-2 grid-rows-4 grid-flow-row md:grid-cols-4 md:grid-rows-2 md:grid-flow-col gap-2 md:justify-items-center">
+				<dt className="font-bold">{t('general.skills.attack')}</dt>
+				<dd>{skillsList(skillsValue.attack)}</dd>
 
-			<dt className="font-bold">{t('general.skills.defend')}</dt>
-			<dd>{skillsList(generalValue.skills.defend)}</dd>
+				<dt className="font-bold">{t('general.skills.defend')}</dt>
+				<dd>{skillsList(skillsValue.defend)}</dd>
 
-			<dt className="font-bold">{t('general.skills.feint')}</dt>
-			<dd>{skillsList(generalValue.skills.feint)}</dd>
+				<dt className="font-bold">{t('general.skills.feint')}</dt>
+				<dd>{skillsList(skillsValue.feint)}</dd>
 
-			<dt className="font-bold">{t('general.skills.maneuver')}</dt>
-			<dd>{skillsList(generalValue.skills.maneuver)}</dd>
-		</dl>
+				<dt className="font-bold">{t('general.skills.maneuver')}</dt>
+				<dd>{skillsList(skillsValue.maneuver)}</dd>
+			</dl>
+			<div className="grid grid-cols-2 gap-2 justify-items-center">
+				<SideSummary side={firstSide} />
+				<SideSummary side={secondSide} />
+			</div>
+		</>
 	);
 }

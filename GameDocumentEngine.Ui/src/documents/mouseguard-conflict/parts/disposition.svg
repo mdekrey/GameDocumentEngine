@@ -1,0 +1,7 @@
+<svg viewBox="0 0 124 271"
+	xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="bevel" stroke-miterlimit="1.5"
+	fill="none"
+	>
+	<path d="M11 3v137l51 21 51 -21 v-137" stroke="#000" stroke-width="3" />
+	<path d="M121 3h-23v24h-24v-24h-23v24h-24v-24h-24v237l59 27 59-27v-237Z" stroke="#000" stroke-width="6"/>
+</svg>

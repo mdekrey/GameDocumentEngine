@@ -96,6 +96,16 @@
 						"errors": {
 							"too_small": "Please provide a name."
 						}
+					},
+					"disposition": {
+						"current": {
+							"label": "Current",
+							"errors": {}
+						},
+						"max": {
+							"label": "Max",
+							"errors": {}
+						}
 					}
 				}
 			}

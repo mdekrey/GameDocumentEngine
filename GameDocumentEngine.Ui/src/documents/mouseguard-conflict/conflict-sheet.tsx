@@ -4,12 +4,13 @@ import { useSubmitOnChange } from '../useSubmitOnChange';
 import { Conflict } from './conflict-types';
 import { OrganizerForm } from './parts/organizer-form';
 import { GeneralDisplay } from './parts/general-display';
+import { Fragment } from 'react';
 
 export function ConflictSheet({
 	form,
 	onSubmit,
 	translation: t,
-	writablePointers,
+	objectRole,
 }: GameObjectFormComponent<Conflict>) {
 	useSubmitOnChange(form, onSubmit);
 	const fields = useFormFields(form, {
@@ -17,33 +18,30 @@ export function ConflictSheet({
 		general: ['details', 'general'],
 		sideAName: ['details', 'sideA', 'name'],
 		sideBName: ['details', 'sideB', 'name'],
-		sideA: ['details', 'sideA'],
-		sideB: ['details', 'sideB'],
+		sideA: { path: ['details', 'sideA'], translationPath: ['details', 'side'] },
+		sideB: { path: ['details', 'sideB'], translationPath: ['details', 'side'] },
 	});
 
-	/*
-	There's several roles for this, several view-only, which will just display
-	all info available. For the rest:
-	- If general is writable, display general form
-	- If display form for side that is writable, if any
-	*/
-	const mode =
-		writablePointers.pointers.length === 0
-			? 'read-only'
-			: form.store.get(fields.general.readOnlyFields) !== true
-			? 'organizer'
-			: form.store.get(fields.sideA.readOnlyFields) !== true
-			? 'side-a'
-			: form.store.get(fields.sideB.readOnlyFields) !== true
-			? 'side-b'
-			: unknownMode();
+	const isSideB = objectRole?.includes('side-b') ?? false;
+
+	const yourSide = objectRole?.includes('side-a')
+		? fields.sideA
+		: objectRole?.includes('side-b')
+		? fields.sideB
+		: undefined;
+	const otherSide = objectRole?.includes('side-a')
+		? fields.sideB
+		: objectRole?.includes('side-b')
+		? fields.sideA
+		: undefined;
+	console.log({ isSideB, yourSide, otherSide });
 
 	return (
 		<form
 			onSubmit={form.handleSubmit(onSubmit)}
 			className="flex flex-col gap-2"
 		>
-			{mode === 'organizer' ? (
+			{objectRole === 'organizer' ? (
 				<OrganizerForm
 					name={fields.name}
 					general={fields.general}
@@ -51,14 +49,16 @@ export function ConflictSheet({
 					sideBName={fields.sideBName}
 				/>
 			) : (
-				<>
-					<GeneralDisplay general={fields.general.atom} translation={t} />
-				</>
+				<Fragment key={objectRole}>
+					<GeneralDisplay
+						conflictAtom={form.atom}
+						translation={t}
+						isSideBFirst={isSideB}
+						sideA={fields.sideA}
+						sideB={fields.sideB}
+					/>
+				</Fragment>
 			)}
 		</form>
 	);
-
-	function unknownMode() {
-		throw new Error('Permissions changed; unknown how to handle');
-	}
 }
