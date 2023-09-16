@@ -5,10 +5,7 @@ import { Conflict } from './conflict-types';
 import { OrganizerForm } from './parts/organizer-form';
 import { GeneralDisplay } from './parts/general-display';
 import { Fragment } from 'react';
-import attackCard from '@/documents/mouseguard-assets/deck/ActionDeckattack.webp';
-import defendCard from '@/documents/mouseguard-assets/deck/ActionDeckdefend.webp';
-import feintCard from '@/documents/mouseguard-assets/deck/ActionDeckfeint.webp';
-import maneuverCard from '@/documents/mouseguard-assets/deck/ActionDeckmaneuver.webp';
+import { ManageSide } from './ManageSide';
 
 export function ConflictSheet({
 	form,
@@ -33,11 +30,11 @@ export function ConflictSheet({
 		: objectRole?.includes('side-b')
 		? fields.sideB
 		: undefined;
-	const otherSide = objectRole?.includes('side-a')
-		? fields.sideB
-		: objectRole?.includes('side-b')
-		? fields.sideA
-		: undefined;
+	// const otherSide = objectRole?.includes('side-a')
+	// 	? fields.sideB
+	// 	: objectRole?.includes('side-b')
+	// 	? fields.sideA
+	// 	: undefined;
 
 	return (
 		<form
@@ -60,12 +57,7 @@ export function ConflictSheet({
 						sideA={fields.sideA}
 						sideB={fields.sideB}
 					/>
-					<div>
-						<img className="inline-block w-48" src={attackCard} />
-						<img className="inline-block w-48" src={defendCard} />
-						<img className="inline-block w-48" src={feintCard} />
-						<img className="inline-block w-48" src={maneuverCard} />
-					</div>
+					{yourSide && <ManageSide side={yourSide} />}
 				</Fragment>
 			)}
 		</form>

@@ -14,6 +14,7 @@ export interface SideState {
 		max: number;
 	};
 	choices: ActionChoice[];
+	ready?: boolean;
 	revealed?: ActionChoice[];
 }
 

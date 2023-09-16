@@ -106,6 +106,9 @@
 							"label": "Max",
 							"errors": {}
 						}
+					},
+					"choices": {
+						"label": "Action choice"
 					}
 				}
 			}
