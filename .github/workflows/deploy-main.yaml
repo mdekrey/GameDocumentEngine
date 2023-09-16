@@ -21,7 +21,9 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
 
     - name: 'Log in to docker registry'
       uses: azure/docker-login@v1
@@ -39,7 +41,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     needs: [build]
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     # Set the target Azure Kubernetes Service (AKS) cluster.
     - uses: azure/login@v1
       with:
