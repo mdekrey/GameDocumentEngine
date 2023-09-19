@@ -77,6 +77,7 @@ export function PassFail({
 
 	function adjust(type: keyof typeof fields, modifier: 1 | -1) {
 		fields[type].setValue((prev) => prev + modifier);
+		// TODO: do not "blur" here to save values; this is a hack.
 		fields[type].onBlur();
 	}
 }
