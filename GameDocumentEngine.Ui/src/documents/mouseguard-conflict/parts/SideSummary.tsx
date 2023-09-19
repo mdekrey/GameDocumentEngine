@@ -5,6 +5,8 @@ import { useFormFields } from '@/utils/form/useFormFields';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import styles from './side-summary.module.css';
+import { useAtomValue } from 'jotai';
+import { Prose } from '@/components/text/common';
 
 export function SideSummary({
 	side,
@@ -15,7 +17,9 @@ export function SideSummary({
 		name: ['name'],
 		current: ['disposition', 'current'],
 		max: ['disposition', 'max'],
+		ready: ['ready'],
 	});
+	const isReady = useAtomValue(fields.ready.atom);
 	return (
 		<div className="max-w-[200px]">
 			<TextField
@@ -41,6 +45,12 @@ export function SideSummary({
 					inputClassName={`${styles.input} border-none`}
 				/>
 			</div>
+
+			<Prose className="text-center">
+				{isReady
+					? fields.ready.translation('is-ready')
+					: fields.ready.translation('is-not-ready')}
+			</Prose>
 		</div>
 	);
 }

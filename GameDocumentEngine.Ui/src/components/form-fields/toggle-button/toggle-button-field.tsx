@@ -9,6 +9,7 @@ export type ToggleButtonFieldProps = Pick<
 	'className'
 > &
 	FieldProps<boolean> & {
+		// TODO: use readOnly/disabled from field
 		readOnly?: boolean;
 		pressedContents?: React.ReactNode;
 		unpressedContents?: React.ReactNode;

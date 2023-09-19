@@ -107,8 +107,24 @@
 							"errors": {}
 						}
 					},
-					"choices": {
-						"label": "Action choice"
+					"choices": [
+						{
+							"label": "Action 1 choice"
+						},
+						{
+							"label": "Action 2 choice"
+						},
+						{
+							"label": "Action 3 choice"
+						}
+					],
+					"ready": {
+						"label": "Ready",
+						"title": "Confirm or cancel your action selections",
+						"not-pressed": "Ready!",
+						"pressed": "Changed my mind...",
+						"is-ready": "Ready!",
+						"is-not-ready": "Not ready..."
 					}
 				}
 			}
