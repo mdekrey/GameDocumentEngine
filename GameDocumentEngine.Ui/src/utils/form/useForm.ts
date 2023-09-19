@@ -25,9 +25,9 @@ import { FormEvents } from './events/FormEvents';
 import { atomFamily as createAtomFamily } from 'jotai/utils';
 import { getZodSchemaForPath } from './getZodSchemaForPath';
 import type {
-	FieldConfig,
+	FieldConfigOrPath,
 	FieldsConfig,
-	TypedFieldConfigObject,
+	FieldConfig,
 	FieldConfigToType,
 } from './field-config-types';
 import { toConfigObject } from './field-config-types';
@@ -57,7 +57,7 @@ type FlagsForFormFieldConfig<
 	T,
 	// keeping the type param for future use
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	TFieldConfig extends FieldConfig<T>,
+	TFieldConfig extends FieldConfigOrPath<T>,
 > = DefaultFormFieldResultFlags;
 // example usage for how these flags work
 // isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
@@ -71,17 +71,17 @@ export type FormFieldReturnType<
 
 type FormFieldReturnTypeFromConfig<
 	T,
-	TFieldConfig extends FieldConfig<T>,
+	TFieldConfig extends FieldConfigOrPath<T>,
 > = FormFieldReturnType<
 	FieldConfigToType<T, TFieldConfig>,
 	FlagsForFormFieldConfig<T, TFieldConfig>
 >;
 
 export type FormFields<T, TFields extends FieldsConfig<T>> = {
-	[K in keyof TFields]: TFields[K] extends FieldConfig<T>
+	[K in keyof TFields]: TFields[K] extends FieldConfigOrPath<T>
 		? FormFieldReturnTypeFromConfig<T, TFields[K]>
 		: TFields[K] extends (...args: infer TArgs) => infer TReturn
-		? TReturn extends FieldConfig<T>
+		? TReturn extends FieldConfigOrPath<T>
 			? (...args: TArgs) => FormFieldReturnTypeFromConfig<T, TReturn>
 			: never
 		: never;
@@ -246,18 +246,18 @@ export function buildFormFields<
 		}),
 	) as never as FormFields<T, TFields>;
 
-	function innerToField(config: FieldConfig<T>) {
+	function innerToField(config: FieldConfigOrPath<T>) {
 		return toField<T, Path<T>, unknown>(
-			toConfigObject<T, unknown, FieldConfig<T, unknown>>(
+			toConfigObject<T, unknown, FieldConfigOrPath<T, unknown>>(
 				config,
-			) as TypedFieldConfigObject<T, Path<T>, unknown>,
+			) as FieldConfig<T, Path<T>, unknown>,
 			params,
 		);
 	}
 }
 
 function toField<T, TPath extends Path<T>, TValue>(
-	config: TypedFieldConfigObject<T, TPath, TValue>,
+	config: FieldConfig<T, TPath, TValue>,
 	context: FormResultContext<T>,
 ): FormFieldReturnType<TValue, DefaultFormFieldResultFlags> {
 	const result = toFormSubset<T, TPath, TValue>(config, context);
@@ -302,7 +302,7 @@ function toField<T, TPath extends Path<T>, TValue>(
 }
 
 function toFormSubset<T, TPath extends Path<T>, TValue>(
-	config: TypedFieldConfigObject<T, TPath, TValue>,
+	config: FieldConfig<T, TPath, TValue>,
 	options: FormResultContext<T>,
 ): UseFormResult<TValue> {
 	const schema: ZodType<TValue> =
@@ -431,7 +431,7 @@ export function useForm<T>(
 }
 
 function getRefForPath<T, TPath extends Path<T>, TValue>(
-	config: TypedFieldConfigObject<T, TPath, TValue>,
+	config: FieldConfig<T, TPath, TValue>,
 	source: React.MutableRefObject<T>,
 ): React.MutableRefObject<TValue> {
 	const mapping = config.mapping as FieldMapping<PathValue<T, TPath>, TValue>;

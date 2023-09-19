@@ -24,7 +24,7 @@ export type UntypedFieldConfigObject<TValue> = {
 	mapping?: FieldMapping<any, TValue>;
 };
 
-export type TypedFieldConfigObject<
+export type FieldConfig<
 	T,
 	TPath extends Path<T> = Path<T>,
 	TValue = PathValue<T, TPath>,
@@ -43,18 +43,20 @@ export type TypedFieldConfigObject<
 	  });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FieldConfig<T, TFieldType = any> =
+export type FieldConfigOrPath<T, TFieldType = any> =
 	| Path<T>
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| TypedFieldConfigObject<T, any, TFieldType>;
+	| FieldConfig<T, any, TFieldType>;
 
 export type FieldsConfig<T> = {
-	[field: string]: FieldConfig<T> | ((...args: AnyArray) => FieldConfig<T>);
+	[field: string]:
+		| FieldConfigOrPath<T>
+		| ((...args: AnyArray) => FieldConfigOrPath<T>);
 };
 
 export type FieldConfigToType<
 	T,
-	TFieldConfig extends FieldConfig<T>,
+	TFieldConfig extends FieldConfigOrPath<T>,
 > = TFieldConfig extends Path<T>
 	? PathValue<T, TFieldConfig>
 	: TFieldConfig extends MappedFieldConfig<T, Path<T>, infer TValue>
@@ -66,11 +68,11 @@ export type FieldConfigToType<
 export function toConfigObject<
 	T,
 	TValue,
-	TFieldConfig extends FieldConfig<T, TValue>,
+	TFieldConfig extends FieldConfigOrPath<T, TValue>,
 >(config: TFieldConfig): UntypedFieldConfigObject<TValue>;
 export function toConfigObject<TValue>(
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	config: FieldConfig<any, TValue>,
+	config: FieldConfigOrPath<any, TValue>,
 ): UntypedFieldConfigObject<TValue> {
 	if (isArray(config)) {
 		return {
