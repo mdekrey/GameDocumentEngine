@@ -3,6 +3,12 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ToggleButtonField } from './toggle-button-field';
 import { useField } from '@/utils/form/useField';
 import { z } from 'zod';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+
+type Props = React.ComponentProps<typeof ToggleButtonField> & {
+	disabled: boolean;
+	readOnly: boolean;
+};
 
 const meta = {
 	title: 'Components/Form/Toggle Button',
@@ -11,19 +17,27 @@ const meta = {
 	argTypes: {
 		field: { table: { disable: true } },
 		readOnly: { control: 'boolean' },
+		disabled: { control: 'boolean' },
 	},
 	args: {
 		field: undefined,
 		readOnly: false,
+		disabled: false,
 	},
-	render: function RenderToggleButtonFieldStory(props) {
+	render: function RenderToggleButtonFieldStory({
+		disabled,
+		readOnly,
+		...props
+	}: Props) {
 		const myField = useField(false, {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
 			schema: z.boolean(),
+			disabled: useComputedAtom(() => disabled),
+			readOnly: useComputedAtom(() => readOnly),
 		});
 		return <ToggleButtonField {...props} field={myField} />;
 	},
-} satisfies Meta<typeof ToggleButtonField>;
+} satisfies Meta<Props>;
 type Story = StoryObj<typeof meta>;
 
 export default meta;

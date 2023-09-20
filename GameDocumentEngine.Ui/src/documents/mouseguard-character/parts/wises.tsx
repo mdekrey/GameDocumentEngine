@@ -54,10 +54,26 @@ const optionalToBoolMapping: FieldMapping<boolean | undefined, boolean> = {
 export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 	const fields = useFormFields(wise, {
 		name: ['name'],
-		pass: { path: ['pass'], mapping: optionalToBoolMapping },
-		fail: { path: ['fail'], mapping: optionalToBoolMapping },
-		persona: { path: ['persona'], mapping: optionalToBoolMapping },
-		fate: { path: ['fate'], mapping: optionalToBoolMapping },
+		pass: {
+			path: ['pass'],
+			mapping: optionalToBoolMapping,
+			disabled: (v: Wise) => !v.name,
+		},
+		fail: {
+			path: ['fail'],
+			mapping: optionalToBoolMapping,
+			disabled: (v: Wise) => !v.name,
+		},
+		persona: {
+			path: ['persona'],
+			mapping: optionalToBoolMapping,
+			disabled: (v: Wise) => !v.name,
+		},
+		fate: {
+			path: ['fate'],
+			mapping: optionalToBoolMapping,
+			disabled: (v: Wise) => !v.name,
+		},
 	});
 
 	return (
@@ -77,17 +93,10 @@ export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
 	);
 }
 
-function WiseToggleButton({
-	field,
-	readOnly,
-}: {
-	field: FormFieldReturnType<boolean>;
-	readOnly?: boolean;
-}) {
+function WiseToggleButton({ field }: { field: FormFieldReturnType<boolean> }) {
 	return (
 		<ToggleButtonField
 			field={field}
-			readOnly={readOnly}
 			pressedContents={
 				<span className="flex flex-row gap-2 items-center">
 					<HiCheck />

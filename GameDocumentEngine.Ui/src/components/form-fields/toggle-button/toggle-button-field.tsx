@@ -9,8 +9,6 @@ export type ToggleButtonFieldProps = Pick<
 	'className'
 > &
 	FieldProps<boolean> & {
-		// TODO: use readOnly/disabled from field
-		readOnly?: boolean;
 		pressedContents?: React.ReactNode;
 		unpressedContents?: React.ReactNode;
 	};
@@ -20,7 +18,6 @@ export function ToggleButtonField({
 	className,
 	pressedContents,
 	unpressedContents,
-	readOnly,
 }: ToggleButtonFieldProps) {
 	const store = useStore();
 	const label = useComputedAtom((get) =>
@@ -40,7 +37,8 @@ export function ToggleButtonField({
 			className={className}
 			onBlur={field.onBlur}
 			onClick={() => field.onChange(!store.get(field.value))}
-			readOnly={readOnly}
+			readOnly={field.readOnly}
+			disabled={field.disabled}
 		>
 			<AtomContents>{display}</AtomContents>
 		</ToggleButton>

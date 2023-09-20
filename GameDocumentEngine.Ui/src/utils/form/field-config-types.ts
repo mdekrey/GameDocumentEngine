@@ -3,6 +3,7 @@ import { isArray } from './arrays';
 import type { ZodType } from 'zod';
 import type { AnyPath, Path, PathValue } from './path';
 import type { FieldMapping } from './useField';
+import { FieldStatePrimitive, PerFieldState } from './fieldStateTracking';
 
 export type UnmappedFieldConfig<T, TPath extends Path<T> = Path<T>> = {
 	path: TPath;
@@ -24,6 +25,10 @@ export type UntypedFieldConfigObject<TValue> = {
 	mapping?: FieldMapping<any, TValue>;
 };
 
+export type FieldStateOverride<TForm, TState extends FieldStatePrimitive> =
+	| PerFieldState<TState>
+	| ((value: TForm) => PerFieldState<TState>);
+
 export type FieldConfig<
 	T,
 	TPath extends Path<T> = Path<T>,
@@ -32,8 +37,8 @@ export type FieldConfig<
 	path: TPath;
 	schema?: ZodType<TValue>;
 	translationPath?: AnyPath;
-	disabled?: boolean;
-	readOnly?: boolean;
+	disabled?: FieldStateOverride<T, boolean>;
+	readOnly?: FieldStateOverride<T, boolean>;
 } & ([PathValue<T, TPath>] extends [TValue]
 	? {
 			mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;

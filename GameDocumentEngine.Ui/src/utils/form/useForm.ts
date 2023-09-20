@@ -29,16 +29,18 @@ import type {
 	FieldsConfig,
 	FieldConfig,
 	FieldConfigToType,
+	FieldStateOverride,
 } from './field-config-types';
 import { toConfigObject } from './field-config-types';
 import { getValueAtPath, getAtomForPath } from './getAtomForPath';
 import { mapAtom, noChange } from './mapAtom';
 import {
 	FieldStateAtom,
+	FieldStatePrimitive,
 	PerFieldState,
 	toAtomFieldState,
 	walkFieldStateAtom,
-	walkFieldStateAtomValue,
+	toFieldStateValue,
 } from './fieldStateTracking';
 
 export type ConfiguredFormField<
@@ -182,6 +184,7 @@ function buildFormResult<T>({
 		errorStrategy,
 		formTranslation,
 		store,
+		atom,
 		atomFamily,
 		defaultValue,
 		formEvents,
@@ -217,6 +220,7 @@ function buildFormResult<T>({
 
 type FormResultContext<T> = Pick<
 	UseFormResult<T>,
+	| 'atom'
 	| 'pathPrefix'
 	| 'translationPath'
 	| 'schema'
@@ -275,18 +279,8 @@ function toField<T, TPath extends Path<T>, TValue>(
 					...(typeof part === 'string' ? [part] : part),
 				].join('.'),
 			),
-		disabled:
-			config.disabled ??
-			(walkFieldStateAtomValue(
-				context.disabledFields,
-				config.path as AnyPath,
-			) as Atom<boolean>),
-		readOnly:
-			config.readOnly ??
-			(walkFieldStateAtomValue(
-				context.readOnlyFields,
-				config.path as AnyPath,
-			) as Atom<boolean>),
+		disabled: substateAtom(config.disabled, context.disabledFields),
+		readOnly: substateAtom(config.readOnly, context.readOnlyFields),
 	};
 	const unmappedAtom = context.atomFamily(config.path as Path<T>);
 	const fieldResult = toInternalFieldAtom<unknown, TValue>(
@@ -299,6 +293,21 @@ function toField<T, TPath extends Path<T>, TValue>(
 		...result,
 		...fieldResult,
 	};
+
+	function substateAtom<TState extends FieldStatePrimitive>(
+		value: undefined | FieldStateOverride<T, TState>,
+		state: FieldStateAtom<TState>,
+	): TState | Atom<TState> {
+		if (typeof value === 'function') {
+			return atom((get) => value(get(context.atom))) as Atom<TState>;
+		}
+		return (
+			(value as TState) ??
+			(toFieldStateValue(
+				walkFieldStateAtom(state, config.path as AnyPath),
+			) as Atom<TState>)
+		);
+	}
 }
 
 function toFormSubset<T, TPath extends Path<T>, TValue>(

@@ -28,7 +28,7 @@ export function ManageSide({ side }: { side: FormFieldReturnType<SideState> }) {
 		ready: { path: ['ready'], mapping: defaultFalse },
 	});
 	// TODO: allow changing ready if there are no choices errors
-	// TODO: allow changing choice only if readonly is false
+	// TODO: allow changing choice only if ready is false
 	return (
 		<>
 			<div className="flex flex-col md:flex-row gap-2">
