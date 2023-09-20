@@ -296,11 +296,13 @@ function toField<T, TPath extends Path<T>, TValue>(
 	};
 
 	function substateAtom<TState extends FieldStatePrimitive>(
-		value: undefined | FieldStateOverride<T, TValue, TState>,
+		value: undefined | FieldStateOverride<TValue, TState>,
 		state: FieldStateAtom<TState>,
 	): FieldStateCallback<TState, TValue> {
+		// These are tchnically giving back structured results, but that is _probably_ okay
+		// FIXME: it would be nice make these types correct and not use `as`
 		if (typeof value === 'function') {
-			return (c) => value(context.atom, c) as Atom<TState>;
+			return value as FieldStateCallback<TState, TValue>;
 		}
 		return () =>
 			value === undefined

@@ -7,6 +7,8 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import type { FieldMapping } from '@/utils/form/useField';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
+import { atom } from 'jotai';
+import { useMemo } from 'react';
 
 const requiredWiseMapping: FieldMapping<Wise | null, Wise> = {
 	toForm: (v) =>
@@ -52,27 +54,31 @@ const optionalToBoolMapping: FieldMapping<boolean | undefined, boolean> = {
 };
 
 export function Wise({ wise }: { wise: FormFieldReturnType<Wise> }) {
+	const disabled = useMemo(
+		() => atom((get) => !get(wise.value).name),
+		[wise.value],
+	);
 	const fields = useFormFields(wise, {
 		name: ['name'],
 		pass: {
 			path: ['pass'],
 			mapping: optionalToBoolMapping,
-			disabled: (v: Wise) => !v.name,
+			disabled,
 		},
 		fail: {
 			path: ['fail'],
 			mapping: optionalToBoolMapping,
-			disabled: (v: Wise) => !v.name,
+			disabled,
 		},
 		persona: {
 			path: ['persona'],
 			mapping: optionalToBoolMapping,
-			disabled: (v: Wise) => !v.name,
+			disabled,
 		},
 		fate: {
 			path: ['fate'],
 			mapping: optionalToBoolMapping,
-			disabled: (v: Wise) => !v.name,
+			disabled,
 		},
 	});
 
