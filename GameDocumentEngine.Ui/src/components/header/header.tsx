@@ -35,7 +35,7 @@ export function Header({
 	return (
 		<div
 			className={twMerge(
-				'w-full bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white shadow-sm flex flex-row items-center gap-4 h-12 p-1 z-normal',
+				'w-full bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white shadow-sm flex flex-row items-center gap-4 h-12 p-1',
 				className,
 			)}
 		>

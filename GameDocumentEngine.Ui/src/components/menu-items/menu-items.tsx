@@ -29,7 +29,7 @@ export const MenuItems = forwardRef(function MenuItems(
 	return (
 		<Menu.Items
 			ref={ref}
-			className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-slate-300 dark:divide-slate-700 rounded-md bg-slate-200 dark:bg-slate-800 shadow-lg ring-1 ring-white dark:ring-black ring-opacity-5 focus:outline-none"
+			className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-slate-300 dark:divide-slate-700 rounded-md bg-slate-200 dark:bg-slate-800 shadow-lg ring-1 ring-white dark:ring-black ring-opacity-5 focus:outline-none z-dropdown"
 		>
 			{menuItems.itemGroups.map((g) => (
 				<div className="p-1" key={g.name}>

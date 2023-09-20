@@ -71,13 +71,6 @@
 	@apply opacity-25 pointer-events-auto;
 }
 
-.sidebar {
-	@apply overflow-auto bg-slate-700 text-white;
-	@apply bg-slate-200 text-slate-950;
-	@apply dark:bg-slate-700 dark:text-white;
-}
-
-
 .sidebar-left {
 	composes: sidebar;
 	display: var(--sidebar-left-display);

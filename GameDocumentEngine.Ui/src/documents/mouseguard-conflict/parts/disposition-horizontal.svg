@@ -1,7 +1,8 @@
 <svg viewBox="0 0 271 124"
 	xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="bevel" stroke-miterlimit="1.5"
 	fill="none"
+	stroke="currentcolor"
 	>
-	<path d="M3 11h127l21,51 -21,51H3" stroke="#000" stroke-width="3" />
-	<path d="M3 121v-23h24v-24h-24v-23h24v-24h-24v-24h237l27,59 -27,59h-237Z" stroke="#000" stroke-width="6"/>
+	<path d="M3 11h127l21,51 -21,51H3" stroke-width="3" />
+	<path d="M3 121v-23h24v-24h-24v-23h24v-24h-24v-24h237l27,59 -27,59h-237Z" stroke-width="6"/>
 </svg>

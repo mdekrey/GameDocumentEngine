@@ -76,7 +76,10 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 			<section
 				ref={leftSidebar}
 				tabIndex={0}
-				className={styles['sidebar-left']}
+				className={twMerge(
+					styles['sidebar-left'],
+					'overflow-auto bg-slate-200 text-slate-950 dark:bg-slate-700 dark:text-white',
+				)}
 			>
 				{slotProps.LeftSidebar?.children}
 			</section>
@@ -93,7 +96,10 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 			<section
 				ref={rightSidebar}
 				tabIndex={0}
-				className={styles['sidebar-right']}
+				className={twMerge(
+					styles['sidebar-right'],
+					'overflow-auto bg-slate-200 text-slate-950 dark:bg-slate-700 dark:text-white',
+				)}
 			>
 				{slotProps.RightSidebar?.children}
 			</section>
