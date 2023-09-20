@@ -33,6 +33,10 @@ export function createRealtimeApi(queryClient: QueryClient): RealtimeApi {
 			});
 			requestHubState();
 		},
+		onRegisterError(error: unknown) {
+			console.error('Unable to register service worker', error);
+			// TODO: pop up a modal that tells the user something went wrong badly
+		},
 	});
 
 	const result: RealtimeApi = {
