@@ -4,8 +4,9 @@ import { useSubmitOnChange } from '../useSubmitOnChange';
 import { Conflict } from './conflict-types';
 import { OrganizerForm } from './parts/organizer-form';
 import { GeneralDisplay } from './parts/general-display';
-import { Fragment } from 'react';
-import { ManageSide } from './ManageSide';
+import { Fragment, useCallback } from 'react';
+import { ManageSide } from './parts/ManageSide';
+import { ReadyWatcher } from './parts/ReadyWatcher';
 
 export function ConflictSheet({
 	form,
@@ -30,11 +31,16 @@ export function ConflictSheet({
 		: objectRole?.includes('side-b')
 		? fields.sideB
 		: undefined;
-	// const otherSide = objectRole?.includes('side-a')
-	// 	? fields.sideB
-	// 	: objectRole?.includes('side-b')
-	// 	? fields.sideA
-	// 	: undefined;
+	const otherSide = objectRole?.includes('side-a')
+		? fields.sideB
+		: objectRole?.includes('side-b')
+		? fields.sideA
+		: undefined;
+
+	const onSave = useCallback(
+		() => form.handleSubmit(onSubmit)(),
+		[onSubmit, form],
+	);
 
 	return (
 		<form
@@ -58,6 +64,16 @@ export function ConflictSheet({
 						sideB={fields.sideB}
 					/>
 					{yourSide && <ManageSide side={yourSide} />}
+					{yourSide &&
+					otherSide &&
+					(objectRole === 'side-a-captain' ||
+						objectRole === 'side-b-captain') ? (
+						<ReadyWatcher
+							yourSide={yourSide}
+							otherSide={otherSide}
+							onSave={onSave}
+						/>
+					) : null}
 				</Fragment>
 			)}
 		</form>

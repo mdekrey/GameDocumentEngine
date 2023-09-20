@@ -1,5 +1,5 @@
 import { useFormFields } from '@/utils/form/useFormFields';
-import { ActionChoice, SideState } from './conflict-types';
+import { ActionChoice, SideState } from '../conflict-types';
 import attackCard from '@/documents/mouseguard-assets/deck/ActionDeckattack.webp';
 import defendCard from '@/documents/mouseguard-assets/deck/ActionDeckdefend.webp';
 import feintCard from '@/documents/mouseguard-assets/deck/ActionDeckfeint.webp';
