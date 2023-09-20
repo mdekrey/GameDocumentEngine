@@ -29,15 +29,16 @@ const preview: Preview & { darkMode: unknown } = {
 			container: (props) => {
 				// workarounds for current state of storybook-dark-mode
 				const isDark = useDarkMode();
-				useEffect(
-					() => () => {
+				useEffect(() => {
+					applyDark(isDark);
+
+					return () => {
 						// channel doesn't work for story iframes
 						if (document.querySelector('iframe')) {
 							window.location.reload();
 						}
-					},
-					[isDark],
-				);
+					};
+				}, [isDark]);
 				const currentProps = {
 					...props,
 					theme: isDark ? themes.dark : themes.light,
@@ -48,5 +49,12 @@ const preview: Preview & { darkMode: unknown } = {
 	},
 	decorators: [StorybookDecorator],
 };
+
+function applyDark(dark: boolean) {
+	document.body.classList.add(dark ? 'dark' : 'light');
+	document.body.classList.remove(dark ? 'light' : 'dark');
+	document.documentElement.classList.add(dark ? 'dark' : 'light');
+	document.documentElement.classList.remove(dark ? 'light' : 'dark');
+}
 
 export default preview;

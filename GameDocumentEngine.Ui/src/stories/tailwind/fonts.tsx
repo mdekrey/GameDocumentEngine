@@ -3,7 +3,7 @@ import { fontSizes, fontFamilies } from './info';
 
 export function FontSizes() {
 	return (
-		<div className="sb-unstyled text-slate-400">
+		<div className="sb-unstyled">
 			{Object.entries(fontSizes).map(([sizeName, sizeAttributes]) => (
 				<FontDemo
 					fontName={sizeName}
@@ -18,7 +18,7 @@ export function FontSizes() {
 
 export function FontFamilies() {
 	return (
-		<div className="sb-unstyled text-slate-400">
+		<div className="sb-unstyled">
 			{Object.entries(fontFamilies).map(([familyName, family]) => (
 				<FontDemo
 					fontName={familyName}
@@ -44,9 +44,7 @@ export function FontDemo({
 }) {
 	return (
 		<div className={twMerge('flex flex-col gap-1', className)}>
-			<p className="text-white" style={fontValue}>
-				The quick brown fox jumped over the lazy dog.
-			</p>
+			<p style={fontValue}>The quick brown fox jumped over the lazy dog.</p>
 			<span className="text-xs">{fontName}</span>
 			<span className="text-xs">{JSON.stringify(fontValue)}</span>
 		</div>
