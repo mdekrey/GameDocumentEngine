@@ -92,14 +92,31 @@ export type FieldMapping<TValue, TFormFieldValue> = {
 	fromForm(this: void, v: TFormFieldValue): TValue | typeof noChange;
 };
 
+//
+export const noErrorsAtom: ErrorsAtom = atom({ state: 'hasData', data: null });
+export type FieldStateContext<TFieldValue> = {
+	value: Atom<TFieldValue>;
+	/** If no schema is provided, will be noErrorsAtom */
+	errors: ErrorsAtom;
+};
+
+export type FieldStateCallback<T, TFieldValue> = (
+	context: FieldStateContext<TFieldValue>,
+) => Atom<T>;
+
+export type FieldStateBoolean<TFieldValue> =
+	| boolean
+	| Atom<boolean>
+	| FieldStateCallback<boolean, TFieldValue>;
+
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
 	mapping: FieldMapping<TValue, TFormFieldValue>;
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
 	translation: FieldTranslation;
-	disabled: boolean | Atom<boolean>;
-	readOnly: boolean | Atom<boolean>;
+	disabled: FieldStateBoolean<TFormFieldValue>;
+	readOnly: FieldStateBoolean<TFormFieldValue>;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,
@@ -111,7 +128,9 @@ type MappedOptions<TValue, TFieldValue> = Partial<
 	mapping: FieldOptions<TValue, TFieldValue>['mapping'];
 };
 
-type Flags<TOptions extends Partial<FieldOptions<unknown, unknown>>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFieldOptions = FieldOptions<any, any>;
+type Flags<TOptions extends Partial<AnyFieldOptions>> = {
 	hasErrors: 'schema' extends keyof TOptions ? true : false;
 	hasTranslations: TOptions['translation'] extends FieldTranslation
 		? true

@@ -14,6 +14,7 @@ import type {
 	FieldMapping,
 	UseFieldResult,
 	UseFieldResultFlags,
+	FieldStateCallback,
 } from './useField';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import { createTriggeredErrorsAtom } from './createErrorsAtom';
@@ -295,18 +296,18 @@ function toField<T, TPath extends Path<T>, TValue>(
 	};
 
 	function substateAtom<TState extends FieldStatePrimitive>(
-		value: undefined | FieldStateOverride<T, TState>,
+		value: undefined | FieldStateOverride<T, TValue, TState>,
 		state: FieldStateAtom<TState>,
-	): TState | Atom<TState> {
+	): FieldStateCallback<TState, TValue> {
 		if (typeof value === 'function') {
-			return atom((get) => value(get(context.atom))) as Atom<TState>;
+			return (c) => value(context.atom, c) as Atom<TState>;
 		}
-		return (
-			(value as TState) ??
-			(toFieldStateValue(
-				walkFieldStateAtom(state, config.path as AnyPath),
-			) as Atom<TState>)
-		);
+		return () =>
+			value === undefined
+				? (toFieldStateValue(
+						walkFieldStateAtom(state, config.path as AnyPath),
+				  ) as Atom<TState>)
+				: atom(value as TState);
 	}
 }
 

@@ -9,12 +9,21 @@ import { SelectField } from '@/components/form-fields/select-input/select-field'
 import { ButtonRow } from '@/components/button/button-row';
 import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
 import { FieldMapping } from '@/utils/form/useField';
+import { atom } from 'jotai';
 
 const cards = {
 	attack: attackCard,
 	defend: defendCard,
 	feint: feintCard,
 	maneuver: maneuverCard,
+};
+
+const defaultNullActionChoice: FieldMapping<
+	ActionChoice | undefined,
+	ActionChoice | null
+> = {
+	toForm: (v) => v ?? null,
+	fromForm: (v) => v ?? undefined,
 };
 
 const defaultFalse: FieldMapping<boolean | undefined, boolean> = {
@@ -24,11 +33,23 @@ const defaultFalse: FieldMapping<boolean | undefined, boolean> = {
 
 export function ManageSide({ side }: { side: FormFieldReturnType<SideState> }) {
 	const fields = useFormFields(side, {
-		choice: (index: 0 | 1 | 2) => ['choices', index] as const,
-		ready: { path: ['ready'], mapping: defaultFalse },
+		choices: ['choices'],
+		choice: (index: 0 | 1 | 2) =>
+			({
+				path: ['choices', index],
+				disabled: () => atom((get) => !!get(side.value).ready),
+				mapping: defaultNullActionChoice,
+			}) as const,
+		ready: {
+			path: ['ready'],
+			mapping: defaultFalse,
+			disabled: () =>
+				atom((get) => {
+					const choices = get(side.value).choices;
+					return choices.length !== 3 || choices.some((v) => !v);
+				}),
+		},
 	});
-	// TODO: allow changing ready if there are no choices errors
-	// TODO: allow changing choice only if ready is false
 	return (
 		<>
 			<div className="flex flex-col md:flex-row gap-2">
@@ -48,15 +69,24 @@ export function ManageSide({ side }: { side: FormFieldReturnType<SideState> }) {
 function SelectAction({
 	action,
 }: {
-	action: FormFieldReturnType<ActionChoice>;
+	action: FormFieldReturnType<ActionChoice | null>;
 }) {
 	return (
 		<SelectField
 			field={action}
 			items={Object.keys(cards) as (keyof typeof cards)[]}
-			children={(item) => (
-				<img className="inline-block w-48" src={cards[item]} />
-			)}
+			children={(item) =>
+				item ? (
+					<img
+						className="inline-block w-48"
+						src={cards[item]}
+						alt={action.translation(item)}
+						title={action.translation(item)}
+					/>
+				) : (
+					action.translation('not-selected')
+				)
+			}
 		/>
 	);
 }

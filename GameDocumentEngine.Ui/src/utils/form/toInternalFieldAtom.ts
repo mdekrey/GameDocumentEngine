@@ -5,22 +5,32 @@ import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
-import type {
-	CheckboxHtmlProps,
-	ControlledHtmlProps,
-	FieldMapping,
-	FieldOptions,
-	InputHtmlProps,
-	ToHtmlInputProps,
-	ToHtmlProps,
-	UseFieldResult,
+import {
+	noErrorsAtom,
+	type CheckboxHtmlProps,
+	type ControlledHtmlProps,
+	type FieldMapping,
+	type FieldOptions,
+	type FieldStateBoolean,
+	type FieldStateContext,
+	type InputHtmlProps,
+	type ToHtmlInputProps,
+	type ToHtmlProps,
+	type UseFieldResult,
 } from './useField';
 import { FieldEvents } from './events/FieldEvents';
 import type { RegisterErrorStrategy } from './errorsStrategy';
 import type { ZodType } from 'zod';
 
-function toFieldStateAtom(value: boolean | Atom<boolean>) {
-	return typeof value === 'boolean' ? atom(value) : value;
+function toFieldStateAtom<TValue>(
+	value: FieldStateBoolean<TValue>,
+	context: FieldStateContext<TValue>,
+): Atom<boolean> {
+	return typeof value === 'boolean'
+		? atom(value)
+		: typeof value === 'function'
+		? value(context)
+		: value;
 }
 
 export function toInternalFieldAtom<TValue, TFieldValue>(
@@ -46,8 +56,18 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const disabled = toFieldStateAtom(options.disabled ?? false);
-	const readOnly = toFieldStateAtom(options.readOnly ?? false);
+	const fieldStateContext: FieldStateContext<TFieldValue> = {
+		value: formValueAtom,
+		errors: errors ?? noErrorsAtom,
+	};
+	const disabled = toFieldStateAtom(
+		options.disabled ?? false,
+		fieldStateContext,
+	);
+	const readOnly = toFieldStateAtom(
+		options.readOnly ?? false,
+		fieldStateContext,
+	);
 
 	const setValue = (v: TFieldValue | ((prev: TFieldValue) => TFieldValue)) => {
 		if (store.get(disabled) || store.get(readOnly)) return;

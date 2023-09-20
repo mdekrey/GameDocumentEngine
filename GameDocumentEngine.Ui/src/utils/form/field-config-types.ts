@@ -2,7 +2,7 @@ import type { AnyArray } from './arrays';
 import { isArray } from './arrays';
 import type { ZodType } from 'zod';
 import type { AnyPath, Path, PathValue } from './path';
-import type { FieldMapping } from './useField';
+import type { FieldMapping, FieldStateContext } from './useField';
 import { FieldStatePrimitive, PerFieldState } from './fieldStateTracking';
 
 export type UnmappedFieldConfig<T, TPath extends Path<T> = Path<T>> = {
@@ -25,9 +25,17 @@ export type UntypedFieldConfigObject<TValue> = {
 	mapping?: FieldMapping<any, TValue>;
 };
 
-export type FieldStateOverride<TForm, TState extends FieldStatePrimitive> =
+export type FieldStateOverride<
+	TForm,
+	TField,
+	TState extends FieldStatePrimitive,
+> =
 	| PerFieldState<TState>
-	| ((value: TForm) => PerFieldState<TState>);
+	| import('jotai').Atom<PerFieldState<TState>>
+	| ((
+			value: import('jotai').Atom<TForm>,
+			context: FieldStateContext<TField>,
+	  ) => import('jotai').Atom<PerFieldState<TState>>);
 
 export type FieldConfig<
 	T,
@@ -37,8 +45,8 @@ export type FieldConfig<
 	path: TPath;
 	schema?: ZodType<TValue>;
 	translationPath?: AnyPath;
-	disabled?: FieldStateOverride<T, boolean>;
-	readOnly?: FieldStateOverride<T, boolean>;
+	disabled?: FieldStateOverride<T, TValue, boolean>;
+	readOnly?: FieldStateOverride<T, TValue, boolean>;
 } & ([PathValue<T, TPath>] extends [TValue]
 	? {
 			mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;

@@ -109,13 +109,37 @@
 					},
 					"choices": [
 						{
-							"label": "Action 1 choice"
+							"label": "Action 1 choice",
+							"not-selected": "Not Selected",
+							"attack": "Attack",
+							"defend": "Defend",
+							"feint": "Feint",
+							"maneuver": "Maneuver",
+							"errors": {
+								"invalid_type": "Please select an action."
+							}
 						},
 						{
-							"label": "Action 2 choice"
+							"label": "Action 2 choice",
+							"not-selected": "Not Selected",
+							"attack": "Attack",
+							"defend": "Defend",
+							"feint": "Feint",
+							"maneuver": "Maneuver",
+							"errors": {
+								"invalid_type": "Please select an action."
+							}
 						},
 						{
-							"label": "Action 3 choice"
+							"label": "Action 3 choice",
+							"not-selected": "Not Selected",
+							"attack": "Attack",
+							"defend": "Defend",
+							"feint": "Feint",
+							"maneuver": "Maneuver",
+							"errors": {
+								"invalid_type": "Please select an action."
+							}
 						}
 					],
 					"ready": {
