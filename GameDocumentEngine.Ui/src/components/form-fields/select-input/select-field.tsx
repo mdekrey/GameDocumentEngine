@@ -6,6 +6,17 @@ import {
 } from '@/components/form-fields/select-input/select-input';
 import type { UseFieldResult } from '@/utils/form/useField';
 
+export function SelectField<T>(props: {
+	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
+	items: T[];
+	children: (item: T) => React.ReactNode;
+	selectInput: React.FC<SelectInputProps<T>>;
+}): JSX.Element;
+export function SelectField<T>(props: {
+	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
+	items: T[];
+	children: (item: T) => React.ReactNode;
+}): JSX.Element;
 export function SelectField<T>({
 	field,
 	items,
