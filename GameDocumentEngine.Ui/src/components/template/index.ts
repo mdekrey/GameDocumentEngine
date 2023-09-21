@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-// TODO: Not sure why there's an unsafe return...
 import type React from 'react';
 import { createElement, forwardRef } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -17,6 +15,8 @@ type ReactElementOfType<TType extends AllowedTypes> = React.ReactElement<
 	PropsOf<TType>,
 	TType
 >;
+
+const identity = <T>(orig: T) => orig;
 
 export type ExtendOptions<TType extends AllowedTypes> = {
 	overrideType?: boolean;
@@ -48,7 +48,7 @@ export function elementTemplate<TType extends AllowedTypes>(
 		baseOptions = {},
 	]: ExtendParams<TType>
 ): ElementTemplate<TType> {
-	const mutateProps = baseOptions?.mutateProps ?? ((orig) => orig);
+	const mutateProps = baseOptions?.mutateProps ?? identity;
 	const base = forwardRef(
 		({ children, className, ...props }: PropsOf<TType>, ref) =>
 			createElement(
@@ -83,6 +83,7 @@ export function elementTemplate<TType extends AllowedTypes>(
 				}) as ReactElementOfType<TType>,
 				{
 					mutateProps: (orig) =>
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 						mutateProps(options?.mutateProps?.(orig) ?? orig),
 				},
 			);
