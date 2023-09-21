@@ -32,13 +32,15 @@ export function ReadyWatcher({
 		revealed: ['revealed'],
 		ready: ['ready'],
 	});
+	const currentChoices = useAtomValue(fields.choices.atom);
+	const currentRevealed = useAtomValue(fields.revealed.atom);
+	const currentReady = useAtomValue(fields.ready.atom);
 	useEffect(() => {
 		const currentRevealed = fields.revealed.get();
 
 		const choices = fields.choices.get();
 		if (isYourSideReady && !allChoicesSelected(choices)) {
 			fields.ready.setValue(false);
-			onSave();
 		} else if (
 			allChoicesSelected(choices) &&
 			isYourSideReady &&
@@ -47,7 +49,6 @@ export function ReadyWatcher({
 		) {
 			// reveal it!
 			fields.revealed.setValue(choices);
-			onSave();
 		} else if (
 			currentRevealed?.length === 3 &&
 			(!isYourSideReady || !isOtherSideReady)
@@ -60,8 +61,11 @@ export function ReadyWatcher({
 					draft.choices = [];
 				}),
 			);
-			onSave();
 		}
 	}, [isYourSideReady, isOtherSideReady, fields, yourSide, onSave]);
+	useEffect(() => {
+		onSave();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentChoices, currentRevealed, currentReady]);
 	return null;
 }

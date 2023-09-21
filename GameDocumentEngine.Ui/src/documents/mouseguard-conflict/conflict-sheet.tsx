@@ -7,6 +7,9 @@ import { GeneralDisplay } from './parts/general-display';
 import { Fragment, useCallback } from 'react';
 import { ManageSide } from './parts/ManageSide';
 import { ReadyWatcher } from './parts/ReadyWatcher';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { useAtomValue } from 'jotai';
+import { ReviewRevealed } from './parts/ReviewRevealed';
 
 export function ConflictSheet({
 	form,
@@ -37,6 +40,13 @@ export function ConflictSheet({
 		? fields.sideA
 		: undefined;
 
+	const yourSideRevealed = useAtomValue(
+		useComputedAtom((get) => yourSide && get(yourSide.atom).revealed),
+	);
+	const otherSideRevealed = useAtomValue(
+		useComputedAtom((get) => otherSide && get(otherSide.atom).revealed),
+	);
+
 	const onSave = useCallback(
 		() => form.handleSubmit(onSubmit)(),
 		[onSubmit, form],
@@ -63,17 +73,29 @@ export function ConflictSheet({
 						sideA={fields.sideA}
 						sideB={fields.sideB}
 					/>
-					{yourSide && <ManageSide side={yourSide} />}
-					{yourSide &&
-					otherSide &&
-					(objectRole === 'side-a-captain' ||
-						objectRole === 'side-b-captain') ? (
-						<ReadyWatcher
-							yourSide={yourSide}
-							otherSide={otherSide}
-							onSave={onSave}
-						/>
-					) : null}
+					{yourSide && (
+						<>
+							{otherSide &&
+							(objectRole === 'side-a-captain' ||
+								objectRole === 'side-b-captain') ? (
+								<ReadyWatcher
+									yourSide={yourSide}
+									otherSide={otherSide}
+									onSave={onSave}
+								/>
+							) : null}
+							{yourSideRevealed && otherSideRevealed ? (
+								<ReviewRevealed
+									yourSide={yourSide}
+									yourSideRevealed={yourSideRevealed}
+									otherSideRevealed={otherSideRevealed}
+									translation={t}
+								/>
+							) : (
+								<ManageSide side={yourSide} translation={t} />
+							)}
+						</>
+					)}
 				</Fragment>
 			)}
 		</form>

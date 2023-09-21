@@ -12,7 +12,13 @@ const defaultFalse: FieldMapping<boolean | undefined, boolean> = {
 	fromForm: (v) => v,
 };
 
-export function ManageSide({ side }: { side: FormFieldReturnType<SideState> }) {
+export function ManageSide({
+	side,
+	translation,
+}: {
+	side: FormFieldReturnType<SideState>;
+	translation: (key: string) => string;
+}) {
 	const fields = useFormFields(side, {
 		choices: ['choices'],
 		choice: (index: 0 | 1 | 2) =>
@@ -35,9 +41,9 @@ export function ManageSide({ side }: { side: FormFieldReturnType<SideState> }) {
 		<>
 			<div className="flex flex-col md:flex-row gap-2">
 				<div className="contents">
-					<SelectAction action={fields.choice(0)} />
-					<SelectAction action={fields.choice(1)} />
-					<SelectAction action={fields.choice(2)} />
+					<SelectAction action={fields.choice(0)} translation={translation} />
+					<SelectAction action={fields.choice(1)} translation={translation} />
+					<SelectAction action={fields.choice(2)} translation={translation} />
 				</div>
 				<ButtonRow className="md:self-center">
 					<ToggleButtonField field={fields.ready} />

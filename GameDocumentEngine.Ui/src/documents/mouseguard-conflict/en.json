@@ -110,35 +110,23 @@
 					"choices": [
 						{
 							"label": "Action 1 choice",
-							"not-selected": "Not Selected",
-							"attack": "Attack",
-							"defend": "Defend",
-							"feint": "Feint",
-							"maneuver": "Maneuver",
 							"errors": {
-								"invalid_type": "Please select an action."
+								"invalid_type": "Please select an action.",
+								"invalid_union": "Please select an action."
 							}
 						},
 						{
 							"label": "Action 2 choice",
-							"not-selected": "Not Selected",
-							"attack": "Attack",
-							"defend": "Defend",
-							"feint": "Feint",
-							"maneuver": "Maneuver",
 							"errors": {
-								"invalid_type": "Please select an action."
+								"invalid_type": "Please select an action.",
+								"invalid_union": "Please select an action."
 							}
 						},
 						{
 							"label": "Action 3 choice",
-							"not-selected": "Not Selected",
-							"attack": "Attack",
-							"defend": "Defend",
-							"feint": "Feint",
-							"maneuver": "Maneuver",
 							"errors": {
-								"invalid_type": "Please select an action."
+								"invalid_type": "Please select an action.",
+								"invalid_union": "Please select an action."
 							}
 						}
 					],
@@ -149,6 +137,9 @@
 						"pressed": "Changed my mind...",
 						"is-ready": "Ready!",
 						"is-not-ready": "Not ready..."
+					},
+					"clear": {
+						"label": "Clear round"
 					}
 				}
 			}
@@ -160,6 +151,20 @@
 			"defend": "Defend Skills",
 			"feint": "Feint Skills",
 			"maneuver": "Maneuver Skills"
-		}
+		},
+		"actions": {
+			"not-selected": "Not Selected",
+			"attack": "Attack",
+			"defend": "Defend",
+			"feint": "Feint",
+			"maneuver": "Maneuver"
+		},
+		"choice": "Action {{index}}",
+		"clear": "Clear choices"
+	},
+	"clear-modal": {
+		"are-you-sure": "Are you sure you want to clear both sides' selections?",
+		"submit": "Yes, I'm sure!",
+		"cancel": "No, don't clear"
 	}
 }

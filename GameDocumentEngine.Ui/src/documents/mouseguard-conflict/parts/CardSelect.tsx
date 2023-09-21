@@ -22,7 +22,7 @@ export const defaultNullActionChoice: FieldMapping<
 	fromForm: (v) => v ?? null,
 };
 
-const cards = {
+export const cards: Record<ActionChoice, string> = {
 	attack: attackCard,
 	defend: defendCard,
 	feint: feintCard,
@@ -39,25 +39,27 @@ export function displayChoice(
 		<img
 			className="inline-block w-48"
 			src={cards[item]}
-			alt={t(item)}
-			title={t(item)}
+			alt={t(`general.actions.${item}`)}
+			title={t(`general.actions.${item}`)}
 		/>
 	) : (
-		t('not-selected')
+		t('general.actions.not-selected')
 	);
 }
 
 export function SelectAction({
 	action,
+	translation,
 }: {
 	action: FormFieldReturnType<ActionChoice | null>;
+	translation: (key: string) => string;
 }) {
 	return (
 		<SelectField
 			field={action}
 			items={cardChoices}
 			selectInput={CardInput}
-			children={(item) => displayChoice(item, action.translation)}
+			children={(item) => displayChoice(item, translation)}
 		/>
 	);
 }
