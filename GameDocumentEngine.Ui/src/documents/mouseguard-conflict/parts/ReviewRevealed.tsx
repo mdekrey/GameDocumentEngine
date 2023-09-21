@@ -25,9 +25,11 @@ export function ReviewRevealed({
 		<section className="flex flex-col gap-4">
 			<table className="grid grid-rows-3 md:grid-rows-none grid-flow-col md:grid-cols-3 md:grid-flow-row auto-rows-min auto-cols-fr justify-items-center items-center justify-center gap-4">
 				<thead className="contents">
-					<th>{translation('general.choice', { index: 1 })}</th>
-					<th>{translation('general.choice', { index: 2 })}</th>
-					<th>{translation('general.choice', { index: 3 })}</th>
+					<tr className="contents">
+						<th>{translation('general.choice', { index: 1 })}</th>
+						<th>{translation('general.choice', { index: 2 })}</th>
+						<th>{translation('general.choice', { index: 3 })}</th>
+					</tr>
 				</thead>
 				<tbody className="contents">
 					<tr className="contents">
