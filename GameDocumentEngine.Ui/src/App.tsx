@@ -27,7 +27,11 @@ function withParamsValue<const T extends string>(prop: T) {
 		return (props: Omit<TProps, T>) => (
 			<GetParams>
 				{(params: { [P in T]: string }) => (
-					<Component {...({ ...props, [prop]: params[prop] } as TProps)} />
+					// key is provided here to prvent reuse of a component when changing pages
+					<Component
+						key={params[prop]}
+						{...({ ...props, [prop]: params[prop] } as TProps)}
+					/>
 				)}
 			</GetParams>
 		);
