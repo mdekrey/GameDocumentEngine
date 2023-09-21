@@ -163,6 +163,7 @@
 		"clear": "Clear choices"
 	},
 	"clear-modal": {
+		"title": "Move to the next round",
 		"are-you-sure": "Are you sure you want to clear both sides' selections?",
 		"submit": "Yes, I'm sure!",
 		"cancel": "No, don't clear"
