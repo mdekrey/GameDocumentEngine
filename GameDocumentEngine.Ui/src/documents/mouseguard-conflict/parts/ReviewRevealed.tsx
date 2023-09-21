@@ -16,16 +16,11 @@ export function ReviewRevealed({
 	otherSideRevealed,
 	translation,
 }: {
-	yourSide: FormFieldReturnType<SideState>;
-	yourSideRevealed: ActionChoice[];
-	otherSideRevealed: ActionChoice[];
+	yourSide: null | FormFieldReturnType<SideState>;
+	yourSideRevealed: undefined | ActionChoice[];
+	otherSideRevealed: undefined | ActionChoice[];
 	translation: (key: string, parameters?: object) => string;
 }) {
-	const field = useFormFields(yourSide, {
-		ready: ['ready'],
-	});
-	const launchModal = useModal();
-
 	return (
 		<section className="flex flex-col gap-4">
 			<table className="grid grid-rows-3 md:grid-rows-none grid-flow-col md:grid-cols-3 md:grid-flow-row auto-rows-min auto-cols-fr justify-items-center items-center justify-center gap-4">
@@ -36,26 +31,45 @@ export function ReviewRevealed({
 				</thead>
 				<tbody className="contents">
 					<tr className="contents">
-						{yourSideRevealed.map((choice, index) => (
+						{yourSideRevealed?.map((choice, index) => (
 							<td key={index}>{displayChoice(choice, translation)}</td>
 						))}
 					</tr>
 					<tr className="contents">
-						{otherSideRevealed.map((choice, index) => (
+						{otherSideRevealed?.map((choice, index) => (
 							<td key={index}>{displayChoice(choice, translation)}</td>
 						))}
 					</tr>
 				</tbody>
 			</table>
-			<ButtonRow>
-				<Button
-					disabled={useAtomValue(field.ready.readOnly)}
-					onClick={() => void confirmClear()}
-				>
-					{translation('general.clear')}
-				</Button>
-			</ButtonRow>
+			{yourSide && (
+				<ClearButtonRow yourSide={yourSide} translation={translation} />
+			)}
 		</section>
+	);
+}
+
+function ClearButtonRow({
+	yourSide,
+	translation,
+}: {
+	yourSide: FormFieldReturnType<SideState>;
+	translation: (key: string, parameters?: object) => string;
+}) {
+	const field = useFormFields(yourSide, {
+		ready: ['ready'],
+	});
+	const launchModal = useModal();
+
+	return (
+		<ButtonRow>
+			<Button
+				disabled={useAtomValue(field.ready.readOnly)}
+				onClick={() => void confirmClear()}
+			>
+				{translation('general.clear')}
+			</Button>
+		</ButtonRow>
 	);
 
 	async function confirmClear() {

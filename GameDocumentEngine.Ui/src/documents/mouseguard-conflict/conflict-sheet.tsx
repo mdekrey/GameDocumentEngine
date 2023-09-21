@@ -41,10 +41,10 @@ export function ConflictSheet({
 		: undefined;
 
 	const yourSideRevealed = useAtomValue(
-		useComputedAtom((get) => yourSide && get(yourSide.atom).revealed),
+		useComputedAtom((get) => get((yourSide ?? fields.sideA).atom).revealed),
 	);
 	const otherSideRevealed = useAtomValue(
-		useComputedAtom((get) => otherSide && get(otherSide.atom).revealed),
+		useComputedAtom((get) => get((otherSide ?? fields.sideB).atom).revealed),
 	);
 
 	const onSave = useCallback(
@@ -73,28 +73,25 @@ export function ConflictSheet({
 						sideA={fields.sideA}
 						sideB={fields.sideB}
 					/>
-					{yourSide && (
-						<>
-							{otherSide &&
-							(objectRole === 'side-a-captain' ||
-								objectRole === 'side-b-captain') ? (
-								<ReadyWatcher
-									yourSide={yourSide}
-									otherSide={otherSide}
-									onSave={onSave}
-								/>
-							) : null}
-							{yourSideRevealed && otherSideRevealed ? (
-								<ReviewRevealed
-									yourSide={yourSide}
-									yourSideRevealed={yourSideRevealed}
-									otherSideRevealed={otherSideRevealed}
-									translation={t}
-								/>
-							) : (
-								<ManageSide side={yourSide} translation={t} />
-							)}
-						</>
+					{yourSide &&
+					otherSide &&
+					(objectRole === 'side-a-captain' ||
+						objectRole === 'side-b-captain') ? (
+						<ReadyWatcher
+							yourSide={yourSide}
+							otherSide={otherSide}
+							onSave={onSave}
+						/>
+					) : null}
+					{yourSideRevealed && otherSideRevealed ? (
+						<ReviewRevealed
+							yourSide={yourSide ?? null}
+							yourSideRevealed={yourSideRevealed}
+							otherSideRevealed={otherSideRevealed}
+							translation={t}
+						/>
+					) : (
+						yourSide && <ManageSide side={yourSide} translation={t} />
 					)}
 				</Fragment>
 			)}
