@@ -72,11 +72,9 @@
 			}
 		},
 		"action": {
-			"type": "string",
 			"enum": ["attack", "defend", "feint", "maneuver"]
 		},
 		"nullableAction": {
-			"x-comment": "TODO: Zod generation requires nullable",
 			"enum": ["attack", "defend", "feint", "maneuver", null]
 		}
 	}

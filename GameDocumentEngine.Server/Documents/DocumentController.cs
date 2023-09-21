@@ -69,10 +69,8 @@ public class DocumentController : Api.DocumentControllerBase
 		var results = schema.Evaluate(createDocumentBody.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
 		if (!results.IsValid)
 		{
-			var errors = results.Errors;
-			if (errors == null)
-				return CreateDocumentActionResult.BadRequest("Unable to verify request");
-			return CreateDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
+			var errors = results.AllErrors();
+			return CreateDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => $"{kvp.Pointer}: [{kvp.ErrorType}] {kvp.Message}"))}");
 		}
 
 		dbContext.Add(document);
@@ -154,10 +152,8 @@ public class DocumentController : Api.DocumentControllerBase
 			var results = schema.Evaluate(document.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
 			if (!results.IsValid)
 			{
-				var errors = results.Errors;
-				if (errors == null)
-					return PatchDocumentActionResult.BadRequest("Unable to verify request");
-				return PatchDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => kvp.Key + ": " + kvp.Value))}");
+				var errors = results.AllErrors();
+				return PatchDocumentActionResult.BadRequest($"Errors from schema: {string.Join('\n', errors.Select(kvp => $"{kvp.Pointer}: [{kvp.ErrorType}] {kvp.Message}"))}");
 			}
 		}
 
