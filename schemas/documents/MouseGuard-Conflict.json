@@ -57,7 +57,7 @@
 				},
 				"choices": {
 					"type": "array",
-					"items": { "$ref": "#/$defs/action" },
+					"items": { "$ref": "#/$defs/nullableAction" },
 					"maxItems": 3
 				},
 				"ready": {
@@ -74,6 +74,10 @@
 		"action": {
 			"type": "string",
 			"enum": ["attack", "defend", "feint", "maneuver"]
+		},
+		"nullableAction": {
+			"x-comment": "TODO: Zod generation requires nullable",
+			"enum": ["attack", "defend", "feint", "maneuver", null]
 		}
 	}
 }

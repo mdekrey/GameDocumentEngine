@@ -1,10 +1,16 @@
 import { useFormFields } from '@/utils/form/useFormFields';
-import { SideState } from '../conflict-types';
+import { ActionChoice, SideState } from '../conflict-types';
 import { useEffect } from 'react';
 import { FormFieldReturnType } from '@/utils/form/useForm';
 import { useAtomValue } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { produce } from 'immer';
+
+function allChoicesSelected(
+	choices: (ActionChoice | null)[],
+): choices is [ActionChoice, ActionChoice, ActionChoice] {
+	return choices.length == 3 && !choices.some((choice) => choice == null);
+}
 
 export function ReadyWatcher({
 	yourSide,
@@ -24,19 +30,24 @@ export function ReadyWatcher({
 	const fields = useFormFields(yourSide, {
 		choices: ['choices'],
 		revealed: ['revealed'],
+		ready: ['ready'],
 	});
 	useEffect(() => {
 		const currentRevealed = fields.revealed.get();
-		console.log({
-			yourSide: JSON.stringify(yourSide.get()),
-			currentRevealed,
-			isYourSideReady,
-			isOtherSideReady,
-		});
 
-		if (isYourSideReady && isOtherSideReady && currentRevealed?.length !== 3) {
+		const choices = fields.choices.get();
+		if (isYourSideReady && !allChoicesSelected(choices)) {
+			fields.ready.setValue(false);
+			onSave();
+		} else if (
+			allChoicesSelected(choices) &&
+			isYourSideReady &&
+			isOtherSideReady &&
+			currentRevealed?.length !== 3
+		) {
 			// reveal it!
-			fields.revealed.setValue(fields.choices.get());
+			// TODO: validate if all choices are in at this stage...
+			fields.revealed.setValue(choices);
 			onSave();
 		} else if (
 			currentRevealed?.length === 3 &&

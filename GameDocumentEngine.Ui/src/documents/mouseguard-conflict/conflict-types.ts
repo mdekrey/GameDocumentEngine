@@ -13,7 +13,7 @@ export interface SideState {
 		current: number;
 		max: number;
 	};
-	choices: ActionChoice[];
+	choices: (ActionChoice | null)[];
 	ready?: boolean;
 	revealed?: ActionChoice[];
 }

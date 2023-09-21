@@ -15,11 +15,11 @@ import { FormFieldReturnType } from '@/utils/form/useForm';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 
 export const defaultNullActionChoice: FieldMapping<
-	ActionChoice | undefined,
+	ActionChoice | null | undefined,
 	ActionChoice | null
 > = {
 	toForm: (v) => v ?? null,
-	fromForm: (v) => v ?? undefined,
+	fromForm: (v) => v ?? null,
 };
 
 const cards = {
