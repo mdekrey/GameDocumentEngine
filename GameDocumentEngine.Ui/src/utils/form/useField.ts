@@ -2,7 +2,7 @@ import type { Atom, PrimitiveAtom } from 'jotai';
 import { atom, useStore } from 'jotai';
 import { useMemo } from 'react';
 import type { ZodError, ZodType } from 'zod';
-import type { Loadable } from 'node_modules/jotai/vanilla/utils/loadable';
+import type { Loadable } from 'jotai/vanilla/utils/loadable';
 import type { StandardWritableAtom } from './StandardWritableAtom';
 import { toInternalFieldAtom } from './toInternalFieldAtom';
 import type { RegisterErrorStrategy } from './errorsStrategy';

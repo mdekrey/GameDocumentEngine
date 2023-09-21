@@ -9,6 +9,7 @@ import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
 import { useTranslation } from 'react-i18next';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Prose } from '@/components/text/common';
+import type { TFunction } from 'i18next';
 
 export function ReviewRevealed({
 	yourSide,
@@ -19,7 +20,7 @@ export function ReviewRevealed({
 	yourSide: null | FormFieldReturnType<SideState>;
 	yourSideRevealed: undefined | ActionChoice[];
 	otherSideRevealed: undefined | ActionChoice[];
-	translation: (key: string, parameters?: object) => string;
+	translation: TFunction<`doc-types:${string}`, undefined>;
 }) {
 	return (
 		<section className="flex flex-col gap-4">
@@ -56,7 +57,7 @@ function ClearButtonRow({
 	translation,
 }: {
 	yourSide: FormFieldReturnType<SideState>;
-	translation: (key: string, parameters?: object) => string;
+	translation: TFunction<`doc-types:${string}`, undefined>;
 }) {
 	const field = useFormFields(yourSide, {
 		ready: ['ready'],
