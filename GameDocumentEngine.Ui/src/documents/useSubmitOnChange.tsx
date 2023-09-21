@@ -13,6 +13,7 @@ export function useSubmitOnChange<T>(
 		};
 
 		function submitOnChange() {
+			console.log('submit on change');
 			form.handleSubmit(onSubmit)();
 		}
 	}, [form, onSubmit]);

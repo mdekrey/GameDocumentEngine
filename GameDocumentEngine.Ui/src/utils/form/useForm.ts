@@ -284,9 +284,9 @@ function toField<T, TPath extends Path<T>, TValue>(
 		readOnly: substateAtom(config.readOnly, context.readOnlyFields),
 	};
 	const unmappedAtom = context.atomFamily(config.path as Path<T>);
-	const fieldResult = toInternalFieldAtom<unknown, TValue>(
+	const fieldResult = toInternalFieldAtom<PathValue<T, TPath>, TValue>(
 		context.store,
-		unmappedAtom as StandardWritableAtom<unknown>,
+		unmappedAtom,
 		options,
 	) as UseFieldResult<TValue, DefaultFormFieldResultFlags>;
 
@@ -296,13 +296,13 @@ function toField<T, TPath extends Path<T>, TValue>(
 	};
 
 	function substateAtom<TState extends FieldStatePrimitive>(
-		value: undefined | FieldStateOverride<TValue, TState>,
+		value: undefined | FieldStateOverride<PathValue<T, TPath>, TState>,
 		state: FieldStateAtom<TState>,
-	): FieldStateCallback<TState, TValue> {
+	): FieldStateCallback<TState, PathValue<T, TPath>> {
 		// These are tchnically giving back structured results, but that is _probably_ okay
 		// FIXME: it would be nice make these types correct and not use `as`
 		if (typeof value === 'function') {
-			return value as FieldStateCallback<TState, TValue>;
+			return value as FieldStateCallback<TState, PathValue<T, TPath>>;
 		}
 		return () =>
 			value === undefined

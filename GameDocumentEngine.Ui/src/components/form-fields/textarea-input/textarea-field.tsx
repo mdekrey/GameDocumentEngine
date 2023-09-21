@@ -2,7 +2,7 @@ import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextareaInput } from './textarea-input';
 import type { FieldMapping, UseFieldResult } from '@/utils/form/useField';
-import type { MappedFieldProps } from '../MappedFieldProps';
+import type { FieldProps } from '../FieldProps';
 import type { JotaiLabel } from '../../jotai/label';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTwMerge } from '../../jotai/useTwMerge';
@@ -11,6 +11,7 @@ import {
 	undefinedAsEmptyStringMapping,
 	undefinedOrIntegerMapping,
 } from '../text-input/text-field';
+import { useMemo } from 'react';
 
 export type TextareaFieldPersistentProps = {
 	description?: boolean;
@@ -18,14 +19,11 @@ export type TextareaFieldPersistentProps = {
 	inputClassName?: string;
 	contentsClassName?: string;
 } & React.ComponentProps<typeof JotaiLabel>;
-export type TextareaFieldProps<TValue> = MappedFieldProps<TValue, string> &
+export type TextareaFieldProps = FieldProps<string> &
 	TextareaFieldPersistentProps;
 
-export function TextareaField<T>(props: TextareaFieldProps<T>) {
-	const htmlProps =
-		'mapping' in props
-			? props.field.htmlProps(props.mapping)
-			: props.field.htmlProps();
+export function TextareaField(props: TextareaFieldProps) {
+	const htmlProps = props.field.htmlProps();
 	const {
 		field: { translation: t, errors },
 		description,
@@ -83,9 +81,8 @@ export function applyMappingToTextareaField<T>(
 	}: {
 		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
 	} & TextareaFieldPersistentProps) {
-		return (
-			<TextareaField field={field} mapping={mapping} {...defaults} {...props} />
-		);
+		const newField = useMemo(() => field.applyMapping(mapping), [field]);
+		return <TextareaField field={newField} {...defaults} {...props} />;
 	}
 	Result.displayName = displayName;
 	return Result;

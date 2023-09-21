@@ -17,7 +17,6 @@ const meta = {
 	tags: ['autodocs'],
 	argTypes: {
 		field: { table: { disable: true } },
-		mapping: { table: { disable: true } },
 		disabled: { control: 'boolean' },
 		readOnly: { control: 'boolean' },
 	},

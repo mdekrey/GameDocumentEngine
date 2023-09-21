@@ -38,8 +38,8 @@ export type FieldConfig<
 	path: TPath;
 	schema?: ZodType<TValue>;
 	translationPath?: AnyPath;
-	disabled?: FieldStateOverride<TValue, boolean>;
-	readOnly?: FieldStateOverride<TValue, boolean>;
+	disabled?: FieldStateOverride<PathValue<T, TPath>, boolean>;
+	readOnly?: FieldStateOverride<PathValue<T, TPath>, boolean>;
 } & ([PathValue<T, TPath>] extends [TValue]
 	? {
 			mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;

@@ -45,6 +45,9 @@ export type UseFieldResult<
 	): void;
 	onBlur(this: void): void;
 	htmlProps: ToHtmlProps<TFieldValue>;
+	applyMapping<TNewValue>(
+		mapping: FieldMapping<TFieldValue, TNewValue>,
+	): UseFieldResult<TNewValue, TFlags>;
 } & IfTrueThenProp<
 	TFlags['hasErrors'],
 	{ schema: ZodType<TFieldValue>; errors: ErrorsAtom }
@@ -52,14 +55,12 @@ export type UseFieldResult<
 	IfTrueThenProp<TFlags['hasTranslations'], { translation: FieldTranslation }>;
 
 export type ToHtmlInputProps<TInputValue> = TInputValue extends string
-	? (mapping?: FieldMapping<TInputValue, string>) => InputHtmlProps
-	: (mapping: FieldMapping<TInputValue, string>) => InputHtmlProps;
+	? () => InputHtmlProps
+	: object;
 
 export type ToHtmlProps<TInputValue> = ToHtmlInputProps<TInputValue> & {
 	asControlled: () => ControlledHtmlProps<TInputValue>;
-	asCheckbox: TInputValue extends boolean
-		? (mapping?: FieldMapping<TInputValue, boolean>) => CheckboxHtmlProps
-		: (mapping: FieldMapping<TInputValue, boolean>) => CheckboxHtmlProps;
+	asCheckbox: TInputValue extends boolean ? () => CheckboxHtmlProps : undefined;
 };
 
 export type CommonEventHandler<TTarget = never> = [TTarget] extends [never]
@@ -100,14 +101,14 @@ export type FieldStateContext<TFieldValue> = {
 	errors: ErrorsAtom;
 };
 
-export type FieldStateCallback<T, TFieldValue> = (
-	context: FieldStateContext<TFieldValue>,
+export type FieldStateCallback<T, TValue> = (
+	context: FieldStateContext<TValue>,
 ) => Atom<T>;
 
-export type FieldStateBoolean<TFieldValue> =
+export type FieldStateBoolean<TValue> =
 	| boolean
 	| Atom<boolean>
-	| FieldStateCallback<boolean, TFieldValue>;
+	| FieldStateCallback<boolean, TValue>;
 
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
@@ -115,8 +116,8 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
 	translation: FieldTranslation;
-	disabled: FieldStateBoolean<TFormFieldValue>;
-	readOnly: FieldStateBoolean<TFormFieldValue>;
+	disabled: FieldStateBoolean<TValue>;
+	readOnly: FieldStateBoolean<TValue>;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,

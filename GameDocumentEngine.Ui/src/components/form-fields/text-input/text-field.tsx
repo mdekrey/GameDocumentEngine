@@ -2,11 +2,12 @@ import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from './text-input';
 import type { FieldMapping, UseFieldResult } from '@/utils/form/useField';
-import type { MappedFieldProps } from '../MappedFieldProps';
+import type { FieldProps } from '../FieldProps';
 import { noChange } from '@/utils/form/mapAtom';
 import type { JotaiLabel } from '../../jotai/label';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTwMerge } from '../../jotai/useTwMerge';
+import { useMemo } from 'react';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
 	string | undefined,
@@ -43,14 +44,10 @@ export type TextFieldPersistentProps = {
 	inputClassName?: string;
 	contentsClassName?: string;
 } & React.ComponentProps<typeof JotaiLabel>;
-export type TextFieldProps<TValue> = MappedFieldProps<TValue, string> &
-	TextFieldPersistentProps;
+export type TextFieldProps = FieldProps<string> & TextFieldPersistentProps;
 
-export function TextField<T>(props: TextFieldProps<T>) {
-	const htmlProps =
-		'mapping' in props
-			? props.field.htmlProps(props.mapping)
-			: props.field.htmlProps();
+export function TextField(props: TextFieldProps) {
+	const htmlProps = props.field.htmlProps();
 	const {
 		field: { translation: t, errors },
 		type,
@@ -81,16 +78,12 @@ export function TextField<T>(props: TextFieldProps<T>) {
 export function applyPropsToTextField<
 	TProps extends Partial<TextFieldPersistentProps>,
 >(displayName: string, defaults: TProps) {
-	function Result<T>(props: TextFieldProps<T>) {
-		return (
-			<TextField<unknown>
-				{...({ ...defaults, ...props } as TextFieldProps<unknown>)}
-			/>
-		);
+	function Result(props: TextFieldProps) {
+		return <TextField {...{ ...defaults, ...props }} />;
 	}
 	Result.displayName = displayName;
-	return Result as never as <T>(
-		p: Omit<TextFieldProps<T>, keyof TProps>,
+	return Result as never as (
+		p: Omit<TextFieldProps, keyof TProps>,
 	) => React.ReactNode;
 }
 
@@ -125,9 +118,8 @@ export function applyMappingToTextField<T>(
 	}: {
 		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
 	} & TextFieldPersistentProps) {
-		return (
-			<TextField field={field} mapping={mapping} {...defaults} {...props} />
-		);
+		const newField = useMemo(() => field.applyMapping(mapping), [field]);
+		return <TextField field={newField} {...defaults} {...props} />;
 	}
 	Result.displayName = displayName;
 	return Result;

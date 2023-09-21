@@ -1,6 +1,6 @@
 import { Atom, atom, type useStore } from 'jotai';
 import type { StandardWritableAtom } from './StandardWritableAtom';
-import { mapAtom } from './mapAtom';
+import { mapAtom, noChange } from './mapAtom';
 import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
@@ -33,6 +33,7 @@ function toFieldStateAtom<TValue>(
 		: value;
 }
 
+const identity = <T>(orig: T) => orig;
 export function toInternalFieldAtom<TValue, TFieldValue>(
 	store: ReturnType<typeof useStore>,
 	fieldValueAtom: StandardWritableAtom<TValue>,
@@ -40,7 +41,13 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): UseFieldResult<TFieldValue, any> {
 	const fieldEvents = new FieldEvents(options.formEvents);
-	const mapping = 'mapping' in options ? options.mapping : undefined;
+	const mapping: FieldMapping<TValue, TFieldValue> =
+		('mapping' in options ? options.mapping : undefined) ??
+		({
+			// mapping should only be missing if TValue === TFieldValue
+			toForm: identity,
+			fromForm: identity,
+		} as unknown as FieldMapping<TValue, TFieldValue>);
 	const formValueAtom = mapping
 		? mapAtom<TValue, TFieldValue>(
 				fieldValueAtom,
@@ -56,15 +63,15 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const fieldStateContext: FieldStateContext<TFieldValue> = {
-		value: formValueAtom,
+	const fieldStateContext: FieldStateContext<TValue> = {
+		value: fieldValueAtom,
 		errors: errors ?? noErrorsAtom,
 	};
-	const disabled = toFieldStateAtom(
+	const disabled = toFieldStateAtom<TValue>(
 		options.disabled ?? false,
 		fieldStateContext,
 	);
-	const readOnly = toFieldStateAtom(
+	const readOnly = toFieldStateAtom<TValue>(
 		options.readOnly ?? false,
 		fieldStateContext,
 	);
@@ -90,6 +97,29 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
 		},
 		htmlProps: buildHtmlProps(),
+		applyMapping: <TNew>(
+			newMapping: FieldMapping<TFieldValue, TNew>,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		): UseFieldResult<TNew, any> => {
+			const newOptions: Partial<FieldOptions<TValue, TNew>> = {
+				...options,
+				mapping: {
+					toForm: (v) => newMapping.toForm(mapping.toForm(v)),
+					fromForm: (v) => {
+						const newResult = newMapping.fromForm(v);
+						return newResult === noChange
+							? noChange
+							: mapping.fromForm(newResult);
+					},
+				},
+			};
+			return {
+				...toInternalFieldAtom(store, fieldValueAtom, newOptions),
+				disabled,
+				readOnly,
+				errors,
+			};
+		},
 	};
 
 	function createErrorStrategyAtom(
@@ -102,20 +132,9 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 	}
 
 	function buildHtmlProps(): ToHtmlProps<TFieldValue> {
-		function mappedAtom<T>(mapping?: FieldMapping<TFieldValue, T> | undefined) {
-			return mapping
-				? mapAtom<TFieldValue, T>(
-						formValueAtom,
-						mapping.toForm,
-						mapping.fromForm,
-				  )
-				: (formValueAtom as unknown as StandardWritableAtom<T>);
-		}
-
-		const toInput = function toInput(
-			mapping?: FieldMapping<TFieldValue, string>,
-		): InputHtmlProps {
-			const htmlAtom = mappedAtom(mapping);
+		// TODO: if this isn't a string, we shouldn't create this function; instead, we should set {}
+		const toInput = function toInput(): InputHtmlProps {
+			const htmlAtom = formValueAtom as unknown as StandardWritableAtom<string>;
 			return toInputTextField(
 				store,
 				(v) => store.set(htmlAtom, v),
@@ -137,10 +156,11 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 					readOnly,
 				);
 			};
-		toInput.asCheckbox = function asCheckbox(
-			mapping?: FieldMapping<TFieldValue, boolean>,
-		): CheckboxHtmlProps {
-			const htmlAtom = mappedAtom(mapping);
+
+		// TODO: if this isn't a boolean, we shouldn't create this function; instead, we should set undefined
+		toInput.asCheckbox = function asCheckbox(): CheckboxHtmlProps {
+			const htmlAtom =
+				formValueAtom as unknown as StandardWritableAtom<boolean>;
 			return toInputCheckboxField(
 				store,
 				(v) => store.set(htmlAtom, v),
@@ -191,11 +211,13 @@ function toInputTextField(
 	return {
 		defaultValue: atom,
 		onChange: (ev) => {
+			console.log('change', ev);
 			if (store.get(disabled) || store.get(readOnly)) return;
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.value);
 		},
 		onBlur: (ev) => {
+			console.log('blur', ev);
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
 			ev.currentTarget.value = getValue();
 		},
