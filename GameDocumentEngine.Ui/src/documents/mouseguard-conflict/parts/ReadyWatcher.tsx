@@ -46,7 +46,6 @@ export function ReadyWatcher({
 			currentRevealed?.length !== 3
 		) {
 			// reveal it!
-			// TODO: validate if all choices are in at this stage...
 			fields.revealed.setValue(choices);
 			onSave();
 		} else if (
