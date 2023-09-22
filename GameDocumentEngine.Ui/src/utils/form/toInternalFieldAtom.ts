@@ -132,7 +132,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 	}
 
 	function buildHtmlProps(): ToHtmlProps<TFieldValue> {
-		// TODO: if this isn't a string, we shouldn't create this function; instead, we should set {}
+		// If this isn't a string, we shouldn't create this function; instead, we should set {} instead... but the types take care of that.
 		const toInput = function toInput(): InputHtmlProps {
 			const htmlAtom = formValueAtom as unknown as StandardWritableAtom<string>;
 			return toInputTextField(
@@ -157,7 +157,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 				);
 			};
 
-		// TODO: if this isn't a boolean, we shouldn't create this function; instead, we should set undefined
+		// If this isn't a boolean, we shouldn't create this function; instead, we should set undefined... but the types take care of that.
 		toInput.asCheckbox = function asCheckbox(): CheckboxHtmlProps {
 			const htmlAtom =
 				formValueAtom as unknown as StandardWritableAtom<boolean>;
