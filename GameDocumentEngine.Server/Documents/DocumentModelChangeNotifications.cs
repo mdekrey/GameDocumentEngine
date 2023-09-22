@@ -46,7 +46,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		var gameUsers = gameUserEntries.AtState(changeState);
 
 		if (!gameTypes.All.TryGetValue(game.Type, out var gameType))
-			// TODO - consider a null game type
+			// TODO - consider a null game type, so that we don't just crash if a game type is removed
 			throw new InvalidOperationException($"Unknown game type: {game.Type}");
 
 		var byUser = (from gameUser in gameUsers
