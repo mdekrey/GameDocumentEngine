@@ -6,7 +6,7 @@ import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
-import { z } from 'zod';
+import { ZodObject, z } from 'zod';
 import { DocumentPointers } from './get-document-pointers';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
@@ -60,7 +60,7 @@ export function documentSchema<T>(
 ): z.ZodType<EditableDocumentDetails<T>> {
 	return z.object({
 		name: z.string().nonempty(),
-		details: schema,
+		details: schema instanceof ZodObject ? schema.deepPartial() : schema,
 	}) as z.ZodType<EditableDocumentDetails<T>>;
 }
 

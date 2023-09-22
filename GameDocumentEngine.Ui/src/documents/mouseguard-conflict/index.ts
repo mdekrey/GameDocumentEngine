@@ -38,8 +38,7 @@ defineDocument('MouseGuard-Conflict', {
 		},
 	} satisfies z.infer<typeof conflictSchema>,
 	component: ConflictSheet,
-	// TODO: determine if this should always be deepPartial
-	schema: conflictSchema.deepPartial() as unknown as typeof conflictSchema,
+	schema: conflictSchema,
 	translations: { en },
 	fixup: conflictFixup,
 });
