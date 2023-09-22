@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
@@ -115,6 +116,7 @@ services.AddSingleton<RollupManifestManager>();
 // TODO: move these to json, but find a way to support translations
 services.AddSingleton<IGameType, GameDocumentEngine.Server.GameTypes.Clocks.ClocksGameType>();
 services.AddSingleton<IGameType, GameDocumentEngine.Server.GameTypes.MouseGuard.MouseGuardGameType>();
+services.Configure<BuildOptions>(builder.Configuration.GetSection("Build"));
 
 foreach (var gameObjectTypeJson in typeof(JsonGameObjectType).Assembly.GetManifestResourceNames().Where(n => n.EndsWith(".document-type.json")))
 {
