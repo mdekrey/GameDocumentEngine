@@ -211,13 +211,11 @@ function toInputTextField(
 	return {
 		defaultValue: atom,
 		onChange: (ev) => {
-			console.log('change', ev);
 			if (store.get(disabled) || store.get(readOnly)) return;
 			fieldEvents.dispatchEvent(FieldEvents.Change);
 			setValue(ev.currentTarget.value);
 		},
 		onBlur: (ev) => {
-			console.log('blur', ev);
 			fieldEvents.dispatchEvent(FieldEvents.Blur);
 			ev.currentTarget.value = getValue();
 		},

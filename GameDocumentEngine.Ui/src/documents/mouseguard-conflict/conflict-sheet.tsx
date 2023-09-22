@@ -4,7 +4,7 @@ import { useSubmitOnChange } from '../useSubmitOnChange';
 import { Conflict } from './conflict-types';
 import { OrganizerForm } from './parts/organizer-form';
 import { GeneralDisplay } from './parts/general-display';
-import { Fragment, useCallback } from 'react';
+import { Fragment } from 'react';
 import { ManageSide } from './parts/ManageSide';
 import { ReadyWatcher } from './parts/ReadyWatcher';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
@@ -47,11 +47,6 @@ export function ConflictSheet({
 		useComputedAtom((get) => get((otherSide ?? fields.sideB).atom).revealed),
 	);
 
-	const onSave = useCallback(
-		() => form.handleSubmit(onSubmit)(),
-		[onSubmit, form],
-	);
-
 	return (
 		<form
 			onSubmit={form.handleSubmit(onSubmit)}
@@ -77,11 +72,7 @@ export function ConflictSheet({
 					otherSide &&
 					(objectRole === 'side-a-captain' ||
 						objectRole === 'side-b-captain') ? (
-						<ReadyWatcher
-							yourSide={yourSide}
-							otherSide={otherSide}
-							onSave={onSave}
-						/>
+						<ReadyWatcher yourSide={yourSide} otherSide={otherSide} />
 					) : null}
 					{yourSideRevealed && otherSideRevealed ? (
 						<ReviewRevealed

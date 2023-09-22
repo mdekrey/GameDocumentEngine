@@ -15,11 +15,9 @@ function allChoicesSelected(
 export function ReadyWatcher({
 	yourSide,
 	otherSide,
-	onSave,
 }: {
 	yourSide: FormFieldReturnType<SideState>;
 	otherSide: FormFieldReturnType<SideState>;
-	onSave: () => void;
 }) {
 	const isYourSideReady = useAtomValue(
 		useComputedAtom((get) => !!get(yourSide.atom).ready),
@@ -32,15 +30,12 @@ export function ReadyWatcher({
 		revealed: ['revealed'],
 		ready: ['ready'],
 	});
-	const currentChoices = useAtomValue(fields.choices.atom);
-	const currentRevealed = useAtomValue(fields.revealed.atom);
-	const currentReady = useAtomValue(fields.ready.atom);
 	useEffect(() => {
 		const currentRevealed = fields.revealed.get();
 
 		const choices = fields.choices.get();
 		if (isYourSideReady && !allChoicesSelected(choices)) {
-			fields.ready.setValue(false);
+			fields.ready.onChange(false);
 		} else if (
 			allChoicesSelected(choices) &&
 			isYourSideReady &&
@@ -48,13 +43,13 @@ export function ReadyWatcher({
 			currentRevealed?.length !== 3
 		) {
 			// reveal it!
-			fields.revealed.setValue(choices);
+			fields.revealed.onChange(choices);
 		} else if (
 			currentRevealed?.length === 3 &&
 			(!isYourSideReady || !isOtherSideReady)
 		) {
 			// clear out both
-			yourSide.setValue((prev) =>
+			yourSide.onChange((prev) =>
 				produce(prev, (draft) => {
 					delete draft.revealed;
 					delete draft.ready;
@@ -62,10 +57,6 @@ export function ReadyWatcher({
 				}),
 			);
 		}
-	}, [isYourSideReady, isOtherSideReady, fields, yourSide, onSave]);
-	useEffect(() => {
-		onSave();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentChoices, currentRevealed, currentReady]);
+	}, [isYourSideReady, isOtherSideReady, fields, yourSide]);
 	return null;
 }

@@ -80,7 +80,7 @@ function ClearButtonRow({
 			ModalContents: ClearChoicesModal,
 		}).catch(() => false);
 		if (shouldClear) {
-			yourSide.set((side) => ({
+			yourSide.onChange((side) => ({
 				...side,
 				choices: [],
 				ready: false,
