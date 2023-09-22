@@ -5,6 +5,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTranslation } from 'react-i18next';
 import { CheckboxList } from './CheckboxList';
 import { twMerge } from 'tailwind-merge';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 export function PassFail({
 	advancement,
@@ -49,7 +50,7 @@ export function PassFail({
 		>
 			<div className="flex gap-2 items-center">
 				<span>{t('pass-abbrev')}:</span>
-				{/* TODO: accessible number of passes/fails; a sr-only TextField crashes */}
+				<NumberField.Integer field={fields.passes} className="sr-only" />
 				<CheckboxList
 					checkedCount={fields.passes.value}
 					uncheckedCount={passesUncheckedCount}
@@ -62,6 +63,7 @@ export function PassFail({
 			</div>
 			<div className="flex gap-2 items-center">
 				<span>{t('fail-abbrev')}:</span>
+				<NumberField.Integer field={fields.fails} className="sr-only" />
 				<CheckboxList
 					checkedCount={fields.fails.value}
 					uncheckedCount={failsUncheckedCount}
@@ -76,8 +78,6 @@ export function PassFail({
 	);
 
 	function adjust(type: keyof typeof fields, modifier: 1 | -1) {
-		fields[type].setValue((prev) => prev + modifier);
-		// TODO: do not "blur" here to save values; this is a hack.
-		fields[type].onBlur();
+		fields[type].onChange((prev) => prev + modifier);
 	}
 }

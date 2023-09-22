@@ -9,6 +9,7 @@ import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { GiPlainCircle, GiCircle } from 'react-icons/gi';
 import { CheckboxList } from '../components/CheckboxList';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 const requiredTraitMapping: FieldMapping<Trait | null, Trait> = {
 	toForm: (v) => v ?? { name: '', level: 0, usedFor: 0 },
@@ -68,7 +69,7 @@ export function Trait({ trait }: { trait: FormFieldReturnType<Trait> }) {
 				)}
 			</div>
 			<div className="flex flex-row gap-2 items-center">
-				{/* TODO: aria */}
+				<NumberField.Integer field={fields.level} className="sr-only" />
 				<TraitLevelButton
 					checked={level1Checked}
 					level={1}
