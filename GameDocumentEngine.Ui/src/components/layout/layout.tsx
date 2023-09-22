@@ -7,7 +7,8 @@ import styles from './layout.module.css';
 import { twMerge } from 'tailwind-merge';
 import { HiOutlineEllipsisVertical } from 'react-icons/hi2';
 import { IconButton } from '../button/icon-button';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export type LayoutProps = { children?: React.ReactNode } & HeaderProps &
 	NetworkIndicatorProps;
@@ -34,6 +35,13 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 }) {
 	const leftSidebar = useRef<HTMLElement>(null);
 	const rightSidebar = useRef<HTMLElement>(null);
+
+	const location = useLocation();
+	useEffect(() => {
+		// This feels like a hack, but it works. This may not be good for
+		// accessibility, however. Need to check with an expert.
+		return () => document.querySelector('main')?.focus();
+	}, [location]);
 	return (
 		<div
 			className={styles.layout}
@@ -84,6 +92,7 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 				{slotProps.LeftSidebar?.children}
 			</section>
 			<main
+				tabIndex={-1}
 				className={twMerge(
 					styles.main,
 					'overflow-auto',
