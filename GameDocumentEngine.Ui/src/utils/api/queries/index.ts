@@ -1,3 +1,4 @@
+import { getInfo } from './environment';
 import { getCurrentUser, patchUser } from './user';
 import type operations from '@/api/operations';
 import {
@@ -22,6 +23,7 @@ import { updateGameRoleAssignments } from './game-roles';
 import { updateDocumentRoleAssignments } from './document-roles';
 
 export const queries = {
+	getInfo,
 	getCurrentUser,
 	patchUser,
 	listGameTypes,
