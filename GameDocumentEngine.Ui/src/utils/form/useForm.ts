@@ -135,7 +135,7 @@ export interface UseFormResult<T> {
 }
 
 export type UseFieldsResult<
-	T extends Objectish,
+	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
 > = {
 	fields: FormFields<T, TFields>;
@@ -144,8 +144,7 @@ export type UseFieldsResult<
 export type UseFormResultWithFields<
 	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
-> = UseFormResult<T> &
-	(T extends Objectish ? UseFieldsResult<T, TFields> : never);
+> = UseFormResult<T> & UseFieldsResult<T, TFields>;
 
 type BuildFormResultOptions<T> = {
 	pathPrefix: AnyPath;
@@ -378,21 +377,15 @@ function createPathAtomFamily<T>(
 }
 
 export function useForm<T>(options: FormOptions<T>): UseFormResult<T>;
-export function useForm<
-	T extends Objectish,
-	const TFields extends FieldsConfig<T>,
->(
+export function useForm<T, const TFields extends FieldsConfig<T>>(
 	options: FormOptions<T> & FormFieldsOptions<T, TFields>,
-): UseFormResult<T> & UseFieldsResult<T, TFields>;
+): UseFormResultWithFields<T, TFields>;
 export function useForm<T>(
-	options: FormOptions<T> &
-		(T extends Objectish
-			? Partial<FormFieldsOptions<T, FieldsConfig<T>>>
-			: never),
-): UseFormResultWithFields<T, FieldsConfig<T>> {
+	options: FormOptions<T> & Partial<FormFieldsOptions<T, FieldsConfig<T>>>,
+): UseFormResult<T> | UseFormResultWithFields<T, FieldsConfig<T>> {
 	const store = useStore();
 	return useMemo(
-		(): UseFormResultWithFields<T, FieldsConfig<T>> => {
+		(): UseFormResult<T> | UseFormResultWithFields<T, FieldsConfig<T>> => {
 			const formEvents = new FormEvents();
 			const strategy = errorsStrategy(
 				options.preSubmit ?? 'onSubmit',
@@ -426,16 +419,14 @@ export function useForm<T>(
 				readOnlyFields: toAtomFieldState(options.readOnly ?? false),
 			});
 
-			if (!('fields' in options) || !options.fields)
-				return result as UseFormResultWithFields<T>;
+			if (!('fields' in options) || !options.fields) return result;
 
 			const fields = buildFormFields(options.fields, result);
 
 			return {
 				...result,
 				fields,
-				// TODO: why does this need to be cast?
-			} as UseFormResultWithFields<T, FieldsConfig<T>>;
+			};
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
