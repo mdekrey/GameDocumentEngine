@@ -38,7 +38,7 @@ COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/
 
 ARG GITHASH
-ENV BUILD__GITHASH=${GITHASH}
+ENV VITE_GITHASH=${GITHASH}
 RUN cd ./GameDocumentEngine.Ui/ && dotnet build -p:Configuration=Release
 
 WORKDIR /src/GameDocumentEngine.Server/wwwroot

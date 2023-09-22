@@ -1,7 +1,9 @@
-﻿using GameDocumentEngine.Server.Data;
+﻿using GameDocumentEngine.Server.Api;
+using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Xml.Linq;
@@ -14,11 +16,13 @@ public class GameDocumentsHub : Hub
 {
 	private readonly IServiceScopeFactory scopeFactory;
 	private readonly Documents.GameTypes gameTypes;
+	private readonly BuildOptions buildOptions;
 
-	public GameDocumentsHub(IServiceScopeFactory scopeFactory, Documents.GameTypes gameTypes)
+	public GameDocumentsHub(IServiceScopeFactory scopeFactory, Documents.GameTypes gameTypes, IOptions<BuildOptions> buildOptions)
 	{
 		this.scopeFactory = scopeFactory;
 		this.gameTypes = gameTypes;
+		this.buildOptions = buildOptions.Value;
 	}
 
 	public override async Task OnConnectedAsync()
@@ -31,6 +35,7 @@ public class GameDocumentsHub : Hub
 		}
 
 		await Clients.Caller.SendAsync("User", userId);
+		await Clients.Caller.SendAsync("GitHash", buildOptions.GitHash);
 
 		await Groups.AddToGroupAsync(Context.ConnectionId, GroupNames.UserDirect(userId));
 		await Groups.AddToGroupAsync(Context.ConnectionId, GroupNames.User(userId));

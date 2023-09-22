@@ -9,8 +9,11 @@ import type {
 } from './service-worker/messages';
 import { neverEver } from './utils/never-ever';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
+/// <reference types="vite/client" />
 
 declare const self: ServiceWorkerGlobalScope;
+
+const gitHash: string = import.meta.env.VITE_GITHASH ?? 'HEAD';
 
 if (import.meta.env.PROD) {
 	precacheAndRoute(self.__WB_MANIFEST);
@@ -18,7 +21,6 @@ if (import.meta.env.PROD) {
 cleanupOutdatedCaches();
 clientsClaim();
 
-const version = 1;
 let userId = '';
 let expectedUserId = '';
 
@@ -50,7 +52,10 @@ async function sendToAll(message: MessageFromServiceWorker) {
 }
 
 function log(...args: unknown[]) {
-	console.log(`[${new Date().toISOString()}] sw${version}`, ...args);
+	console.log(
+		`[${new Date().toISOString()}] @${gitHash.substring(0, 8)}`,
+		...args,
+	);
 	// void sendToAll({ type: 'log', args });
 }
 
@@ -99,6 +104,12 @@ function setupConnection(connection: HubConnection) {
 			entityName: args[0],
 			changeEvent: args[1],
 		});
+	});
+	connection.off('GitHash');
+	connection.on('GitHash', (serverGitHash) => {
+		if (serverGitHash !== gitHash) {
+			void self.registration.update();
+		}
 	});
 	connection.onclose((err) => {
 		console.error('onclose', err);
