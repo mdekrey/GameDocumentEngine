@@ -55,6 +55,7 @@ export function CreateGame() {
 								)
 							}
 						</SelectField>
+						{/* TODO: invite users from other games? */}
 						<ButtonRow>
 							<Button type="submit">{t('submit')}</Button>
 						</ButtonRow>

@@ -59,6 +59,8 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 								)
 							}
 						</SelectField>
+						{/* TODO: initial permissions */}
+						{/* TODO: create doc wizard options? */}
 						<ButtonRow>
 							<Button type="submit">{t('submit')}</Button>
 						</ButtonRow>
