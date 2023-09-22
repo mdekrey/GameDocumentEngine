@@ -1,7 +1,7 @@
 import { useFormFields } from '@/utils/form/useFormFields';
-import { ActionChoice, SideState } from '../conflict-types';
+import type { ActionChoice, SideState } from '../conflict-types';
 import { useEffect } from 'react';
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { useAtomValue } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { produce } from 'immer';

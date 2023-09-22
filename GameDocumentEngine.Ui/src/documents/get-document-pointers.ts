@@ -4,11 +4,11 @@ import {
 } from '@/utils/security/permission-strings';
 import { matchingPermissionParams } from '@/utils/security/get-permissions-params';
 import { JSONPath } from 'jsonpath-plus';
-import {
+import type {
 	EditableDocumentDetails,
 	TypedDocumentDetails,
 } from '@/documents/defineDocument';
-import { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form/useField';
 
 export type DocumentPointers = {
 	pointers: string[];

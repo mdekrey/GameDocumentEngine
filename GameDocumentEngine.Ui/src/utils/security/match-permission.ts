@@ -1,6 +1,6 @@
-import { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@/api/models/GameDetails';
 import { toPermissionPatternRegex } from './to-permission-pattern-regex';
-import { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@/api/models/DocumentDetails';
 
 export function matchPermission(
 	permissionPattern: string,

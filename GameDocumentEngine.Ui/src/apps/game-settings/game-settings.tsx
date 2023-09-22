@@ -19,7 +19,7 @@ import {
 	displayDangerZone,
 	GameDangerZone,
 } from './game-danger-zone/game-danger-zone';
-import { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@/api/models/GameDetails';
 
 function displayInvites(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, listInvitations);

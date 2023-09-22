@@ -3,9 +3,9 @@ import type {
 	GameObjectWidgetProps,
 } from '../defineDocument';
 import { useMemo } from 'react';
-import { UseFormResult } from '@/utils/form/useForm';
+import type { UseFormResult } from '@/utils/form/useForm';
 import type { Character } from './character-types';
-import { CharacterDocument } from './character-types';
+import type { CharacterDocument } from './character-types';
 import {
 	HiOutlineUser,
 	HiOutlineHeart,
@@ -21,7 +21,8 @@ import { Skills } from './parts/skills';
 import { Traits } from './parts/traits';
 import { Rewards } from './parts/rewards';
 import { Conditions } from './parts/conditions';
-import { TabConfig, Tabs } from '@/components/tabs/tabs';
+import type { TabConfig } from '@/components/tabs/tabs';
+import { Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
 import { useSubmitOnChange } from '../useSubmitOnChange';
 

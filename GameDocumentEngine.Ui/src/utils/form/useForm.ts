@@ -35,10 +35,12 @@ import type {
 import { toConfigObject } from './field-config-types';
 import { getValueAtPath, getAtomForPath } from './getAtomForPath';
 import { mapAtom, noChange } from './mapAtom';
-import {
+import type {
 	FieldStateAtom,
 	FieldStatePrimitive,
 	PerFieldState,
+} from './fieldStateTracking';
+import {
 	toAtomFieldState,
 	walkFieldStateAtom,
 	toFieldStateValue,

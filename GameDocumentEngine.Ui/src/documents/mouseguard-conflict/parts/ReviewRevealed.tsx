@@ -1,11 +1,12 @@
-import { ActionChoice, SideState } from '../conflict-types';
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { ActionChoice, SideState } from '../conflict-types';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { displayChoice } from './CardSelect';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
 import { useFormFields } from '@/utils/form/useFormFields';
 import { useAtomValue } from 'jotai';
-import { ModalContentsProps, useModal } from '@/utils/modal/modal-service';
+import type { ModalContentsProps } from '@/utils/modal/modal-service';
+import { useModal } from '@/utils/modal/modal-service';
 import { useTranslation } from 'react-i18next';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Prose } from '@/components/text/common';

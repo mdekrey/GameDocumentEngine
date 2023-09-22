@@ -4,7 +4,8 @@
 // This was copied from the source of vite-plugin-dev-manifest
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'fs';
 import path from 'path';
-import { Plugin, normalizePath } from 'vite';
+import type { Plugin } from 'vite';
+import { normalizePath } from 'vite';
 import os from 'os';
 
 /**

@@ -1,9 +1,9 @@
 import { useFormFields } from '@/utils/form/useFormFields';
-import { SideState } from '../conflict-types';
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { SideState } from '../conflict-types';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { ButtonRow } from '@/components/button/button-row';
 import { ToggleButtonField } from '@/components/form-fields/toggle-button/toggle-button-field';
-import { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form/useField';
 import { atom } from 'jotai';
 import { SelectAction, defaultNullActionChoice } from './CardSelect';
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { UseFormResult } from '@/utils/form/useForm';
+import type { UseFormResult } from '@/utils/form/useForm';
 import { FormEvents } from '@/utils/form/events/FormEvents';
 
 export function useSubmitOnChange<T>(

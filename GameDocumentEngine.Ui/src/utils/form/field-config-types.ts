@@ -3,7 +3,7 @@ import { isArray } from './arrays';
 import type { ZodType } from 'zod';
 import type { AnyPath, Path, PathValue } from './path';
 import type { FieldMapping, FieldStateCallback } from './useField';
-import { FieldStatePrimitive, PerFieldState } from './fieldStateTracking';
+import type { FieldStatePrimitive, PerFieldState } from './fieldStateTracking';
 
 export type UnmappedFieldConfig<T, TPath extends Path<T> = Path<T>> = {
 	path: TPath;

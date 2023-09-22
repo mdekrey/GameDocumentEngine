@@ -1,8 +1,5 @@
-import {
-	HubConnection,
-	HubConnectionBuilder,
-	LogLevel,
-} from '@microsoft/signalr';
+import type { HubConnection } from '@microsoft/signalr';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
 function abortPromise(signal: AbortSignal) {
 	return new Promise((_, reject) =>

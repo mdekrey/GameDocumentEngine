@@ -1,9 +1,9 @@
 import { useFormFields } from '@/utils/form/useFormFields';
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { ConflictGeneral } from '../conflict-types';
-import { FieldMapping } from '@/utils/form/useField';
+import type { ConflictGeneral } from '../conflict-types';
+import type { FieldMapping } from '@/utils/form/useField';
 
 const arrayWithCommas: FieldMapping<string[], string> = {
 	toForm: function (v) {

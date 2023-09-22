@@ -1,5 +1,6 @@
-import { WritableAtom, atom } from 'jotai';
-import { AnyPath } from './path';
+import type { WritableAtom } from 'jotai';
+import { atom } from 'jotai';
+import type { AnyPath } from './path';
 import { produce } from 'immer';
 
 export type SetStateNoInitialAction<T> = (prev: T | undefined) => T;

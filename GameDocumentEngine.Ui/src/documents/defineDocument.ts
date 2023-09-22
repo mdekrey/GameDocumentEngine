@@ -1,13 +1,13 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import { FieldMapping } from '@/utils/form/useField';
-import { UseFormResult } from '@/utils/form/useForm';
+import type { FieldMapping } from '@/utils/form/useField';
+import type { UseFormResult } from '@/utils/form/useForm';
 import { i18n } from '@/utils/i18n/setup';
 import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
-import { DocumentPointers } from './get-document-pointers';
+import type { DocumentPointers } from './get-document-pointers';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
 	details: T;

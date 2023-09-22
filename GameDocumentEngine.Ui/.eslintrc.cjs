@@ -36,7 +36,12 @@ module.exports = {
 				tsconfigRootDir: __dirname,
 			},
 			rules: {
-				// '@typescript-eslint/consistent-type-imports': 'error',
+				'@typescript-eslint/consistent-type-imports': [
+					'error',
+					{
+						disallowTypeAnnotations: false,
+					},
+				],
 				'i18next/no-literal-string': [
 					2,
 					{
@@ -46,7 +51,7 @@ module.exports = {
 						},
 					},
 				],
-				// TODO: no-unsafe-assignment seems broken with my config, especially around passing components as variables
+				// no-unsafe-assignment complains when passing components as variables
 				'@typescript-eslint/no-unsafe-assignment': [0],
 			},
 		},

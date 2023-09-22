@@ -1,4 +1,5 @@
-import { Atom, atom, type useStore } from 'jotai';
+import type { Atom } from 'jotai';
+import { atom, type useStore } from 'jotai';
 import type { StandardWritableAtom } from './StandardWritableAtom';
 import { mapAtom, noChange } from './mapAtom';
 import {

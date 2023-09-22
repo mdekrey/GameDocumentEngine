@@ -15,7 +15,7 @@ import {
 	updateDocumentUserAccess,
 } from '@/utils/security/permission-strings';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
-import { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@/api/models/DocumentDetails';
 
 function displayUserPermissions(documentDetails: DocumentDetails) {
 	return hasDocumentPermission(documentDetails, updateDocumentUserAccess);

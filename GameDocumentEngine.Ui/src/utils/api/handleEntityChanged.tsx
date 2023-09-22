@@ -3,7 +3,7 @@ import type { EntityChangedProps } from './EntityChangedProps';
 import { handleUserUpdateEvent } from './queries/user';
 import { handleDocumentUpdateEvent } from './queries/document';
 import { handleGameUpdateEvent } from './queries/games';
-import { RealtimeApi } from './realtime-api';
+import type { RealtimeApi } from './realtime-api';
 
 type RealtimeMessageHandler<TKey, TValue> = (
 	queryClient: QueryClient,

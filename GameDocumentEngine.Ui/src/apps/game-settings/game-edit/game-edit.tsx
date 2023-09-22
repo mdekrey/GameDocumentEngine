@@ -7,7 +7,6 @@ import type { UseFieldResult } from '@/utils/form/useField';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { useForm } from '@/utils/form/useForm';
-import type { GameDetails } from '@/api/models/GameDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +39,7 @@ export function GameEditFields({
 	);
 }
 
-const GameDetails = z.object({
+const GameDetailsSchema = z.object({
 	name: z.string().min(3),
 });
 
@@ -49,7 +48,7 @@ export function GameEdit({ gameId }: { gameId: string }) {
 	const gameForm = useForm({
 		defaultValue: { name: '' },
 		translation: t,
-		schema: GameDetails,
+		schema: GameDetailsSchema,
 		fields: {
 			name: ['name'],
 		},
@@ -77,7 +76,7 @@ export function GameEdit({ gameId }: { gameId: string }) {
 		</>
 	);
 
-	function onSubmit(currentValue: z.infer<typeof GameDetails>) {
+	function onSubmit(currentValue: z.infer<typeof GameDetailsSchema>) {
 		const patches = produceWithPatches(gameData, (draft) => {
 			draft.name = currentValue.name;
 		})[1];

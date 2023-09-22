@@ -1,9 +1,9 @@
 import { withSlots } from 'react-slot-component';
-import { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form/useForm';
 import layout from './ability-layout.module.css';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { PassFail } from './pass-fail';
-import { Atom } from 'jotai';
+import type { Atom } from 'jotai';
 import { twMerge } from 'tailwind-merge';
 
 export type AbilityLayoutSlots = {

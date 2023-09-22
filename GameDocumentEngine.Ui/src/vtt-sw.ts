@@ -8,7 +8,8 @@ import type {
 	VerifyUserMessage,
 } from './service-worker/messages';
 import { neverEver } from './utils/never-ever';
-import { HubConnection, HubConnectionState } from '@microsoft/signalr';
+import type { HubConnection } from '@microsoft/signalr';
+import { HubConnectionState } from '@microsoft/signalr';
 /// <reference types="vite/client" />
 
 declare const self: ServiceWorkerGlobalScope;

@@ -8,7 +8,7 @@ import { useModal } from '@/utils/modal/modal-service';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
-import { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@/api/models/GameDetails';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	deleteGame,

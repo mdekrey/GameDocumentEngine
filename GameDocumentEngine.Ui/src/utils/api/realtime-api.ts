@@ -11,7 +11,7 @@ import { createContext, useContext } from 'react';
 import type { Atom } from 'jotai';
 import { atom, getDefaultStore } from 'jotai';
 import { queries } from './queries';
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 
 const reconnectStates = [
 	HubConnectionState.Connecting,

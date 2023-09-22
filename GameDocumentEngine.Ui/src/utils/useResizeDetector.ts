@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react';
-import { PrimitiveAtom, useSetAtom, atom } from 'jotai';
+import type { PrimitiveAtom } from 'jotai';
+import { useSetAtom, atom } from 'jotai';
 
 export interface ElementDimensions {
 	left?: number;

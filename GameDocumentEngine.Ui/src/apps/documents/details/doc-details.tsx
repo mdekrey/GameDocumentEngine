@@ -1,29 +1,25 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { queries } from '@/utils/api/queries';
-import {
-	QueryObserverSuccessResult,
-	useMutation,
-	useQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import type { QueryObserverSuccessResult } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useGameType } from '../useGameType';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
+import type { TypedDocumentDetails } from '@/documents/defineDocument';
 import {
 	documentSchema,
-	TypedDocumentDetails,
 	type EditableDocumentDetails,
 } from '@/documents/defineDocument';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
-import { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
+import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form/useForm';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { applyPatch, createPatch } from 'rfc6902';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
-import { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@/api/models/UserDetails';
 
 export function DocumentDetails({
 	gameId,
