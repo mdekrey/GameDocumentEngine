@@ -281,7 +281,7 @@ paths:
           description: Target game not found
   /game/{gameId}/document:
     get:
-      # TODO: pagination
+      # TODO: pagination and/or search
       x-dotnet-mvc-server-controller: Document
       operationId: listDocuments
       security:

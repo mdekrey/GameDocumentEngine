@@ -47,7 +47,6 @@ export function GameObjects({ gameId }: { gameId: string }) {
 						</IconLinkButton.Save>
 					)}
 				</div>
-				{/* TODO: search? */}
 				<ul className={'contents'}>
 					{Object.values(docsResult.data).map((s) => {
 						const Icon = gameType.data.objectTypes[s.type].typeInfo.icon;
