@@ -15,13 +15,13 @@ namespace GameDocumentEngine.Server.Migrations
 				name: "Games",
 				columns: table => new
 				{
-					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-					LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
+					Name = table.Column<string>(type: "text", nullable: false),
+					Type = table.Column<string>(type: "text", nullable: false),
+					CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					CreatedBy = table.Column<string>(type: "text", nullable: true),
+					LastModifiedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					LastModifiedBy = table.Column<string>(type: "text", nullable: true)
 				},
 				constraints: table =>
 				{
@@ -32,10 +32,10 @@ namespace GameDocumentEngine.Server.Migrations
 				name: "Users",
 				columns: table => new
 				{
-					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					GoogleNameId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-					EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
+					Name = table.Column<string>(type: "text", nullable: false),
+					GoogleNameId = table.Column<string>(type: "text", nullable: false),
+					EmailAddress = table.Column<string>(type: "text", nullable: false)
 				},
 				constraints: table =>
 				{
@@ -46,15 +46,15 @@ namespace GameDocumentEngine.Server.Migrations
 				name: "Documents",
 				columns: table => new
 				{
-					Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-					LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
+					GameId = table.Column<Guid>(type: "uuid", nullable: false),
+					Name = table.Column<string>(type: "text", nullable: false),
+					Type = table.Column<string>(type: "text", nullable: false),
+					Details = table.Column<string>(type: "text", nullable: false),
+					CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					CreatedBy = table.Column<string>(type: "text", nullable: true),
+					LastModifiedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					LastModifiedBy = table.Column<string>(type: "text", nullable: true)
 				},
 				constraints: table =>
 				{
@@ -69,16 +69,37 @@ namespace GameDocumentEngine.Server.Migrations
 				});
 
 			migrationBuilder.CreateTable(
+				name: "Invites",
+				columns: table => new
+				{
+					InviteId = table.Column<string>(type: "text", nullable: false),
+					GameId = table.Column<Guid>(type: "uuid", nullable: false),
+					Expiration = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					UsesRemaining = table.Column<int>(type: "integer", nullable: false),
+					GameRole = table.Column<string>(type: "text", nullable: false)
+				},
+				constraints: table =>
+				{
+					table.PrimaryKey("PK_Invites", x => x.InviteId);
+					table.ForeignKey(
+						name: "FK_Invites_Games_GameId",
+						column: x => x.GameId,
+						principalTable: "Games",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Cascade);
+				});
+
+			migrationBuilder.CreateTable(
 				name: "GameUsers",
 				columns: table => new
 				{
-					GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-					CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-					LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+					GameId = table.Column<Guid>(type: "uuid", nullable: false),
+					UserId = table.Column<Guid>(type: "uuid", nullable: false),
+					Role = table.Column<string>(type: "text", nullable: false),
+					CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					CreatedBy = table.Column<string>(type: "text", nullable: true),
+					LastModifiedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					LastModifiedBy = table.Column<string>(type: "text", nullable: true)
 				},
 				constraints: table =>
 				{
@@ -101,13 +122,14 @@ namespace GameDocumentEngine.Server.Migrations
 				name: "DocumentUsers",
 				columns: table => new
 				{
-					DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-					CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-					LastModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-					LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+					DocumentId = table.Column<Guid>(type: "uuid", nullable: false),
+					UserId = table.Column<Guid>(type: "uuid", nullable: false),
+					GameId = table.Column<Guid>(type: "uuid", nullable: false),
+					Role = table.Column<string>(type: "text", nullable: false),
+					CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					CreatedBy = table.Column<string>(type: "text", nullable: true),
+					LastModifiedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+					LastModifiedBy = table.Column<string>(type: "text", nullable: true)
 				},
 				constraints: table =>
 				{
@@ -156,6 +178,16 @@ namespace GameDocumentEngine.Server.Migrations
 				column: "GameId");
 
 			migrationBuilder.CreateIndex(
+				name: "IX_Invites_Expiration",
+				table: "Invites",
+				column: "Expiration");
+
+			migrationBuilder.CreateIndex(
+				name: "IX_Invites_GameId_Expiration",
+				table: "Invites",
+				columns: new[] { "GameId", "Expiration" });
+
+			migrationBuilder.CreateIndex(
 				name: "IX_Users_GoogleNameId",
 				table: "Users",
 				column: "GoogleNameId");
@@ -166,6 +198,9 @@ namespace GameDocumentEngine.Server.Migrations
 		{
 			migrationBuilder.DropTable(
 				name: "DocumentUsers");
+
+			migrationBuilder.DropTable(
+				name: "Invites");
 
 			migrationBuilder.DropTable(
 				name: "Documents");

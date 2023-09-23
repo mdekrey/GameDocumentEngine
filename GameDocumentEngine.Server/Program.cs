@@ -176,14 +176,7 @@ services.AddScoped<IEntityChangeNotifications, DocumentModelChangeNotifications>
 services.AddScoped<IEntityChangeNotifications, GameModelChangeNotifications>();
 services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
-	if (builder.Configuration["Postgres:ConnectionString"] != null)
-	{
-		o.UseNpgsql(builder.Configuration["Postgres:ConnectionString"]);
-	}
-	else
-	{
-		o.UseSqlServer(builder.Configuration["Sql:ConnectionString"] ?? throw new InvalidOperationException("Sql and Postgres both are not configured"));
-	}
+	o.UseNpgsql(builder.Configuration["Postgres:ConnectionString"]);
 	o.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
 	 .AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });
@@ -309,7 +302,11 @@ if (app.Environment.IsDevelopment())
 	using (var scope = app.Services.CreateScope())
 	{
 		var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
-		dbContext.Database.EnsureCreated();
+		if (dbContext.Database.GetPendingMigrations().Any())
+		{
+			// TODO: make this fail and expect database to be updated separately
+			dbContext.Database.Migrate();
+		}
 	}
 
 app.Run();
