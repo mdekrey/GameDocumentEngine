@@ -42,9 +42,12 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(d => d.Id);
 			entity.HasIndex(d => new { d.GameId, d.Id });
+			entity.HasIndex(d => new { d.GameId, d.FolderId, d.Name });
+			entity.HasIndex(d => new { d.GameId, d.Type, d.Name });
 			entity.HasMany(d => d.Players).WithOne(du => du.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId }).OnDelete(DeleteBehavior.NoAction);
 
 			entity.Property(d => d.Details).HasConversion(JsonValueConverter.Instance);
+			entity.HasMany(d => d.FolderContents).WithOne(d => d.Folder).HasForeignKey(d => d.FolderId).OnDelete(DeleteBehavior.Cascade);
 		});
 
 		modelBuilder.Entity<Documents.GameUserModel>(entity =>

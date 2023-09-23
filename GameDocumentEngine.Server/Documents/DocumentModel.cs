@@ -12,8 +12,9 @@ public class DocumentModel : IAuditable
 	public string Name { get; set; }
 	public string Type { get; set; }
 
-	// TODO: some kind of organization here
-
+	public Guid? FolderId { get; set; }
+	public DocumentModel? Folder { get; set; }
+	public ICollection<DocumentModel> FolderContents { get; } = new List<DocumentModel>();
 
 	public JsonNode Details { get; set; }
 
