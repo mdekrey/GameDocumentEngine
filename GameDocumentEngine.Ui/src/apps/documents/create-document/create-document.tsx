@@ -22,12 +22,13 @@ function useCreateDocument(gameId: string) {
 const CreateDocumentDetails = z.object({
 	name: z.string().min(3),
 	type: z.string().nonempty(),
+	folderId: z.string().nullable(),
 }) satisfies ZodType<Omit<CreateDocumentDetails, 'details'>>;
 
 export function CreateDocument({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['create-document']);
 	const gameForm = useForm({
-		defaultValue: { name: '', type: '' },
+		defaultValue: { name: '', type: '', folderId: null },
 		schema: CreateDocumentDetails,
 		translation: t,
 	});

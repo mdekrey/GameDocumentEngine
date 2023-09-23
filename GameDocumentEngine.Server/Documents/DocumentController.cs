@@ -39,6 +39,7 @@ public class DocumentController : Api.DocumentControllerBase
 
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
 	{
+		if (!ModelState.IsValid) return CreateDocumentActionResult.BadRequest("Unable to parse response");
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
 		if (permissions == null) return CreateDocumentActionResult.NotFound();
 		if (!permissions.HasPermission(GameSecurity.CreateDocument(gameId))) return CreateDocumentActionResult.Forbidden();
@@ -79,7 +80,7 @@ public class DocumentController : Api.DocumentControllerBase
 		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
-	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId)
+	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId, Guid? folderId, string? type)
 	{
 		var viewAny = await permissionSetResolver.HasPermission(User, gameId, SeeAnyDocument(gameId));
 		if (viewAny == null) return ListDocumentsActionResult.NotFound();
@@ -89,7 +90,7 @@ public class DocumentController : Api.DocumentControllerBase
 			: from gameUser in dbContext.DocumentUsers
 			  where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
 			  select gameUser.Document)
-			  .Select(doc => new DocumentSummary(doc.Id, doc.Name, doc.Type)).ToArrayAsync();
+			  .Select(doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, null)).ToArrayAsync();
 
 		return ListDocumentsActionResult.Ok(documents.ToDictionary(d => d.Id.ToString()));
 	}

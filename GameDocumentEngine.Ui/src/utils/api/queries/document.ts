@@ -50,9 +50,8 @@ export async function handleDocumentUpdateEvent(
 	} else if (resultData) {
 		await applyChangeToQuery(queryClient, listQuery, (list) => {
 			list[event.key.id] = {
+				...resultData,
 				id: event.key.id,
-				name: resultData.name,
-				type: resultData.type,
 			};
 		});
 	} else {

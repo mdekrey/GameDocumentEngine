@@ -52,7 +52,8 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 					p => p.UserId.ToString(),
 					p => p.Role
 				),
-			Permissions: permissionSet.Permissions.Permissions
+			Permissions: permissionSet.Permissions.Permissions,
+			FolderId: null
 		);
 	}
 

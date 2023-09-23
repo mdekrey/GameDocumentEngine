@@ -1,7 +1,8 @@
 {
 	"key": "Clocks",
 	"objectTypes": [
-		"Clock"
+		"Clock",
+		"Folder"
 	],
 	"defaultNewGameRole": "gm",
 	"permissions": {

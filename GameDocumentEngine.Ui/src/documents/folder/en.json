@@ -1,0 +1,27 @@
+{
+	"name": "Folder",
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the folder with full control"
+		},
+		"contributor": {
+			"name": "Contributor",
+			"description": "Contributor to the folder with rights to create new documents within the folder"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the character's details"
+		}
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			}
+		}
+	}
+}

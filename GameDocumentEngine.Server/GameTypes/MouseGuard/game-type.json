@@ -3,7 +3,8 @@
 	"objectTypes": [
 		"Clock",
 		"MouseGuard-Character",
-		"MouseGuard-Conflict"
+		"MouseGuard-Conflict",
+		"Folder"
 	],
 	"defaultNewGameRole": "gm",
 	"permissions": {

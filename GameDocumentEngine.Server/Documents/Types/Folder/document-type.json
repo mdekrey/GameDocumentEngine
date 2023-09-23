@@ -1,0 +1,21 @@
+{
+	"name": "Folder",
+	"script": {
+		"type": "manifest",
+		"path": "src/documents/folder/index.ts"
+	},
+	"roles": {
+		"owner": {
+			"creatorDefault": true,
+			"permissions": ["view", "change-permissions", "delete", "details:*#$..*"]
+		},
+		"contributor": {
+			"default": false,
+			"permissions": ["view", "details:read#$..*"]
+		},
+		"observer": {
+			"default": false,
+			"permissions": ["view", "details:read#$..*"]
+		}
+	}
+}

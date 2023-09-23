@@ -311,6 +311,14 @@ paths:
         in: path
         required: true
         schema: { type: string, format: guid }
+      - name: folderId
+        in: query
+        required: false
+        schema: { type: string, format: guid }
+      - name: type
+        in: query
+        required: false
+        schema: { type: string }
       responses:
         200:
           description: Success
@@ -667,7 +675,19 @@ components:
           description: "-1 with unlimited uses"
         expiration: { type: string, format: date-time }
 
-    BaseDocumentDetails:
+    CreateDocumentDetails:
+      type: object
+      required:
+      - name
+      - type
+      - details
+      - folderId
+      properties:
+        name: { type: string }
+        type: { type: string }
+        details: { type: object, format: any }
+        folderId: { type: string, format: guid, nullable: true }
+    DocumentDetails:
       type: object
       required:
       - gameId
@@ -675,44 +695,32 @@ components:
       - name
       - type
       - details
+      - userRoles
+      - permissions
+      - folderId
       properties:
         gameId: { type: string, format: guid }
         id: { type: string, format: guid }
         name: { type: string }
         type: { type: string }
         details: { type: object, format: any }
-    CreateDocumentDetails:
-      type: object
-      required:
-      - name
-      - type
-      - details
-      properties:
-        name: { type: string }
-        type: { type: string }
-        details: { type: object, format: any }
-    DocumentDetails:
-      allOf:
-        - $ref: '#/components/schemas/BaseDocumentDetails'
-        - type: object
-          required:
-          - userRoles
-          - permissions
-          properties:
-            userRoles:
-              type: object
-              additionalProperties: { type: string }
-            permissions: { type: array, items: { type: string} }
+        userRoles:
+          type: object
+          additionalProperties: { type: string }
+        permissions: { type: array, items: { type: string} }
+        folderId: { type: string, format: guid, nullable: true }
     DocumentSummary:
       type: object
       required:
         - id
         - name
         - type
+        - folderId
       properties:
         id: { type: string, format: guid }
         name: { type: string }
         type: { type: string }
+        folderId: { type: string, format: guid, nullable: true }
 
     UserDetails:
       type: object
