@@ -7,6 +7,7 @@ using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
+using GameDocumentEngine.Server.GameTypes;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
@@ -113,19 +114,29 @@ services.AddMemoryCache();
 services.AddTransient<JsonSchemaResolver>();
 services.AddSingleton<GameTypes>();
 services.AddSingleton<RollupManifestManager>();
-// TODO: move these to json, but find a way to support translations
-services.AddSingleton<IGameType, GameDocumentEngine.Server.GameTypes.Clocks.ClocksGameType>();
-services.AddSingleton<IGameType, GameDocumentEngine.Server.GameTypes.MouseGuard.MouseGuardGameType>();
-services.Configure<BuildOptions>(builder.Configuration.GetSection("Build"));
 
+var gameObjectTypes = new List<IGameObjectType>();
 foreach (var gameObjectTypeJson in typeof(JsonGameObjectType).Assembly.GetManifestResourceNames().Where(n => n.EndsWith(".document-type.json")))
 {
 	using var stream = typeof(JsonGameObjectType).Assembly.GetManifestResourceStream(gameObjectTypeJson);
 	if (stream == null) throw new InvalidOperationException("Could not load embedded stream");
 	var gameObjectType = JsonSerializer.Deserialize<JsonGameObjectType>(stream);
 	if (gameObjectType != null)
+	{
+		gameObjectTypes.Add(gameObjectType);
 		services.AddSingleton<IGameObjectType>(gameObjectType);
+	}
 }
+
+foreach (var gameTypeJson in typeof(JsonGameTypeBuilder).Assembly.GetManifestResourceNames().Where(n => n.EndsWith(".game-type.json")))
+{
+	using var stream = typeof(JsonGameTypeBuilder).Assembly.GetManifestResourceStream(gameTypeJson);
+	if (stream == null) throw new InvalidOperationException("Could not load embedded stream");
+	var gameObjectType = JsonSerializer.Deserialize<JsonGameTypeBuilder>(stream);
+	if (gameObjectType != null)
+		services.AddSingleton(gameObjectType.Build(gameObjectTypes));
+}
+services.Configure<BuildOptions>(builder.Configuration.GetSection("Build"));
 
 services.AddAuthorization(options =>
 {

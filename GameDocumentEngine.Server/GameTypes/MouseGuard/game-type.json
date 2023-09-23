@@ -1,0 +1,36 @@
+{
+	"key": "MouseGuard",
+	"objectTypes": [
+		"Clock",
+		"MouseGuard-Character",
+		"MouseGuard-Conflict"
+	],
+	"defaultNewGameRole": "gm",
+	"permissions": {
+		"gm": [
+			"*",
+			"invitations:**",
+			"document:*:view",
+			"document:*:delete",
+			"document:*:change-permissions",
+			"document:*:change-my-permissions"
+		],
+		"asst-gm": [
+			"read",
+			"update",
+			"create-document",
+			"invitations:list",
+			"invitations:create:role-asst-gm",
+			"invitations:create:role-trusted",
+			"invitations:create:role-player",
+			"invitations:cancel"
+		],
+		"trusted": [
+			"read",
+			"create-document"
+		],
+		"player": [
+			"read"
+		]
+	}
+}
