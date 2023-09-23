@@ -1,3 +1,4 @@
+- TODO: make all i18n load via requests
 - TODO: colocate schemas and document js
 - TODO: make document translations async loaded
 - TODO: move game type translations to load with game type json
