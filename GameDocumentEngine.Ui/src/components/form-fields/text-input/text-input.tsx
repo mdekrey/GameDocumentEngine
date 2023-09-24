@@ -1,6 +1,7 @@
 import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { JotaiInput } from '../../jotai/input';
 import { useTwMerge } from '../../jotai/useTwMerge';
+import styles from './text-input.module.css';
 
 export function TextInput({
 	type = 'text',
@@ -11,6 +12,7 @@ export function TextInput({
 	return (
 		<JotaiInput
 			className={useTwMerge(
+				styles.textInput,
 				'px-2 py-2 w-full',
 				'border',
 				useComputedAtom((get) =>

@@ -1,8 +1,8 @@
 import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { useFormFields } from '@/utils/form/useFormFields';
-import { TextField } from '@/components/form-fields/text-input/text-field';
 import type { Atom } from 'jotai';
 import { AbilityLayout } from './ability-layout';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 export function StandardAbility({
 	ability,
@@ -30,7 +30,7 @@ export function StandardAbility({
 			passFailPadding={padToCount}
 		>
 			<AbilityLayout.Rating>
-				<TextField.Integer
+				<NumberField.Integer
 					contentsClassName="w-10"
 					labelClassName="sr-only"
 					inputClassName="text-center"

@@ -129,8 +129,3 @@ TextField.AllowUndefined = applyMappingToTextField(
 	'TextFieldWithUndefined',
 	undefinedAsEmptyStringMapping,
 );
-TextField.Integer = applyMappingToTextField('IntegerTextField', integerMapping);
-TextField.UndefinedOrInteger = applyMappingToTextField(
-	'UndefinedOrIntegerrTextField',
-	undefinedOrIntegerMapping,
-);
