@@ -17,5 +17,6 @@ export function toReadOnlyFields(
 				toReadOnlyFields(p.navigate(key), `${path}/${key}`),
 			]),
 	);
+	result[defaultField] = !p.contains();
 	return result;
 }
