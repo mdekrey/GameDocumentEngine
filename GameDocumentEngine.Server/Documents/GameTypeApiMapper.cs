@@ -57,7 +57,7 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 	{
 		return new GameObjectTypeDetails(
 								Key: obj.Key,
-									Scripts: (await Task.WhenAll(gameType.ObjectTypes.Select(gameTypes.ResolveGameObjectScripts))).SelectMany(a => a).Distinct(),
+									Scripts: (await gameTypes.ResolveGameObjectScripts(obj)).Distinct(),
 									// Game types could have different roles eventually; for now, we use a hard-coded set
 									UserRoles: obj.PermissionLevels
 								);
