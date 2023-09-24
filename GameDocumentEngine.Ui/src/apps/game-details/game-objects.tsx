@@ -48,7 +48,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 					)}
 				</div>
 				<ul className={'contents'}>
-					{Object.values(docsResult.data).map((s) => {
+					{Array.from(docsResult.data.values()).map((s) => {
 						const Icon = gameType.data.objectTypes[s.type].typeInfo.icon;
 						return (
 							<li key={s.id} className="contents">

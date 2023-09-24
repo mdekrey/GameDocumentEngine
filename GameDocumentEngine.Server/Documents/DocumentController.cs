@@ -7,19 +7,25 @@ using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Json.Patch;
 using Json.Schema;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Specialized;
+using System.Web;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
 
 namespace GameDocumentEngine.Server.Documents;
 
 public class DocumentController : Api.DocumentControllerBase
 {
+	const int defaultLimit = 100;
+
 	private readonly Documents.GameTypes allGameTypes;
 	private readonly DocumentDbContext dbContext;
 	private readonly JsonSchemaResolver schemaResolver;
 	private readonly IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper;
 	private readonly GamePermissionSetResolver permissionSetResolver;
 	private readonly DocumentUserLoader userLoader;
+	private readonly IDataProtector cursorProtector;
 
 	public DocumentController(
 		Documents.GameTypes allGameTypes,
@@ -27,7 +33,8 @@ public class DocumentController : Api.DocumentControllerBase
 		JsonSchemaResolver schemaResolver,
 		IPermissionedApiMapper<DocumentModel, DocumentDetails> documentMapper,
 		GamePermissionSetResolver permissionSetResolver,
-		DocumentUserLoader userLoader)
+		DocumentUserLoader userLoader,
+		IDataProtectionProvider protector)
 	{
 		this.allGameTypes = allGameTypes;
 		this.dbContext = dbContext;
@@ -35,6 +42,7 @@ public class DocumentController : Api.DocumentControllerBase
 		this.documentMapper = documentMapper;
 		this.permissionSetResolver = permissionSetResolver;
 		this.userLoader = userLoader;
+		this.cursorProtector = protector.CreateProtector(nameof(cursorProtector));
 	}
 
 	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
@@ -80,19 +88,70 @@ public class DocumentController : Api.DocumentControllerBase
 		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
-	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId, Guid? folderId, string? type)
+	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId, Guid? folderId, string? type, string? search, int? limit, string? cursor)
 	{
 		var viewAny = await permissionSetResolver.HasPermission(User, gameId, SeeAnyDocument(gameId));
 		if (viewAny == null) return ListDocumentsActionResult.NotFound();
 
-		var documents = await (viewAny.Value
+		IQueryable<DocumentModel> baseDocuments = viewAny.Value
 			? dbContext.Documents.Where(doc => doc.GameId == gameId)
 			: from gameUser in dbContext.DocumentUsers
 			  where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
-			  select gameUser.Document)
-			  .Select(doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, null)).ToArrayAsync();
+			  select gameUser.Document;
 
-		return ListDocumentsActionResult.Ok(documents.ToDictionary(d => d.Id.ToString()));
+		string? afterName = null;
+		NameValueCollection cursorParts;
+		if (cursor != null)
+		{
+			cursorParts = HttpUtility.ParseQueryString(cursorProtector.Unprotect(cursor));
+			type = cursorParts.GetValues(nameof(type)) is [string cursorDocType] ? cursorDocType : null;
+			folderId = cursorParts.GetValues(nameof(folderId)) is [string cursorFolder] ? Guid.Parse(cursorFolder) : null;
+			search = cursorParts.GetValues(nameof(search)) is [string cursorSearch] ? cursorSearch : null;
+			afterName = cursorParts.GetValues(nameof(afterName)) is [string cursorAfterName] ? cursorAfterName : null;
+		}
+		else
+		{
+			cursorParts = HttpUtility.ParseQueryString("");
+		}
+
+		if (type != null)
+		{
+			baseDocuments = baseDocuments.Where(doc => doc.Type == type);
+			cursorParts.Set(nameof(type), type);
+		}
+		else
+		{
+			baseDocuments = baseDocuments.Where(doc => doc.FolderId == folderId);
+			if (folderId != null)
+				cursorParts.Set(nameof(folderId), folderId.ToString());
+		}
+		if (search != null)
+		{
+			baseDocuments = baseDocuments.Where(doc => doc.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase));
+			cursorParts.Set(nameof(search), search);
+		}
+		var count = await baseDocuments.CountAsync();
+		baseDocuments = baseDocuments.OrderBy(doc => doc.Name);
+		if (afterName != null)
+			baseDocuments = baseDocuments.Where(d => string.Compare(d.Name, afterName) > 0);
+		var remainingCount = await baseDocuments.CountAsync();
+		baseDocuments = baseDocuments.Take(limit ?? defaultLimit);
+
+		var documents = await baseDocuments.ToArrayAsync();
+		var hasMore = remainingCount > documents.Length;
+		cursorParts.Set(nameof(afterName), documents.Last().Name);
+
+		var nextCursor = hasMore
+			? cursorProtector.Protect(cursorParts.ToString() ?? throw new InvalidOperationException("Cursor could not be created"))
+			: null;
+
+		return ListDocumentsActionResult.Ok(new ListDocumentsResponse(
+			Data: documents.ToDictionary(d => d.Id.ToString(), doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, null)),
+			Pagination: new PaginatedDetails(
+				TotalRecords: count,
+				NextCursor: nextCursor
+			)
+		));
 	}
 
 	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)

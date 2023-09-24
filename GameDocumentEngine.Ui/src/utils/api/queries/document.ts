@@ -1,22 +1,44 @@
-import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
+import type {
+	QueryClient,
+	UseMutationOptions,
+	UseQueryOptions,
+} from '@tanstack/react-query';
 import type { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { api } from '../fetch-api';
 import type { NavigateFunction } from 'react-router-dom';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { Patch } from 'rfc6902';
 import type { EntityChangedProps } from '../EntityChangedProps';
-import {
-	applyChangeToQuery,
-	applyEventToQuery,
-	applyPatchToQuery,
-} from './applyEventToQuery';
+import { applyEventToQuery, applyChangeToMapQuery } from './applyEventToQuery';
+import type { DocumentSummary } from '@/api/models/DocumentSummary';
 
-export const listDocuments = (gameId: string) => ({
+type DocumentCollection = Map<string, DocumentSummary>;
+export const listDocuments = (
+	gameId: string,
+): UseQueryOptions<DocumentCollection> &
+	Required<Pick<UseQueryOptions<DocumentCollection>, 'queryKey'>> => ({
 	queryKey: ['game', gameId, 'document', 'list'],
-	queryFn: async () => {
+	queryFn: async ({ signal }): Promise<DocumentCollection> => {
 		const response = await api.listDocuments({ params: { gameId } });
 		if (response.statusCode !== 200) return Promise.reject(response);
-		return response.data;
+		const result = new Map(Object.entries(response.data.data));
+
+		void (async () => {
+			let nextCursor = response.data.pagination.nextCursor;
+			while (nextCursor) {
+				if (signal?.aborted) return;
+				const response = await api.listDocuments({
+					params: { gameId, cursor: nextCursor },
+				});
+				if (response.statusCode !== 200) return;
+				nextCursor = response.data.pagination.nextCursor;
+				for (const kvp of Object.entries(response.data.data)) {
+					result.set(...kvp);
+				}
+			}
+		})();
+
+		return result;
 	},
 });
 
@@ -44,16 +66,16 @@ export async function handleDocumentUpdateEvent(
 	const listQuery = listDocuments(event.key.gameId);
 
 	if ('removed' in event && event.removed) {
-		await applyPatchToQuery(queryClient, listQuery, [
-			{ path: `/${event.key.id}`, op: 'remove' },
-		]);
+		await applyChangeToMapQuery(queryClient, listQuery, (map) =>
+			map.delete(event.key.id),
+		);
 	} else if (resultData) {
-		await applyChangeToQuery(queryClient, listQuery, (list) => {
-			list[event.key.id] = {
+		await applyChangeToMapQuery(queryClient, listQuery, (map) =>
+			map.set(event.key.id, {
 				...resultData,
 				id: event.key.id,
-			};
-		});
+			}),
+		);
 	} else {
 		await queryClient.invalidateQueries(listQuery);
 	}

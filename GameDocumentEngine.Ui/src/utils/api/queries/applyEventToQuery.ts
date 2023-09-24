@@ -65,3 +65,18 @@ export async function applyChangeToQuery<T = unknown>(
 		await queryClient.invalidateQueries(queryKey);
 	}
 }
+
+export async function applyChangeToMapQuery<T>(
+	queryClient: QueryClient,
+	{ queryKey }: { queryKey: QueryKey; queryFn?: QueryFunction<Map<string, T>> },
+	recipe: (draft: Map<string, T>) => void,
+) {
+	const data = queryClient.getQueryData<Map<string, T>>(queryKey);
+	if (data === undefined) return;
+	try {
+		recipe(data);
+	} catch (ex) {
+		console.error(ex);
+		await queryClient.invalidateQueries(queryKey);
+	}
+}

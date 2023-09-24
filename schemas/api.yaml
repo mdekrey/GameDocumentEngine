@@ -319,6 +319,9 @@ paths:
         in: query
         required: false
         schema: { type: string }
+      - { $ref: "#/components/parameters/search" }
+      - { $ref: "#/components/parameters/limit" }
+      - { $ref: "#/components/parameters/cursor" }
       responses:
         200:
           description: Success
@@ -326,8 +329,15 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties:
-                  $ref: "#/components/schemas/DocumentSummary"
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      $ref: "#/components/schemas/DocumentSummary"
+                  pagination: { $ref: '#/components/schemas/PaginatedDetails' }
         401:
           $ref: "#/components/responses/401"
         404:
@@ -600,6 +610,23 @@ paths:
           description: Invite link invalid
 
 components:
+  parameters:
+    search:
+      name: search
+      in: query
+      required: false
+      schema: { type: string }
+    limit:
+      name: limit
+      in: query
+      required: false
+      schema: { type: integer, default: 100 }
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      schema: { type: string }
+
   securitySchemes:
     AuthenticatedUser:
       type: apiKey
@@ -611,6 +638,14 @@ components:
       name: .AspNetCore.Cookies
 
   schemas:
+    PaginatedDetails:
+      type: object
+      required:
+      - totalRecords
+      - nextCursor
+      properties:
+        totalRecords: { type: integer }
+        nextCursor: { type: string, nullable: true }
     CreateGameDetails:
       type: object
       required:
