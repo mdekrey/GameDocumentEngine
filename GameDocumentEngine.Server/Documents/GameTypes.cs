@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -58,7 +59,13 @@ public class RollupManifestManager
 	{
 		var assetManifest = await GetAssetManifest();
 		var node = assetManifest[path];
-		return new[] { node!["file"]!.GetValue<string>() };
+		var entry = node.Deserialize<ManifestEntry>()
+			?? throw new InvalidOperationException($"Unknown script: {path}");
+		return (entry.CssFiles ?? Enumerable.Empty<string>()).Append(entry.Script);
 	}
 
+	internal record ManifestEntry(
+		[property: JsonPropertyName("css")] IEnumerable<string> CssFiles,
+		[property: JsonPropertyName("file")] string Script
+	);
 }

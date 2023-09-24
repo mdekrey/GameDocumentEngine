@@ -66,13 +66,19 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 					(src) =>
 						new Promise((resolve, reject) => {
 							try {
-								const tag = document.createElement('script');
+								const tag =
+									src.endsWith('.js') ||
+									src.endsWith('.ts') ||
+									src.endsWith('.tsx')
+										? convertToScript(src)
+										: src.endsWith('.css')
+										? convertToStyles(src)
+										: null;
+								if (!tag) {
+									throw new Error(`Unable to load script with src ${src}`);
+								}
+
 								const container = document.head || document.body;
-
-								tag.type = 'module';
-								tag.crossOrigin = 'true';
-								tag.src = src;
-
 								tag.addEventListener('load', () => {
 									resolve({ loaded: true, error: false });
 								});
@@ -84,7 +90,6 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 										message: `Failed to load script with src ${src}`,
 									});
 								});
-
 								container.appendChild(tag);
 							} catch (error) {
 								reject(error);
@@ -99,4 +104,21 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 			};
 		},
 	};
+}
+function convertToScript(src: string) {
+	const tag = document.createElement('script');
+
+	tag.type = 'module';
+	tag.crossOrigin = 'true';
+	tag.src = src;
+
+	return tag;
+}
+function convertToStyles(src: string) {
+	const tag = document.createElement('link');
+
+	tag.rel = 'stylesheet';
+	tag.href = src;
+
+	return tag;
 }

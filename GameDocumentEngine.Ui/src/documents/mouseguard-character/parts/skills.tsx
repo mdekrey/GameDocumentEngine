@@ -11,6 +11,7 @@ import { useAtomValue } from 'jotai';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { HiXMark } from 'react-icons/hi2';
 import { positions } from '../skill-positions';
+import { NumberField } from '@/components/form-fields/text-input/number-field';
 
 const requiredSkillMappingWithDefaultName = (
 	defaultName: string,
@@ -132,7 +133,7 @@ export function Skill({
 						<HiXMark className="w-6 h-6 inline-block" />
 					</span>
 				) : (
-					<TextField.Integer
+					<NumberField.Integer
 						contentsClassName="w-10"
 						labelClassName="sr-only"
 						inputClassName="text-center"

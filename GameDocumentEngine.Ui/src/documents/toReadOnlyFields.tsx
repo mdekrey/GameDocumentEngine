@@ -12,7 +12,10 @@ export function toReadOnlyFields(
 	const result: PerFieldState<boolean> & object = Object.fromEntries(
 		p
 			.topLevelKeys()
-			.map((key) => [key, toReadOnlyFields(p.navigate(key), `${path}/${key}`)]),
+			.map((key) => [
+				key ?? defaultField,
+				toReadOnlyFields(p.navigate(key), `${path}/${key}`),
+			]),
 	);
 	result[defaultField] = !p.contains();
 	return result;
