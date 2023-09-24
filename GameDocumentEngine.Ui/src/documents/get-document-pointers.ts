@@ -108,7 +108,7 @@ function buildDocumentPointers(pointers: string[]): DocumentPointers {
 			const prefix = steps.map((s) => `/${s}`).join('');
 			return buildDocumentPointers(
 				pointers
-					.filter((p) => p.startsWith(prefix))
+					.filter((p) => p.startsWith(prefix + '/') || p === prefix)
 					.map((p) => p.substring(prefix.length)),
 			);
 		},
