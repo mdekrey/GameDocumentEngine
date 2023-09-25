@@ -66,15 +66,24 @@ export async function applyChangeToQuery<T = unknown>(
 	}
 }
 
+export type MapQueryResult<T> = { data: Map<string, T>; forceReload?: number };
 export async function applyChangeToMapQuery<T>(
 	queryClient: QueryClient,
-	{ queryKey }: { queryKey: QueryKey; queryFn?: QueryFunction<Map<string, T>> },
+	{
+		queryKey,
+	}: { queryKey: QueryKey; queryFn?: QueryFunction<MapQueryResult<T>> },
 	recipe: (draft: Map<string, T>) => void,
 ) {
-	const data = queryClient.getQueryData<Map<string, T>>(queryKey);
+	const data = queryClient.getQueryData<MapQueryResult<T>>(queryKey);
 	if (data === undefined) return;
 	try {
-		recipe(data);
+		const map = data.data;
+		recipe(map);
+		queryClient.setQueryData<MapQueryResult<T>>(queryKey, {
+			data: map,
+			// without this field, react-query does not serve change notifications
+			forceReload: Math.random(),
+		});
 	} catch (ex) {
 		console.error(ex);
 		await queryClient.invalidateQueries(queryKey);

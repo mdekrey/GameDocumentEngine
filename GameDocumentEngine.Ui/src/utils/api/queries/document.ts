@@ -9,16 +9,17 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { Patch } from 'rfc6902';
 import type { EntityChangedProps } from '../EntityChangedProps';
+import type { MapQueryResult } from './applyEventToQuery';
 import { applyEventToQuery, applyChangeToMapQuery } from './applyEventToQuery';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
 
 type DocumentCollection = Map<string, DocumentSummary>;
 export const listDocuments = (
 	gameId: string,
-): UseQueryOptions<DocumentCollection> &
+): UseQueryOptions<MapQueryResult<DocumentSummary>> &
 	Required<Pick<UseQueryOptions<DocumentCollection>, 'queryKey'>> => ({
 	queryKey: ['game', gameId, 'document', 'list'],
-	queryFn: async ({ signal }): Promise<DocumentCollection> => {
+	queryFn: async ({ signal }): Promise<MapQueryResult<DocumentSummary>> => {
 		const response = await api.listDocuments({ params: { gameId } });
 		if (response.statusCode !== 200) return Promise.reject(response);
 		const result = new Map(Object.entries(response.data.data));
@@ -38,7 +39,7 @@ export const listDocuments = (
 			}
 		})();
 
-		return result;
+		return { data: result };
 	},
 });
 
@@ -70,12 +71,12 @@ export async function handleDocumentUpdateEvent(
 			map.delete(event.key.id),
 		);
 	} else if (resultData) {
-		await applyChangeToMapQuery(queryClient, listQuery, (map) =>
+		await applyChangeToMapQuery(queryClient, listQuery, (map) => {
 			map.set(event.key.id, {
 				...resultData,
 				id: event.key.id,
-			}),
-		);
+			});
+		});
 	} else {
 		await queryClient.invalidateQueries(listQuery);
 	}

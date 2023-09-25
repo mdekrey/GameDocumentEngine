@@ -14,9 +14,36 @@ public class JsonGameTypeBuilder
 	[JsonPropertyName("objectTypes")]
 	public IEnumerable<string> ObjectTypes { get; set; }
 	[JsonPropertyName("defaultNewGameRole")]
-	public string DefaultNewGameRole { get; set; }
+	public string DefaultNewGameRole { get; set; } = "gm";
 	[JsonPropertyName("permissions")]
-	public IReadOnlyDictionary<string, IEnumerable<string>> Permissions { get; set; }
+	public IReadOnlyDictionary<string, IEnumerable<string>> Permissions { get; set; } = new Dictionary<string, IEnumerable<string>>()
+	{
+		["gm"] = new[] {
+			"*",
+			"invitations:**",
+			"document:*:view",
+			"document:*:delete",
+			"document:*:change-permissions",
+			"document:*:change-my-permissions"
+		},
+		["asst-gm"] = new[] {
+			"read",
+			"update",
+			"create-document",
+			"invitations:list",
+			"invitations:create:role-asst-gm",
+			"invitations:create:role-trusted",
+			"invitations:create:role-player",
+			"invitations:cancel"
+		},
+		["trusted"] = new[] {
+			"read",
+			"create-document"
+		},
+		["player"] = new[] {
+			"read"
+		}
+	};
 
 #pragma warning restore
 

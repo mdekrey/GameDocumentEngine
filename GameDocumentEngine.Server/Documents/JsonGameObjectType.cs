@@ -12,7 +12,18 @@ public class JsonGameObjectType : IGameObjectType
 	public JsonGameObjectTypeScript Script { get; set; }
 
 	[JsonPropertyName("roles")]
-	public Dictionary<string, JsonGameObjectTypeRole> Roles { get; set; }
+	public Dictionary<string, JsonGameObjectTypeRole> Roles { get; set; } = new Dictionary<string, JsonGameObjectTypeRole>()
+	{
+		["owner"] = new JsonGameObjectTypeRole
+		{
+			IsCreatorDefault = true,
+			Permissions = new[] { "**", "details:*#$..*" }
+		},
+		["observer"] = new JsonGameObjectTypeRole
+		{
+			Permissions = new[] { "view", "details:read#$..*" }
+		},
+	};
 
 	public IReadOnlyList<string> PermissionLevels => Roles.Keys.ToArray();
 

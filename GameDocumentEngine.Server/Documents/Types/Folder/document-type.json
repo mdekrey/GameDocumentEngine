@@ -7,7 +7,7 @@
 	"roles": {
 		"owner": {
 			"creatorDefault": true,
-			"permissions": ["view", "change-permissions", "delete", "details:*#$..*"]
+			"permissions": ["**", "details:*#$..*"]
 		},
 		"contributor": {
 			"default": false,

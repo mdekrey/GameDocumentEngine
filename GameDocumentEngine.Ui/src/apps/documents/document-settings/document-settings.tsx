@@ -16,6 +16,8 @@ import {
 } from '@/utils/security/permission-strings';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import { Section, SingleColumnSections } from '@/components/sections';
+import { DocumentEdit } from './document-edit/document-edit';
 
 function displayUserPermissions(documentDetails: DocumentDetails) {
 	return hasDocumentPermission(documentDetails, updateDocumentUserAccess);
@@ -37,14 +39,6 @@ export function displayDocumentSettings(documentDetails: DocumentDetails) {
 
 function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
-}
-
-function Sections({ children }: { children?: React.ReactNode }) {
-	return (
-		<div className="flex flex-col max-w-sm m-auto divide-y gap-4">
-			{children}
-		</div>
-	);
 }
 
 const SectionHeader = Prose.extend(
@@ -100,8 +94,12 @@ export function DocumentSettings({
 	const displayDelete = displayDeleteDocument(docData);
 
 	return (
-		<Sections>
-			<section>
+		<SingleColumnSections>
+			<Section>
+				<SectionHeader>{t('configure-details')}</SectionHeader>
+				<DocumentEdit gameId={gameId} documentId={documentId} />
+			</Section>
+			<Section>
 				<SectionHeader>
 					{t('configure-roles', { name: docData.name })}
 				</SectionHeader>
@@ -118,17 +116,17 @@ export function DocumentSettings({
 					allowUpdate={displayUserPermissions(docData)}
 					allowUpdateSelf={canUpdateOwnPermissions(docData)}
 				/>
-			</section>
+			</Section>
 			{displayDelete && (
-				<section className="flex flex-col gap-2">
+				<Section className="flex flex-col gap-2">
 					<SectionHeader>{t('danger-zone')}</SectionHeader>
 					<Button.Destructive onClick={() => void handleDelete()}>
 						<HiOutlineTrash />
 						{t('delete-document', { name: docData.name })}
 					</Button.Destructive>
-				</section>
+				</Section>
 			)}
-		</Sections>
+		</SingleColumnSections>
 	);
 
 	function onSaveRoles(roleAssignments: { [userId: string]: string }) {

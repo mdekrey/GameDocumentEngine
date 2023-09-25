@@ -119,11 +119,16 @@ public class DocumentController : Api.DocumentControllerBase
 			baseDocuments = baseDocuments.Where(doc => doc.Type == type);
 			cursorParts.Set(nameof(type), type);
 		}
-		else
+
+		if (folderId != null)
 		{
-			baseDocuments = baseDocuments.Where(doc => doc.FolderId == folderId);
-			if (folderId != null)
-				cursorParts.Set(nameof(folderId), folderId.ToString());
+			var isEmpty = folderId == Guid.Empty;
+			baseDocuments = baseDocuments.Where(
+				isEmpty
+					? doc => doc.FolderId == null
+					: doc => doc.FolderId == folderId
+			);
+			cursorParts.Set(nameof(folderId), folderId.ToString());
 		}
 		if (search != null)
 		{

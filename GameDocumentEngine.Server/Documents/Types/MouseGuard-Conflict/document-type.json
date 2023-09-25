@@ -9,6 +9,7 @@
 			"creatorDefault": true,
 			"permissions": [
 				"view",
+				"move",
 				"details:*#$.name",
 				"details:*#$.details.general..*",
 				"details:*#$.details..name",

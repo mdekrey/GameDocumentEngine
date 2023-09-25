@@ -3,15 +3,5 @@
 	"script": {
 		"type": "manifest",
 		"path": "src/documents/mouseguard-character/index.ts"
-	},
-	"roles": {
-		"owner": {
-			"creatorDefault": true,
-			"permissions": ["view", "change-permissions", "delete", "details:*#$..*"]
-		},
-		"observer": {
-			"default": true,
-			"permissions": ["view", "details:read#$..*"]
-		}
 	}
 }
