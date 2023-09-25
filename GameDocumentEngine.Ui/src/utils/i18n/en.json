@@ -78,11 +78,28 @@
 		"cancel": "Cancel"
 	},
 	"document-settings": {
+		"configure-details": "Details",
 		"configure-roles": "Configure Roles for {{name}}",
 		"no-role": "None",
 		"submit": "Save Changes",
 		"danger-zone": "Danger Zone",
 		"delete-document": "Delete {{name}}"
+	},
+	"edit-document": {
+		"fields": {
+			"name": {
+				"label": "Name",
+				"errors": {
+					"too_small": "Please provide a name."
+				}
+			},
+			"folderId": {
+				"label": "Folder",
+				"errors": {},
+				"root": "<Root>"
+			}
+		},
+		"submit": "Save Changes"
 	},
 	"game-settings": {
 		"configure-details": "Details",

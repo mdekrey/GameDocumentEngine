@@ -44,6 +44,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			GameId: resultGame.GameId,
 			Id: resultGame.Id,
 			Name: resultGame.Name,
+			FolderId: resultGame.FolderId,
 			Type: resultGame.Type,
 			Details: filtered,
 			UserRoles: permissionEntries
@@ -52,8 +53,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 					p => p.UserId.ToString(),
 					p => p.Role
 				),
-			Permissions: permissionSet.Permissions.Permissions,
-			FolderId: null
+			Permissions: permissionSet.Permissions.Permissions
 		);
 	}
 

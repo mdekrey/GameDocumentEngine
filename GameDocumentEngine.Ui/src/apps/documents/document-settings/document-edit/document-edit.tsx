@@ -13,6 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
 import { writeDocumentDetailsPrefix } from '@/utils/security/permission-strings';
+import type { DocumentSummary } from '@/api/models/DocumentSummary';
+import type { MapQueryResult } from '@/utils/api/queries/applyEventToQuery';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
 
 function usePatchDocument(gameId: string, documentId: string) {
 	const queryClient = useQueryClient();
@@ -21,15 +24,26 @@ function usePatchDocument(gameId: string, documentId: string) {
 
 export function DocumentEditFields({
 	name,
+	folderId,
 	canEdit,
+	allFolders,
 }: {
 	name: UseFieldResult<string>;
+	folderId: UseFieldResult<string | null>;
 	canEdit: boolean;
+	allFolders: MapQueryResult<DocumentSummary>['data'];
 }) {
 	const { t } = useTranslation(['edit-document']);
 	return (
 		<Fieldset>
 			<TextField field={name} />
+			<SelectField field={folderId} items={Array.from(allFolders.keys())}>
+				{(anyFolderId) =>
+					anyFolderId === null
+						? folderId.translation('root')
+						: allFolders.get(anyFolderId)?.name
+				}
+			</SelectField>
 			{canEdit && (
 				<ButtonRow>
 					<Button type="submit">{t('submit')}</Button>
@@ -41,6 +55,7 @@ export function DocumentEditFields({
 
 const DocumentDetailsSchema = z.object({
 	name: z.string().min(3),
+	folderId: z.string().nullable(),
 });
 
 export function DocumentEdit({
@@ -52,19 +67,21 @@ export function DocumentEdit({
 }) {
 	const { t } = useTranslation(['edit-document']);
 	const documentForm = useForm({
-		defaultValue: { name: '' },
+		defaultValue: { name: '', folderId: null },
 		translation: t,
 		schema: DocumentDetailsSchema,
 		fields: {
 			name: ['name'],
+			folderId: ['folderId'],
 		},
 	});
 
+	const documentsListResult = useQuery(queries.listDocuments(gameId));
 	const documentQueryResult = useQuery(queries.getDocument(gameId, documentId));
 	const saveDocument = usePatchDocument(gameId, documentId);
 
-	if (!documentQueryResult.isSuccess) {
-		if (documentQueryResult.isLoadingError) {
+	if (!documentQueryResult.isSuccess || !documentsListResult.isSuccess) {
+		if (documentQueryResult.isError || documentsListResult.isError) {
 			return 'Failed to load';
 		}
 		return 'Loading';
@@ -80,7 +97,11 @@ export function DocumentEdit({
 	return (
 		<>
 			<form onSubmit={documentForm.handleSubmit(onSubmit)}>
-				<DocumentEditFields {...documentForm.fields} canEdit={canEdit} />
+				<DocumentEditFields
+					{...documentForm.fields}
+					canEdit={canEdit}
+					allFolders={documentsListResult.data.data}
+				/>
 			</form>
 		</>
 	);
@@ -88,6 +109,7 @@ export function DocumentEdit({
 	function onSubmit(currentValue: z.infer<typeof DocumentDetailsSchema>) {
 		const patches = produceWithPatches(documentData, (draft) => {
 			draft.name = currentValue.name;
+			draft.folderId = currentValue.folderId;
 		})[1];
 		if (patches.length > 0)
 			saveDocument.mutate(patches.map(immerPatchToStandard));
