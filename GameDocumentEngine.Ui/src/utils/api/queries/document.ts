@@ -1,47 +1,99 @@
-import type {
-	QueryClient,
-	UseMutationOptions,
-	UseQueryOptions,
-} from '@tanstack/react-query';
+import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import type { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { api } from '../fetch-api';
 import type { NavigateFunction } from 'react-router-dom';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { Patch } from 'rfc6902';
 import type { EntityChangedProps } from '../EntityChangedProps';
-import type { MapQueryResult } from './applyEventToQuery';
+import type { MapQueryConfig } from './applyEventToQuery';
 import { applyEventToQuery, applyChangeToMapQuery } from './applyEventToQuery';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
 
-type DocumentCollection = Map<string, DocumentSummary>;
+type FolderNode = {
+	/** Undefined if in an unknown loop */
+	path?: (string | null)[];
+	childrenIds: string[];
+};
+type AllFolderData = {
+	unrootedFolderIds: string[];
+	/** Mapping of all folders to their children */
+	hierarchy: Map<string | null, FolderNode>;
+};
 export const listDocuments = (
 	gameId: string,
-): UseQueryOptions<MapQueryResult<DocumentSummary>> &
-	Required<Pick<UseQueryOptions<DocumentCollection>, 'queryKey'>> => ({
-	queryKey: ['game', gameId, 'document', 'list'],
-	queryFn: async ({ signal }): Promise<MapQueryResult<DocumentSummary>> => {
-		const response = await api.listDocuments({ params: { gameId } });
-		if (response.statusCode !== 200) return Promise.reject(response);
-		const result = new Map(Object.entries(response.data.data));
+): MapQueryConfig<DocumentSummary, AllFolderData> => {
+	return {
+		queryKey: ['game', gameId, 'document', 'list'],
+		queryFn: async ({ signal }) => {
+			const response = await api.listDocuments({ params: { gameId } });
+			if (response.statusCode !== 200) return Promise.reject(response);
+			const result = new Map(Object.entries(response.data.data));
 
-		void (async () => {
-			let nextCursor = response.data.pagination.nextCursor;
-			while (nextCursor) {
-				if (signal?.aborted) return;
-				const response = await api.listDocuments({
-					params: { gameId, cursor: nextCursor },
-				});
-				if (response.statusCode !== 200) return;
-				nextCursor = response.data.pagination.nextCursor;
-				for (const kvp of Object.entries(response.data.data)) {
-					result.set(...kvp);
+			void (async () => {
+				let nextCursor = response.data.pagination.nextCursor;
+				while (nextCursor) {
+					if (signal?.aborted) return;
+					const response = await api.listDocuments({
+						params: { gameId, cursor: nextCursor },
+					});
+					if (response.statusCode !== 200) return;
+					nextCursor = response.data.pagination.nextCursor;
+					for (const kvp of Object.entries(response.data.data)) {
+						result.set(...kvp);
+					}
 				}
-			}
-		})();
+			})();
 
-		return { data: result };
-	},
-});
+			return { data: result, additional: mapDocumentsToFolders(result) };
+		},
+		mapAdditionalProps: mapDocumentsToFolders,
+	};
+};
+
+function mapDocumentsToFolders(
+	documents: Map<string, DocumentSummary>,
+): AllFolderData {
+	const unrootedFolderIds = new Set<string>(documents.keys());
+	const hierarchy: AllFolderData['hierarchy'] = new Map();
+	const rootedQueue: (string | null)[] = [null];
+
+	for (const doc of documents.values()) {
+		const parent = hierarchy.get(doc.folderId) ?? createEmptyNode();
+		hierarchy.set(doc.folderId, parent);
+		if (doc.folderId === null && !parent.path) parent.path = [];
+		parent.childrenIds.push(doc.id);
+	}
+	let nextId: string | null | undefined;
+	while ((nextId = rootedQueue.pop()) !== undefined) {
+		const nextFolder = hierarchy.get(nextId);
+		if (!nextFolder) continue;
+		for (const childId of nextFolder.childrenIds) {
+			const child = documents.get(childId);
+			if (!child) throw new Error('unknown document found');
+			setRoot(child, nextFolder);
+		}
+	}
+
+	// TODO: consider walking through unrootedFolderIds to get partial folder structures
+
+	return {
+		unrootedFolderIds: Array.from(unrootedFolderIds.values()),
+		hierarchy,
+	};
+
+	function createEmptyNode(): FolderNode {
+		return { childrenIds: [] };
+	}
+
+	function setRoot(doc: DocumentSummary, parent: FolderNode) {
+		if (!parent?.path) throw new Error(`invalid root for ${doc.id}`);
+		unrootedFolderIds.delete(doc.id);
+		rootedQueue.push(doc.id);
+		const selfFolder = hierarchy.get(doc.id);
+		if (!selfFolder) return;
+		selfFolder.path = [...parent.path, doc.folderId];
+	}
+}
 
 export const getDocument = (gameId: string, documentId: string) => {
 	const result = {

@@ -151,7 +151,7 @@ public class DocumentController : Api.DocumentControllerBase
 			: null;
 
 		return ListDocumentsActionResult.Ok(new ListDocumentsResponse(
-			Data: documents.ToDictionary(d => d.Id.ToString(), doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, null)),
+			Data: documents.ToDictionary(d => d.Id.ToString(), doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, doc.FolderId)),
 			Pagination: new PaginatedDetails(
 				TotalRecords: count,
 				NextCursor: nextCursor

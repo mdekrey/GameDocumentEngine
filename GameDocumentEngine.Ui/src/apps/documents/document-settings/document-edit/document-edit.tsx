@@ -14,7 +14,6 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
 import { writeDocumentDetailsPrefix } from '@/utils/security/permission-strings';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
-import type { MapQueryResult } from '@/utils/api/queries/applyEventToQuery';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 
 function usePatchDocument(gameId: string, documentId: string) {
@@ -31,13 +30,13 @@ export function DocumentEditFields({
 	name: UseFieldResult<string>;
 	folderId: UseFieldResult<string | null>;
 	canEdit: boolean;
-	allFolders: MapQueryResult<DocumentSummary>['data'];
+	allFolders: Map<string, DocumentSummary>;
 }) {
 	const { t } = useTranslation(['edit-document']);
 	return (
 		<Fieldset>
 			<TextField field={name} />
-			<SelectField field={folderId} items={Array.from(allFolders.keys())}>
+			<SelectField field={folderId} items={[null, ...allFolders.keys()]}>
 				{(anyFolderId) =>
 					anyFolderId === null
 						? folderId.translation('root')

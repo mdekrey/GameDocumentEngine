@@ -66,23 +66,38 @@ export async function applyChangeToQuery<T = unknown>(
 	}
 }
 
-export type MapQueryResult<T> = { data: Map<string, T>; forceReload?: number };
-export async function applyChangeToMapQuery<T>(
+export type MapQueryResult<T, TAdditional> = {
+	data: Map<string, T>;
+	forceReload?: number;
+	additional: TAdditional;
+};
+export type MapQueryConfig<T, TAdditional> = {
+	queryKey: QueryKey;
+	queryFn: QueryFunction<MapQueryResult<T, TAdditional>>;
+	mapAdditionalProps(
+		data: Map<string, T>,
+		prevAdditional?: TAdditional,
+	): TAdditional;
+};
+export async function applyChangeToMapQuery<T, TAdditional>(
 	queryClient: QueryClient,
 	{
 		queryKey,
-	}: { queryKey: QueryKey; queryFn?: QueryFunction<MapQueryResult<T>> },
+		mapAdditionalProps,
+	}: Pick<MapQueryConfig<T, TAdditional>, 'queryKey' | 'mapAdditionalProps'>,
 	recipe: (draft: Map<string, T>) => void,
 ) {
-	const data = queryClient.getQueryData<MapQueryResult<T>>(queryKey);
+	const data =
+		queryClient.getQueryData<MapQueryResult<T, TAdditional>>(queryKey);
 	if (data === undefined) return;
 	try {
 		const map = data.data;
 		recipe(map);
-		queryClient.setQueryData<MapQueryResult<T>>(queryKey, {
+		queryClient.setQueryData<MapQueryResult<T, TAdditional>>(queryKey, {
 			data: map,
 			// without this field, react-query does not serve change notifications
 			forceReload: Math.random(),
+			additional: mapAdditionalProps(map, data.additional),
 		});
 	} catch (ex) {
 		console.error(ex);
