@@ -9,12 +9,12 @@ import type { MapQueryConfig } from './applyEventToQuery';
 import { applyEventToQuery, applyChangeToMapQuery } from './applyEventToQuery';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
 
-type FolderNode = {
+export type FolderNode = {
 	/** Undefined if in an unknown loop */
 	path?: (string | null)[];
 	childrenIds: string[];
 };
-type AllFolderData = {
+export type AllFolderData = {
 	unrootedFolderIds: string[];
 	/** Mapping of all folders to their children */
 	hierarchy: Map<string | null, FolderNode>;

@@ -119,7 +119,9 @@
 	"game-objects": {
 		"header": "Documents",
 		"create-document": "Create a new document within the game",
-		"settings": "Settings for {{name}}"
+		"settings": "Settings for {{name}}",
+		"no-documents": "No documents could be found",
+		"unrooted": "The following folders could not be found in the hierarchy. This may mean you do not have access to them or there is a bug."
 	},
 	"delete-game": {
 		"title": "Delete game",
