@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping, FieldStateContext } from '@/utils/form/useField';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
@@ -16,6 +16,7 @@ import { noChange } from '@/utils/form/mapAtom';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { createInvitation } from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
+import { atom } from 'jotai';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -65,8 +66,9 @@ export function CreateInvite({
 			uses: {
 				path: ['uses'],
 				mapping: positiveIntegerMapping,
-				// TODO: make this disabled flag work correctly
-				disabled: true,
+				// TODO: why does this parameter need to be explicitly typed?
+				disabled: (v: FieldStateContext<number>) =>
+					atom((get) => get(v.value) < 1),
 			},
 			role: ['role'],
 			isUnlimited: {
@@ -96,10 +98,7 @@ export function CreateInvite({
 							)
 						}
 					</SelectField>
-					<CheckboxField
-						className="col-span-2"
-						field={form.fields.isUnlimited}
-					/>
+					<CheckboxField field={form.fields.isUnlimited} />
 					<NumberField field={form.fields.uses} />
 				</Fieldset>
 
