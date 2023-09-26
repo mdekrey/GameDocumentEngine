@@ -55,10 +55,10 @@ public class GamePermissionSetResolver
 			gameType);
 	}
 
-	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, (DocumentModel Document, DocumentUserModel DocumentUser)? documentUserTuple, IGameType gameType)
+	public async Task<PermissionSet?> GetPermissions(GameUserModel gameUser, (DocumentModel Document, DocumentUserModel? DocumentUser)? documentUserTuple, IGameType gameType)
 	{
 		PermissionList? documentPermissions = null;
-		if (documentUserTuple is (var document, var documentUser))
+		if (documentUserTuple is (var document, DocumentUserModel documentUser))
 		{
 			if (documentUser.GameId != gameUser.GameId || document.GameId != gameUser.GameId)
 				throw new ArgumentException("Not from the same game!", nameof(documentUser));

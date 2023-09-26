@@ -52,7 +52,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		var byUser = (from gameUser in gameUsers
 					  let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
 					  // Document User may not have existed for every user, such as when creating or destroying
-					  where documentUser != null
+					  // but may still have permission from game role
 					  select new
 					  {
 						  gameUser,
