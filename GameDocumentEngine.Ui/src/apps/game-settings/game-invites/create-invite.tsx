@@ -65,6 +65,7 @@ export function CreateInvite({
 			uses: {
 				path: ['uses'],
 				mapping: positiveIntegerMapping,
+				// TODO: make this disabled flag work correctly
 				disabled: true,
 			},
 			role: ['role'],
