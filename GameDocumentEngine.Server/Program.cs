@@ -298,15 +298,14 @@ app.MapWhen(context => context.Request.Method == "GET" || context.Request.Method
 	});
 });
 
-if (app.Environment.IsDevelopment())
-	using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
+{
+	var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
+	if (dbContext.Database.GetPendingMigrations().Any())
 	{
-		var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
-		if (dbContext.Database.GetPendingMigrations().Any())
-		{
-			// TODO: make this fail and expect database to be updated separately
-			dbContext.Database.Migrate();
-		}
+		// TODO: make this fail and expect database to be updated separately
+		dbContext.Database.Migrate();
 	}
+}
 
 app.Run();
