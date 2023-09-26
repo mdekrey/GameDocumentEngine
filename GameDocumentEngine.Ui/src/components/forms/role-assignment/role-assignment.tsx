@@ -10,6 +10,7 @@ import { useForm } from '@/utils/form/useForm';
 import { queries } from '@/utils/api/queries';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { defaultField } from '@/utils/form/fieldStateTracking';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 
 export const UserRoleAssignment = z.object({}).catchall(z.string());
 
@@ -71,39 +72,38 @@ export function RoleAssignment({
 	}
 
 	return (
-		<form
-			onSubmit={form.handleSubmit(onSubmit)}
-			className="flex flex-col gap-4"
-		>
-			{Object.entries(playerNames).map(([k, name]) => {
-				const field = form.fields.row(k);
-				return (
-					<Field key={k}>
-						<Field.Label>{name}</Field.Label>
+		<form onSubmit={form.handleSubmit(onSubmit)}>
+			<Fieldset>
+				{Object.entries(playerNames).map(([k, name]) => {
+					const field = form.fields.row(k);
+					return (
+						<Field key={k}>
+							<Field.Label>{name}</Field.Label>
 
-						<Field.Contents>
-							<SelectInput {...field.htmlProps.asControlled()} items={roles}>
-								{(gt) =>
-									gt ? (
-										<>{roleTranslations(`roles.${gt}.name`)}</>
-									) : (
-										<>{t('no-role')}</>
-									)
-								}
-							</SelectInput>
-							<ErrorsList
-								errors={field.errors}
-								translations={field.translation}
-							/>
-						</Field.Contents>
-					</Field>
-				);
-			})}
-			{allowUpdate && (
-				<ButtonRow>
-					<Button type="submit">{t('submit')}</Button>
-				</ButtonRow>
-			)}
+							<Field.Contents>
+								<SelectInput {...field.htmlProps.asControlled()} items={roles}>
+									{(gt) =>
+										gt ? (
+											<>{roleTranslations(`roles.${gt}.name`)}</>
+										) : (
+											<>{t('no-role')}</>
+										)
+									}
+								</SelectInput>
+								<ErrorsList
+									errors={field.errors}
+									translations={field.translation}
+								/>
+							</Field.Contents>
+						</Field>
+					);
+				})}
+				{allowUpdate && (
+					<ButtonRow>
+						<Button type="submit">{t('submit')}</Button>
+					</ButtonRow>
+				)}
+			</Fieldset>
 		</form>
 	);
 
