@@ -9,6 +9,7 @@ import type { RegisterErrorStrategy } from './errorsStrategy';
 import type { FormEvents } from './events/FormEvents';
 import type { IfTrueThenProp } from './type-helpers';
 import type { noChange } from './mapAtom';
+import { useConstant } from './useConstant';
 
 export type FieldTranslatablePart =
 	| ['label']
@@ -155,11 +156,7 @@ export function useField<TValue, TFieldValue>(
 	options: Partial<FieldOptions<TValue, TFieldValue>> = {},
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): UseFieldResult<TFieldValue, any> {
-	const fieldValueAtom = useMemo(
-		() => atom<TValue>(defaultValue),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
-	);
+	const fieldValueAtom = useConstant(() => atom<TValue>(defaultValue));
 	return useInternalFieldAtom(fieldValueAtom, options);
 }
 

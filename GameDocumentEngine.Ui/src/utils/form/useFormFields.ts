@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
 import type { Objectish } from 'immer';
 import type { UseFormResult, UseFieldsResult } from './useForm';
 import { buildFormFields } from './useForm';
 import type { FieldsConfig } from './field-config-types';
+import { useConstant } from './useConstant';
 
 export function useFormFields<
 	T extends Objectish,
@@ -11,9 +11,5 @@ export function useFormFields<
 	form: UseFormResult<T>,
 	fields: TFields,
 ): UseFieldsResult<T, TFields>['fields'] {
-	return useMemo(
-		() => buildFormFields<T, TFields>(fields, form),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
-	);
+	return useConstant(() => buildFormFields<T, TFields>(fields, form));
 }

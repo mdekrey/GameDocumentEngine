@@ -3,7 +3,6 @@ import type { Atom } from 'jotai';
 import { atom, useStore } from 'jotai';
 import type { MutableRefObject } from 'react';
 import type React from 'react';
-import { useMemo } from 'react';
 import type { ZodError, ZodType } from 'zod';
 import type { StandardWritableAtom } from './StandardWritableAtom';
 import type { AnyPath, Path, PathValue } from './path';
@@ -45,6 +44,7 @@ import {
 	walkFieldStateAtom,
 	toFieldStateValue,
 } from './fieldStateTracking';
+import { useConstant } from './useConstant';
 
 export type ConfiguredFormField<
 	TValue,
@@ -240,6 +240,7 @@ export function buildFormFields<
 	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
 >(fields: TFields, params: FormResultContext<T>): FormFields<T, TFields> {
+	console.log('buildFormFields', Object.keys(fields));
 	return Object.fromEntries(
 		Object.entries(fields).map(([field, config]) => {
 			return [
@@ -386,7 +387,7 @@ export function useForm<T>(
 	options: FormOptions<T> & Partial<FormFieldsOptions<T, FieldsConfig<T>>>,
 ): UseFormResult<T> | UseFormResultWithFields<T, FieldsConfig<T>> {
 	const store = useStore();
-	return useMemo(
+	return useConstant(
 		(): UseFormResult<T> | UseFormResultWithFields<T, FieldsConfig<T>> => {
 			const formEvents = new FormEvents();
 			const strategy = errorsStrategy(
@@ -430,8 +431,6 @@ export function useForm<T>(
 				fields,
 			};
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
 	);
 }
 

@@ -114,12 +114,7 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 					},
 				},
 			};
-			return {
-				...toInternalFieldAtom(store, fieldValueAtom, newOptions),
-				disabled,
-				readOnly,
-				errors,
-			};
+			return toInternalFieldAtom(store, fieldValueAtom, newOptions);
 		},
 	};
 
