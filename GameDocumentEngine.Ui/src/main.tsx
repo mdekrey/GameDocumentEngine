@@ -11,6 +11,7 @@ import {
 	RealtimeApiProvider,
 	createRealtimeApi,
 } from './utils/api/realtime-api.ts';
+import './runtime-api';
 
 declare global {
 	interface WorkerNavigator {

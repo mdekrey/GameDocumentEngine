@@ -158,7 +158,7 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 
 function forceReconnect() {
 	// To trigger this, run this in the console:
-	// navigator.serviceWorker?.controller?.postMessage({type: 'forceReconnect' });
+	// vaultApi.reconnectHub()
 	// This will allow you to see WS communication
 	if (connection.state !== HubConnectionState.Disconnected) {
 		void (async function () {
