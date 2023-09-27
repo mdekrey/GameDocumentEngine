@@ -24,6 +24,8 @@ import { updateDocumentRoleAssignments } from './document-roles';
 
 export const queries = {
 	getInfo,
+	/** Intentionally not supporting `getTranslationData` here */
+	getTranslationData: null,
 	getCurrentUser,
 	patchUser,
 	listGameTypes,

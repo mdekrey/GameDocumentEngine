@@ -57,6 +57,7 @@ export default defineConfig({
 	build: {
 		outDir: '../GameDocumentEngine.Server/wwwroot',
 		emptyOutDir: true,
+		assetsInlineLimit: 0,
 		rollupOptions: {
 			input: ['./index.html', ...globSync('./src/documents/*/index.ts')],
 			output: {

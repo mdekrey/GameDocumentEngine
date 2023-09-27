@@ -3,7 +3,7 @@ import { defineDocument } from '../defineDocument';
 import { ConflictSheet } from './conflict-sheet';
 import conflictSchema from './schema';
 import type { z } from 'zod';
-import en from './en.json';
+// import './en.json?url';
 import { conflictFixup } from './fixupConflict';
 
 defineDocument('MouseGuard-Conflict', {
@@ -39,6 +39,6 @@ defineDocument('MouseGuard-Conflict', {
 	} satisfies z.infer<typeof conflictSchema>,
 	component: ConflictSheet,
 	schema: conflictSchema,
-	translations: { en },
+	translations: {},
 	fixup: conflictFixup,
 });

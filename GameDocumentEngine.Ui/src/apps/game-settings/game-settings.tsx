@@ -20,6 +20,7 @@ import {
 	GameDangerZone,
 } from './game-danger-zone/game-danger-zone';
 import type { GameDetails } from '@/api/models/GameDetails';
+import { Suspense } from 'react';
 
 function displayInvites(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, listInvitations);
@@ -61,7 +62,9 @@ export function GameSettings({ gameId }: { gameId: string }) {
 			{showInvites && (
 				<Section>
 					<SectionHeader>{t('configure-invites')}</SectionHeader>
-					<GameInvites gameId={gameId} />
+					<Suspense>
+						<GameInvites gameId={gameId} />
+					</Suspense>
 				</Section>
 			)}
 			{displayDangerZone(gameDetails) && (

@@ -31,7 +31,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 			playerNames={gameDetails.playerNames}
 			roles={gameDetails.typeInfo.userRoles}
 			onSaveRoles={onSaveRoles}
-			roleTranslations={gameType.data.translation}
+			roleTranslationsNamespace={gameType.data.translationNamespace}
 			translations={t}
 			allowUpdate={hasGamePermission(gameDetails, updateGameUserAccess)}
 		/>

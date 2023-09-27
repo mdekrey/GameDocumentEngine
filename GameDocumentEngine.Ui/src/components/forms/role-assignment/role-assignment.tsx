@@ -11,6 +11,7 @@ import { queries } from '@/utils/api/queries';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { defaultField } from '@/utils/form/fieldStateTracking';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import { useTranslation } from 'react-i18next';
 
 export const UserRoleAssignment = z.object({}).catchall(z.string());
 
@@ -22,7 +23,7 @@ export type RoleAssignmentProps = {
 	onSaveRoles: (
 		roles: z.infer<typeof UserRoleAssignment>,
 	) => void | Promise<void>;
-	roleTranslations: (key: string) => string;
+	roleTranslationsNamespace: string;
 	translations: (key: string) => string;
 	allowUpdate: boolean;
 	allowUpdateSelf?: boolean;
@@ -34,12 +35,13 @@ export function RoleAssignment({
 	roles,
 	defaultRole,
 	onSaveRoles,
-	roleTranslations,
+	roleTranslationsNamespace,
 	allowUpdate,
 	allowUpdateSelf,
 	translations: t,
 }: RoleAssignmentProps) {
 	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
+	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace);
 
 	const formData =
 		defaultRole !== undefined

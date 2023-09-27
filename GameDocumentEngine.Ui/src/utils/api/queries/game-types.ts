@@ -3,8 +3,6 @@ import type { QueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 import type { IGameObjectType } from '@/documents/defineDocument';
 import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
-import type { TFunction } from 'i18next';
-import { i18n } from '@/utils/i18n/setup';
 
 export function getGameType(
 	gameType: string,
@@ -21,12 +19,12 @@ export function getGameType(
 
 export type GameTypeScripts = {
 	objectTypes: Record<string, GameTypeObjectScripts>;
-	translation: TFunction<`game-types:${string}`, undefined>;
+	translationNamespace: `game-types:${string}`;
 };
 
 export type GameTypeObjectScripts<T = unknown> = {
 	typeInfo: IGameObjectType<T>;
-	translation: TFunction<`doc-types:${string}`, undefined>;
+	translationNamespace: `doc-types:${string}`;
 };
 
 export function getGameTypeScripts(
@@ -51,7 +49,7 @@ export function getGameTypeScripts(
 						),
 					),
 				),
-				translation: i18n.getFixedT(null, `game-types:${gameTypeKey}`),
+				translationNamespace: `game-types:${gameTypeKey}`,
 			} as GameTypeScripts;
 		},
 	};
@@ -99,7 +97,7 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 			);
 
 			return {
-				translation: i18n.getFixedT(null, `doc-types:${objectType.key}`),
+				translationNamespace: `doc-types:${objectType.key}`,
 				typeInfo: window.widgets[objectType.key],
 			};
 		},

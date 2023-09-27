@@ -57,6 +57,7 @@ export function CreateInvite({
 	}
 >) {
 	const { t } = useTranslation(['create-invite']);
+	const { t: roleTranslations } = useTranslation(gameType.translationNamespace);
 	const createInvite = useCreateInvite(gameId);
 	const form = useForm({
 		schema: CreateInviteForm,
@@ -92,7 +93,7 @@ export function CreateInvite({
 					<SelectField field={form.fields.role} items={allowedRoles}>
 						{(dt) =>
 							dt ? (
-								<>{gameType.translation?.(`roles.${dt}.name`)}</>
+								<>{roleTranslations(`roles.${dt}.name`)}</>
 							) : (
 								form.fields.role.translation('not-selected')
 							)

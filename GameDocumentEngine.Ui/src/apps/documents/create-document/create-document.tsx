@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
 import { useGameType } from '../useGameType';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { Section, SingleColumnSections } from '@/components/sections';
@@ -52,7 +52,10 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						>
 							{(key) =>
 								gameType.isSuccess && gameType.data.objectTypes[key] ? (
-									gameType.data.objectTypes[key].translation('name')
+									<Trans
+										ns={gameType.data.objectTypes[key].translationNamespace}
+										i18nKey={'name'}
+									/>
 								) : (
 									<span className="text-slate-500">
 										{gameForm.field(['type']).translation('not-selected')}

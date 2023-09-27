@@ -8,7 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import type { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useGameType } from '../../documents/useGameType';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
@@ -95,7 +95,12 @@ export function GameInvites({ gameId }: { gameId: string }) {
 									</td>
 								) : (
 									<>
-										<td>{gameType.translation(`roles.${invite.role}.name`)}</td>
+										<td>
+											<Trans
+												ns={gameType.translationNamespace}
+												i18nKey={`roles.${invite.role}.name`}
+											/>
+										</td>
 										<td className="text-center">
 											{invite.usesRemaining === -1
 												? t('unlimited-uses-remaining')

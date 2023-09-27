@@ -3,7 +3,7 @@ import { defineDocument } from '../defineDocument';
 import { Clock } from './clock-widget';
 import clockSchema from './schema';
 import type { z } from 'zod';
-import en from './en.json';
+// import en from './en.json?url';
 
 defineDocument('Clock', {
 	icon: HiOutlineClock,
@@ -13,7 +13,7 @@ defineDocument('Clock', {
 	} satisfies z.infer<typeof clockSchema>,
 	component: Clock,
 	schema: clockSchema,
-	translations: { en },
+	translations: {},
 	fixup: {
 		toForm: (a) => a,
 		fromForm: (a) => a,

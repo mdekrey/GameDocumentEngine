@@ -20,6 +20,7 @@ import { updateFormDefaultMapped } from '@/utils/form/update-form-default';
 import { applyPatch, createPatch } from 'rfc6902';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 import type { UserDetails } from '@/api/models/UserDetails';
+import { useTranslation } from 'react-i18next';
 
 export function DocumentDetails({
 	gameId,
@@ -66,10 +67,13 @@ export function DocumentDetailsForm<T = unknown>({
 		() => toEditableDetails(document.data, fixup),
 		[document.data, fixup],
 	);
+	const { t } = useTranslation(scripts.translationNamespace, {
+		keyPrefix: `document`,
+	});
 	const form = useForm({
 		defaultValue: fixup.toForm(editable.editable),
 		schema: documentSchema(scripts.typeInfo.schema),
-		translation: (f) => scripts.translation(`document.${f}`),
+		translation: t,
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
 	updateFormDefaultMapped(form, editable.document, fixup);
@@ -132,7 +136,7 @@ export function DocumentDetailsForm<T = unknown>({
 				<Component
 					form={form}
 					onSubmit={onSubmit}
-					translation={scripts.translation}
+					translation={t}
 					readablePointers={editable.readablePointers}
 					writablePointers={editable.writablePointers}
 					objectRole={document.data.userRoles[user.data.id]}

@@ -18,6 +18,9 @@ import { hasDocumentPermission } from '@/utils/security/match-permission';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { DocumentEdit } from './document-edit/document-edit';
+import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
+import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
+import type { GameDetails } from '@/api/models/GameDetails';
 
 function displayUserPermissions(documentDetails: DocumentDetails) {
 	return hasDocumentPermission(documentDetails, updateDocumentUserAccess);
@@ -54,19 +57,8 @@ export function DocumentSettings({
 	gameId: string;
 	documentId: string;
 }) {
-	const navigate = useNavigate();
-	const launchModal = useModal();
-	const { t } = useTranslation('document-settings');
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const documentResult = useQuery(queries.getDocument(gameId, documentId));
-	const queryClient = useQueryClient();
-	const deleteDocument = useMutation(
-		queries.deleteDocument(queryClient, gameId, documentId),
-	);
-	const updateDocumentRoleAssignments = useUpdateDocumentRoleAssignments(
-		gameId,
-		documentId,
-	);
 	const gameType = useGameType(gameId);
 
 	if (gameResult.isLoading || documentResult.isLoading || gameType.isLoading) {
@@ -88,10 +80,52 @@ export function DocumentSettings({
 	if (!docType) {
 		return 'Unknown document type';
 	}
+
+	return (
+		<LoadedDocumentSettings
+			gameId={gameId}
+			documentId={documentId}
+			gameDetails={gameDetails}
+			docData={docData}
+			docType={docType}
+			userRoles={documentResult.data.userRoles}
+			objectType={gameType.data.objectTypes[documentResult.data.type]}
+		/>
+	);
+}
+
+function LoadedDocumentSettings({
+	gameId,
+	documentId,
+	gameDetails,
+	docData,
+	docType,
+	userRoles,
+	objectType,
+}: {
+	gameId: string;
+	documentId: string;
+	gameDetails: GameDetails;
+	docData: DocumentDetails;
+	docType: GameObjectTypeDetails;
+	userRoles: Record<string, string>;
+	objectType: GameTypeObjectScripts<unknown>;
+}) {
+	const { t } = useTranslation('document-settings');
 	const actualRoles = ['', ...docType.userRoles];
-	const userRoles = documentResult.data.userRoles;
 
 	const displayDelete = displayDeleteDocument(docData);
+
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	const launchModal = useModal();
+	const deleteDocument = useMutation(
+		queries.deleteDocument(queryClient, gameId, documentId),
+	);
+	const updateDocumentRoleAssignments = useUpdateDocumentRoleAssignments(
+		gameId,
+		documentId,
+	);
 
 	return (
 		<SingleColumnSections>
@@ -110,9 +144,7 @@ export function DocumentSettings({
 					roles={actualRoles}
 					onSaveRoles={onSaveRoles}
 					translations={t}
-					roleTranslations={
-						gameType.data.objectTypes[documentResult.data.type].translation
-					}
+					roleTranslationsNamespace={objectType.translationNamespace}
 					allowUpdate={displayUserPermissions(docData)}
 					allowUpdateSelf={canUpdateOwnPermissions(docData)}
 				/>

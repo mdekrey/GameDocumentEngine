@@ -19,6 +19,7 @@ import { GameObjects } from './apps/game-details/game-objects';
 import { GameSubheader } from './apps/game-details/game-subheader';
 import { GameSettings } from './apps/game-settings/game-settings';
 import { DocumentSubheader } from './apps/documents/subheader/document-subheader';
+import { Suspense } from 'react';
 
 function withParamsValue<const T extends string>(prop: T) {
 	return <TProps extends { [P in T]: string }>(
@@ -90,7 +91,7 @@ function App() {
 			{subheaderRoute ? (
 				<Layout.Subheader>{subheaderRoute}</Layout.Subheader>
 			) : null}
-			{useRoutes(mainRoute)}
+			<Suspense fallback={<>Loading...</>}>{useRoutes(mainRoute)}</Suspense>
 			{leftSidebar ? (
 				<Layout.LeftSidebar>{leftSidebar}</Layout.LeftSidebar>
 			) : null}
