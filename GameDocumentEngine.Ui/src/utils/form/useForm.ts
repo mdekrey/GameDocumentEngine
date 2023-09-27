@@ -240,7 +240,6 @@ export function buildFormFields<
 	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
 >(fields: TFields, params: FormResultContext<T>): FormFields<T, TFields> {
-	console.log('buildFormFields', Object.keys(fields));
 	return Object.fromEntries(
 		Object.entries(fields).map(([field, config]) => {
 			return [

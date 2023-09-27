@@ -112,7 +112,7 @@ function Folder({
 			{Array.from(hierarchy.get(id)?.childrenIds ?? []).map((childId) => {
 				const doc = allDocuments.get(childId);
 				return (
-					<li>
+					<li key={childId}>
 						{recursive ? (
 							<FolderEntry
 								gameId={gameId}
