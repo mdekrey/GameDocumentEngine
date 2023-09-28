@@ -1,0 +1,13 @@
+{
+	"header": {
+		"app-title": "Vault VTT",
+		"menu": "Menu"
+	},
+	"menu": {
+		"edit-profile": "Hello, {{name}}",
+		"select-game": "Select Game",
+		"new-game": "New Game",
+		"switch-to-light-mode": "Switch to Light Mode",
+		"switch-to-dark-mode": "Switch to Dark Mode"
+	}
+}

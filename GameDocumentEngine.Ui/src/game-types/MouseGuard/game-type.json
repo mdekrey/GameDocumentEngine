@@ -26,12 +26,7 @@
 			"invitations:create:role-player",
 			"invitations:cancel"
 		],
-		"trusted": [
-			"read",
-			"create-document"
-		],
-		"player": [
-			"read"
-		]
+		"trusted": ["read", "create-document"],
+		"player": ["read"]
 	}
 }

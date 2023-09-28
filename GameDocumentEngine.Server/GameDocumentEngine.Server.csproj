@@ -51,7 +51,13 @@
 			<Link>Documents/Types/%(FileName)/schema.json</Link>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Documents\Types\*\document-type.json" />
-		<EmbeddedResource Include="GameTypes\*\game-type.json" />
+		<GameTypeFolder Include="$([System.IO.Directory]::GetDirectories($(SolutionRoot)GameDocumentEngine.Ui\src\game-types\,*))">
+			<FolderName>$([System.IO.Path]::GetFileName(%(Identity)))</FolderName>
+		</GameTypeFolder>
+		<EmbeddedResource Include="@(GameTypeFolder->'%(Identity)/game-type.json')">
+			<LogicalName>GameTypes.%(FolderName).game-type.json</LogicalName>
+			<Link>GameTypes/%(FolderName)/schema.json</Link>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>

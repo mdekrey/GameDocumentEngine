@@ -8,6 +8,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
 using GameDocumentEngine.Server.GameTypes;
+using GameDocumentEngine.Server.Localization;
 using GameDocumentEngine.Server.Realtime;
 using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
@@ -137,6 +138,7 @@ foreach (var gameTypeJson in typeof(JsonGameTypeBuilder).Assembly.GetManifestRes
 		services.AddSingleton(gameObjectType.Build(gameObjectTypes));
 }
 services.Configure<BuildOptions>(builder.Configuration.GetSection("Build"));
+services.Configure<LocalizationOptions>(builder.Configuration.GetSection("Localization"));
 
 services.AddAuthorization(options =>
 {

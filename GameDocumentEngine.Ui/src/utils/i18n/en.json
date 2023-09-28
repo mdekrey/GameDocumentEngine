@@ -1,17 +1,4 @@
 {
-	"layout": {
-		"header": {
-			"app-title": "Vault VTT",
-			"menu": "Menu"
-		},
-		"menu": {
-			"edit-profile": "Hello, {{name}}",
-			"select-game": "Select Game",
-			"new-game": "New Game",
-			"switch-to-light-mode": "Switch to Light Mode",
-			"switch-to-dark-mode": "Switch to Dark Mode"
-		}
-	},
 	"network": {
 		"signal-disconnected": "Cannot connect to the network",
 		"reconnecting": {
@@ -220,49 +207,5 @@
 			}
 		},
 		"submit": "Save Changes"
-	},
-	"game-types:Clocks": {
-		"name": "Clocks",
-		"description": "A simple game type to track PbtA-style clocks",
-		"roles": {
-			"gm": {
-				"name": "Game Master",
-				"description": "Full control over the game; can delete it, invite new players, and change permissions on any objects within the game."
-			},
-			"asst-gm": {
-				"name": "Assistant Game Master",
-				"description": "Can create invitations and update game details, but cannot update documents nor delete the game."
-			},
-			"trusted": {
-				"name": "Trusted Player",
-				"description": "Can create new documents, but otherwise has the same access as player."
-			},
-			"player": {
-				"name": "Player",
-				"description": "Can view details about the game and game objects that have been explicitly granted."
-			}
-		}
-	},
-	"game-types:MouseGuard": {
-		"name": "Mouse Guard",
-		"description": "Mouse Guard character sheets and related trackers and tools",
-		"roles": {
-			"gm": {
-				"name": "Game Master",
-				"description": "Full control over the game; can delete it, invite new players, and change permissions on any objects within the game."
-			},
-			"asst-gm": {
-				"name": "Assistant Game Master",
-				"description": "Can create invitations and update game details, but cannot update documents nor delete the game."
-			},
-			"trusted": {
-				"name": "Trusted Player",
-				"description": "Can create new documents, but otherwise has the same access as player."
-			},
-			"player": {
-				"name": "Player",
-				"description": "Can view details about the game and game objects that have been explicitly granted."
-			}
-		}
 	}
 }

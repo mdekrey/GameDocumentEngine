@@ -1,9 +1,6 @@
 {
 	"key": "Clocks",
-	"objectTypes": [
-		"Clock",
-		"Folder"
-	],
+	"objectTypes": ["Clock", "Folder"],
 	"defaultNewGameRole": "gm",
 	"permissions": {
 		"gm": [
@@ -24,12 +21,7 @@
 			"invitations:create:role-player",
 			"invitations:cancel"
 		],
-		"trusted": [
-			"read",
-			"create-document"
-		],
-		"player": [
-			"read"
-		]
+		"trusted": ["read", "create-document"],
+		"player": ["read"]
 	}
 }

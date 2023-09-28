@@ -6,6 +6,7 @@ import MultiloadAdapter, {
 } from 'i18next-multiload-backend-adapter';
 import HttpApi, { type HttpBackendOptions } from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { constructUrl as toLocalizationUrl } from '@/api/operations/getTranslationData';
 // import en from './en.json';
 
 class MyAdapter extends MultiloadAdapter {
@@ -36,7 +37,11 @@ void i18n.init({
 	backend: {
 		backend: HttpApi,
 		backendOption: {
-			loadPath: '/locales?lng={{lng}}&ns={{ns}}',
+			loadPath: (languages, namespaces) =>
+				toLocalizationUrl({
+					lng: languages.join(' '),
+					ns: namespaces.join(' '),
+				}),
 		} satisfies HttpBackendOptions,
 	} satisfies MultiloadBackendOptions,
 
