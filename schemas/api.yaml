@@ -29,11 +29,11 @@ paths:
       operationId: getTranslationData
       summary: Gets translations based on a language
       parameters:
-        - name: ns
+        - name: lng
           schema: { type: string }
           required: true
           in: query
-        - name: lng
+        - name: ns
           schema: { type: string }
           required: true
           in: query
