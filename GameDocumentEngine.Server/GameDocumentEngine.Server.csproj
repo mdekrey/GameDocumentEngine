@@ -51,7 +51,8 @@
 			<Link>Documents/Types/%(FileName)/schema.json</Link>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Documents\Types\*\document-type.json" />
-		<GameTypeFolder Include="$([System.IO.Directory]::GetDirectories($(SolutionRoot)GameDocumentEngine.Ui\src\game-types\,*))">
+		<GameTypeFolder Include="$([System.IO.Directory]::GetDirectories($(SolutionRoot)GameDocumentEngine.Ui\src\game-types\,*))"
+			 Condition="Exists('$(SolutionRoot)\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')">
 			<FolderName>$([System.IO.Path]::GetFileName(%(Identity)))</FolderName>
 		</GameTypeFolder>
 		<EmbeddedResource Include="@(GameTypeFolder->'%(Identity)/game-type.json')">
@@ -62,7 +63,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\GameDocumentEngine.DevProxy\GameDocumentEngine.DevProxy.csproj" Condition=" '$(Configuration)' == 'Debug' " />
-	  <ProjectReference Include="..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj" Condition="Exists('..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')" />
+	  <ProjectReference Include="..\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj" Condition="Exists('$(SolutionRoot)\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')" />
 	</ItemGroup>
 
 	<Target Name="SetupDockerCompose" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">

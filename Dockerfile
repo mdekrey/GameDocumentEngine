@@ -41,6 +41,12 @@ ARG GITHASH
 ENV VITE_GITHASH=${GITHASH}
 RUN cd ./GameDocumentEngine.Ui/ && dotnet build -p:Configuration=Release
 
+WORKDIR /src/GameDocumentEngine.Ui/src
+# Copy i18n files to /i18n, preserving folder structure
+RUN cd utils/i18n && find . -type f -regex ".*/.*\.json" | cpio -dumv -p /i18n/core/.
+RUN cd documents && find . -type f -regex ".*/i18n/.*\.json" | cpio -dumv -p /i18n/doc-types/.
+RUN cd game-types && find . -type f -regex ".*/i18n/.*\.json" | cpio -dumv -p /i18n/game-types/.
+
 WORKDIR /src/GameDocumentEngine.Server/wwwroot
 RUN find . -type f -not -regex ".*\.\(avif\|jpg\|jpeg\|gif\|png\|webp\|mp4\|webm\)" -exec gzip -k "{}" \; -exec brotli -k "{}" \;
 
@@ -48,7 +54,13 @@ FROM base AS final
 WORKDIR /app
 ARG GITHASH
 ENV BUILD__GITHASH=${GITHASH}
+ENV LOCALIZATION__BUNDLEROOT=./i18n/core/<lang>.json
+ENV LOCALIZATION__STANDARDROOT=./i18n/core/<namespace>/<lang>.json
+ENV LOCALIZATION__GAMETYPESROOT=./i18n/game-types/<gametype>/i18n/<lang>.json
+ENV LOCALIZATION__DOCUMENTTYPESROOT=./i18n/doc-types/<documenttype>/i18n/<lang>.json
 COPY --from=build-dotnet /src/artifacts/bin/GameDocumentEngine.Server/Release/net7.0/linux-x64/publish .
 COPY --from=build-ui /src/GameDocumentEngine.Server/wwwroot ./wwwroot
+COPY --from=build-ui /i18n ./i18n
+
 
 ENTRYPOINT ["dotnet", "GameDocumentEngine.Server.dll"]
