@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { documentSchema } from '../defineDocument';
+import { documentSchema } from '@/documents/defineDocument';
 import ClockSchema from './schema';
 
 export type Clock = z.infer<typeof ClockSchema>;

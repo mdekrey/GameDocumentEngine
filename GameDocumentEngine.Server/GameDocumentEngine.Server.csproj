@@ -46,19 +46,6 @@
 	<ItemGroup>
 		<OpenApiSchemaCSharpServerOptions Include="Api\codegen.config.yaml" />
 		<OpenApiSchemaMvcServer Include="$(SolutionRoot)schemas\api.yaml" Link="Api\api.yaml" />
-		<EmbeddedResource Include="$(SolutionRoot)schemas\documents\*.json">
-			<LogicalName>Documents.Types.%(FileName).schema.json</LogicalName>
-			<Link>Documents/Types/%(FileName)/schema.json</Link>
-		</EmbeddedResource>
-		<EmbeddedResource Include="Documents\Types\*\document-type.json" />
-		<GameTypeFolder Include="$([System.IO.Directory]::GetDirectories($(SolutionRoot)GameDocumentEngine.Ui\src\game-types\,*))"
-			 Condition="Exists('$(SolutionRoot)\GameDocumentEngine.Ui\GameDocumentEngine.Ui.esproj')">
-			<FolderName>$([System.IO.Path]::GetFileName(%(Identity)))</FolderName>
-		</GameTypeFolder>
-		<EmbeddedResource Include="@(GameTypeFolder->'%(Identity)/game-type.json')">
-			<LogicalName>GameTypes.%(FolderName).game-type.json</LogicalName>
-			<Link>GameTypes/%(FolderName)/schema.json</Link>
-		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,6 +1,6 @@
 import { useFormFields } from '@/utils/form/useFormFields';
-import type { GameObjectFormComponent } from '../defineDocument';
-import { useSubmitOnChange } from '../useSubmitOnChange';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
+import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import type { Conflict } from './conflict-types';
 import { OrganizerForm } from './parts/organizer-form';
 import { GeneralDisplay } from './parts/general-display';

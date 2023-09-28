@@ -1,4 +1,4 @@
-[submodule "GameDocumentEngine.Ui/src/documents/mouseguard-assets"]
-	path = GameDocumentEngine.Ui/src/documents/mouseguard-assets
+[submodule "GameDocumentEngine.Ui/src/doc-types/mouseguard-assets"]
+	path = GameDocumentEngine.Ui/src/doc-types/mouseguard-assets
 	url = https://github.com/mdekrey/foundryvtt-mouseguard-svelte.git
 	branch = assets-only

@@ -1,12 +1,12 @@
 import '@/utils/api/queries';
-import type { GameObjectFormComponent } from '../defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { ClockSvg } from './clock-svg';
 import { ClockEdit } from './clock-edit';
 import type { Clock } from './clock-types';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { AtomContents } from '@/components/jotai/atom-contents';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { useSubmitOnChange } from '../useSubmitOnChange';
+import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 
 export function Clock({
 	form,

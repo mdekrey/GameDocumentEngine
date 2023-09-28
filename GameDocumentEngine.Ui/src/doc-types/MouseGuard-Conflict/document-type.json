@@ -2,7 +2,7 @@
 	"name": "MouseGuard-Conflict",
 	"script": {
 		"type": "manifest",
-		"path": "src/documents/mouseguard-conflict/index.ts"
+		"path": "src/doc-types/MouseGuard-Conflict/index.ts"
 	},
 	"roles": {
 		"organizer": {

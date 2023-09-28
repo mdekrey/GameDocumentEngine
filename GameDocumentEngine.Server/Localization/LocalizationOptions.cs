@@ -3,8 +3,8 @@
 #pragma warning disable
 public class LocalizationOptions
 {
-	public string BundleRoot { get; set; }
-	public string StandardRoot { get; set; }
-	public string GameTypesRoot { get; set; }
-	public string DocumentTypesRoot { get; set; }
+	public string BundlePath { get; set; }
+	public string StandardPath { get; set; }
+	public string GameTypesPath { get; set; }
+	public string DocumentTypesPath { get; set; }
 }

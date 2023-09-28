@@ -7,6 +7,7 @@ using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Documents.Types;
+using GameDocumentEngine.Server.DynamicTypes;
 using GameDocumentEngine.Server.GameTypes;
 using GameDocumentEngine.Server.Localization;
 using GameDocumentEngine.Server.Realtime;
@@ -19,6 +20,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -116,28 +118,41 @@ services.AddTransient<JsonSchemaResolver>();
 services.AddSingleton<GameTypes>();
 services.AddSingleton<RollupManifestManager>();
 
+var dynamicTypeOptions = builder.Configuration.GetSection("DynamicTypes").Get<DynamicTypeOptions>();
+if (dynamicTypeOptions?.GameTypesRoot == null || dynamicTypeOptions.DocumentTypesRoot == null || dynamicTypeOptions.DocumentSchemaPath == null)
+	throw new InvalidOperationException("Configuration invalid, check DynamicTypes key");
+
 var gameObjectTypes = new List<IGameObjectType>();
-foreach (var gameObjectTypeJson in typeof(JsonGameObjectType).Assembly.GetManifestResourceNames().Where(n => n.EndsWith(".document-type.json")))
+foreach (var gameObjectTypeFolderPath in Directory.GetDirectories(dynamicTypeOptions.DocumentTypesRoot))
 {
-	using var stream = typeof(JsonGameObjectType).Assembly.GetManifestResourceStream(gameObjectTypeJson);
-	if (stream == null) throw new InvalidOperationException("Could not load embedded stream");
+	var gameObjectTypeName = Path.GetFileName(gameObjectTypeFolderPath);
+	var path = Path.Combine(gameObjectTypeFolderPath, "document-type.json");
+	if (!File.Exists(path)) continue;
+	using var stream = File.OpenRead(path)
+		?? throw new InvalidOperationException($"Could not load file at {path}");
 	var gameObjectType = JsonSerializer.Deserialize<JsonGameObjectType>(stream);
 	if (gameObjectType != null)
 	{
+		if (gameObjectType.Key != gameObjectTypeName)
+			throw new InvalidOperationException($"Key mismatch; expected {gameObjectTypeName} got {gameObjectType.Key}");
 		gameObjectTypes.Add(gameObjectType);
 		services.AddSingleton<IGameObjectType>(gameObjectType);
 	}
 }
 
-foreach (var gameTypeJson in typeof(JsonGameTypeBuilder).Assembly.GetManifestResourceNames().Where(n => n.EndsWith(".game-type.json")))
+foreach (var gameTypeFolderPath in
+	Directory.GetDirectories(dynamicTypeOptions.GameTypesRoot))
 {
-	using var stream = typeof(JsonGameTypeBuilder).Assembly.GetManifestResourceStream(gameTypeJson);
-	if (stream == null) throw new InvalidOperationException("Could not load embedded stream");
+	var path = Path.Combine(gameTypeFolderPath, "game-type.json");
+	if (!File.Exists(path)) continue;
+	using var stream = File.OpenRead(path)
+		?? throw new InvalidOperationException($"Could not load file at {path}");
 	var gameObjectType = JsonSerializer.Deserialize<JsonGameTypeBuilder>(stream);
 	if (gameObjectType != null)
 		services.AddSingleton(gameObjectType.Build(gameObjectTypes));
 }
 services.Configure<BuildOptions>(builder.Configuration.GetSection("Build"));
+services.Configure<DynamicTypeOptions>(builder.Configuration.GetSection("DynamicTypes"));
 services.Configure<LocalizationOptions>(builder.Configuration.GetSection("Localization"));
 
 services.AddAuthorization(options =>

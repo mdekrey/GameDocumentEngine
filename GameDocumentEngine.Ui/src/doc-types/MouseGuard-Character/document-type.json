@@ -2,6 +2,6 @@
 	"name": "MouseGuard-Character",
 	"script": {
 		"type": "manifest",
-		"path": "src/documents/mouseguard-character/index.ts"
+		"path": "src/doc-types/MouseGuard-Character/index.ts"
 	}
 }

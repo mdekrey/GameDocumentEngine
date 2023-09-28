@@ -1,5 +1,5 @@
 import { HiOutlineFolder } from 'react-icons/hi2';
-import { defineDocument } from '../defineDocument';
+import { defineDocument } from '@/documents/defineDocument';
 import { Sheet } from './sheet';
 import folderSchema from './schema';
 import type { z } from 'zod';

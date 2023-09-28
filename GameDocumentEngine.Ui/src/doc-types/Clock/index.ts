@@ -1,5 +1,5 @@
 import { HiOutlineClock } from 'react-icons/hi2';
-import { defineDocument } from '../defineDocument';
+import { defineDocument } from '@/documents/defineDocument';
 import { Clock } from './clock-widget';
 import clockSchema from './schema';
 import type { z } from 'zod';

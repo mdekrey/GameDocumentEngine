@@ -1,5 +1,5 @@
 import { GiSwordsEmblem } from 'react-icons/gi';
-import { defineDocument } from '../defineDocument';
+import { defineDocument } from '@/documents/defineDocument';
 import { ConflictSheet } from './conflict-sheet';
 import conflictSchema from './schema';
 import type { z } from 'zod';

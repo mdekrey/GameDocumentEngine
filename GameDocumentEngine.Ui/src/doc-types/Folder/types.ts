@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { documentSchema } from '../defineDocument';
+import { documentSchema } from '@/documents/defineDocument';
 import folderScheam from './schema';
 
 export type Folder = z.infer<typeof folderScheam>;

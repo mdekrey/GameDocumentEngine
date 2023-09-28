@@ -1,5 +1,5 @@
 import { GiSeatedMouse } from 'react-icons/gi';
-import { defineDocument } from '../defineDocument';
+import { defineDocument } from '@/documents/defineDocument';
 import { CharacterSheet } from './character-sheet';
 import characterSchema from './schema';
 import type { z } from 'zod';

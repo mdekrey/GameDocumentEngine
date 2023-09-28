@@ -8,26 +8,15 @@ import type { JSONSchema7 } from 'json-schema';
 
 const require = createRequire(import.meta.url);
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const documentSchemaDir = path.resolve(__dirname, '../../schemas/documents');
-const documentsDir = path.resolve(__dirname, '../src/documents');
+const rootPath = path.resolve(__dirname, '..');
+const documentSchemaGlob = 'src/doc-types/*/schema.json';
 
-const schemaExtension = '.json';
-
-const documentTypes = (
-	await glob(`*${schemaExtension}`, { cwd: documentSchemaDir })
-).map((file) => file.substring(0, file.length - schemaExtension.length));
+const documentSchemaPaths = await glob(documentSchemaGlob, { cwd: rootPath });
 
 await Promise.all(
-	documentTypes.map(async (documentType) => {
-		const schemaPath = path.resolve(
-			documentSchemaDir,
-			`${documentType}${schemaExtension}`,
-		);
-		const outPath = path.resolve(
-			documentsDir,
-			documentType.toLowerCase(),
-			'schema.ts',
-		);
+	documentSchemaPaths.map(async (documentSchemaPath) => {
+		const schemaPath = path.resolve(rootPath, documentSchemaPath);
+		const outPath = path.resolve(path.dirname(schemaPath), 'schema.ts');
 		const schema = require(schemaPath) as JSONSchema7;
 
 		const module = await jsonSchemaToZodDereffed(schema);
@@ -36,6 +25,6 @@ await Promise.all(
 		await new Promise((resolve, reject) =>
 			writeFile(outPath, module, (err) => (err ? reject(err) : resolve(true))),
 		);
-		console.log(`wrote schema for ${documentType}`);
+		console.log(`wrote schema for ${documentSchemaPath}`);
 	}),
 );

@@ -2,7 +2,7 @@
 	"name": "Folder",
 	"script": {
 		"type": "manifest",
-		"path": "src/documents/folder/index.ts"
+		"path": "src/doc-types/Folder/index.ts"
 	},
 	"roles": {
 		"owner": {

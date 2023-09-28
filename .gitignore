@@ -481,5 +481,5 @@ GameDocumentEngine.Server/wwwroot
 GameDocumentEngine.Ui/src/api/
 GameDocumentEngine.Server/setup.ps1
 GameDocumentEngine.Ui/.env
-GameDocumentEngine.Ui/src/documents/*/schema.ts
+GameDocumentEngine.Ui/src/doc-types/*/schema.ts
 eng/**/secrets.ps1

@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { documentSchema } from '../defineDocument';
+import { documentSchema } from '@/documents/defineDocument';
 import conflictSchema from './schema';
 
 export type Conflict = z.infer<typeof conflictSchema>;

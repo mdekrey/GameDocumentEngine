@@ -59,25 +59,25 @@ public class LocalizationController : LocalesControllerBase
 
 	private Task<JsonNode?> LoadDocType(string language, string docType)
 	{
-		return Load(localizationOptions.DocumentTypesRoot
+		return Load(localizationOptions.DocumentTypesPath
 			.Replace("<lang>", language)
 			.Replace("<documenttype>", docType));
 	}
 
 	private Task<JsonNode?> LoadGameType(string language, string gameType)
 	{
-		return Load(localizationOptions.GameTypesRoot
+		return Load(localizationOptions.GameTypesPath
 			.Replace("<lang>", language)
 			.Replace("<gametype>", gameType));
 	}
 
 	private async Task<JsonNode?> LoadOtherNamespace(string language, string ns)
 	{
-		var result = await Load(localizationOptions.StandardRoot
+		var result = await Load(localizationOptions.StandardPath
 			.Replace("<lang>", language)
 			.Replace("<namespace>", ns));
 		if (result != null) return result;
-		var bundle = await Load(localizationOptions.BundleRoot.Replace("<lang>", language));
+		var bundle = await Load(localizationOptions.BundlePath.Replace("<lang>", language));
 		return bundle?[ns];
 	}
 

@@ -2,7 +2,7 @@
 	"name": "Clock",
 	"script": {
 		"type": "manifest",
-		"path": "src/documents/clock/index.ts"
+		"path": "src/doc-types/Clock/index.ts"
 	},
 	"roles": {
 		"owner": {

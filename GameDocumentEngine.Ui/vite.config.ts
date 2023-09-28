@@ -59,7 +59,7 @@ export default defineConfig({
 		emptyOutDir: true,
 		assetsInlineLimit: 0,
 		rollupOptions: {
-			input: ['./index.html', ...globSync('./src/documents/*/index.ts')],
+			input: ['./index.html', ...globSync('./src/doc-types/*/index.ts')],
 			output: {
 				manualChunks(id) {
 					if (!id.startsWith(nodeModulesRoot)) {

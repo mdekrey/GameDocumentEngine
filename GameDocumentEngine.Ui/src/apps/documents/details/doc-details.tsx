@@ -67,13 +67,14 @@ export function DocumentDetailsForm<T = unknown>({
 		() => toEditableDetails(document.data, fixup),
 		[document.data, fixup],
 	);
-	const { t } = useTranslation(scripts.translationNamespace, {
+	const { t: fullTranslation } = useTranslation(scripts.translationNamespace);
+	const { t: formTranslation } = useTranslation(scripts.translationNamespace, {
 		keyPrefix: `document`,
 	});
 	const form = useForm({
 		defaultValue: fixup.toForm(editable.editable),
 		schema: documentSchema(scripts.typeInfo.schema),
-		translation: t,
+		translation: formTranslation,
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
 	updateFormDefaultMapped(form, editable.document, fixup);
@@ -136,7 +137,7 @@ export function DocumentDetailsForm<T = unknown>({
 				<Component
 					form={form}
 					onSubmit={onSubmit}
-					translation={t}
+					translation={fullTranslation}
 					readablePointers={editable.readablePointers}
 					writablePointers={editable.writablePointers}
 					objectRole={document.data.userRoles[user.data.id]}

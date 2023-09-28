@@ -1,7 +1,7 @@
 import type {
 	GameObjectFormComponent,
 	GameObjectWidgetProps,
-} from '../defineDocument';
+} from '@/documents/defineDocument';
 import { useMemo } from 'react';
 import type { UseFormResult } from '@/utils/form/useForm';
 import type { Character } from './character-types';
@@ -24,7 +24,7 @@ import { Conditions } from './parts/conditions';
 import type { TabConfig } from '@/components/tabs/tabs';
 import { Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
-import { useSubmitOnChange } from '../useSubmitOnChange';
+import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;

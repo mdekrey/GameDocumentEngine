@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 import { ZodNull } from 'zod';
-import { documentSchema } from '../defineDocument';
+import { documentSchema } from '@/documents/defineDocument';
 import characterSchema from './schema';
 
 export type Character = z.infer<typeof characterSchema>;

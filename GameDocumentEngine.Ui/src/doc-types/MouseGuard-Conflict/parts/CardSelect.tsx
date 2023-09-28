@@ -8,10 +8,10 @@ import type { FieldMapping } from '@/utils/form/useField';
 import type { SelectInputProps } from '@/components/form-fields/select-input/select-input';
 import type { ActionChoice } from '../conflict-types';
 import { actionChoices } from '../conflict-types';
-import attackCard from '@/documents/mouseguard-assets/deck/ActionDeckattack.webp';
-import defendCard from '@/documents/mouseguard-assets/deck/ActionDeckdefend.webp';
-import feintCard from '@/documents/mouseguard-assets/deck/ActionDeckfeint.webp';
-import maneuverCard from '@/documents/mouseguard-assets/deck/ActionDeckmaneuver.webp';
+import attackCard from '@/doc-types/mouseguard-assets/deck/ActionDeckattack.webp';
+import defendCard from '@/doc-types/mouseguard-assets/deck/ActionDeckdefend.webp';
+import feintCard from '@/doc-types/mouseguard-assets/deck/ActionDeckfeint.webp';
+import maneuverCard from '@/doc-types/mouseguard-assets/deck/ActionDeckmaneuver.webp';
 import type { FormFieldReturnType } from '@/utils/form/useForm';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 
