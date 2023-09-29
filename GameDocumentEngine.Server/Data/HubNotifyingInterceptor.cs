@@ -43,7 +43,7 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 		using Activity? activity = TracingHelper.StartActivity(nameof(NotifyChangesAsync));
 
 		var allBaseEntities = await GetEntitiesToNotify(context);
-		await NotifyEntitiesChanged(context, allBaseEntities);
+		await NotifyEntitiesChanged(context, allBaseEntities.DistinctBy(ToEntityKey));
 	}
 
 	private async Task<IEnumerable<EntityEntry>> GetEntitiesToNotify(DocumentDbContext context)
@@ -70,5 +70,17 @@ class HubNotifyingInterceptor : ISaveChangesInterceptor
 		{
 			await notifications.SendNotification(context, hubContext.Clients, changedEntity);
 		}
+	}
+
+	private static (string TypeName, string key) ToEntityKey(EntityEntry entry)
+	{
+		var result = (
+			entry.Metadata.Name,
+			string.Join(":::",
+				entry.Metadata.FindPrimaryKey()?.Properties.Select(p => entry.Property(p).CurrentValue?.ToString() ?? "null")
+					?? throw new InvalidOperationException("Cannot do change notifications entity without primary key")
+			)
+		);
+		return result;
 	}
 }
