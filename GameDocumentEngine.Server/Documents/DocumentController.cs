@@ -144,11 +144,16 @@ public class DocumentController : Api.DocumentControllerBase
 
 		var documents = await baseDocuments.ToArrayAsync();
 		var hasMore = remainingCount > documents.Length;
-		cursorParts.Set(nameof(afterName), documents.Last().Name);
-
-		var nextCursor = hasMore
-			? cursorProtector.Protect(cursorParts.ToString() ?? throw new InvalidOperationException("Cursor could not be created"))
-			: null;
+		string? nextCursor;
+		if (hasMore)
+		{
+			cursorParts.Set(nameof(afterName), documents.Last().Name);
+			nextCursor = cursorProtector.Protect(cursorParts.ToString() ?? throw new InvalidOperationException("Cursor could not be created"));
+		}
+		else
+		{
+			nextCursor = null;
+		}
 
 		return ListDocumentsActionResult.Ok(new ListDocumentsResponse(
 			Data: documents.ToDictionary(d => d.Id.ToString(), doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, doc.FolderId)),
