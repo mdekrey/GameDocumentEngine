@@ -63,7 +63,7 @@ public static class FilterExtensions
 			case null:
 				return null;
 			case JsonValue value:
-				// TODO: is this a Json.More bug with not using `NotNullIfNull`?
+				// TODO: is this a Json.More bug with not using `NotNullIfNotNull`?
 				return value.Copy() as JsonValue ?? throw new InvalidOperationException("The value was not a value");
 			default:
 				throw new InvalidOperationException("Unknown System.Text.Json.Nodes Type");
