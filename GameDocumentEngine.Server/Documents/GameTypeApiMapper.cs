@@ -3,6 +3,7 @@ using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Tracing;
 using Microsoft.Extensions.Caching.Memory;
 using static GameDocumentEngine.Server.Documents.GameSecurity;
+using static GameDocumentEngine.Server.Localization.Namespaces;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -39,7 +40,8 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 					UserRoles: gameType.Roles,
 					ObjectTypes: await Task.WhenAll(
 						gameType.ObjectTypes.Select(obj => GetGameObjectTypeFromCache(gameType, obj))
-					)
+					),
+					TranslationNamespace: $"{gameTypeNsPrefix}{gameType.Key}"
 				);
 	}
 
@@ -57,10 +59,11 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 	{
 		return new GameObjectTypeDetails(
 								Key: obj.Key,
-									Scripts: (await gameTypes.ResolveGameObjectScripts(obj)).Distinct(),
-									// Game types could have different roles eventually; for now, we use a hard-coded set
-									UserRoles: obj.PermissionLevels
-								);
+								Scripts: (await gameTypes.ResolveGameObjectScripts(obj)).Distinct(),
+								// Game types could have different roles eventually; for now, we use a hard-coded set
+								UserRoles: obj.PermissionLevels,
+								TranslationNamespace: $"{docTypeNsPrefix}{obj.Key}"
+							);
 	}
 
 	public Task<GameTypeDetails> ToApiBeforeChanges(DocumentDbContext dbContext, IGameType gameType) =>

@@ -798,8 +798,10 @@ components:
       required:
         - key
         - objectTypes
+        - translationNamespace
       properties:
         key: { type: string }
+        translationNamespace: { type: string }
         objectTypes: { type: array, items: { type: string } }
     GameTypeDetails:
       type: object
@@ -807,9 +809,11 @@ components:
         - key
         - objectTypes
         - userRoles
+        - translationNamespace
       properties:
         key: { type: string }
         userRoles: { type: array, items: { type: string } }
+        translationNamespace: { type: string }
         objectTypes:
           type: array
           items:
@@ -820,10 +824,12 @@ components:
         - key
         - scripts
         - userRoles
+        - translationNamespace
       properties:
         key: { type: string }
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
+        translationNamespace: { type: string }
   responses:
     "401":
       description: User was not authenticated

@@ -1,7 +1,6 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { FieldMapping } from '@/utils/form/useField';
 import type { UseFormResult } from '@/utils/form/useForm';
-import { i18n } from '@/utils/i18n/setup';
 import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
@@ -27,13 +26,13 @@ export type GameObjectWidgetProps<T = unknown> = {
 	documentId: string;
 	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
 	onUpdateDocument: Updater<T>;
-	translation: TFunction<`doc-types:${string}`, undefined>;
+	translation: TFunction;
 };
 
 export type GameObjectFormComponent<T = unknown> = {
 	form: UseFormResult<EditableDocumentDetails<T>>;
 	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
-	translation: TFunction<`doc-types:${string}`, undefined>;
+	translation: TFunction;
 	readablePointers: DocumentPointers;
 	writablePointers: DocumentPointers;
 	objectRole: string | undefined;
@@ -43,7 +42,6 @@ export type IGameObjectType<T = unknown> = {
 	icon: IconType;
 	template: T;
 	component: React.ComponentType<GameObjectFormComponent<T>>;
-	translations: Record<string, Record<string, unknown>>;
 	fixup: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>;
 	schema: z.ZodType<T>;
 	widgets?: Record<string, GameObjectWidgetProps<T>>;
@@ -70,11 +68,4 @@ export function defineDocument<T>(
 ) {
 	window.widgets ??= {};
 	window.widgets[name] = objectTypeDefinition as IGameObjectType;
-
-	const translationNamespace = `doc-types:${name}`;
-	for (const [language, resources] of Object.entries(
-		objectTypeDefinition.translations,
-	)) {
-		i18n.addResourceBundle(language, translationNamespace, resources);
-	}
 }

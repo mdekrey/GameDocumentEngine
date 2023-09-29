@@ -10,6 +10,7 @@ import {
 	applyEventToQuery,
 	applyPatchToQuery,
 } from './applyEventToQuery';
+import { i18n } from '@/utils/i18n/setup';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -18,6 +19,11 @@ export const listGameTypes = () => ({
 		if (response.statusCode !== 200) {
 			return Promise.reject(response);
 		}
+		await Promise.all(
+			Object.values(response.data).map(async (gt) =>
+				i18n.loadNamespaces(gt.translationNamespace),
+			),
+		);
 		return response.data;
 	},
 });

@@ -3,6 +3,7 @@ import type { QueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 import type { IGameObjectType } from '@/documents/defineDocument';
 import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
+import { i18n } from '@/utils/i18n/setup';
 
 export function getGameType(
 	gameType: string,
@@ -17,14 +18,12 @@ export function getGameType(
 	};
 }
 
-export type GameTypeScripts = {
+export type GameTypeScripts = GameTypeDetails & {
 	objectTypes: Record<string, GameTypeObjectScripts>;
-	translationNamespace: `game-types:${string}`;
 };
 
-export type GameTypeObjectScripts<T = unknown> = {
+export type GameTypeObjectScripts<T = unknown> = GameObjectTypeDetails & {
 	typeInfo: IGameObjectType<T>;
-	translationNamespace: `doc-types:${string}`;
 };
 
 export function getGameTypeScripts(
@@ -49,7 +48,6 @@ export function getGameTypeScripts(
 						),
 					),
 				),
-				translationNamespace: `game-types:${gameTypeKey}`,
 			} as GameTypeScripts;
 		},
 	};
@@ -93,11 +91,12 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 								reject(error);
 							}
 						}),
+					i18n.loadNamespaces(objectType.translationNamespace),
 				),
 			);
 
 			return {
-				translationNamespace: `doc-types:${objectType.key}`,
+				...objectType,
 				typeInfo: window.widgets[objectType.key],
 			};
 		},

@@ -21,7 +21,7 @@ export function ReviewRevealed({
 	yourSide: null | FormFieldReturnType<SideState>;
 	yourSideRevealed: undefined | ActionChoice[];
 	otherSideRevealed: undefined | ActionChoice[];
-	translation: TFunction<`doc-types:${string}`, undefined>;
+	translation: TFunction;
 }) {
 	return (
 		<section className="flex flex-col gap-4">
@@ -58,7 +58,7 @@ function ClearButtonRow({
 	translation,
 }: {
 	yourSide: FormFieldReturnType<SideState>;
-	translation: TFunction<`doc-types:${string}`, undefined>;
+	translation: TFunction;
 }) {
 	const field = useFormFields(yourSide, {
 		ready: ['ready'],

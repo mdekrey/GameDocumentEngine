@@ -7,7 +7,7 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { useForm } from '@/utils/form/useForm';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
@@ -47,7 +47,10 @@ export function CreateGame() {
 						>
 							{(gt) =>
 								gt ? (
-									<>{getGameTypeName(gt)}</>
+									<Trans
+										ns={gameTypesResult.data?.[gt].translationNamespace}
+										i18nKey={'name'}
+									/>
 								) : (
 									<span className="text-slate-500">
 										{gameForm.field(['type']).translation('not-selected')}
@@ -67,9 +70,5 @@ export function CreateGame() {
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {
 		createGame.mutate(currentValue);
-	}
-
-	function getGameTypeName(gameType: string) {
-		return t('name', { ns: `game-types:${gameType}` });
 	}
 }

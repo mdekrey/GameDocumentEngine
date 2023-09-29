@@ -20,7 +20,7 @@ export function GeneralDisplay({
 	isSideBFirst,
 }: {
 	conflictAtom: Atom<ConflictDocument>;
-	translation: TFunction<`doc-types:${string}`, undefined>;
+	translation: TFunction;
 	sideA: FormFieldReturnType<SideState>;
 	sideB: FormFieldReturnType<SideState>;
 	isSideBFirst: boolean;

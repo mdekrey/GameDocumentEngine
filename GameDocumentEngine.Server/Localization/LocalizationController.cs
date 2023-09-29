@@ -3,13 +3,12 @@ using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
+using static GameDocumentEngine.Server.Localization.Namespaces;
 
 namespace GameDocumentEngine.Server.Localization;
 
 public class LocalizationController : LocalesControllerBase
 {
-	private const string docTypeNsPrefix = "doc-types:";
-	private const string gameTypeNsPrefix = "game-types:";
 	private readonly LocalizationOptions localizationOptions;
 
 	public LocalizationController(IOptions<LocalizationOptions> options)

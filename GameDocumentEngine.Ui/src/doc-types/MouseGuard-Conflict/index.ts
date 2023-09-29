@@ -39,6 +39,5 @@ defineDocument('MouseGuard-Conflict', {
 	} satisfies z.infer<typeof conflictSchema>,
 	component: ConflictSheet,
 	schema: conflictSchema,
-	translations: {},
 	fixup: conflictFixup,
 });

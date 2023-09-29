@@ -3,7 +3,6 @@ import { defineDocument } from '@/documents/defineDocument';
 import { CharacterSheet } from './character-sheet';
 import characterSchema from './schema';
 import type { z } from 'zod';
-// import en from './en.json';
 import { characterFixup } from './fixupCharacter';
 
 defineDocument('MouseGuard-Character', {
@@ -31,6 +30,5 @@ defineDocument('MouseGuard-Character', {
 	} satisfies z.infer<typeof characterSchema>,
 	component: CharacterSheet,
 	schema: characterSchema,
-	translations: {},
 	fixup: characterFixup,
 });

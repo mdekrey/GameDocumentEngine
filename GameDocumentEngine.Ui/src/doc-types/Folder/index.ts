@@ -3,7 +3,6 @@ import { defineDocument } from '@/documents/defineDocument';
 import { Sheet } from './sheet';
 import folderSchema from './schema';
 import type { z } from 'zod';
-// import en from './en.json';
 import { fixup } from './fixup';
 
 defineDocument('Folder', {
@@ -11,6 +10,5 @@ defineDocument('Folder', {
 	template: {} satisfies z.infer<typeof folderSchema>,
 	component: Sheet,
 	schema: folderSchema,
-	translations: {},
 	fixup: fixup,
 });
