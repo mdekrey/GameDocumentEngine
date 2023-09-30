@@ -1,7 +1,8 @@
-import type { WritableAtom } from 'jotai';
+import type { Atom, WritableAtom } from 'jotai';
 import { atom } from 'jotai';
 import type { AnyPath } from './path';
 import { produce } from 'immer';
+import { isAtom } from '@principlestudios/jotai-react-signals';
 
 export type SetStateNoInitialAction<T> = (prev: T | undefined) => T;
 export type NoInitialWritableAtom<Value> = WritableAtom<
@@ -20,6 +21,27 @@ export type PerFieldState<T extends FieldStatePrimitive> =
 
 export type FieldStateAtom<T extends FieldStatePrimitive> =
 	NoInitialWritableAtom<PerFieldState<T>>;
+
+export function toWritableAtom<T extends FieldStatePrimitive>(
+	value: PerFieldState<T> | Atom<PerFieldState<T>>,
+): FieldStateAtom<T> {
+	const fieldState = atom(value);
+	if (!isAtom(value)) return toAtomFieldState(value);
+	return atom(
+		(get) => {
+			const temp = get(fieldState);
+			return isAtom(temp) ? get(temp) : temp;
+		},
+		(get, set, action) => {
+			let temp = get(fieldState);
+			temp = isAtom(temp) ? get(temp) : temp;
+			set(
+				fieldState,
+				typeof action === 'function' ? action(temp) : () => action,
+			);
+		},
+	);
+}
 
 export function walkFieldState<T extends FieldStatePrimitive>(
 	fieldState: PerFieldState<T>,
@@ -40,10 +62,10 @@ export function walkFieldState<T extends FieldStatePrimitive>(
 
 function ensureValue<T extends FieldStatePrimitive>(
 	fieldState: PerFieldState<T>,
-) {
+): T {
 	if (typeof fieldState === 'object' && defaultField in fieldState)
-		return fieldState[defaultField];
-	return fieldState;
+		return ensureValue(fieldState[defaultField]);
+	return fieldState as T;
 }
 
 export function toAtomFieldState<T extends FieldStatePrimitive>(
@@ -102,7 +124,7 @@ export function toFieldStateValue<T extends FieldStatePrimitive>(
 	fieldState: FieldStateAtom<T>,
 ): NoInitialWritableAtom<T> {
 	return atom(
-		(get) => ensureValue(get(fieldState)) as T,
+		(get) => ensureValue(get(fieldState)),
 		(get, set, action) => {
 			set(
 				fieldState,

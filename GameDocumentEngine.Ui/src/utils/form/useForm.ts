@@ -42,7 +42,7 @@ import type {
 import {
 	toAtomFieldState,
 	walkFieldStateAtom,
-	toFieldStateValue,
+	toWritableAtom,
 } from './fieldStateTracking';
 import { useConstant } from './useConstant';
 
@@ -262,6 +262,25 @@ export function buildFormFields<
 	}
 }
 
+// export function buildFormField<
+// 	T,
+// 	TFields extends FieldsConfig<T> = Record<never, never>,
+// >(fields: TFields, config: FormResultContext<T>): FormFields<T, TFields> {
+// 	return typeof config === 'function'
+// 	? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+// 	  (...args: AnyArray) => innerToField(config(...args))
+// 	: innerToField(config);
+
+// 	function innerToField(config: FieldConfigOrPath<T>) {
+// 		return toField<T, Path<T>, unknown>(
+// 			toConfigObject<T, unknown, FieldConfigOrPath<T, unknown>>(
+// 				config,
+// 			) as FieldConfig<T, Path<T>, unknown>,
+// 			params,
+// 		);
+// 	}
+// }
+
 function toField<T, TPath extends Path<T>, TValue>(
 	config: FieldConfig<T, TPath, TValue>,
 	context: FormResultContext<T>,
@@ -297,20 +316,21 @@ function toField<T, TPath extends Path<T>, TValue>(
 	};
 
 	function substateAtom<TState extends FieldStatePrimitive>(
-		value: undefined | FieldStateOverride<PathValue<T, TPath>, TState>,
+		value:
+			| undefined
+			| FieldStateOverride<T, PathValue<T, TPath>, TValue, TState>,
 		state: FieldStateAtom<TState>,
-	): FieldStateCallback<TState, PathValue<T, TPath>> {
+	):
+		| FieldStateAtom<TState>
+		| FieldStateCallback<PerFieldState<TState>, PathValue<T, TPath>, TValue> {
 		// These are tchnically giving back structured results, but that is _probably_ okay
 		// FIXME: it would be nice make these types correct and not use `as`
 		if (typeof value === 'function') {
-			return value as FieldStateCallback<TState, PathValue<T, TPath>>;
+			return (props) => value({ ...props, value: context.atom });
 		}
-		return () =>
-			value === undefined
-				? (toFieldStateValue(
-						walkFieldStateAtom(state, config.path as AnyPath),
-				  ) as Atom<TState>)
-				: atom(value as TState);
+		if (value === undefined)
+			return walkFieldStateAtom(state, config.path as AnyPath);
+		return toWritableAtom(value);
 	}
 }
 

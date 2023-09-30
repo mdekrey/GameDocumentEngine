@@ -68,8 +68,8 @@ export function CreateInvite({
 				path: ['uses'],
 				mapping: positiveIntegerMapping,
 				// TODO: why does this parameter need to be explicitly typed?
-				disabled: (v: FieldStateContext<number>) =>
-					atom((get) => get(v.value) < 1),
+				disabled: (v: FieldStateContext<number, string>) =>
+					atom((get) => get(v.originalValue) < 1),
 			},
 			role: ['role'],
 			isUnlimited: {

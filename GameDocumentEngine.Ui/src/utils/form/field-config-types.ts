@@ -2,8 +2,9 @@ import type { AnyArray } from './arrays';
 import { isArray } from './arrays';
 import type { ZodType } from 'zod';
 import type { AnyPath, Path, PathValue } from './path';
-import type { FieldMapping, FieldStateCallback } from './useField';
+import type { FieldMapping, FieldStateContext } from './useField';
 import type { FieldStatePrimitive, PerFieldState } from './fieldStateTracking';
+import type { Atom } from 'jotai';
 
 export type UnmappedFieldConfig<T, TPath extends Path<T> = Path<T>> = {
 	path: TPath;
@@ -25,10 +26,33 @@ export type UntypedFieldConfigObject<TValue> = {
 	mapping?: FieldMapping<any, TValue>;
 };
 
-export type FieldStateOverride<TField, TState extends FieldStatePrimitive> =
+export type FormFieldStateContext<TFormValue, TOriginalValue, TDerivedValue> = {
+	value: Atom<TFormValue>;
+} & FieldStateContext<TOriginalValue, TDerivedValue>;
+
+export type FormFieldStateCallback<
+	T,
+	TFormValue,
+	TOriginalValue,
+	TDerivedValue,
+> = (
+	context: FormFieldStateContext<TFormValue, TOriginalValue, TDerivedValue>,
+) => Atom<T>;
+
+export type FieldStateOverride<
+	TFormValue,
+	TOriginalValue,
+	TDerivedValue,
+	TState extends FieldStatePrimitive,
+> =
 	| PerFieldState<TState>
 	| import('jotai').Atom<PerFieldState<TState>>
-	| FieldStateCallback<PerFieldState<TState>, TField>;
+	| FormFieldStateCallback<
+			PerFieldState<TState>,
+			TFormValue,
+			TOriginalValue,
+			TDerivedValue
+	  >;
 
 export type FieldConfig<
 	T,
@@ -38,8 +62,8 @@ export type FieldConfig<
 	path: TPath;
 	schema?: ZodType<TValue>;
 	translationPath?: AnyPath;
-	disabled?: FieldStateOverride<PathValue<T, TPath>, boolean>;
-	readOnly?: FieldStateOverride<PathValue<T, TPath>, boolean>;
+	disabled?: FieldStateOverride<T, PathValue<T, TPath>, TValue, boolean>;
+	readOnly?: FieldStateOverride<T, PathValue<T, TPath>, TValue, boolean>;
 } & ([PathValue<T, TPath>] extends [TValue]
 	? {
 			mapping?: FieldMapping<PathValue<T, TPath>, PathValue<T, TPath>>;
@@ -47,6 +71,30 @@ export type FieldConfig<
 	: {
 			mapping: FieldMapping<PathValue<T, TPath>, TValue>;
 	  });
+
+/** To be used with InferredFieldConfig to defer enforcing type assignment */
+export type BaseAnyFieldConfig<T> = Path<T> | { path: Path<T> };
+
+export type InferredFieldConfig<
+	T,
+	TConfig extends BaseAnyFieldConfig<T>,
+> = TConfig extends { path: infer TPath }
+	? TPath extends Path<T>
+		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+		  TConfig extends { mapping: FieldMapping<PathValue<T, TPath>, any> }
+			? TConfig extends MappedFieldConfig<T, TPath, infer TValue>
+				? FieldConfig<T, TPath, TValue>
+				: FieldConfig<T, TPath, PathValue<T, TPath>>
+			: {
+					path: {
+						ERROR: `Mapping is not valid for type`;
+						expectedType: PathValue<T, TPath>;
+					};
+			  }
+		: {
+				path: { ERROR: `Path is not valid for type`; validPaths: Path<T> };
+		  }
+	: Path<T>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FieldConfigOrPath<T, TFieldType = any> =
@@ -62,7 +110,7 @@ export type FieldsConfig<T> = {
 
 export type FieldConfigToType<
 	T,
-	TFieldConfig extends FieldConfigOrPath<T>,
+	TFieldConfig extends BaseAnyFieldConfig<T>,
 > = TFieldConfig extends Path<T>
 	? PathValue<T, TFieldConfig>
 	: TFieldConfig extends MappedFieldConfig<T, Path<T>, infer TValue>

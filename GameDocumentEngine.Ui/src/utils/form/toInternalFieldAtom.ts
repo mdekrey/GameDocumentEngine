@@ -6,33 +6,23 @@ import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
+import type { FieldStateContext } from './useField';
 import {
-	noErrorsAtom,
 	type CheckboxHtmlProps,
 	type ControlledHtmlProps,
 	type FieldMapping,
 	type FieldOptions,
-	type FieldStateBoolean,
-	type FieldStateContext,
 	type InputHtmlProps,
 	type ToHtmlInputProps,
 	type ToHtmlProps,
 	type UseFieldResult,
+	noErrorsAtom,
 } from './useField';
 import { FieldEvents } from './events/FieldEvents';
 import type { RegisterErrorStrategy } from './errorsStrategy';
 import type { ZodType } from 'zod';
-
-function toFieldStateAtom<TValue>(
-	value: FieldStateBoolean<TValue>,
-	context: FieldStateContext<TValue>,
-): Atom<boolean> {
-	return typeof value === 'boolean'
-		? atom(value)
-		: typeof value === 'function'
-		? value(context)
-		: value;
-}
+import type { PerFieldState } from './fieldStateTracking';
+import { toFieldStateValue, toWritableAtom } from './fieldStateTracking';
 
 const identity = <T>(orig: T) => orig;
 export function toInternalFieldAtom<TValue, TFieldValue>(
@@ -64,18 +54,21 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 			: createErrorsAtom(fieldValueAtom, schema)
 		: undefined;
 
-	const fieldStateContext: FieldStateContext<TValue> = {
-		value: fieldValueAtom,
+	const fieldStateContext: FieldStateContext<TValue, TFieldValue> = {
+		originalValue: fieldValueAtom,
+		mappedValue: formValueAtom,
 		errors: errors ?? noErrorsAtom,
 	};
-	const disabled = toFieldStateAtom<TValue>(
-		options.disabled ?? false,
-		fieldStateContext,
-	);
-	const readOnly = toFieldStateAtom<TValue>(
-		options.readOnly ?? false,
-		fieldStateContext,
-	);
+	const deepDisabled =
+		typeof options.disabled === 'function'
+			? toWritableAtom(options.disabled(fieldStateContext))
+			: options.disabled ?? atom<PerFieldState<boolean>>(false);
+	const deepReadOnly =
+		typeof options.readOnly === 'function'
+			? toWritableAtom(options.readOnly(fieldStateContext))
+			: options.readOnly ?? atom<PerFieldState<boolean>>(false);
+	const disabled = toFieldStateValue(deepDisabled);
+	const readOnly = toFieldStateValue(deepReadOnly);
 
 	const setValue = (v: TFieldValue | ((prev: TFieldValue) => TFieldValue)) => {
 		if (store.get(disabled) || store.get(readOnly)) return;
@@ -104,6 +97,8 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		): UseFieldResult<TNew, any> => {
 			const newOptions: Partial<FieldOptions<TValue, TNew>> = {
 				...options,
+				disabled: deepDisabled,
+				readOnly: deepReadOnly,
 				mapping: {
 					toForm: (v) => newMapping.toForm(mapping.toForm(v)),
 					fromForm: (v) => {

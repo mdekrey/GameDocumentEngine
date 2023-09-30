@@ -10,6 +10,7 @@ import type { FormEvents } from './events/FormEvents';
 import type { IfTrueThenProp } from './type-helpers';
 import type { noChange } from './mapAtom';
 import { useConstant } from './useConstant';
+import type { FieldStateAtom, PerFieldState } from './fieldStateTracking';
 
 export type FieldTranslatablePart =
 	| ['label']
@@ -96,20 +97,17 @@ export type FieldMapping<TValue, TFormFieldValue> = {
 
 //
 export const noErrorsAtom: ErrorsAtom = atom({ state: 'hasData', data: null });
-export type FieldStateContext<TFieldValue> = {
-	value: Atom<TFieldValue>;
-	/** If no schema is provided, will be noErrorsAtom */
-	errors: ErrorsAtom;
-};
+export type FieldStateContext<TOriginalValue, TDerivedValue> = {
+	originalValue: Atom<TOriginalValue>;
+	mappedValue: Atom<TDerivedValue>;
+} & IfTrueThenProp<
+	true /* TODO: take flags into account: TFlags['hasErrors'] */,
+	{ errors: ErrorsAtom }
+>;
 
-export type FieldStateCallback<T, TValue> = (
-	context: FieldStateContext<TValue>,
+export type FieldStateCallback<T, TOriginalValue, TDerivedValue> = (
+	context: FieldStateContext<TOriginalValue, TDerivedValue>,
 ) => Atom<T>;
-
-export type FieldStateBoolean<TValue> =
-	| boolean
-	| Atom<boolean>
-	| FieldStateCallback<boolean, TValue>;
 
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;
@@ -117,8 +115,12 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 	errorStrategy: RegisterErrorStrategy;
 	formEvents: FormEvents;
 	translation: FieldTranslation;
-	disabled: FieldStateBoolean<TValue>;
-	readOnly: FieldStateBoolean<TValue>;
+	disabled:
+		| FieldStateAtom<boolean>
+		| FieldStateCallback<PerFieldState<boolean>, TValue, TFormFieldValue>;
+	readOnly:
+		| FieldStateAtom<boolean>
+		| FieldStateCallback<PerFieldState<boolean>, TValue, TFormFieldValue>;
 };
 type UnmappedOptions<TValue> = Omit<
 	Partial<FieldOptions<TValue, TValue>>,
