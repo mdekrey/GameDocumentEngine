@@ -58,6 +58,6 @@ export function getAtomForPath<T, TPath extends Path<T>>(
 				return applyPatches(prev as Objectish, finalPatches) as T;
 			}),
 	);
-	resultAtom.debugLabel = steps.join('/') + `#${Math.random()}`;
+	resultAtom.debugLabel = (steps as AnyPath).join('/') + `#${Math.random()}`;
 	return resultAtom;
 }

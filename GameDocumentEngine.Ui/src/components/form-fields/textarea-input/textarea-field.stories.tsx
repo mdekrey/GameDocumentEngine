@@ -27,11 +27,18 @@ const meta = {
 		readOnly: false,
 	},
 	decorators: [formFieldDecorator],
-	render: function RenderTextareaFieldStory({ disabled, ...props }: Props) {
+	render: function RenderTextareaFieldStory({
+		disabled,
+		readOnly,
+		...props
+	}: Props) {
+		const disabledAtom = useComputedAtom(() => disabled);
+		const readonlyAtom = useComputedAtom(() => readOnly);
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
 			schema: z.string().ip(),
-			disabled: useComputedAtom(() => disabled),
+			disabled: (_, get) => get(disabledAtom),
+			readOnly: (_, get) => get(readonlyAtom),
 		});
 		return <TextareaField {...props} field={myField} />;
 	},

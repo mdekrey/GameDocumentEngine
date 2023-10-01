@@ -31,11 +31,13 @@ const meta = {
 	},
 	decorators: [formFieldDecorator],
 	render: function RenderSelectFieldStory({ readOnly, disabled, ...props }) {
+		const disabledAtom = useComputedAtom(() => disabled);
+		const readonlyAtom = useComputedAtom(() => readOnly);
 		const myField = useField('', {
 			translation: (key) => (typeof key === 'string' ? key : key.join('.')),
 			schema: z.string().ip(),
-			disabled: useComputedAtom(() => disabled),
-			readOnly: useComputedAtom(() => readOnly),
+			disabled: (_, get) => get(disabledAtom),
+			readOnly: (_, get) => get(readonlyAtom),
 		});
 
 		return (
