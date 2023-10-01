@@ -72,7 +72,7 @@ type ArrayPathInternal<T, TraversedTypes = T> = T extends ReadonlyArray<infer V>
 	  }[keyof T];
 type ArrayPath<T> = T extends any ? ArrayPathInternal<T> : never;
 
-export type Path<T> = T extends any ? PathInternal<T> : never;
+export type Path<T> = IfAny<T, any, T extends any ? PathInternal<T> : never>;
 export type PathValue<T, P extends Path<T> | ArrayPath<T>> = IfAny<
 	P,
 	any,

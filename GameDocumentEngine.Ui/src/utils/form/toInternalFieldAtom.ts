@@ -6,7 +6,7 @@ import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
-import type { FieldStateContext } from './useField';
+import type { FieldStateCallback, FieldStateContext } from './useField';
 import {
 	type CheckboxHtmlProps,
 	type ControlledHtmlProps,
@@ -59,13 +59,19 @@ export function toInternalFieldAtom<TValue, TFieldValue>(
 		mappedValue: formValueAtom,
 		errors: errors ?? noErrorsAtom,
 	};
+	function contextToAtom<TState>(
+		callback: FieldStateCallback<TState, TValue, TFieldValue>,
+	) {
+		return atom((get) => callback(fieldStateContext, get));
+	}
+
 	const deepDisabled =
 		typeof options.disabled === 'function'
-			? toWritableAtom(options.disabled(fieldStateContext))
+			? toWritableAtom(contextToAtom(options.disabled))
 			: options.disabled ?? atom<PerFieldState<boolean>>(false);
 	const deepReadOnly =
 		typeof options.readOnly === 'function'
-			? toWritableAtom(options.readOnly(fieldStateContext))
+			? toWritableAtom(contextToAtom(options.readOnly))
 			: options.readOnly ?? atom<PerFieldState<boolean>>(false);
 	const disabled = toFieldStateValue(deepDisabled);
 	const readOnly = toFieldStateValue(deepReadOnly);

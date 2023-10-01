@@ -1,4 +1,4 @@
-import type { Atom, PrimitiveAtom } from 'jotai';
+import type { Atom, Getter, PrimitiveAtom } from 'jotai';
 import { atom, useStore } from 'jotai';
 import { useMemo } from 'react';
 import type { ZodError, ZodType } from 'zod';
@@ -107,7 +107,8 @@ export type FieldStateContext<TOriginalValue, TDerivedValue> = {
 
 export type FieldStateCallback<T, TOriginalValue, TDerivedValue> = (
 	context: FieldStateContext<TOriginalValue, TDerivedValue>,
-) => Atom<T>;
+	get: Getter,
+) => T;
 
 export type FieldOptions<TValue, TFormFieldValue> = {
 	schema: ZodType<TValue>;

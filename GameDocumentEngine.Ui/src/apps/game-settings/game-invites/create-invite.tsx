@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { FormFieldReturnTypeFromConfig } from '@/utils/form/useForm';
 import { useForm } from '@/utils/form/useForm';
 import { Button } from '@/components/button/button';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
@@ -16,8 +17,16 @@ import { noChange } from '@/utils/form/mapAtom';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { createInvitation } from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
+import type { Getter } from 'jotai';
 import { atom } from 'jotai';
 import { useFormField } from '@/utils/form/useFormFields';
+import type {
+	BaseAnyFieldConfig,
+	FieldConfig,
+	InferredFieldConfigParams,
+	FormFieldStateContext,
+} from '@/utils/form/field-config-types';
+import { FormFieldStateContextAtom } from '@/utils/form/field-config-types';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -45,6 +54,25 @@ const positiveIntegerMapping: FieldMapping<number, string> = {
 	},
 };
 
+type FormType = z.infer<typeof CreateInviteForm>;
+
+type Target = BaseAnyFieldConfig<FormType>;
+type TargetConfig = FieldConfig<FormType, readonly ['uses'], any>['mapping'];
+type Temp = InferredFieldConfigParams<
+	FormType,
+	{
+		path: ['uses'];
+		mapping: typeof unlimitedCheckboxMapping;
+	}
+>;
+type TempFull = FormFieldReturnTypeFromConfig<
+	FormType,
+	{
+		path: ['uses'];
+		mapping: typeof unlimitedCheckboxMapping;
+	}
+>;
+
 export function CreateInvite({
 	resolve,
 	reject,
@@ -69,8 +97,10 @@ export function CreateInvite({
 				path: ['uses'],
 				mapping: positiveIntegerMapping,
 				// TODO: why does this parameter need to be explicitly typed?
-				disabled: (v: FieldStateContext<number, string>) =>
-					atom((get) => get(v.originalValue) < 1),
+				disabled: (
+					v: FormFieldStateContext<FormType, number, string>,
+					get: Getter,
+				) => get(v.originalValue) < 1,
 			},
 			role: ['role'],
 			isUnlimited: {
@@ -80,10 +110,15 @@ export function CreateInvite({
 			},
 		},
 	});
-	const temp = useFormField(form, {
+	const tempUses = useFormField(form, {
 		path: ['uses'],
 		mapping: positiveIntegerMapping,
-		disabled: (v) => atom((get) => get(v.originalValue) < 1),
+		disabled: (v, get) => get(v.value).uses < 1,
+	});
+	const tempIsUnlimited = useFormField(form, {
+		path: ['uses'],
+		translationPath: ['isUnlimited'],
+		mapping: unlimitedCheckboxMapping,
 	});
 
 	const allowedRoles = gameData.typeInfo.userRoles.filter((role) =>
@@ -107,6 +142,8 @@ export function CreateInvite({
 					</SelectField>
 					<CheckboxField field={form.fields.isUnlimited} />
 					<NumberField field={form.fields.uses} />
+					<CheckboxField field={tempIsUnlimited} />
+					<NumberField field={tempUses} />
 				</Fieldset>
 
 				<ModalDialogLayout.Buttons>
@@ -119,7 +156,7 @@ export function CreateInvite({
 		</form>
 	);
 
-	async function onSubmit(data: z.infer<typeof CreateInviteForm>) {
+	async function onSubmit(data: FormType) {
 		await createInvite.mutateAsync(data);
 		resolve(true);
 	}

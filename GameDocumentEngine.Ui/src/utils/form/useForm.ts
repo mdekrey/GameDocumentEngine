@@ -30,6 +30,11 @@ import type {
 	FieldConfig,
 	FieldConfigToType,
 	FieldStateOverride,
+	BaseAnyFieldConfig,
+	InferredFieldConfigParams,
+	InferredFieldConfig,
+	AnyFieldConfig,
+	InferredFieldConfigObject,
 } from './field-config-types';
 import { toConfigObject } from './field-config-types';
 import { getValueAtPath, getAtomForPath } from './getAtomForPath';
@@ -62,7 +67,7 @@ type FlagsForFormFieldConfig<
 	T,
 	// keeping the type param for future use
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	TFieldConfig extends FieldConfigOrPath<T>,
+	TFieldConfig extends BaseAnyFieldConfig<T>,
 > = DefaultFormFieldResultFlags;
 // example usage for how these flags work
 // isCheckbox: TFieldConfig extends { readonly isCheckbox?: boolean }
@@ -74,19 +79,22 @@ export type FormFieldReturnType<
 	TFlags extends UseFieldResultFlags = DefaultFormFieldResultFlags,
 > = UseFieldResult<T, TFlags> & UseFormResult<T>;
 
-type FormFieldReturnTypeFromConfig<
+export type FormFieldReturnTypeFromConfig<
 	T,
-	TFieldConfig extends FieldConfigOrPath<T>,
-> = FormFieldReturnType<
-	FieldConfigToType<T, TFieldConfig>,
-	FlagsForFormFieldConfig<T, TFieldConfig>
->;
+	TFieldConfig extends BaseAnyFieldConfig<T>,
+> = InferredFieldConfigParams<T, TFieldConfig> extends [
+	T,
+	infer TPath,
+	infer TValue,
+]
+	? FormFieldReturnType<TValue, FlagsForFormFieldConfig<T, TFieldConfig>>
+	: never;
 
 export type FormFields<T, TFields extends FieldsConfig<T>> = {
-	[K in keyof TFields]: TFields[K] extends FieldConfigOrPath<T>
+	[K in keyof TFields]: TFields[K] extends BaseAnyFieldConfig<T>
 		? FormFieldReturnTypeFromConfig<T, TFields[K]>
 		: TFields[K] extends (...args: infer TArgs) => infer TReturn
-		? TReturn extends FieldConfigOrPath<T>
+		? TReturn extends BaseAnyFieldConfig<T>
 			? (...args: TArgs) => FormFieldReturnTypeFromConfig<T, TReturn>
 			: never
 		: never;
@@ -236,6 +244,16 @@ type FormResultContext<T> = Pick<
 	| 'readOnlyFields'
 >;
 
+export function buildFormField<T, TFieldConfig extends BaseAnyFieldConfig<T>>(
+	field: TFieldConfig & InferredFieldConfig<T, TFieldConfig>,
+	params: FormResultContext<T>,
+): FormFieldReturnTypeFromConfig<T, TFieldConfig> {
+	return toField<T, TFieldConfig>(
+		toConfigObject<T, TFieldConfig>(field),
+		params,
+	);
+}
+
 export function buildFormFields<
 	T,
 	TFields extends FieldsConfig<T> = Record<never, never>,
@@ -245,9 +263,10 @@ export function buildFormFields<
 			return [
 				field,
 				typeof config === 'function'
-					? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-					  (...args: AnyArray) => innerToField(config(...args))
-					: innerToField(config),
+					? (...args: AnyArray) =>
+							// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+							buildFormField(config(...args) as any, params)
+					: buildFormField(config as any, params),
 			];
 		}),
 	) as never as FormFields<T, TFields>;
@@ -281,13 +300,25 @@ export function buildFormFields<
 // 	}
 // }
 
+function toField<T, TConfig extends BaseAnyFieldConfig<T>>(
+	config: InferredFieldConfigObject<T, TConfig>,
+	context: FormResultContext<T>,
+): FormFieldReturnTypeFromConfig<T, TConfig>;
+function toField<T, TPath extends Path<T>, TValue>(
+	config: FieldConfig<T, TPath, TValue>,
+	context: FormResultContext<T>,
+): FormFieldReturnType<TValue, DefaultFormFieldResultFlags>;
 function toField<T, TPath extends Path<T>, TValue>(
 	config: FieldConfig<T, TPath, TValue>,
 	context: FormResultContext<T>,
 ): FormFieldReturnType<TValue, DefaultFormFieldResultFlags> {
 	const result = toFormSubset<T, TPath, TValue>(config, context);
 	const options: Partial<FieldOptions<PathValue<T, TPath>, TValue>> = {
-		mapping: config.mapping,
+		// TODO: figure out why this needs a cast
+		mapping: config.mapping as FieldOptions<
+			PathValue<T, TPath>,
+			TValue
+		>['mapping'],
 		schema: getZodSchemaForPath(config.path, context.schema),
 		errorStrategy: context.errorStrategy,
 		formEvents: context.formEvents,
@@ -326,7 +357,8 @@ function toField<T, TPath extends Path<T>, TValue>(
 		// These are tchnically giving back structured results, but that is _probably_ okay
 		// FIXME: it would be nice make these types correct and not use `as`
 		if (typeof value === 'function') {
-			return (props) => value({ ...props, value: context.atom });
+			return (props, getter) =>
+				value({ ...props, value: context.atom }, getter);
 		}
 		if (value === undefined)
 			return walkFieldStateAtom(state, config.path as AnyPath);
