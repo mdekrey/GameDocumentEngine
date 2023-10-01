@@ -89,10 +89,13 @@ export type InferredFieldConfig<
 					path: {
 						ERROR: `Mapping is not valid for type`;
 						expectedType: PathValue<T, TPath>;
-					};
+					} & BaseAnyFieldConfig<T>;
 			  }
 		: {
-				path: { ERROR: `Path is not valid for type`; validPaths: Path<T> };
+				path: {
+					ERROR: `Path is not valid for type`;
+					validPaths: Path<T>;
+				} & BaseAnyFieldConfig<T>;
 		  }
 	: Path<T>;
 

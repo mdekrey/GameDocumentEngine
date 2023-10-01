@@ -17,6 +17,7 @@ import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { createInvitation } from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import { atom } from 'jotai';
+import { useFormField } from '@/utils/form/useFormFields';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -78,6 +79,11 @@ export function CreateInvite({
 				mapping: unlimitedCheckboxMapping,
 			},
 		},
+	});
+	const temp = useFormField(form, {
+		path: ['uses'],
+		mapping: positiveIntegerMapping,
+		disabled: (v) => atom((get) => get(v.originalValue) < 1),
 	});
 
 	const allowedRoles = gameData.typeInfo.userRoles.filter((role) =>
