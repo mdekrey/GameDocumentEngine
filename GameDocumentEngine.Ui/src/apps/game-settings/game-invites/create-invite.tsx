@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { FormFieldReturnTypeFromConfig } from '@/utils/form/useForm';
 import { useForm } from '@/utils/form/useForm';
 import { Button } from '@/components/button/button';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
@@ -8,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import type { FieldMapping, FieldStateContext } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form/useField';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
@@ -17,16 +16,7 @@ import { noChange } from '@/utils/form/mapAtom';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { createInvitation } from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
-import type { Getter } from 'jotai';
-import { atom } from 'jotai';
-import { useFormField } from '@/utils/form/useFormFields';
-import type {
-	BaseAnyFieldConfig,
-	FieldConfig,
-	InferredFieldConfigParams,
-	FormFieldStateContext,
-} from '@/utils/form/field-config-types';
-import { FormFieldStateContextAtom } from '@/utils/form/field-config-types';
+import type { FieldsConfig } from '@/utils/form/field-config-types';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -56,23 +46,6 @@ const positiveIntegerMapping: FieldMapping<number, string> = {
 
 type FormType = z.infer<typeof CreateInviteForm>;
 
-type Target = BaseAnyFieldConfig<FormType>;
-type TargetConfig = FieldConfig<FormType, readonly ['uses'], any>['mapping'];
-type Temp = InferredFieldConfigParams<
-	FormType,
-	{
-		path: ['uses'];
-		mapping: typeof unlimitedCheckboxMapping;
-	}
->;
-type TempFull = FormFieldReturnTypeFromConfig<
-	FormType,
-	{
-		path: ['uses'];
-		mapping: typeof unlimitedCheckboxMapping;
-	}
->;
-
 export function CreateInvite({
 	resolve,
 	reject,
@@ -96,11 +69,7 @@ export function CreateInvite({
 			uses: {
 				path: ['uses'],
 				mapping: positiveIntegerMapping,
-				// TODO: why does this parameter need to be explicitly typed?
-				disabled: (
-					v: FormFieldStateContext<FormType, number, string>,
-					get: Getter,
-				) => get(v.originalValue) < 1,
+				disabled: ({ value }) => value.uses < 1,
 			},
 			role: ['role'],
 			isUnlimited: {
@@ -108,17 +77,9 @@ export function CreateInvite({
 				translationPath: ['isUnlimited'],
 				mapping: unlimitedCheckboxMapping,
 			},
-		},
-	});
-	const tempUses = useFormField(form, {
-		path: ['uses'],
-		mapping: positiveIntegerMapping,
-		disabled: (v, get) => get(v.value).uses < 1,
-	});
-	const tempIsUnlimited = useFormField(form, {
-		path: ['uses'],
-		translationPath: ['isUnlimited'],
-		mapping: unlimitedCheckboxMapping,
+			// TODO: TypeScript updates may eliminate this explicit `satisfies`,
+			// but otherwise this seems to be required.
+		} satisfies FieldsConfig<FormType>,
 	});
 
 	const allowedRoles = gameData.typeInfo.userRoles.filter((role) =>
@@ -142,8 +103,6 @@ export function CreateInvite({
 					</SelectField>
 					<CheckboxField field={form.fields.isUnlimited} />
 					<NumberField field={form.fields.uses} />
-					<CheckboxField field={tempIsUnlimited} />
-					<NumberField field={tempUses} />
 				</Fieldset>
 
 				<ModalDialogLayout.Buttons>

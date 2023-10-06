@@ -25,16 +25,14 @@ import { FormEvents } from './events/FormEvents';
 import { atomFamily as createAtomFamily } from 'jotai/utils';
 import { getZodSchemaForPath } from './getZodSchemaForPath';
 import type {
-	FieldConfigOrPath,
 	FieldsConfig,
 	FieldConfig,
-	FieldConfigToType,
 	FieldStateOverride,
 	BaseAnyFieldConfig,
 	InferredFieldConfigParams,
 	InferredFieldConfig,
-	AnyFieldConfig,
 	InferredFieldConfigObject,
+	FieldConfigParams,
 } from './field-config-types';
 import { toConfigObject } from './field-config-types';
 import { getValueAtPath, getAtomForPath } from './getAtomForPath';
@@ -82,11 +80,11 @@ export type FormFieldReturnType<
 export type FormFieldReturnTypeFromConfig<
 	T,
 	TFieldConfig extends BaseAnyFieldConfig<T>,
-> = InferredFieldConfigParams<T, TFieldConfig> extends [
+> = InferredFieldConfigParams<T, TFieldConfig> extends FieldConfigParams<
 	T,
-	infer TPath,
-	infer TValue,
-]
+	Path<T>,
+	infer TValue
+>
 	? FormFieldReturnType<TValue, FlagsForFormFieldConfig<T, TFieldConfig>>
 	: never;
 
@@ -244,6 +242,14 @@ type FormResultContext<T> = Pick<
 	| 'readOnlyFields'
 >;
 
+export function buildFormField<T>(
+	field: BaseAnyFieldConfig<T>,
+	params: FormResultContext<T>,
+): FormFieldReturnTypeFromConfig<T, BaseAnyFieldConfig<T>>;
+export function buildFormField<T, TFieldConfig extends BaseAnyFieldConfig<T>>(
+	field: TFieldConfig & InferredFieldConfig<T, TFieldConfig>,
+	params: FormResultContext<T>,
+): FormFieldReturnTypeFromConfig<T, TFieldConfig>;
 export function buildFormField<T, TFieldConfig extends BaseAnyFieldConfig<T>>(
 	field: TFieldConfig & InferredFieldConfig<T, TFieldConfig>,
 	params: FormResultContext<T>,
@@ -265,40 +271,12 @@ export function buildFormFields<
 				typeof config === 'function'
 					? (...args: AnyArray) =>
 							// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-							buildFormField(config(...args) as any, params)
-					: buildFormField(config as any, params),
+							buildFormField(config(...args), params)
+					: buildFormField(config, params),
 			];
 		}),
 	) as never as FormFields<T, TFields>;
-
-	function innerToField(config: FieldConfigOrPath<T>) {
-		return toField<T, Path<T>, unknown>(
-			toConfigObject<T, unknown, FieldConfigOrPath<T, unknown>>(
-				config,
-			) as FieldConfig<T, Path<T>, unknown>,
-			params,
-		);
-	}
 }
-
-// export function buildFormField<
-// 	T,
-// 	TFields extends FieldsConfig<T> = Record<never, never>,
-// >(fields: TFields, config: FormResultContext<T>): FormFields<T, TFields> {
-// 	return typeof config === 'function'
-// 	? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-// 	  (...args: AnyArray) => innerToField(config(...args))
-// 	: innerToField(config);
-
-// 	function innerToField(config: FieldConfigOrPath<T>) {
-// 		return toField<T, Path<T>, unknown>(
-// 			toConfigObject<T, unknown, FieldConfigOrPath<T, unknown>>(
-// 				config,
-// 			) as FieldConfig<T, Path<T>, unknown>,
-// 			params,
-// 		);
-// 	}
-// }
 
 function toField<T, TConfig extends BaseAnyFieldConfig<T>>(
 	config: InferredFieldConfigObject<T, TConfig>,
@@ -358,7 +336,15 @@ function toField<T, TPath extends Path<T>, TValue>(
 		// FIXME: it would be nice make these types correct and not use `as`
 		if (typeof value === 'function') {
 			return (props, getter) =>
-				value({ ...props, value: context.atom }, getter);
+				value(
+					{
+						...props,
+						get value() {
+							return getter(context.atom);
+						},
+					},
+					getter,
+				);
 		}
 		if (value === undefined)
 			return walkFieldStateAtom(state, config.path as AnyPath);

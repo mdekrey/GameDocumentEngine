@@ -28,7 +28,7 @@ export type UntypedFieldConfigObject<TValue> = {
 };
 
 export type FormFieldStateContext<TFormValue, TOriginalValue, TDerivedValue> = {
-	value: Atom<TFormValue>;
+	readonly value: TFormValue;
 } & FieldStateContext<TOriginalValue, TDerivedValue>;
 
 export type FormFieldStateCallback<
@@ -78,6 +78,7 @@ export type FieldConfig<
 	readOnly?: FieldStateOverride<T, PathValue<T, TPath>, TValue, boolean>;
 } & IfAny<
 	TValue,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	Partial<MappedFieldConfig<T, TPath, any>>,
 	[PathValue<T, TPath>] extends [TValue]
 		? {
@@ -95,97 +96,103 @@ export type FieldConfig<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFieldConfig<T> = FieldConfig<T, Path<T>, any>;
 export type BaseAnyFieldConfig<T> = Path<T> | AnyFieldConfig<T>;
+export type BaseAnyFieldConfigConstructor<T> =
+	| BaseAnyFieldConfig<T>
+	| ((...args: AnyArray) => BaseAnyFieldConfig<T>);
 
 export type InferredFieldConfig<
 	T,
 	TConfig extends BaseAnyFieldConfig<T>,
 > = TConfig extends FieldConfig<T, infer TPath, infer TValue>
 	? FieldConfig<T, TPath, TValue>
-	: /*TConfig extends FieldConfig<T, infer TPath, any>
-	? TPath extends Path<T>
-		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-		  TConfig extends { mapping?: undefined }
-			? FieldConfig<T, TPath, PathValue<T, TPath>>
-			: TConfig extends { mapping: FieldMapping<PathValue<T, TPath>, any> }
-			? TConfig extends MappedFieldConfig<T, TPath, infer TValue>
-				? FieldConfig<T, TPath, TValue>
-				: FieldConfig<T, TPath, PathValue<T, TPath>>
-			: {
-					path: {
-						ERROR: `Mapping is not valid for type`;
-						expectedType: PathValue<T, TPath>;
-					} & BaseAnyFieldConfig<T>;
-			  }
-		: {
-				path: {
-					ERROR: `Path is not valid for type`;
-					validPaths: Path<T>;
-				} & BaseAnyFieldConfig<T>;
-		  }*/
-	  Path<T>;
+	: Path<T>;
 
+export type InferredFieldConfigConstructor<
+	T,
+	TConfig extends BaseAnyFieldConfigConstructor<T>,
+> = TConfig extends ReadonlyArray<unknown>
+	? Path<T>
+	: InferredFieldConfigConstructorParams<T, TConfig> extends FieldConfigParams<
+			T,
+			infer TPath,
+			infer TValue,
+			infer TArgs
+	  >
+	? [TArgs] extends [never]
+		? FieldConfig<T, TPath, TValue>
+		: (...args: TArgs) => FieldConfig<T, TPath, TValue>
+	: never;
+
+/** A type that represents the generic args for a field config */
+export type FieldConfigParams<
+	T,
+	TPath extends Path<T>,
+	TValue,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	TArgs extends any[] = never,
+> = [T, TPath, TValue, TArgs];
+
+/** Converts a field config into its parameters for inference */
 export type InferredFieldConfigParams<
 	T,
 	TConfig extends BaseAnyFieldConfig<T>,
 > = TConfig extends { path: infer TPath }
 	? TPath extends Path<T>
 		? TConfig extends MappedFieldConfig<T, TPath, infer TValue>
-			? [T, TPath, TValue]
+			? FieldConfigParams<T, TPath, TValue>
 			: TConfig extends UnmappedFieldConfig<T, infer TPath>
-			? [T, TPath, PathValue<T, TPath>]
+			? FieldConfigParams<T, TPath, PathValue<T, TPath>>
 			: { error: 'Invalid mapping' }
 		: never
 	: TConfig extends Path<T>
-	? [T, TConfig, PathValue<T, TConfig>]
+	? FieldConfigParams<T, TConfig, PathValue<T, TConfig>>
 	: never;
 
+/** Converts a FieldConfig or Path to the actual FieldConfig (object) */
 export type InferredFieldConfigObject<
 	T,
 	TConfig extends BaseAnyFieldConfig<T>,
-> = InferredFieldConfigParams<T, TConfig> extends [T, infer TPath, infer TValue]
-	? TPath extends Path<T>
-		? FieldConfig<T, TPath, TValue>
-		: never
+> = InferredFieldConfigParams<T, TConfig> extends FieldConfigParams<
+	T,
+	infer TPath,
+	infer TValue
+>
+	? FieldConfig<T, TPath, TValue>
 	: never;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FieldConfigOrPath<T, TFieldType = any> =
-	| Path<T>
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| FieldConfig<T, any, TFieldType>;
+export type InferredFieldConfigConstructorParams<
+	T,
+	TConfig extends BaseAnyFieldConfigConstructor<T>,
+> = TConfig extends (...args: infer TArgs) => infer TReturn
+	? TReturn extends BaseAnyFieldConfig<T>
+		? InferredFieldConfigParams<T, TReturn> extends FieldConfigParams<
+				T,
+				infer TPath,
+				infer TValue
+		  >
+			? FieldConfigParams<T, TPath, TValue, TArgs>
+			: never
+		: never
+	: TConfig extends BaseAnyFieldConfig<T>
+	? InferredFieldConfigParams<T, TConfig>
+	: never;
 
 export type FieldsConfig<T> = {
-	[field: string]:
-		| FieldConfigOrPath<T>
-		| ((...args: AnyArray) => FieldConfigOrPath<T>);
+	[field: string]: BaseAnyFieldConfigConstructor<T>;
 };
 
-export type FieldConfigToType<
-	T,
-	TFieldConfig extends BaseAnyFieldConfig<T>,
-> = TFieldConfig extends Path<T>
-	? PathValue<T, TFieldConfig>
-	: TFieldConfig extends MappedFieldConfig<T, Path<T>, infer TValue>
-	? TValue
-	: TFieldConfig extends UnmappedFieldConfig<T, infer TPath>
-	? PathValue<T, TPath>
-	: never;
-
-export function toConfigObject<T, TFieldConfig extends BaseAnyFieldConfig<T>>(
-	config: TFieldConfig & InferredFieldConfig<T, TFieldConfig>,
-): InferredFieldConfigObject<T, TFieldConfig>;
-export function toConfigObject<
-	T,
-	TValue,
-	TFieldConfig extends FieldConfigOrPath<T, TValue>,
->(config: TFieldConfig): UntypedFieldConfigObject<TValue>;
-export function toConfigObject<TValue>(
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	config: FieldConfigOrPath<any, TValue>,
-): UntypedFieldConfigObject<TValue> {
+export function toConfigObject<T, TField extends BaseAnyFieldConfig<T>>(
+	config: TField,
+): InferredFieldConfigObject<T, TField>;
+export function toConfigObject<T>(
+	config: BaseAnyFieldConfig<T>,
+): AnyFieldConfig<T>;
+export function toConfigObject<T>(
+	config: BaseAnyFieldConfig<T>,
+): AnyFieldConfig<T> {
 	if (isArray(config)) {
 		return {
-			path: config,
+			path: config as Path<T>,
 		};
 	}
 	return config;

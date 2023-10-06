@@ -2,7 +2,6 @@ import type { Objectish } from 'immer';
 import type {
 	UseFormResult,
 	UseFieldsResult,
-	FormFieldReturnType,
 	FormFieldReturnTypeFromConfig,
 } from './useForm';
 import { buildFormField, buildFormFields } from './useForm';
@@ -11,10 +10,9 @@ import type {
 	FieldConfig,
 	FieldsConfig,
 	InferredFieldConfig,
-	InferredFieldConfigParams,
 } from './field-config-types';
 import { useConstant } from './useConstant';
-import type { Path, PathValue } from './path';
+import type { Path } from './path';
 
 export function useFormFields<
 	T extends Objectish,
@@ -25,21 +23,19 @@ export function useFormFields<
 ): UseFieldsResult<T, TFields>['fields'] {
 	return useConstant(() => buildFormFields<T, TFields>(fields, form));
 }
-// export function useFormField<
-// 	T extends Objectish,
-// 	TPath extends Path<T> = Path<T>,
-// 	TValue = PathValue<T, TPath>,
-// >(
-// 	form: UseFormResult<T>,
-// 	field: FieldConfig<T, TPath, TValue>,
-// ): never; /* TODO */
+
+// TODO - accept function callbacks
 export function useFormField<
 	T extends Objectish,
-	const TField extends BaseAnyFieldConfig<T>,
+	TPath extends Path<T>,
+	TValue,
 >(
 	form: UseFormResult<T>,
-	field: TField & InferredFieldConfig<T, TField>,
-): FormFieldReturnTypeFromConfig<T, TField>; /* TODO */
+	field: FieldConfig<T, TPath, TValue>,
+): FormFieldReturnTypeFromConfig<
+	T,
+	BaseAnyFieldConfig<T> & FieldConfig<T, TPath, TValue>
+>;
 export function useFormField<
 	T extends Objectish,
 	const TField extends BaseAnyFieldConfig<T>,
