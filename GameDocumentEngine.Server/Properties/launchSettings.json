@@ -27,7 +27,15 @@
       "applicationUrl": "https://localhost:7226;http://localhost:5035",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+    },
+    "migrate": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "commandLineArgs": "--ef-migrate"
     },
     "IIS Express": {
       "commandName": "IISExpress",

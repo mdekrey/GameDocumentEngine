@@ -10,6 +10,29 @@ serviceAccount:
   create: false
   name: main-docs-user
 
+initContainers:
+- name: ef-migrations
+  imagePullPolicy: Always
+  env:
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: http://docs-engine-monitor-collector:4317
+  - name: Authentication__Google__ClientId
+    valueFrom:
+      secretKeyRef:
+        name: vtt-dekrey-net-env
+        key: Authentication__Google__ClientId
+  - name: Authentication__Google__ClientSecret
+    valueFrom:
+      secretKeyRef:
+        name: vtt-dekrey-net-env
+        key: Authentication__Google__ClientSecret
+  - name: Postgres__ConnectionString
+    valueFrom:
+      secretKeyRef:
+        name: vtt-dekrey-net-env
+        key: Postgres__ConnectionString
+  args: ['--ef-migrate']
+
 image:
   pullPolicy: Always
   repository: dekreydotnet.azurecr.io/gamedocsengine

@@ -315,13 +315,19 @@ app.MapWhen(context => context.Request.Method == "GET" || context.Request.Method
 	});
 });
 
+
 using (var scope = app.Services.CreateScope())
 {
 	var dbContext = scope.ServiceProvider.GetRequiredService<DocumentDbContext>();
-	if (dbContext.Database.GetPendingMigrations().Any())
+
+	if (args.Contains("--ef-migrate"))
 	{
-		// TODO: make this fail and expect database to be updated separately
 		dbContext.Database.Migrate();
+		return;
+	}
+	else if (dbContext.Database.GetPendingMigrations().Any())
+	{
+		throw new InvalidOperationException($"Missing {dbContext.Database.GetPendingMigrations().Count()} unapplied migrations");
 	}
 }
 

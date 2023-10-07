@@ -61,5 +61,6 @@ jobs:
         helm upgrade --install -n $k8sNamespace $releaseName --create-namespace \
           --repo https://mdekrey.github.io/helm-charts single-container \
           --set-string "image.tag=${{ env.dockerImageTag }}" \
+          --set-string "initContainers[0].image=$registryLoginServer/$imageName:${{ env.dockerImageTag }}" \
           --values ./eng/deployment/values.prod.yaml \
           --wait
