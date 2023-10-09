@@ -16,6 +16,7 @@ import {
 	createDocument,
 	deleteDocument,
 	patchDocument,
+	changeDocumentFolder,
 } from './document';
 import { getGameType } from './game-types';
 import { listInvitations, createInvitation, cancelInvitation } from './invites';
@@ -49,3 +50,6 @@ export const queries = {
 	claimInvitation: null,
 	cancelInvitation,
 } satisfies { [K in keyof typeof operations]: unknown };
+export const extraQueries = {
+	changeDocumentFolder,
+};

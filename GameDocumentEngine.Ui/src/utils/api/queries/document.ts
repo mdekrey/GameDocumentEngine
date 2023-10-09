@@ -58,6 +58,8 @@ function mapDocumentsToFolders(
 	const rootedQueue: (string | null)[] = [null];
 
 	for (const doc of documents.values()) {
+		const current = hierarchy.get(doc.id) ?? createEmptyNode();
+		hierarchy.set(doc.id, current);
 		const parent = hierarchy.get(doc.folderId) ?? createEmptyNode();
 		hierarchy.set(doc.folderId, parent);
 		if (doc.folderId === null && !parent.path) parent.path = [];
@@ -75,7 +77,6 @@ function mapDocumentsToFolders(
 	}
 
 	// TODO: consider walking through unrootedFolderIds to get partial folder structures
-
 	return {
 		unrootedFolderIds: Array.from(unrootedFolderIds.values()),
 		hierarchy,
@@ -202,6 +203,38 @@ export function patchDocument(
 			await queryClient.invalidateQueries(
 				getDocument(gameId, documentId).queryKey,
 			);
+		},
+	};
+}
+
+export function changeDocumentFolder(
+	queryClient: QueryClient,
+	gameId: string,
+): UseMutationOptions<
+	DocumentDetails,
+	unknown,
+	{ id: string; folderId?: string },
+	unknown
+> {
+	return {
+		mutationFn: async ({ id, folderId }) => {
+			const response = await api.patchDocument({
+				params: { gameId, id },
+				body: [
+					folderId
+						? { op: 'replace', path: '/folderId', value: folderId }
+						: { op: 'remove', path: '/folderId' },
+				],
+			});
+			if (response.statusCode === 200) return response.data;
+			else if (response.statusCode === 409)
+				throw new Error(
+					'Other changes were being applied at the same time. Try again later.',
+				);
+			else throw new Error('Could not save changes');
+		},
+		onError: async (err, { id }) => {
+			await queryClient.invalidateQueries(getDocument(gameId, id).queryKey);
 		},
 	};
 }
