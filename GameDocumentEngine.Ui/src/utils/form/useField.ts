@@ -98,11 +98,11 @@ export type FieldMapping<TValue, TFormFieldValue> = {
 //
 export const noErrorsAtom: ErrorsAtom = atom({ state: 'hasData', data: null });
 export type FieldStateContext<TOriginalValue, TDerivedValue> = {
-	readonly original: TOriginalValue;
-	readonly mapped: TDerivedValue;
+	get original(): TOriginalValue;
+	get mapped(): TDerivedValue;
 } & IfTrueThenProp<
 	true /* TODO: take flags into account: TFlags['hasErrors'] */,
-	{ readonly errors: Loadable<ZodError | null> }
+	{ get errors(): Loadable<ZodError | null> }
 >;
 
 export type FieldStateCallback<T, TOriginalValue, TDerivedValue> = (

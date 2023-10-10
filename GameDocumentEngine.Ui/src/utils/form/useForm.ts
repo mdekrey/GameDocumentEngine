@@ -332,21 +332,28 @@ function toField<T, TPath extends Path<T>, TValue>(
 	):
 		| FieldStateAtom<TState>
 		| FieldStateCallback<PerFieldState<TState>, PathValue<T, TPath>, TValue> {
-		// These are tchnically giving back structured results, but that is _probably_ okay
-		// FIXME: it would be nice make these types correct and not use `as`
 		if (typeof value === 'function') {
 			return (props, getter) =>
 				value(
 					{
-						...props,
 						get value() {
 							return getter(context.atom);
+						},
+						get original() {
+							return props.original;
+						},
+						get mapped() {
+							return props.mapped;
+						},
+						get errors() {
+							return props.errors;
 						},
 					},
 					getter,
 				);
 		}
 		if (value === undefined)
+			// FIXME: it would be nice make these types correct and not use `as`
 			return walkFieldStateAtom(state, config.path as AnyPath);
 		return toWritableAtom(value);
 	}

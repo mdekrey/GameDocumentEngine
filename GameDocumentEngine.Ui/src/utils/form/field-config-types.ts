@@ -28,7 +28,7 @@ export type UntypedFieldConfigObject<TValue> = {
 };
 
 export type FormFieldStateContext<TFormValue, TOriginalValue, TDerivedValue> = {
-	readonly value: TFormValue;
+	get value(): TFormValue;
 } & FieldStateContext<TOriginalValue, TDerivedValue>;
 
 export type FormFieldStateCallback<
