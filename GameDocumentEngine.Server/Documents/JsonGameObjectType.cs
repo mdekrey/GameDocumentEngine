@@ -11,6 +11,19 @@ public class JsonGameObjectType : IGameObjectType
 	[JsonPropertyName("script")]
 	public JsonGameObjectTypeScript Script { get; set; }
 
+	/*
+	The default roles:
+	"roles": {
+		"owner": {
+			"creatorDefault": true,
+			"permissions": ["**", "details:*#$..*"]
+		},
+		"observer": {
+			"default": false,
+			"permissions": ["view", "details:read#$..*"]
+		}
+	}
+*/
 	[JsonPropertyName("roles")]
 	public Dictionary<string, JsonGameObjectTypeRole> Roles { get; set; } = new Dictionary<string, JsonGameObjectTypeRole>()
 	{

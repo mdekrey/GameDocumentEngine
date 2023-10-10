@@ -8,7 +8,8 @@
 		"observer": {
 			"name": "Observer",
 			"description": "Can see the character's details"
-		}
+		},
+		"no-role": { "name": "None" }
 	},
 	"details": {
 		"delete": "Delete character",

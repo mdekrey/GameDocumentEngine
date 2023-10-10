@@ -67,7 +67,6 @@
 	"document-settings": {
 		"configure-details": "Details",
 		"configure-roles": "Configure Roles for {{name}}",
-		"no-role": "None",
 		"submit": "Save Changes",
 		"danger-zone": "Danger Zone",
 		"delete-document": "Delete {{name}}"

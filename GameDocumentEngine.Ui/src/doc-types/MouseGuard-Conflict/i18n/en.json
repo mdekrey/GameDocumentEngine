@@ -28,7 +28,8 @@
 		"side-b-member": {
 			"name": "Member of Side B",
 			"description": "Participates for side B, but does not make choices"
-		}
+		},
+		"no-role": { "name": "None" }
 	},
 	"details": {
 		"delete": "Delete character",

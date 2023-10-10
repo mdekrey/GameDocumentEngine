@@ -2,9 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
-import { ErrorsList } from '@/components/form-fields/errors/errors-list';
-import { Field } from '@/components/form-fields/field/field';
-import { SelectInput } from '@/components/form-fields/select-input/select-input';
 import { updateFormDefault } from '@/utils/form/update-form-default';
 import { useForm } from '@/utils/form/useForm';
 import { queries } from '@/utils/api/queries';
@@ -12,6 +9,7 @@ import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { defaultField } from '@/utils/form/fieldStateTracking';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useTranslation } from 'react-i18next';
+import { RoleAssignmentField } from './role-assignment-field';
 
 export const UserRoleAssignment = z.object({}).catchall(z.string());
 
@@ -76,30 +74,12 @@ export function RoleAssignment({
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<Fieldset>
-				{Object.entries(playerNames).map(([k, name]) => {
-					const field = form.fields.row(k);
-					return (
-						<Field key={k}>
-							<Field.Label>{name}</Field.Label>
-
-							<Field.Contents>
-								<SelectInput {...field.htmlProps.asControlled()} items={roles}>
-									{(gt) =>
-										gt ? (
-											<>{roleTranslations(`roles.${gt}.name`)}</>
-										) : (
-											<>{t('no-role')}</>
-										)
-									}
-								</SelectInput>
-								<ErrorsList
-									errors={field.errors}
-									translations={field.translation}
-								/>
-							</Field.Contents>
-						</Field>
-					);
-				})}
+				<RoleAssignmentField
+					fields={form.fields.row}
+					players={playerNames}
+					roles={roles}
+					translations={roleTranslations}
+				/>
 				{allowUpdate && (
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>
