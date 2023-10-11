@@ -7,14 +7,12 @@ type RoleAssignemntProps = {
 	fields: (userId: string) => FormFieldReturnType<string>;
 	players: { [userId: string]: string };
 	roles: string[];
-	translations: (key: string) => string;
 };
 
 export function RoleAssignmentField({
 	fields,
 	players,
 	roles,
-	translations: t,
 }: RoleAssignemntProps) {
 	return Object.entries(players).map(([k, name]) => {
 		const field = fields(k);
@@ -26,9 +24,9 @@ export function RoleAssignmentField({
 					<SelectInput {...field.htmlProps.asControlled()} items={roles}>
 						{(roleKey) =>
 							roleKey ? (
-								<>{t(`roles.${roleKey}.name`)}</>
+								<>{field.translation(`roles.${roleKey}.name`)}</>
 							) : (
-								<>{t('roles.no-role.name')}</>
+								<>{field.translation('roles.no-role.name')}</>
 							)
 						}
 					</SelectInput>

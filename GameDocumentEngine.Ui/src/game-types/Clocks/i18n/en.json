@@ -1,22 +1,26 @@
 {
 	"name": "Clocks",
 	"description": "A simple game type to track PbtA-style clocks",
-	"roles": {
-		"gm": {
-			"name": "Game Master",
-			"description": "Full control over the game; can delete it, invite new players, and change permissions on any objects within the game."
-		},
-		"asst-gm": {
-			"name": "Assistant Game Master",
-			"description": "Can create invitations and update game details, but cannot update documents nor delete the game."
-		},
-		"trusted": {
-			"name": "Trusted Player",
-			"description": "Can create new documents, but otherwise has the same access as player."
-		},
-		"player": {
-			"name": "Player",
-			"description": "Can view details about the game and game objects that have been explicitly granted."
+	"document": {
+		"fields": {
+			"roles": {
+				"gm": {
+					"name": "Game Master",
+					"description": "Full control over the game; can delete it, invite new players, and change permissions on any objects within the game."
+				},
+				"asst-gm": {
+					"name": "Assistant Game Master",
+					"description": "Can create invitations and update game details, but cannot update documents nor delete the game."
+				},
+				"trusted": {
+					"name": "Trusted Player",
+					"description": "Can create new documents, but otherwise has the same access as player."
+				},
+				"player": {
+					"name": "Player",
+					"description": "Can view details about the game and game objects that have been explicitly granted."
+				}
+			}
 		}
 	}
 }

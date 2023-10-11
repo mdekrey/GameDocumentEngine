@@ -39,7 +39,9 @@ export function RoleAssignment({
 	translations: t,
 }: RoleAssignmentProps) {
 	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
-	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace);
+	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace, {
+		keyPrefix: 'document',
+	});
 
 	const formData =
 		defaultRole !== undefined
@@ -52,9 +54,12 @@ export function RoleAssignment({
 	const form = useForm({
 		defaultValue: formData,
 		schema: UserRoleAssignment,
-		translation: t,
+		translation: roleTranslations,
 		fields: {
-			row: (userId: string) => [userId] as const,
+			row: (userId: string) => ({
+				path: [userId] as const,
+				translationPath: [],
+			}),
 		},
 		readOnly: !allowUpdate,
 	});
@@ -78,7 +83,6 @@ export function RoleAssignment({
 					fields={form.fields.row}
 					players={playerNames}
 					roles={roles}
-					translations={roleTranslations}
 				/>
 				{allowUpdate && (
 					<ButtonRow>

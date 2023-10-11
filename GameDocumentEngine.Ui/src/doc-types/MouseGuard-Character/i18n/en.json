@@ -1,16 +1,5 @@
 {
 	"name": "Mouse Guard Character",
-	"roles": {
-		"owner": {
-			"name": "Owner",
-			"description": "Owner of the character with full control"
-		},
-		"observer": {
-			"name": "Observer",
-			"description": "Can see the character's details"
-		},
-		"no-role": { "name": "None" }
-	},
 	"details": {
 		"delete": "Delete character",
 		"edit-roles": "Edit roles"
@@ -45,6 +34,17 @@
 				"errors": {
 					"too_small": "Please provide a name."
 				}
+			},
+			"roles": {
+				"owner": {
+					"name": "Owner",
+					"description": "Owner of the character with full control"
+				},
+				"observer": {
+					"name": "Observer",
+					"description": "Can see the character's details"
+				},
+				"no-role": { "name": "None" }
 			},
 			"details": {
 				"bio": {

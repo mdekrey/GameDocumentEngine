@@ -4,25 +4,6 @@
 		"edit": "Edit",
 		"delete": "Delete"
 	},
-	"roles": {
-		"owner": {
-			"name": "Owner",
-			"description": "Owner of the clock with full control"
-		},
-		"ticker": {
-			"name": "Ticker",
-			"description": "Can change the current value of the clock"
-		},
-		"observer": {
-			"name": "Observer",
-			"description": "Can see the clock's details"
-		},
-		"doomsday": {
-			"name": "Doomsday",
-			"description": "Can see the clock's maximum value, but not the ticks"
-		},
-		"no-role": { "name": "None" }
-	},
 	"document": {
 		"fields": {
 			"name": {
@@ -44,6 +25,25 @@
 						"too_small": "Please enter a number at least 1."
 					}
 				}
+			},
+			"roles": {
+				"owner": {
+					"name": "Owner",
+					"description": "Owner of the clock with full control"
+				},
+				"ticker": {
+					"name": "Ticker",
+					"description": "Can change the current value of the clock"
+				},
+				"observer": {
+					"name": "Observer",
+					"description": "Can see the clock's details"
+				},
+				"doomsday": {
+					"name": "Doomsday",
+					"description": "Can see the clock's maximum value, but not the ticks"
+				},
+				"no-role": { "name": "None" }
 			}
 		}
 	},
