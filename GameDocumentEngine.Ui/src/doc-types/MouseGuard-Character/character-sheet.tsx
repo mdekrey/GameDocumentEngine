@@ -3,7 +3,7 @@ import type {
 	GameObjectWidgetProps,
 } from '@/documents/defineDocument';
 import { useMemo } from 'react';
-import type { UseFormResult } from '@/utils/form/useForm';
+import type { UseFormResult } from '@/utils/form';
 import type { Character } from './character-types';
 import type { CharacterDocument } from './character-types';
 import {

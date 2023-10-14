@@ -3,7 +3,7 @@ import type {
 	SetStateAction,
 	StandardWritableAtom,
 } from './StandardWritableAtom';
-import type { AnyPath, Path, PathValue } from './path';
+import type { AnyPath, Path, PathValue } from '../path';
 import type { Patch, Objectish } from 'immer';
 import { applyPatches, produceWithPatches } from 'immer';
 

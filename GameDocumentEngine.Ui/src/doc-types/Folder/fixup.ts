@@ -1,4 +1,4 @@
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form';
 import type { FolderDocument } from './types';
 
 export const fixup: FieldMapping<FolderDocument, FolderDocument> = {

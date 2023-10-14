@@ -1,8 +1,9 @@
 import type { AnyArray } from './arrays';
 import { isArray } from './arrays';
 import type { ZodType } from 'zod';
-import type { AnyPath, Path, PathValue } from './path';
-import type { FieldMapping, FieldStateContext } from './useField';
+import type { AnyPath, Path, PathValue } from '../path';
+import type { FieldStateContext } from './useFieldHelpers';
+import type { FieldMapping } from './FieldMapping';
 import type { FieldStatePrimitive, PerFieldState } from './fieldStateTracking';
 import type { Atom, Getter } from 'jotai';
 import type { IfAny } from './type-helpers';
@@ -135,6 +136,7 @@ export type FieldConfigParams<
 /** Converts a field config into its parameters for inference */
 export type InferredFieldConfigParams<
 	T,
+	// TODO - allow BaseAnyFieldConfigConstructor here
 	TConfig extends BaseAnyFieldConfig<T>,
 > = TConfig extends { path: infer TPath }
 	? TPath extends Path<T>

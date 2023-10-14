@@ -1,4 +1,5 @@
-import type { ErrorsAtom, FieldTranslation } from '@/utils/form/useField';
+import type { ErrorsAtom } from '@/utils/form';
+import type { FieldTranslation } from '@/utils/form';
 import { HiX } from 'react-icons/hi';
 import { useAtomValue } from 'jotai';
 

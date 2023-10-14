@@ -1,6 +1,6 @@
 import type { DocumentPointers } from './get-document-pointers';
-import type { PerFieldState } from '@/utils/form/fieldStateTracking';
-import { defaultField } from '@/utils/form/fieldStateTracking';
+import type { PerFieldState } from '@/utils/form';
+import { defaultField } from '@/utils/form';
 
 export function toReadOnlyFields(
 	p: DocumentPointers,

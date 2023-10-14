@@ -6,23 +6,25 @@ import {
 	createErrorsAtom,
 	createTriggeredErrorsAtom,
 } from './createErrorsAtom';
-import type { FieldStateCallback } from './useField';
+import type { FieldStateCallback } from './useFieldHelpers';
 import {
-	type CheckboxHtmlProps,
-	type ControlledHtmlProps,
-	type FieldMapping,
 	type FieldOptions,
-	type InputHtmlProps,
 	type ToHtmlInputProps,
 	type ToHtmlProps,
-	type UseFieldResult,
 	noErrorsAtom,
-} from './useField';
-import { FieldEvents } from './events/FieldEvents';
+} from './useFieldHelpers';
+import type {
+	InputHtmlProps,
+	ControlledHtmlProps,
+	CheckboxHtmlProps,
+} from './HtmlProps';
+import { type FieldMapping } from './FieldMapping';
+import { FieldEvents } from '../events/FieldEvents';
 import type { RegisterErrorStrategy } from './errorsStrategy';
 import type { ZodType } from 'zod';
 import type { PerFieldState } from './fieldStateTracking';
 import { toFieldStateValue, toWritableAtom } from './fieldStateTracking';
+import type { UseFieldResult } from '../useField';
 
 const identity = <T>(orig: T) => orig;
 export function toInternalFieldAtom<TValue, TFieldValue>(

@@ -1,7 +1,7 @@
 import { ErrorsList } from '@/components/form-fields/errors/errors-list';
 import { Field } from '@/components/form-fields/field/field';
 import { SelectInput } from '@/components/form-fields/select-input/select-input';
-import type { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form';
 
 type RoleAssignemntProps = {
 	fields: (userId: string) => FormFieldReturnType<string>;

@@ -1,17 +1,17 @@
 import type { Objectish } from 'immer';
 import type {
-	UseFormResult,
 	UseFieldsResult,
 	FormFieldReturnTypeFromConfig,
-} from './useForm';
-import { buildFormField, buildFormFields } from './useForm';
+} from './internals/useFormHelpers';
+import type { UseFormResult } from './internals/UseFormResult';
+import { buildFormField, buildFormFields } from './internals/useFormHelpers';
 import type {
 	BaseAnyFieldConfig,
 	FieldConfig,
 	FieldsConfig,
 	InferredFieldConfig,
-} from './field-config-types';
-import { useConstant } from './useConstant';
+} from './internals/field-config-types';
+import { useConstant } from './internals/useConstant';
 import type { Path } from './path';
 
 export function useFormFields<

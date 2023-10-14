@@ -1,6 +1,6 @@
 import type { CharacterDocument } from '../character-types';
-import type { UseFormResult } from '@/utils/form/useForm';
-import { useFormFields } from '@/utils/form/useFormFields';
+import type { UseFormResult } from '@/utils/form';
+import { useFormFields } from '@/utils/form';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-input/text-field';

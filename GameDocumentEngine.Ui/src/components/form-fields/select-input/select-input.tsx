@@ -3,7 +3,7 @@ import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { twMerge } from 'tailwind-merge';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
-import type { ControlledHtmlProps } from '@/utils/form/useField';
+import type { ControlledHtmlProps } from '@/utils/form';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck, HiChevronUpDown } from 'react-icons/hi2';
 

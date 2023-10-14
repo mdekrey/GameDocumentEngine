@@ -1,4 +1,4 @@
-import { useFormFields } from '@/utils/form/useFormFields';
+import { useFormFields } from '@/utils/form';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import type { Folder } from './types';

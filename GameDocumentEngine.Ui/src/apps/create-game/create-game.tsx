@@ -5,7 +5,7 @@ import { queries } from '@/utils/api/queries';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
-import { useForm } from '@/utils/form/useForm';
+import { useForm } from '@/utils/form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

@@ -1,5 +1,5 @@
-import type { UseFormResult } from '@/utils/form/useForm';
-import { useFormFields } from '@/utils/form/useFormFields';
+import type { UseFormResult } from '@/utils/form';
+import { useFormFields } from '@/utils/form';
 import type { CharacterDocument } from '../character-types';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';

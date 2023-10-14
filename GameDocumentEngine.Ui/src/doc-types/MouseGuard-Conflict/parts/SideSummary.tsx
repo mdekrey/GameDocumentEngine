@@ -1,7 +1,7 @@
 import type { SideState } from '../conflict-types';
 import { ReactComponent as DispositionBanner } from './disposition-horizontal.svg';
-import type { FormFieldReturnType } from '@/utils/form/useForm';
-import { useFormFields } from '@/utils/form/useFormFields';
+import type { FormFieldReturnType } from '@/utils/form';
+import { useFormFields } from '@/utils/form';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import styles from './side-summary.module.css';

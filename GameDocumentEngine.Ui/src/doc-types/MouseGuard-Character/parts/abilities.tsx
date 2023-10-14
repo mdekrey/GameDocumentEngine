@@ -1,5 +1,5 @@
-import type { UseFormResult } from '@/utils/form/useForm';
-import { useFormFields } from '@/utils/form/useFormFields';
+import type { UseFormResult } from '@/utils/form';
+import { useFormFields } from '@/utils/form';
 import type { CharacterDocument } from '../character-types';
 import { StandardAbility } from '../components/standard-ability';
 import { NatureAbility } from '../components/nature-ability';

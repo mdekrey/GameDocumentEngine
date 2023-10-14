@@ -1,4 +1,4 @@
-import type { IfAny } from './type-helpers';
+import type { IfAny } from './internals/type-helpers';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type IsEqual<T1, T2> = T1 extends T2

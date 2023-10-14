@@ -1,6 +1,6 @@
 import type { Atom, WritableAtom } from 'jotai';
 import { atom } from 'jotai';
-import type { AnyPath } from './path';
+import type { AnyPath } from '../path';
 import { produce } from 'immer';
 import { isAtom } from '@principlestudios/jotai-react-signals';
 

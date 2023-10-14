@@ -1,10 +1,10 @@
 import type { EditableDocumentDetails } from '@/documents/defineDocument';
-import type { UseFormResult } from '@/utils/form/useForm';
+import type { UseFormResult } from '@/utils/form';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import type { Clock } from './clock-types';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
-import { useFormFields } from '@/utils/form/useFormFields';
+import { useFormFields } from '@/utils/form';
 import type { DocumentPointers } from '@/documents/get-document-pointers';
 
 export function ClockEdit({

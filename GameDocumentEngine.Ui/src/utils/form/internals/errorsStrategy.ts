@@ -1,6 +1,6 @@
-import type { IFieldEvents } from './events/FieldEvents';
-import { FieldEvents } from './events/FieldEvents';
-import { FormEvents } from './events/FormEvents';
+import type { IFieldEvents } from '../events/FieldEvents';
+import { FieldEvents } from '../events/FieldEvents';
+import { FormEvents } from '../events/FormEvents';
 
 export type ErrorsStrategy =
 	| 'onChange'

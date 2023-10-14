@@ -3,7 +3,7 @@ import { useAtomValue } from 'jotai';
 import type { ConflictDocument, SideState } from '../conflict-types';
 import type { TFunction } from 'i18next';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import type { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form';
 import { SideSummary } from './SideSummary';
 
 function skillsList(skills: string[]) {

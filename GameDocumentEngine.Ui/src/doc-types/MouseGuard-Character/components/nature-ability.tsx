@@ -1,5 +1,5 @@
-import type { FormFieldReturnType } from '@/utils/form/useForm';
-import { useFormFields } from '@/utils/form/useFormFields';
+import type { FormFieldReturnType } from '@/utils/form';
+import { useFormFields } from '@/utils/form';
 import type { CharacterDocument } from '../character-types';
 import { atom } from 'jotai';
 import { AbilityLayout } from './ability-layout';

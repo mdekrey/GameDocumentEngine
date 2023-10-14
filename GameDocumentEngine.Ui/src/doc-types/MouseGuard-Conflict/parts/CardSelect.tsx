@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import { HiCheck, HiChevronUpDown } from 'react-icons/hi2';
 import { Listbox, Transition } from '@headlessui/react';
 import { twMerge } from 'tailwind-merge';
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form';
 import type { SelectInputProps } from '@/components/form-fields/select-input/select-input';
 import type { ActionChoice } from '../conflict-types';
 import { actionChoices } from '../conflict-types';
@@ -12,7 +12,7 @@ import attackCard from '@/doc-types/mouseguard-assets/deck/ActionDeckattack.webp
 import defendCard from '@/doc-types/mouseguard-assets/deck/ActionDeckdefend.webp';
 import feintCard from '@/doc-types/mouseguard-assets/deck/ActionDeckfeint.webp';
 import maneuverCard from '@/doc-types/mouseguard-assets/deck/ActionDeckmaneuver.webp';
-import type { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 
 export const defaultNullActionChoice: FieldMapping<

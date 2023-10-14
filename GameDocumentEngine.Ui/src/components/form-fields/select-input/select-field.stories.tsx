@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { SelectField } from './select-field';
-import { useField } from '@/utils/form/useField';
+import { useField } from '@/utils/form';
 import { z } from 'zod';
 import { formFieldDecorator } from '../stories/field-decorator';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';

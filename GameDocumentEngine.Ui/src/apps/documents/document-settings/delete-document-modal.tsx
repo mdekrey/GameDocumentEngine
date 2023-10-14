@@ -2,7 +2,7 @@ import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { Prose } from '@/components/text/common';
-import { useForm } from '@/utils/form/useForm';
+import { useForm } from '@/utils/form';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useMemo } from 'react';

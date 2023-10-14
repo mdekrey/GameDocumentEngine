@@ -1,6 +1,6 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import type { FieldMapping } from '@/utils/form/useField';
-import type { UseFormResult } from '@/utils/form/useForm';
+import type { FieldMapping } from '@/utils/form';
+import type { UseFormResult } from '@/utils/form';
 import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';

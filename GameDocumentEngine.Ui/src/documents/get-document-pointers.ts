@@ -8,7 +8,7 @@ import type {
 	EditableDocumentDetails,
 	TypedDocumentDetails,
 } from '@/documents/defineDocument';
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form';
 
 export type DocumentPointers = {
 	pointers: string[];

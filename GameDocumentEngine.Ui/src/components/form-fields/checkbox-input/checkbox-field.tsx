@@ -5,7 +5,7 @@ import { CheckboxInput } from './checkbox-input';
 import type { FieldProps } from '../FieldProps';
 import { JotaiLabel } from '../../jotai/label';
 import { JotaiDiv } from '../../jotai/div';
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form';
 import { ErrorsList } from '../errors/errors-list';
 
 export const undefinedAsFalseMapping: FieldMapping<

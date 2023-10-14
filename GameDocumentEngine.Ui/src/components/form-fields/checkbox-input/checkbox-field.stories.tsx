@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CheckboxField } from './checkbox-field';
-import { useField } from '@/utils/form/useField';
+import { useField } from '@/utils/form';
 import { z } from 'zod';
 
 const meta = {

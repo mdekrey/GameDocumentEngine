@@ -1,4 +1,4 @@
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form';
 import type { CharacterDocument } from './character-types';
 import { produce } from 'immer';
 

@@ -3,7 +3,7 @@ import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { useForm } from '@/utils/form/useForm';
+import { useForm } from '@/utils/form';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';

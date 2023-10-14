@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { useForm } from '@/utils/form/useForm';
+import { useForm } from '@/utils/form';
 import { Button } from '@/components/button/button';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
@@ -7,16 +7,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import type { FieldMapping } from '@/utils/form/useField';
+import type { FieldMapping } from '@/utils/form';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
-import { noChange } from '@/utils/form/mapAtom';
+import { noChange } from '@/utils/form';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { createInvitation } from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
-import type { FieldsConfig } from '@/utils/form/field-config-types';
+import type { FieldsConfig } from '@/utils/form';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),

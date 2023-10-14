@@ -1,7 +1,8 @@
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextareaInput } from './textarea-input';
-import type { FieldMapping, UseFieldResult } from '@/utils/form/useField';
+import type { UseFieldResult } from '@/utils/form';
+import type { FieldMapping } from '@/utils/form';
 import type { FieldProps } from '../FieldProps';
 import type { JotaiLabel } from '../../jotai/label';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';

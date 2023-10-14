@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { ToggleButtonField } from './toggle-button-field';
-import { useField } from '@/utils/form/useField';
+import { useField } from '@/utils/form';
 import { z } from 'zod';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 

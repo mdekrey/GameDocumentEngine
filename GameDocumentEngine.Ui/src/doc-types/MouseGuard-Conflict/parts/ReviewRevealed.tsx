@@ -1,9 +1,9 @@
 import type { ActionChoice, SideState } from '../conflict-types';
-import type { FormFieldReturnType } from '@/utils/form/useForm';
+import type { FormFieldReturnType } from '@/utils/form';
 import { displayChoice } from './CardSelect';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
-import { useFormFields } from '@/utils/form/useFormFields';
+import { useFormFields } from '@/utils/form';
 import { useAtomValue } from 'jotai';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useModal } from '@/utils/modal/modal-service';
