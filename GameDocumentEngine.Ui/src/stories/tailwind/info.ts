@@ -5,7 +5,6 @@ import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
 const fullConfig = resolveConfig(tailwindConfig);
 
 if (!fullConfig.theme) throw new Error('tailwind config failed to parse');
-console.log(fullConfig.theme);
 
 export const colors = flattenColorPalette(fullConfig.theme.colors);
 delete colors.transparent;
