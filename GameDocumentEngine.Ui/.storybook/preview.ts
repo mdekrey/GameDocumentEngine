@@ -8,6 +8,9 @@ import { createElement, useEffect } from 'react';
 import { themes } from '@storybook/theming';
 import { DocsContainer } from '@storybook/blocks';
 import { addons } from '@storybook/preview-api';
+import { enablePatches } from 'immer';
+
+enablePatches();
 
 const channel = addons.getChannel();
 
