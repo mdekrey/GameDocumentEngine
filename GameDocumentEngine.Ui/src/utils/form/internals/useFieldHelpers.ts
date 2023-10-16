@@ -64,14 +64,13 @@ export type FieldOptions<TValue, TFormFieldValue> = {
 		| FieldStateAtom<boolean>
 		| FieldStateCallback<PerFieldState<boolean>, TValue, TFormFieldValue>;
 };
-export type UnmappedOptions<TValue> = Omit<
-	Partial<FieldOptions<TValue, TValue>>,
-	'mapping'
->;
+export type UnmappedOptions<TValue> = Partial<FieldOptions<TValue, TValue>> & {
+	mapping?: never;
+};
 export type MappedOptions<TValue, TFieldValue> = Partial<
 	FieldOptions<TValue, TFieldValue>
 > & {
-	mapping: FieldOptions<TValue, TFieldValue>['mapping'];
+	mapping: FieldMapping<TValue, TFieldValue>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
