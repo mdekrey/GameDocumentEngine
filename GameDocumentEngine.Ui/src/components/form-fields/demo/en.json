@@ -1,6 +1,13 @@
 {
 	"demo": {
-		"fields": {},
-		"submit": "Submit Demo Form"
+		"fields": {
+			"name": {
+				"label": "Your Name",
+				"errors": {
+					"too_small": "Your name must be at least 5 characters long"
+				}
+			}
+		},
+		"submit": "Submit"
 	}
 }

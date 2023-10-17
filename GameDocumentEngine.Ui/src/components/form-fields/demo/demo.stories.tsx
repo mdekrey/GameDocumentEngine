@@ -4,7 +4,7 @@ import translations from './en.json';
 
 import { FormDemo } from './FormDemo';
 
-i18n.addResources('en', 'demo', translations.demo);
+i18n.addResourceBundle('en', 'demo', translations.demo);
 
 const meta = {
 	title: 'Form Demo',
