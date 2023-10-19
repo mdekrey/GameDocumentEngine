@@ -35,17 +35,6 @@
 					"too_small": "Please provide a name."
 				}
 			},
-			"roles": {
-				"owner": {
-					"name": "Owner",
-					"description": "Owner of the character with full control"
-				},
-				"observer": {
-					"name": "Observer",
-					"description": "Can see the character's details"
-				},
-				"no-role": { "name": "None" }
-			},
 			"details": {
 				"bio": {
 					"age": {
@@ -291,5 +280,16 @@
 				}
 			}
 		}
+	},
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the character with full control"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the character's details"
+		},
+		"no-role": { "name": "None" }
 	}
 }

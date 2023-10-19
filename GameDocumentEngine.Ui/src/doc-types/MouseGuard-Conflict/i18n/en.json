@@ -12,37 +12,6 @@
 					"too_small": "Please provide a name."
 				}
 			},
-			"roles": {
-				"organizer": {
-					"name": "Organizer",
-					"description": "Organizer of the conflict; sets skills and type"
-				},
-				"omniscient": {
-					"name": "Omniscient Observer",
-					"description": "Can see both side's choices as they make them"
-				},
-				"observer": {
-					"name": "Observer",
-					"description": "Can see only what is publicly revealed"
-				},
-				"side-a-captain": {
-					"name": "Conflict Captain of Side A",
-					"description": "Makes choices for side A"
-				},
-				"side-a-member": {
-					"name": "Member of Side A",
-					"description": "Participates for side A, but does not make choices"
-				},
-				"side-b-captain": {
-					"name": "Conflict Captain of Side B",
-					"description": "Makes choices for side B"
-				},
-				"side-b-member": {
-					"name": "Member of Side B",
-					"description": "Participates for side B, but does not make choices"
-				},
-				"no-role": { "name": "None" }
-			},
 			"details": {
 				"general": {
 					"type": {
@@ -168,5 +137,36 @@
 		"are-you-sure": "Are you sure you want to clear both sides' selections?",
 		"submit": "Yes, I'm sure!",
 		"cancel": "No, don't clear"
+	},
+	"roles": {
+		"organizer": {
+			"name": "Organizer",
+			"description": "Organizer of the conflict; sets skills and type"
+		},
+		"omniscient": {
+			"name": "Omniscient Observer",
+			"description": "Can see both side's choices as they make them"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see only what is publicly revealed"
+		},
+		"side-a-captain": {
+			"name": "Conflict Captain of Side A",
+			"description": "Makes choices for side A"
+		},
+		"side-a-member": {
+			"name": "Member of Side A",
+			"description": "Participates for side A, but does not make choices"
+		},
+		"side-b-captain": {
+			"name": "Conflict Captain of Side B",
+			"description": "Makes choices for side B"
+		},
+		"side-b-member": {
+			"name": "Member of Side B",
+			"description": "Participates for side B, but does not make choices"
+		},
+		"no-role": { "name": "None" }
 	}
 }

@@ -39,9 +39,7 @@ export function RoleAssignment({
 	translations: t,
 }: RoleAssignmentProps) {
 	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
-	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace, {
-		keyPrefix: 'document',
-	});
+	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace);
 
 	const formData =
 		defaultRole !== undefined
@@ -83,6 +81,7 @@ export function RoleAssignment({
 					fields={form.fields.row}
 					players={playerNames}
 					roles={roles}
+					translation={roleTranslations}
 				/>
 				{allowUpdate && (
 					<ButtonRow>
