@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { Button } from '@/components/button/button';
-import { useModal } from '@/utils/modal/modal-service';
+import { useLaunchModal } from '@/utils/modal/modal-service';
 import { useGameType } from '../useGameType';
 import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
 import { Prose } from '@/components/text/common';
@@ -118,7 +118,7 @@ function LoadedDocumentSettings({
 
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-	const launchModal = useModal();
+	const launchModal = useLaunchModal();
 	const deleteDocument = useMutation(
 		queries.deleteDocument(queryClient, gameId, documentId),
 	);

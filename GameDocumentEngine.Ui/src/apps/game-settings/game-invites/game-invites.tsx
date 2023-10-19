@@ -1,6 +1,6 @@
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
-import { useModal } from '@/utils/modal/modal-service';
+import { useLaunchModal } from '@/utils/modal/modal-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
@@ -21,7 +21,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 
 	const gameData = useQuery(queries.getGameDetails(gameId));
 	const invitationsResult = useQuery(queries.listInvitations(gameId));
-	const launchModal = useModal();
+	const launchModal = useLaunchModal();
 	const copyLink = useMutation({
 		mutationFn: async (invitation: GameInvite) => {
 			await navigator.clipboard.writeText(getInviteUrl(invitation));

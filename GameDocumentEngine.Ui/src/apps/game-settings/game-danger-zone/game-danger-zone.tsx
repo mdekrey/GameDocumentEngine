@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { Button } from '@/components/button/button';
-import { useModal } from '@/utils/modal/modal-service';
+import { useLaunchModal } from '@/utils/modal/modal-service';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
@@ -37,7 +37,7 @@ function useRemoveUserFromGame() {
 
 export function GameDangerZone({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
-	const launchModal = useModal();
+	const launchModal = useLaunchModal();
 	const { t } = useTranslation('game-settings');
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));

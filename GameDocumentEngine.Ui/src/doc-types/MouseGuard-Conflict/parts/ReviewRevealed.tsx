@@ -6,7 +6,7 @@ import { Button } from '@/components/button/button';
 import { useFormFields } from '@/utils/form';
 import { useAtomValue } from 'jotai';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { useModal } from '@/utils/modal/modal-service';
+import { useLaunchModal } from '@/utils/modal/modal-service';
 import { useTranslation } from 'react-i18next';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Prose } from '@/components/text/common';
@@ -63,7 +63,7 @@ function ClearButtonRow({
 	const field = useFormFields(yourSide, {
 		ready: ['ready'],
 	});
-	const launchModal = useModal();
+	const launchModal = useLaunchModal();
 
 	return (
 		<ButtonRow>

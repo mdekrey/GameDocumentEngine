@@ -5,7 +5,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { HubConnectionState } from '@microsoft/signalr';
 import { JotaiDiv } from '@/components/jotai/div';
 import { IconButton } from '../button/icon-button';
-import { useModal } from '@/utils/modal/modal-service';
+import { useLaunchModal } from '@/utils/modal/modal-service';
 import { useRef, useEffect, useCallback, memo } from 'react';
 import type { Atom } from 'jotai';
 import { useStore } from 'jotai';
@@ -22,7 +22,7 @@ export const NetworkIndicator = memo(function NetworkIndicator({
 	onReconnect: reconnect,
 }: NetworkIndicatorProps) {
 	const abortModal = useRef<AbortController | null>(null);
-	const launchModal = useModal();
+	const launchModal = useLaunchModal();
 	const store = useStore();
 	const onReconnect = useCallback(
 		function onReconnect() {
