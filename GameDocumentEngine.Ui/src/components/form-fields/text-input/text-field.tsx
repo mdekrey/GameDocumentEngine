@@ -1,7 +1,6 @@
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextInput } from './text-input';
-import type { UseFieldResult } from '@/utils/form';
 import type { FieldMapping } from '@/utils/form';
 import type { FieldProps } from '../FieldProps';
 import { noChange } from '@/utils/form';
@@ -96,18 +95,12 @@ export function applyMappingToTextField<
 	mapping: FieldMapping<T, string>,
 	defaults: TDefaults,
 ): (
-	props: {
-		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
-	} & Omit<TextFieldPersistentProps, keyof TDefaults>,
+	props: FieldProps<T> & Omit<TextFieldPersistentProps, keyof TDefaults>,
 ) => React.ReactNode;
 export function applyMappingToTextField<T>(
 	displayName: string,
 	mapping: FieldMapping<T, string>,
-): (
-	props: {
-		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
-	} & TextFieldPersistentProps,
-) => React.ReactNode;
+): (props: FieldProps<T> & TextFieldPersistentProps) => React.ReactNode;
 export function applyMappingToTextField<T>(
 	displayName: string,
 	mapping: FieldMapping<T, string>,
@@ -116,9 +109,7 @@ export function applyMappingToTextField<T>(
 	function Result({
 		field,
 		...props
-	}: {
-		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
-	} & TextFieldPersistentProps) {
+	}: FieldProps<T> & TextFieldPersistentProps) {
 		const newField = useMemo(() => field.applyMapping(mapping), [field]);
 		return <TextField field={newField} {...defaults} {...props} />;
 	}

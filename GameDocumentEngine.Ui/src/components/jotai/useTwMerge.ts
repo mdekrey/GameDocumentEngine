@@ -1,4 +1,5 @@
-import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { isAtom } from '@principlestudios/jotai-utilities/isAtom';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { Atom } from 'jotai';
 import type { ClassNameValue } from 'tailwind-merge';
 import { twMerge } from 'tailwind-merge';

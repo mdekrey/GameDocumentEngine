@@ -1,5 +1,5 @@
+import { isAtom } from '@principlestudios/jotai-utilities/isAtom';
 import {
-	isAtom,
 	mapProperty,
 	useComputedAtom,
 	withSignal,

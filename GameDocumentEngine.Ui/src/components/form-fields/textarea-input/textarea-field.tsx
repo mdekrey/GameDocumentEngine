@@ -1,7 +1,6 @@
 import { ErrorsList } from '../errors/errors-list';
 import { Field } from '../field/field';
 import { TextareaInput } from './textarea-input';
-import type { UseFieldResult } from '@/utils/form';
 import type { FieldMapping } from '@/utils/form';
 import type { FieldProps } from '../FieldProps';
 import type { JotaiLabel } from '../../jotai/label';
@@ -59,18 +58,12 @@ export function applyMappingToTextareaField<
 	mapping: FieldMapping<T, string>,
 	defaults: TDefaults,
 ): (
-	props: {
-		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
-	} & Omit<TextareaFieldPersistentProps, keyof TDefaults>,
+	props: FieldProps<T> & Omit<TextareaFieldPersistentProps, keyof TDefaults>,
 ) => React.ReactNode;
 export function applyMappingToTextareaField<T>(
 	displayName: string,
 	mapping: FieldMapping<T, string>,
-): (
-	props: {
-		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
-	} & TextareaFieldPersistentProps,
-) => React.ReactNode;
+): (props: FieldProps<T> & TextareaFieldPersistentProps) => React.ReactNode;
 export function applyMappingToTextareaField<T>(
 	displayName: string,
 	mapping: FieldMapping<T, string>,
@@ -79,9 +72,7 @@ export function applyMappingToTextareaField<T>(
 	function Result({
 		field,
 		...props
-	}: {
-		field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
-	} & TextareaFieldPersistentProps) {
+	}: FieldProps<T> & TextareaFieldPersistentProps) {
 		const newField = useMemo(() => field.applyMapping(mapping), [field]);
 		return <TextareaField field={newField} {...defaults} {...props} />;
 	}
