@@ -1,0 +1,159 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Break-Character",
+	"type": "object",
+	"required": [
+		"identity",
+		"aptitudes",
+		"combatValues",
+		"quirk",
+		"abilities",
+		"gear",
+		"social",
+		"allegience",
+		"wealth",
+		"xp"
+	],
+	"properties": {
+		"identity": { "$ref": "#/$defs/identity" },
+		"aptitudes": { "$ref": "#/$defs/aptitudes" },
+		"combatValues": { "$ref": "#/$defs/combatValues" },
+		"quirk": { "$ref": "#/$defs/quirk" },
+		"abilities": { "$ref": "#/$defs/abilities" },
+		"gear": { "$ref": "#/$defs/gear" },
+		"social": { "$ref": "#/$defs/social" },
+		"allegience": { "$ref": "#/$defs/allegience" },
+		"wealth": { "$ref": "#/$defs/wealth" },
+		"xp": { "$ref": "#/$defs/xp" }
+	},
+
+	"$defs": {
+		"identity": {
+			"type": "object",
+			"required": [],
+			"properties": {
+				"name": { "type": "string" },
+				"calling": { "type": "string" },
+				"rank": { "type": "integer" },
+				"species": { "type": "string" },
+				"size": { "type": "string", "enum": ["medium", "large"] },
+				"homeland": { "type": "string" },
+				"languages": { "type": "array", "items": { "type": "string" } },
+				"history": { "type": "string" },
+				"purviews": { "type": "string" },
+				"description": { "type": "string" }
+			}
+		},
+		"aptitudes": {
+			"type": "object",
+			"required": ["might", "deftness", "grit", "insight", "aura"],
+			"properties": {
+				"might": { "$ref": "#/$defs/aptitude" },
+				"deftness": { "$ref": "#/$defs/aptitude" },
+				"grit": { "$ref": "#/$defs/aptitude" },
+				"insight": { "$ref": "#/$defs/aptitude" },
+				"aura": { "$ref": "#/$defs/aptitude" }
+			}
+		},
+		"aptitude": {
+			"type": "object",
+			"required": ["base", "trait", "modifiers"],
+			"properties": {
+				"base": { "type": "integer" },
+				"trait": { "type": "integer" },
+				"current": { "type": "integer" },
+				"modifiers": { "$ref": "#/$defs/modifiers" }
+			}
+		},
+		"combatValues": {
+			"type": "object",
+			"required": ["attackBonus", "weapons", "hearts", "defense", "speed"],
+			"properties": {
+				"attackBonus": { "type": "integer" },
+				"weapons": { "type": "array", "items": { "$ref": "#/$defs/weapon" } },
+				"hearts": { "$ref": "#/$defs/hearts" },
+				"defense": { "$ref": "#/$defs/rating" },
+				"speed": { "$ref": "#/$defs/rating" }
+			}
+		},
+		"hearts": {
+			"type": "object",
+			"required": ["base", "total", "current", "modifiers", "injuries"],
+			"properties": {
+				"base": { "type": "integer" },
+				"total": { "type": "integer" },
+				"current": { "type": "integer" },
+				"modifiers": { "$ref": "#/$defs/modifiers" },
+				"injuries": { "type": "string" }
+			}
+		},
+		"rating": {
+			"type": "object",
+			"required": ["base", "total", "modifiers"],
+			"properties": {
+				"base": { "type": "integer" },
+				"total": { "type": "integer" },
+				"modifiers": { "$ref": "#/$defs/modifiers" }
+			}
+		},
+		"quirk": { "type": "string" },
+		"abilities": { "type": "array", "items": { "$ref": "#/$defs/ability" } },
+		"gear": {
+			"type": "object",
+			"required": [
+				"worn",
+				"slotsBase",
+				"slotsTotal",
+				"slotsModifiers",
+				"inventory"
+			],
+			"properties": {
+				"worn": { "type": "string" },
+				"slotsBase": { "type": "integer" },
+				"slotsTotal": { "type": "integer" },
+				"slotsModifiers": { "$ref": "#/$defs/modifiers" },
+				"inventory": { "type": "array", "items": { "type": "string" } }
+			}
+		},
+		"social": { "type": "string" },
+		"allegience": {
+			"type": "object",
+			"required": ["darkPoints", "brightPoints", "gifts"],
+			"properties": {
+				"darkPoints": { "type": "integer" },
+				"brightPoints": { "type": "integer" },
+				"gifts": { "type": "string" }
+			}
+		},
+		"wealth": {
+			"type": "object",
+			"required": ["stones", "coins", "gems"],
+			"properties": {
+				"stones": { "type": "integer" },
+				"coins": { "type": "integer" },
+				"gems": { "type": "integer" }
+			}
+		},
+		"xp": {
+			"type": "object",
+			"required": ["current", "nextRank"],
+			"properties": {
+				"current": { "type": "integer" },
+				"nextRank": { "type": "integer" }
+			}
+		},
+
+		"modifiers": {
+			"type": "string"
+		},
+		"ability": {
+			"type": "object",
+			"required": ["name", "description"],
+			"properties": {
+				"name": { "type": "string" },
+				"page": { "type": "integer" },
+				"description": { "type": "string" }
+			}
+		}
+	}
+}
