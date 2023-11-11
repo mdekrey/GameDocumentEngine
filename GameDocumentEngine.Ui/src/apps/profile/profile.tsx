@@ -3,7 +3,7 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
-import type { UseFieldResult } from '@/utils/form';
+import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { useForm } from '@/utils/form';
@@ -20,7 +20,7 @@ function usePatchUser() {
 	return useMutation(queries.patchUser(queryClient));
 }
 
-export function ProfileFields({ name }: { name: UseFieldResult<string> }) {
+export function ProfileFields({ name }: { name: StandardField<string> }) {
 	const { t } = useTranslation(['profile']);
 	return (
 		<Fieldset>

@@ -43,7 +43,7 @@ internal sealed class NodeScriptRunner : IDisposable
 			// directly (except with UseShellExecute=true, but that's no good, because
 			// it prevents capturing stdio). So we need to invoke it via "cmd /c".
 			exeToRun = "cmd";
-			completeArguments = $"/c {command} {completeArguments}";
+			completeArguments = $"/c \"{command}\" {completeArguments}";
 		}
 
 		var processStartInfo = new ProcessStartInfo(exeToRun)

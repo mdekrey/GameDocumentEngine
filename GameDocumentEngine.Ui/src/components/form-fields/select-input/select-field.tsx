@@ -2,16 +2,16 @@ import { ErrorsList } from '@/components/form-fields/errors/errors-list';
 import { Field } from '@/components/form-fields/field/field';
 import type { SelectInputProps } from '@/components/form-fields/select-input/select-input';
 import { SelectInput } from '@/components/form-fields/select-input/select-input';
-import type { UseFieldResult } from '@/utils/form';
+import type { StandardField } from '../FieldProps';
 
 export function SelectField<T>(props: {
-	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
+	field: StandardField<T>;
 	items: T[];
 	children: (item: T) => React.ReactNode;
 	selectInput: React.FC<SelectInputProps<T>>;
 }): JSX.Element;
 export function SelectField<T>(props: {
-	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
+	field: StandardField<T>;
 	items: T[];
 	children: (item: T) => React.ReactNode;
 }): JSX.Element;
@@ -21,7 +21,7 @@ export function SelectField<T>({
 	children,
 	selectInput: InputComponent = SelectInput,
 }: {
-	field: UseFieldResult<T, { hasErrors: true; hasTranslations: true }>;
+	field: StandardField<T>;
 	items: T[];
 	children: (item: T) => React.ReactNode;
 	selectInput?: React.FC<SelectInputProps<T>>;

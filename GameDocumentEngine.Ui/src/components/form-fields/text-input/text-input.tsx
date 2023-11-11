@@ -1,4 +1,5 @@
-import { isAtom, useComputedAtom } from '@principlestudios/jotai-react-signals';
+import { isAtom } from '@principlestudios/jotai-utilities/isAtom';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { JotaiInput } from '../../jotai/input';
 import { useTwMerge } from '../../jotai/useTwMerge';
 import styles from './text-input.module.css';

@@ -21,7 +21,10 @@
 	"dependencies": {
 		"@headlessui/react": "^1.7.16",
 		"@microsoft/signalr": "^7.0.9",
-		"@principlestudios/jotai-react-signals": "^0.4.1",
+		"@principlestudios/jotai-react-signals": "^0.5.1",
+		"@principlestudios/jotai-utilities": "^0.5.0",
+		"@principlestudios/react-jotai-form-components": "^0.1.1",
+		"@principlestudios/react-jotai-forms": "^0.1.1",
 		"@principlestudios/openapi-codegen-typescript": "^0.6.3",
 		"@principlestudios/openapi-codegen-typescript-fetch": "^0.7.1",
 		"@tanstack/react-query": "^4.29.19",

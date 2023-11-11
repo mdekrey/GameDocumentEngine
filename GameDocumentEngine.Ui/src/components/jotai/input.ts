@@ -1,9 +1,3 @@
-import { withSignal, mapProperty } from '@principlestudios/jotai-react-signals';
+import JotaiInput from '@principlestudios/react-jotai-form-components/input';
 
-export const JotaiInput = withSignal('input', {
-	defaultValue: mapProperty('value'),
-	defaultChecked: mapProperty('checked'),
-	disabled: mapProperty('disabled'),
-	readOnly: mapProperty('readOnly'),
-	className: mapProperty('className'),
-});
+export { JotaiInput };
