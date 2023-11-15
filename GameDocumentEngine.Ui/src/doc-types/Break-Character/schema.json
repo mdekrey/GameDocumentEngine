@@ -32,11 +32,13 @@
 			"type": "object",
 			"required": [],
 			"properties": {
-				"name": { "type": "string" },
 				"calling": { "type": "string" },
 				"rank": { "type": "integer" },
 				"species": { "type": "string" },
-				"size": { "type": "string", "enum": ["medium", "large"] },
+				"size": {
+					"type": "string",
+					"enum": ["tiny", "small", "medium", "large", "massive", "colossal"]
+				},
 				"homeland": { "type": "string" },
 				"languages": { "type": "array", "items": { "type": "string" } },
 				"history": { "type": "string" },
@@ -57,23 +59,40 @@
 		},
 		"aptitude": {
 			"type": "object",
-			"required": ["base", "trait", "modifiers"],
+			"required": ["base", "trait", "total", "modifiers"],
 			"properties": {
 				"base": { "type": "integer" },
 				"trait": { "type": "integer" },
-				"current": { "type": "integer" },
+				"total": { "type": "integer" },
 				"modifiers": { "$ref": "#/$defs/modifiers" }
 			}
 		},
 		"combatValues": {
 			"type": "object",
-			"required": ["attackBonus", "weapons", "hearts", "defense", "speed"],
+			"required": ["attack", "hearts", "defense", "speed"],
+			"properties": {
+				"attack": { "$ref": "#/$defs/attack" },
+				"hearts": { "$ref": "#/$defs/hearts" },
+				"defense": { "$ref": "#/$defs/defense" },
+				"speed": { "$ref": "#/$defs/speed" }
+			}
+		},
+		"attack": {
+			"type": "object",
+			"required": ["attackBonus", "weapons"],
 			"properties": {
 				"attackBonus": { "type": "integer" },
-				"weapons": { "type": "array", "items": { "$ref": "#/$defs/weapon" } },
-				"hearts": { "$ref": "#/$defs/hearts" },
-				"defense": { "$ref": "#/$defs/rating" },
-				"speed": { "$ref": "#/$defs/rating" }
+				"weapons": { "type": "array", "items": { "$ref": "#/$defs/weapon" } }
+			}
+		},
+		"weapon": {
+			"type": "object",
+			"required": [],
+			"properties": {
+				"name": { "type": "string" },
+				"bonuses": { "type": "string" },
+				"extraDamage": { "type": "integer" },
+				"attackBonus": { "type": "integer" }
 			}
 		},
 		"hearts": {
@@ -87,12 +106,27 @@
 				"injuries": { "type": "string" }
 			}
 		},
-		"rating": {
+		"defense": {
 			"type": "object",
 			"required": ["base", "total", "modifiers"],
 			"properties": {
 				"base": { "type": "integer" },
 				"total": { "type": "integer" },
+				"modifiers": { "$ref": "#/$defs/modifiers" }
+			}
+		},
+		"speed": {
+			"type": "object",
+			"required": ["base", "actual", "modifiers"],
+			"properties": {
+				"base": {
+					"type": "string",
+					"enum": ["slow", "average", "fast", "very-fast"]
+				},
+				"actual": {
+					"type": "string",
+					"enum": ["slow", "average", "fast", "very-fast"]
+				},
 				"modifiers": { "$ref": "#/$defs/modifiers" }
 			}
 		},

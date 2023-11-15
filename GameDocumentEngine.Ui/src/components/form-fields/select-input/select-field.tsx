@@ -6,13 +6,13 @@ import type { StandardField } from '../FieldProps';
 
 export function SelectField<T>(props: {
 	field: StandardField<T>;
-	items: T[];
+	items: readonly T[];
 	children: (item: T) => React.ReactNode;
 	selectInput: React.FC<SelectInputProps<T>>;
 }): JSX.Element;
 export function SelectField<T>(props: {
 	field: StandardField<T>;
-	items: T[];
+	items: readonly T[];
 	children: (item: T) => React.ReactNode;
 }): JSX.Element;
 export function SelectField<T>({
@@ -22,7 +22,7 @@ export function SelectField<T>({
 	selectInput: InputComponent = SelectInput,
 }: {
 	field: StandardField<T>;
-	items: T[];
+	items: readonly T[];
 	children: (item: T) => React.ReactNode;
 	selectInput?: React.FC<SelectInputProps<T>>;
 }) {

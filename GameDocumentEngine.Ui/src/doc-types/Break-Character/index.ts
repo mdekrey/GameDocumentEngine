@@ -11,32 +11,39 @@ const template: z.infer<typeof schema> = {
 		might: {
 			base: 6,
 			trait: 0,
+			total: 6,
 			modifiers: '',
 		},
 		deftness: {
 			base: 6,
 			trait: 0,
+			total: 6,
 			modifiers: '',
 		},
 		grit: {
 			base: 6,
 			trait: 0,
+			total: 6,
 			modifiers: '',
 		},
 		insight: {
 			base: 6,
 			trait: 0,
+			total: 6,
 			modifiers: '',
 		},
 		aura: {
 			base: 6,
 			trait: 0,
+			total: 6,
 			modifiers: '',
 		},
 	},
 	combatValues: {
-		attackBonus: 0,
-		weapons: [],
+		attack: {
+			attackBonus: 0,
+			weapons: [],
+		},
 		hearts: {
 			base: 0,
 			current: 0,
@@ -50,9 +57,9 @@ const template: z.infer<typeof schema> = {
 			total: 0,
 		},
 		speed: {
-			base: 0,
+			base: 'average',
 			modifiers: '',
-			total: 0,
+			actual: 'average',
 		},
 	},
 	quirk: '',

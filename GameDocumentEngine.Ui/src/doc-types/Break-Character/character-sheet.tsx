@@ -1,47 +1,57 @@
-import type { TabConfig } from '@/components/tabs/tabs';
-import type { HiOutlineUser } from 'react-icons/hi2';
 import {
+	HiOutlineUser,
 	HiOutlineHeart,
 	HiOutlineListBullet,
-	HiOutlineAcademicCap,
+	HiChatBubbleLeftRight,
 } from 'react-icons/hi2';
+import { CombatValues } from './parts/combat-values';
 import { Tabs } from '@/components/tabs/tabs';
-import type {
-	GameObjectFormComponent,
-	GameObjectWidgetProps,
-} from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
-import { useMemo } from 'react';
-import type { Character, CharacterDocument } from './character-types';
-import type { UseFormResult } from '@principlestudios/react-jotai-forms';
+import type { Character } from './character-types';
 import { AtomContents } from '@/components/jotai/atom-contents';
 import { atom } from 'jotai';
+import { Identity } from './parts/identity';
+import { Aptitudes } from './parts/aptitudes';
+import { LuBackpack, LuSword } from 'react-icons/lu';
+import { Abilities } from './parts/abilities';
+import { Social } from './parts/social';
+import { Gear } from './parts/gear';
 
-type TabContent = React.FC<{
-	form: UseFormResult<CharacterDocument>;
-	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
-}>;
-
-const tabInfo: [id: string, icon: typeof HiOutlineUser, content: TabContent][] =
-	[];
+const tabInfo: [
+	id: string,
+	icon: typeof HiOutlineUser,
+	content: React.FC<GameObjectFormComponent<Character>>,
+][] = [
+	['identity', HiOutlineUser, Identity],
+	['aptitudes', HiOutlineHeart, Aptitudes],
+	['combat', LuSword, CombatValues],
+	['abilities', HiOutlineListBullet, Abilities],
+	['social', HiChatBubbleLeftRight, Social],
+	['inventory', LuBackpack, Gear],
+];
 
 export function CharacterSheet({
 	form,
 	onSubmit,
 	translation: t,
+	...remaining
 }: GameObjectFormComponent<Character>) {
 	useSubmitOnChange(form, onSubmit);
 
-	const tabs = useMemo(
-		(): TabConfig[] =>
-			tabInfo.map(([key, icon, Component]) => ({
-				key,
-				icon,
-				title: t(`character-sheet.tabs.${key}`),
-				content: <Component form={form} translation={t} />,
-			})),
-		[form, t],
-	);
+	const tabs = tabInfo.map(([key, icon, Component]) => ({
+		key,
+		icon,
+		title: t(`character-sheet.tabs.${key}`),
+		content: (
+			<Component
+				form={form}
+				translation={t}
+				onSubmit={onSubmit}
+				{...remaining}
+			/>
+		),
+	}));
 
 	const contents = atom((get) => JSON.stringify(get(form.atom)));
 
