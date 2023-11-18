@@ -39,7 +39,7 @@ export function Identity({ form }: GameObjectFormComponent<Character>) {
 				<NumberField.UndefinedOrInteger field={fields.rank} />
 				<TextField.AllowUndefined field={fields.species} />
 				<SelectField field={fields.size} items={sizes}>
-					{(s) => s && fields.size.translation(s)}
+					{(s) => (s ? fields.size.translation(s) : '-')}
 				</SelectField>
 				<TextField.AllowUndefined field={fields.homeland} />
 				{/* <TextField.AllowUndefined field={fields.languages} /> */}

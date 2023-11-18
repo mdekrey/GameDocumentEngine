@@ -9,8 +9,6 @@ import { Tabs } from '@/components/tabs/tabs';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import type { Character } from './character-types';
-import { AtomContents } from '@/components/jotai/atom-contents';
-import { atom } from 'jotai';
 import { Identity } from './parts/identity';
 import { Aptitudes } from './parts/aptitudes';
 import { LuBackpack, LuSword } from 'react-icons/lu';
@@ -53,14 +51,11 @@ export function CharacterSheet({
 		),
 	}));
 
-	const contents = atom((get) => JSON.stringify(get(form.atom)));
-
 	return (
 		<form
 			onSubmit={form.handleSubmit(onSubmit)}
 			className="flex flex-col gap-2"
 		>
-			<AtomContents>{contents}</AtomContents>
 			<Tabs tabs={tabs} />
 		</form>
 	);

@@ -19,6 +19,7 @@ export function useFieldList<T>(
 	const { item } = useFormFields(field, {
 		item: (index: number) => ({
 			path: [index] as const,
+			translationPath: [],
 		}),
 	});
 	const length = useAtomValue(useComputedAtom((get) => get(field.atom).length));

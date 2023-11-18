@@ -18,8 +18,6 @@ export function Gear({ form }: GameObjectFormComponent<Character>) {
 		slotsTotal: ['details', 'gear', 'slotsTotal'],
 		slotsModifiers: ['details', 'gear', 'slotsModifiers'],
 		inventory: ['details', 'gear', 'inventory'],
-		inventoryItem: (index: number) =>
-			['details', 'gear', 'inventory', index] as const,
 	});
 
 	return (
