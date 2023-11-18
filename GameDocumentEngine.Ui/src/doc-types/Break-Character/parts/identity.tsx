@@ -1,4 +1,5 @@
 import type { Character } from '../character-types';
+import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import { useFormFields } from '@/utils/form';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
@@ -6,6 +7,9 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
+import { BasicList } from './BasicList';
+import { IconButton } from '@/components/button/icon-button';
+import { HiMinus } from 'react-icons/hi2';
 
 const sizes = [
 	undefined,
@@ -17,6 +21,15 @@ const sizes = [
 	'colossal',
 ] as const;
 
+export const languageFixup: FieldMapping<string[] | undefined, string[]> = {
+	toForm(networkValue) {
+		return networkValue ?? [];
+	},
+	fromForm(currentValue) {
+		return currentValue.length === 0 ? undefined : currentValue;
+	},
+};
+
 export function Identity({ form }: GameObjectFormComponent<Character>) {
 	const fields = useFormFields(form, {
 		name: ['name'],
@@ -25,10 +38,15 @@ export function Identity({ form }: GameObjectFormComponent<Character>) {
 		species: ['details', 'identity', 'species'],
 		size: ['details', 'identity', 'size'],
 		homeland: ['details', 'identity', 'homeland'],
-		languages: ['details', 'identity', 'languages'],
+		languages: {
+			path: ['details', 'identity', 'languages'],
+			mapping: languageFixup,
+		},
 		history: ['details', 'identity', 'history'],
 		purviews: ['details', 'identity', 'purviews'],
 		description: ['details', 'identity', 'description'],
+		currentXp: ['details', 'xp', 'current'],
+		nextRank: ['details', 'xp', 'nextRank'],
 	});
 
 	return (
@@ -42,11 +60,35 @@ export function Identity({ form }: GameObjectFormComponent<Character>) {
 					{(s) => (s ? fields.size.translation(s) : '-')}
 				</SelectField>
 				<TextField.AllowUndefined field={fields.homeland} />
-				{/* <TextField.AllowUndefined field={fields.languages} /> */}
+				<h3 className="text-lg">{fields.languages.translation('title')}</h3>
+				<BasicList
+					field={fields.languages}
+					defaultValue=""
+					fieldComponent={LanguageField}
+				/>
 				<TextField.AllowUndefined field={fields.history} />
 				<TextareaField.AllowUndefined field={fields.purviews} />
 				<TextareaField.AllowUndefined field={fields.description} />
+				<NumberField.Integer field={fields.currentXp} />
+				<NumberField.Integer field={fields.nextRank} />
 			</Fieldset>
+		</div>
+	);
+}
+
+function LanguageField({
+	field,
+	onRemove,
+}: {
+	field: FormFieldReturnType<string>;
+	onRemove: () => void;
+}) {
+	return (
+		<div>
+			<TextField field={field} />
+			<IconButton.Destructive onClick={onRemove}>
+				<HiMinus />
+			</IconButton.Destructive>
 		</div>
 	);
 }

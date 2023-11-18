@@ -53,6 +53,10 @@
 					"homeland": {
 						"label": "Homeland"
 					},
+					"languages": {
+						"title": "Languages",
+						"label": "Language"
+					},
 					"history": {
 						"label": "History"
 					},
@@ -178,6 +182,15 @@
 					"slotsTotal": { "label": "Total Slots" },
 					"slotsModifiers": { "label": "Additional Slots" },
 					"inventory": { "label": "Item" }
+				},
+				"wealth": {
+					"stones": { "label": "Stones" },
+					"coins": { "label": "Coins" },
+					"gems": { "label": "Gems" }
+				},
+				"xp": {
+					"current": { "label": "Current XP" },
+					"nextRank": { "label": "Next Rank at XP" }
 				}
 			}
 		}

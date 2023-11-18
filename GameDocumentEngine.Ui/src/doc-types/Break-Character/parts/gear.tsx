@@ -18,6 +18,9 @@ export function Gear({ form }: GameObjectFormComponent<Character>) {
 		slotsTotal: ['details', 'gear', 'slotsTotal'],
 		slotsModifiers: ['details', 'gear', 'slotsModifiers'],
 		inventory: ['details', 'gear', 'inventory'],
+		stones: ['details', 'wealth', 'stones'],
+		coins: ['details', 'wealth', 'coins'],
+		gems: ['details', 'wealth', 'gems'],
 	});
 
 	return (
@@ -31,6 +34,9 @@ export function Gear({ form }: GameObjectFormComponent<Character>) {
 				defaultValue={defaultInventoryItem}
 				fieldComponent={InventoryItemField}
 			/>
+			<NumberField.Integer field={fields.stones} />
+			<NumberField.Integer field={fields.coins} />
+			<NumberField.Integer field={fields.gems} />
 		</>
 	);
 }
@@ -44,7 +50,7 @@ function InventoryItemField({
 }) {
 	return (
 		<div>
-			<TextField field={field} />
+			<TextareaField field={field} />
 			<IconButton.Destructive onClick={onRemove}>
 				<HiMinus />
 			</IconButton.Destructive>

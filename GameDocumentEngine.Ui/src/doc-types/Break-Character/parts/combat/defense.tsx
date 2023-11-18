@@ -24,6 +24,7 @@ export function DefenseFields({
 }) {
 	const fields = useFormFields(form, {
 		base: ['base'],
+		total: ['total'],
 		modifiers: ['modifiers'],
 	});
 
@@ -33,6 +34,7 @@ export function DefenseFields({
 			<CardTitle>{form.translation('title')}</CardTitle>
 			<CardHint>{form.translation('hint')}</CardHint>
 			<NumberField.Integer field={fields.base} />
+			<NumberField.Integer field={fields.total} />
 			{/* TODO */}
 			<TextareaField field={fields.modifiers} />
 		</Container>
