@@ -60,13 +60,13 @@ function AbilityField({
 	return (
 		<div className={styles.ability}>
 			<TextField className={styles.abilityName} field={fields.name} />
-			<TextareaField
-				className={styles.abilityDescription}
-				field={fields.description}
-			/>
 			<NumberField.UndefinedOrInteger
 				className={styles.abilityPage}
 				field={fields.page}
+			/>
+			<TextareaField
+				className={styles.abilityDescription}
+				field={fields.description}
 			/>
 			<IconButton.Destructive
 				onClick={onRemove}
