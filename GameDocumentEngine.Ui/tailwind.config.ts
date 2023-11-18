@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 import defaultColors from 'tailwindcss/colors';
 
 const config: Config = {
-	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,css}'],
 	darkMode: 'class',
 	theme: {
 		colors: {

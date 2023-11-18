@@ -1,0 +1,107 @@
+.aptitude {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto auto auto auto auto auto;
+	grid-template-areas:
+		'title title base'
+		'hint hint base'
+		'total trait trait'
+		'total indicator indicator'
+		'total modifiers-label modifiers-label'
+		'. modifiers-field modifiers-field';
+	max-width: 380px;
+}
+.might .stop1 { stop-color: rgb(240, 89, 74); }
+.might .stop2 { stop-color: rgb(237, 37, 41); }
+.deftness .stop1 { stop-color: rgb(246, 146, 34); }
+.deftness .stop2 { stop-color: rgb(241, 90, 40); }
+.grit .stop1 { stop-color: rgb(138, 197, 66); }
+.grit .stop2 { stop-color: rgb(61, 181, 75); }
+.insight .stop1 { stop-color: rgb(39, 167, 223); }
+.insight .stop2 { stop-color: rgb(9, 114, 186); }
+.aura .stop1 { stop-color: rgb(129, 92, 167); }
+.aura .stop2 { stop-color: rgb(103, 50, 144); }
+
+
+.title {
+	grid-area: title;
+}
+
+.hint {
+	grid-area: hint;
+	composes: mb-2 from global;
+}
+
+.base {
+	grid-area: base;
+	composes: flex flex-row gap-4 from global;
+}
+.base input {
+	height: 2.5rem;
+	width: 2.5rem;
+	border-radius: 100%;
+	text-align: center;
+}
+
+.total {
+	grid-area: total;
+	composes: self-center from global;
+	z-index: theme(zIndex.dropdown);
+}
+.total span {
+	@apply sr-only;
+}
+.total input {
+	height: 3rem;
+	width: 3rem;
+	border-radius: 100%;
+	text-align: center;
+	background-color: theme(colors.white);
+	border-color: theme(colors.slate.800);
+}
+:global(.dark) .total input {
+	background-color: theme(colors.slate.950);
+	border-color: theme(colors.slate.200);
+}
+
+.trait {
+	grid-area: trait;
+	composes: flex flex-row items-center from global;
+}
+.trait div {
+	display: contents;
+}
+.trait span {
+	font-size: 0.75rem;
+	padding-top: 0;
+	width: 2.5rem;
+}
+.trait input {
+	font-size: 0.75rem;
+	padding: 0;
+	border: none;
+	text-align: center;
+	width: 2rem;
+}
+
+.indicator {
+	grid-area: indicator;
+	display: block;
+	margin-left: -4px;
+}
+
+.modifiers {
+	display: contents;
+}
+.modifiers span {
+	grid-area: modifiers-label;
+	font-size: 0.75rem;
+	padding-top: 0;
+}
+.modifiers div {
+	grid-area: modifiers-field;
+}
+.modifiers textarea {
+	border: none;
+	resize: none;
+}

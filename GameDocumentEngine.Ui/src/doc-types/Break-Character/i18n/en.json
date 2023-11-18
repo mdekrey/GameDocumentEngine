@@ -1,0 +1,185 @@
+{
+	"name": "Break!! Character",
+	"details": {
+		"delete": "Delete character",
+		"edit-roles": "Edit roles"
+	},
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the character with full control"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the character's details"
+		},
+		"no-role": { "name": "None" }
+	},
+	"character-sheet": {
+		"tabs": {
+			"identity": "Identity",
+			"aptitudes": "Aptitudes",
+			"combat": "Combat",
+			"abilities": "Abilities",
+			"social": "Social",
+			"inventory": "Gear"
+		}
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			},
+			"details": {
+				"identity": {
+					"calling": {
+						"label": "Calling"
+					},
+					"rank": {
+						"label": "Rank"
+					},
+					"species": {
+						"label": "Species"
+					},
+					"size": {
+						"label": "Size",
+						"tiny": "Tiny",
+						"small": "Small",
+						"medium": "Medium",
+						"large": "Large",
+						"massive": "Massive",
+						"colossal": "Colossal"
+					},
+					"homeland": {
+						"label": "Homeland"
+					},
+					"history": {
+						"label": "History"
+					},
+					"purviews": {
+						"label": "Purviews"
+					},
+					"description": {
+						"label": "Description"
+					}
+				},
+				"aptitudes": {
+					"might": {
+						"sectionHeader": "Might",
+						"sectionHint": "Smash, crush, lift",
+						"base": { "label": "Base" },
+						"trait": { "label": "Trait" },
+						"total": { "label": "Total" },
+						"modifiers": { "label": "Bonuses/Penalties" }
+					},
+					"deftness": {
+						"sectionHeader": "Deftness",
+						"sectionHint": "Dodge, sneak, leap",
+						"base": { "label": "Base" },
+						"trait": { "label": "Trait" },
+						"total": { "label": "Total" },
+						"modifiers": { "label": "Bonuses/Penalties" }
+					},
+					"grit": {
+						"sectionHeader": "Grit",
+						"sectionHint": "Cling, persist, press on",
+						"base": { "label": "Base" },
+						"trait": { "label": "Trait" },
+						"total": { "label": "Total" },
+						"modifiers": { "label": "Bonuses/Penalties" }
+					},
+					"insight": {
+						"sectionHeader": "Insight",
+						"sectionHint": "Notice, know, remember",
+						"base": { "label": "Base" },
+						"trait": { "label": "Trait" },
+						"total": { "label": "Total" },
+						"modifiers": { "label": "Bonuses/Penalties" }
+					},
+					"aura": {
+						"sectionHeader": "Aura",
+						"sectionHint": "Persuade, inspire, terrify",
+						"base": { "label": "Base" },
+						"trait": { "label": "Trait" },
+						"total": { "label": "Total" },
+						"modifiers": { "label": "Bonuses/Penalties" }
+					}
+				},
+				"combatValues": {
+					"attack": {
+						"title": "Attack Bonus",
+						"hint": "Add to my Attack rolls",
+						"attackBonus": {
+							"label": "Base"
+						},
+						"weapons": {
+							"title": "Weapons",
+							"name": { "label": "Weapon" },
+							"bonuses": { "label": "Weapon Bonuses" },
+							"extraDamage": { "label": "Extra Damage" },
+							"attackBonus": { "label": "Attack Bonus" }
+						}
+					},
+					"hearts": {
+						"title": "Hearts Total",
+						"hint": "Protecting me from injury",
+						"base": {
+							"label": "Base"
+						},
+						"total": {
+							"label": "Total"
+						},
+						"current": {
+							"label": "Current"
+						},
+						"modifiers": { "label": "Bonuses/Penalties" },
+						"injuries": { "label": "Injuries" }
+					},
+					"defense": {
+						"title": "Defense Rating",
+						"hint": "Match or best this to harm me",
+						"base": {
+							"label": "Base"
+						},
+						"modifiers": { "label": "Bonuses/Penalties" }
+					},
+					"speed": {
+						"title": "Speed Rating",
+						"hint": "Sets Areas I can move through",
+						"base": {
+							"label": "Base"
+						},
+						"actual": {
+							"label": "Actual"
+						},
+						"modifiers": { "label": "Bonuses/Penalties" },
+						"slow": "Slow",
+						"average": "Average",
+						"fast": "Fast",
+						"very-fast": "V. Fast"
+					}
+				},
+				"quirk": { "label": "Quirk" },
+				"abilities": {
+					"title": "Abilities",
+					"name": { "label": "Name" },
+					"description": { "label": "Description" },
+					"page": { "label": "Page" }
+				},
+				"social": { "label": "Social" },
+				"allegience": {
+					"darkPoints": { "label": "Dark Allegience Points" },
+					"brightPoints": { "label": "Bright Allegience Points" },
+					"gifts": { "label": "Gifts" }
+				},
+				"gear": {
+					"worn": { "label": "Worn Outfit" },
+					"slotsBase": { "label": "Base Slots" },
+					"slotsTotal": { "label": "Total Slots" },
+					"slotsModifiers": { "label": "Additional Slots" },
+					"inventory": { "label": "Item" }
+				}
+			}
+		}
+	}
+}

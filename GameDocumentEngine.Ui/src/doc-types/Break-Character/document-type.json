@@ -1,0 +1,7 @@
+{
+	"name": "Break-Character",
+	"script": {
+		"type": "manifest",
+		"path": "src/doc-types/Break-Character/index.ts"
+	}
+}

@@ -9,7 +9,7 @@ import { HiCheck, HiChevronUpDown } from 'react-icons/hi2';
 
 export type SelectInputProps<T> = {
 	className?: string | Atom<string>;
-	items: T[];
+	items: readonly T[];
 	children: (item: T) => React.ReactNode;
 } & ControlledHtmlProps<T>;
 
