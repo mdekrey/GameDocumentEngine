@@ -30,7 +30,6 @@ export function Gear({ form }: GameObjectFormComponent<Character>) {
 			<TextareaField field={fields.slotsModifiers} />
 			<BasicList
 				field={fields.inventory}
-				item={fields.inventoryItem}
 				defaultValue={defaultInventoryItem}
 				fieldComponent={InventoryItemField}
 			/>

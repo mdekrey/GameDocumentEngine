@@ -1,33 +1,53 @@
-import type { FormFieldReturnType } from '@/utils/form';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useFormFields, type FormFieldReturnType } from '@/utils/form';
+import { useAtomValue } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { useCallback } from 'react';
-import { produce } from 'immer';
+import { useCallback, useRef } from 'react';
 
 export function useFieldList<T>(
 	field: FormFieldReturnType<T[]>,
-	item: (index: number) => FormFieldReturnType<T>,
 	defaultValue: T,
-) {
-	// TODO: the form library is restricting `Path<T[]>` from being `[number]`, making this all harder than it needs to be
+	toKey?: (this: void, item: T) => React.Key | undefined,
+): {
+	length: number;
+	addItem(this: void): void;
+	removeItem(this: void, index: number): void;
+	item(this: void, index: number): FormFieldReturnType<T>;
+	key(this: void, index: number): React.Key;
+	mutateKeys(this: void, mutator: (keys: React.Key[]) => React.Key[]): void;
+} {
+	const keys = useRef<React.Key[]>([]);
+	const { item } = useFormFields(field, {
+		item: (index: number) => ({
+			path: [index] as const,
+		}),
+	});
 	const length = useAtomValue(useComputedAtom((get) => get(field.atom).length));
-	const setter = useSetAtom(field.atom);
+	if (keys.current.length !== length) {
+		keys.current = field.get().map((v) => toKey?.(v) ?? crypto.randomUUID());
+	}
 	const addItem = useCallback(
 		function addItem() {
-			setter((items) => produce(items, (d: T[]) => void d.push(defaultValue)));
+			field.onChange((items) => [...items, defaultValue]);
 		},
-		[setter, defaultValue],
+		[field, defaultValue],
 	);
 	const removeItem = useCallback(
 		function removeItem(index: number) {
-			setter((items) => {
-				return produce(items, (d: T[]) => {
-					return d.filter((_, i) => i !== index);
-				});
-			});
+			field.onChange((items) => items.filter((_, i) => i !== index));
 		},
-		[setter],
+		[field],
 	);
 
-	return { length, addItem, removeItem, item };
+	return {
+		length,
+		addItem,
+		removeItem,
+		item: item as (index: number) => FormFieldReturnType<T>,
+		key(index) {
+			return keys.current[index];
+		},
+		mutateKeys(mutator) {
+			keys.current = mutator(keys.current);
+		},
+	};
 }
