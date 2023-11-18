@@ -6,10 +6,10 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import React from 'react';
 import { BasicList } from './BasicList';
 import { IconButton } from '@/components/button/icon-button';
 import { HiMinus } from 'react-icons/hi2';
+import styles from './ability.module.css';
 
 type Ability = {
 	name: string;
@@ -33,6 +33,8 @@ export function Abilities({ form }: GameObjectFormComponent<Character>) {
 		<div className="flex flex-col md:grid md:grid-cols-2 gap-2">
 			<Fieldset>
 				<TextareaField field={fields.quirk} />
+				<hr />
+				<h3 className="text-xl">{fields.abilities.translation('title')}</h3>
 				<BasicList
 					field={fields.abilities}
 					defaultValue={defaultAbility}
@@ -56,11 +58,20 @@ function AbilityField({
 		page: ['page'],
 	});
 	return (
-		<div>
-			<TextField field={fields.name} />
-			<TextareaField field={fields.description} />
-			<NumberField.UndefinedOrInteger field={fields.page} />
-			<IconButton.Destructive onClick={onRemove}>
+		<div className={styles.ability}>
+			<TextField className={styles.abilityName} field={fields.name} />
+			<TextareaField
+				className={styles.abilityDescription}
+				field={fields.description}
+			/>
+			<NumberField.UndefinedOrInteger
+				className={styles.abilityPage}
+				field={fields.page}
+			/>
+			<IconButton.Destructive
+				onClick={onRemove}
+				className={styles.removeButton}
+			>
 				<HiMinus />
 			</IconButton.Destructive>
 		</div>

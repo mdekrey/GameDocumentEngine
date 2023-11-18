@@ -160,6 +160,7 @@
 				},
 				"quirk": { "label": "Quirk" },
 				"abilities": {
+					"title": "Abilities",
 					"name": { "label": "Name" },
 					"description": { "label": "Description" },
 					"page": { "label": "Page" }
