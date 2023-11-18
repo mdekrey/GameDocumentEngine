@@ -24,6 +24,8 @@ export function HeartsFields({
 }) {
 	const fields = useFormFields(form, {
 		base: ['base'],
+		total: ['total'],
+		current: ['current'],
 		modifiers: ['modifiers'],
 		injuries: ['injuries'],
 	});
@@ -34,7 +36,8 @@ export function HeartsFields({
 			<CardTitle>{form.translation('title')}</CardTitle>
 			<CardHint>{form.translation('hint')}</CardHint>
 			<NumberField.Integer field={fields.base} />
-			{/* TODO */}
+			<NumberField.Integer field={fields.total} />
+			<NumberField.Integer field={fields.current} />
 			<TextareaField field={fields.modifiers} />
 			<TextareaField field={fields.injuries} />
 		</Container>

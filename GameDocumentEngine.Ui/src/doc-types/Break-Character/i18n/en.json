@@ -111,6 +111,12 @@
 						"hint": "Add to my Attack rolls",
 						"attackBonus": {
 							"label": "Base"
+						},
+						"weapons": {
+							"name": { "label": "Weapon" },
+							"bonuses": { "label": "Weapon Bonuses" },
+							"extraDamage": { "label": "Extra Damage" },
+							"attackBonus": { "label": "Attack Bonus" }
 						}
 					},
 					"hearts": {
@@ -118,6 +124,12 @@
 						"hint": "Protecting me from injury",
 						"base": {
 							"label": "Base"
+						},
+						"total": {
+							"label": "Total"
+						},
+						"current": {
+							"label": "Current"
 						},
 						"modifiers": { "label": "Bonuses/Penalties" },
 						"injuries": { "label": "Injuries" }
