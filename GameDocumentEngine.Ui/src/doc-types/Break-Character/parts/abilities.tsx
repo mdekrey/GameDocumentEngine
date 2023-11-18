@@ -34,7 +34,7 @@ export function Abilities({ form }: GameObjectFormComponent<Character>) {
 			<Fieldset>
 				<TextareaField field={fields.quirk} />
 				<hr />
-				<h3 className="text-xl">{fields.abilities.translation('title')}</h3>
+				<h3 className="text-lg">{fields.abilities.translation('title')}</h3>
 				<BasicList
 					field={fields.abilities}
 					defaultValue={defaultAbility}

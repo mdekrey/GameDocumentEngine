@@ -113,6 +113,7 @@
 							"label": "Base"
 						},
 						"weapons": {
+							"title": "Weapons",
 							"name": { "label": "Weapon" },
 							"bonuses": { "label": "Weapon Bonuses" },
 							"extraDamage": { "label": "Extra Damage" },

@@ -1,0 +1,32 @@
+.weapon {
+	composes: grid gap-2 from global;
+	grid-template-columns: 2rem 1fr auto auto auto;
+	grid-template-rows: auto auto;
+	grid-template-areas:
+		'name name name name remove'
+		'. bonuses extraDamage attackBonus attackBonus';
+}
+
+.name {
+	grid-area: name;
+}
+.name span, .bonuses span, .extraDamage span, .attackBonus span {
+	font-size: 0.75rem;
+	padding-top: 0;
+}
+
+.bonuses {
+	grid-area: bonuses;
+}
+.extraDamage {
+	grid-area: extraDamage;
+}
+.attackBonus {
+	grid-area: attackBonus;
+}
+.extraDamage input, .attackBonus input {
+	width: 4rem;
+}
+.removeButton {
+	grid-area: remove;
+}

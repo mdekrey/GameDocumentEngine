@@ -9,6 +9,8 @@ import { BasicList } from '../BasicList';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { IconButton } from '@/components/button/icon-button';
 import { HiMinus } from 'react-icons/hi2';
+import styles from './attack.module.css';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 
 export function Attack({
 	form,
@@ -43,13 +45,16 @@ export function AttackFields({
 			<LuSword />
 			<CardTitle>{form.translation('title')}</CardTitle>
 			<CardHint>{form.translation('hint')}</CardHint>
+
 			<NumberField.Integer field={fields.attackBonus} />
-			<BasicList
-				defaultValue={newWeapon}
-				field={fields.weapons}
-				fieldComponent={WeaponField}
-			/>
-			{/* TODO: weapons */}
+			<Fieldset>
+				<h3 className="text-lg">{fields.weapons.translation('title')}</h3>
+				<BasicList
+					defaultValue={newWeapon}
+					field={fields.weapons}
+					fieldComponent={WeaponField}
+				/>
+			</Fieldset>
 		</Container>
 	);
 }
@@ -68,12 +73,24 @@ function WeaponField({
 		attackBonus: ['attackBonus'],
 	});
 	return (
-		<div>
-			<TextField.AllowUndefined field={fields.name} />
-			<TextField.AllowUndefined field={fields.bonuses} />
-			<NumberField.UndefinedOrInteger field={fields.extraDamage} />
-			<NumberField.UndefinedOrInteger field={fields.attackBonus} />
-			<IconButton.Destructive onClick={onRemove}>
+		<div className={styles.weapon}>
+			<TextField.AllowUndefined field={fields.name} className={styles.name} />
+			<TextField.AllowUndefined
+				field={fields.bonuses}
+				className={styles.bonuses}
+			/>
+			<NumberField.UndefinedOrInteger
+				field={fields.extraDamage}
+				className={styles.extraDamage}
+			/>
+			<NumberField.UndefinedOrInteger
+				field={fields.attackBonus}
+				className={styles.attackBonus}
+			/>
+			<IconButton.Destructive
+				onClick={onRemove}
+				className={styles.removeButton}
+			>
 				<HiMinus />
 			</IconButton.Destructive>
 		</div>
