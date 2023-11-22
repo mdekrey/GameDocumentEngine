@@ -1,5 +1,6 @@
 ﻿using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Users;
+using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -17,7 +18,8 @@ public class DocumentUserModel : IAuditable
 
 	// Role name from game document type
 	public string Role { get; set; }
-
+	// User options for this document
+	public JsonNode Options { get; set; }
 
 	public DateTimeOffset CreatedDate { get; private set; }
 	public string? CreatedBy { get; private set; }

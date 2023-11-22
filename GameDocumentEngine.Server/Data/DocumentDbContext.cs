@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Data;
 
@@ -19,11 +20,16 @@ public class DocumentDbContext : DbContext
 	{
 		base.OnModelCreating(modelBuilder);
 
+		var emptyObject = JsonNode.Parse("{}");
+
 		modelBuilder.Entity<Users.UserModel>(entity =>
 		{
 			entity.HasKey(u => u.Id);
 			entity.HasIndex(u => u.GoogleNameId);
 			entity.HasMany(u => u.Games).WithOne(u => u.User).HasForeignKey(u => u.UserId);
+			entity.Property(d => d.Options)
+				.HasDefaultValue(emptyObject)
+				.HasConversion(JsonValueConverter.Instance);
 
 			entity.HasMany(u => u.Documents).WithOne(du => du.User).HasForeignKey(du => du.UserId).OnDelete(DeleteBehavior.NoAction);
 		});
@@ -46,7 +52,9 @@ public class DocumentDbContext : DbContext
 			entity.HasIndex(d => new { d.GameId, d.Type, d.Name });
 			entity.HasMany(d => d.Players).WithOne(du => du.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId }).OnDelete(DeleteBehavior.NoAction);
 
-			entity.Property(d => d.Details).HasConversion(JsonValueConverter.Instance);
+			entity.Property(d => d.Details)
+				.HasDefaultValue(emptyObject)
+				.HasConversion(JsonValueConverter.Instance);
 			entity.HasMany(d => d.FolderContents).WithOne(d => d.Folder).HasForeignKey(d => d.FolderId).OnDelete(DeleteBehavior.Cascade);
 		});
 
@@ -56,6 +64,9 @@ public class DocumentDbContext : DbContext
 			entity.HasIndex(gu => gu.GameId);
 			entity.HasMany(gu => gu.Documents).WithOne(du => du.GameUser).HasForeignKey(du => new { du.UserId, du.GameId }).HasPrincipalKey(gu => new { gu.UserId, gu.GameId });
 			entity.Property(gu => gu.Role).IsRequired();
+			entity.Property(d => d.Options)
+				.HasDefaultValue(emptyObject)
+				.HasConversion(JsonValueConverter.Instance);
 		});
 
 		modelBuilder.Entity<Documents.DocumentUserModel>(entity =>
@@ -63,6 +74,9 @@ public class DocumentDbContext : DbContext
 			entity.HasKey(du => new { du.UserId, du.DocumentId });
 			entity.HasIndex(d => new { d.DocumentId });
 			entity.Property(gu => gu.Role).IsRequired();
+			entity.Property(d => d.Options)
+				.HasDefaultValue(emptyObject)
+				.HasConversion(JsonValueConverter.Instance);
 		});
 
 		modelBuilder.Entity<Security.GameInviteModel>(entity =>
