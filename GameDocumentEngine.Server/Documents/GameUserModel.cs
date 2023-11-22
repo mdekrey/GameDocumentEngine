@@ -1,5 +1,6 @@
 ﻿using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Users;
+using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Documents;
 
@@ -12,9 +13,12 @@ public class GameUserModel : IAuditable
 
 	public GameModel Game { get; set; }
 	public UserModel User { get; set; }
+	public string? NameOverride { get; set; }
 
 	// Role name from global game roles
 	public string Role { get; set; }
+	// User options for this game
+	public JsonNode Options { get; set; }
 
 	public ICollection<DocumentUserModel> Documents { get; private set; } = new List<DocumentUserModel>();
 

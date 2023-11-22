@@ -5,12 +5,13 @@ namespace GameDocumentEngine.Server.Documents;
 
 #nullable disable warnings
 
-public class DocumentModel : IAuditable
+public class DocumentModel : IAuditable, IOperationalTransformed
 {
 	public Guid GameId { get; set; }
 	public Guid Id { get; set; }
 	public string Name { get; set; }
 	public string Type { get; set; }
+	public Guid Version { get; set; }
 
 	public Guid? FolderId { get; set; }
 	public DocumentModel? Folder { get; set; }

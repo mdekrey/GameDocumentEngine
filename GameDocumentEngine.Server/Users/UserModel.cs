@@ -1,4 +1,5 @@
 ﻿using GameDocumentEngine.Server.Documents;
+using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Users;
 
@@ -10,6 +11,7 @@ public class UserModel
 	public string Name { get; set; }
 	public string GoogleNameId { get; set; }
 	public string EmailAddress { get; set; }
+	public JsonNode Options { get; set; }
 	public ICollection<Documents.GameUserModel> Games { get; } = new List<Documents.GameUserModel>();
 	public ICollection<Documents.DocumentUserModel> Documents { get; } = new List<Documents.DocumentUserModel>();
 }

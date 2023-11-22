@@ -184,6 +184,7 @@ services.AddScoped<IApiChangeNotification<GameDetails>, GameApiChangeNotificatio
 
 services.AddHttpContextAccessor();
 services.AddScoped<AuditableInterceptor>();
+services.AddScoped<VersioningInterceptor>();
 services.AddScoped<HubNotifyingInterceptor>();
 services.AddScoped<IApiChangeDetector, UserModelChangeNotifications>();
 services.AddScoped<IApiChangeDetector, DocumentModelChangeNotifications>();
@@ -195,6 +196,7 @@ services.AddDbContext<DocumentDbContext>((provider, o) =>
 {
 	o.UseNpgsql(builder.Configuration["Postgres:ConnectionString"]);
 	o.AddInterceptors(provider.GetRequiredService<AuditableInterceptor>())
+	 .AddInterceptors(provider.GetRequiredService<VersioningInterceptor>())
 	 .AddInterceptors(provider.GetRequiredService<HubNotifyingInterceptor>());
 });
 
