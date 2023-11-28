@@ -212,6 +212,7 @@ public class DocumentController : Api.DocumentControllerBase
 		if (docType == null)
 			return PatchDocumentActionResult.BadRequest("Unknown document type for game");
 
+		// TODO - if a Test operation fails, return 409
 		using (TracingHelper.StartActivity("Apply Patch"))
 			if (!patchDocumentBody.ApplyModelPatch(document, EditableDocumentModel.Create, dbContext, out var error))
 				return PatchDocumentActionResult.BadRequest(error.Message ?? "Unknown error");

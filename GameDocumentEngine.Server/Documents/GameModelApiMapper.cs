@@ -72,6 +72,7 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 						p => p.Name
 					),
 					Id: game.Id,
+					Version: game.Version,
 					TypeInfo: typeInfo,
 					Permissions: permissionSet.Permissions.Permissions
 				);

@@ -188,9 +188,11 @@ export function patchDocument(
 ): UseMutationOptions<DocumentDetails, unknown, Patch, unknown> {
 	return {
 		mutationFn: async (changes: Patch) => {
+			// TODO: queue changes, on 409 failure retry
+			// TODO: upon receiving new patch, update queued patches
 			const response = await api.patchDocument({
 				params: { gameId, id: documentId },
-				body: changes,
+				body: [...getTestPatch(), ...changes],
 			});
 			if (response.statusCode === 200) return response.data;
 			else if (response.statusCode === 409)
@@ -205,6 +207,13 @@ export function patchDocument(
 			);
 		},
 	};
+
+	function getTestPatch(): Patch {
+		const version = queryClient.getQueryData<DocumentDetails>(
+			getDocument(gameId, documentId).queryKey,
+		)?.version;
+		return version ? [{ op: 'test', path: '/version', value: version }] : [];
+	}
 }
 
 export function changeDocumentFolder(

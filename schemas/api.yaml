@@ -696,8 +696,10 @@ components:
           - permissions
           - typeInfo
           - id
+          - version
           properties:
             id: { type: string, format: guid }
+            version: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
             playerNames:
               type: object
@@ -752,6 +754,7 @@ components:
       required:
       - gameId
       - id
+      - version
       - name
       - type
       - details
@@ -761,6 +764,7 @@ components:
       properties:
         gameId: { type: string, format: guid }
         id: { type: string, format: guid }
+        version: { type: string, format: guid }
         name: { type: string }
         type: { type: string }
         details: { type: object, format: any }

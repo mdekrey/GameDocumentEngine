@@ -21,7 +21,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 	public async Task<DocumentDetails> ToApi(DocumentDbContext dbContext, DocumentModel entity, PermissionSet permissionSet, DbContextChangeUsage usage)
 	{
 		using var activity = TracingHelper.StartActivity($"{nameof(DocumentModelApiMapper)}.{nameof(ToApi)}");
-		var resultGame = dbContext.Entry(entity).AtState(usage);
+		var resultDocument = dbContext.Entry(entity).AtState(usage);
 
 		var documentUsersCollection = await LoadDocumentUsers(dbContext, entity);
 
@@ -31,7 +31,7 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			.Append("$.details")
 			.ToArray();
 
-		var filtered = JsonSerializer.SerializeToNode(new { details = resultGame.Details })
+		var filtered = JsonSerializer.SerializeToNode(new { details = resultDocument.Details })
 				?.FilterNode(jsonPaths)["details"]
 				?? throw new InvalidDataException("Json path excluded details object");
 
@@ -41,11 +41,12 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 								select entry;
 
 		return new DocumentDetails(
-			GameId: resultGame.GameId,
-			Id: resultGame.Id,
-			Name: resultGame.Name,
-			FolderId: resultGame.FolderId,
-			Type: resultGame.Type,
+			GameId: resultDocument.GameId,
+			Id: resultDocument.Id,
+			Version: resultDocument.Version,
+			Name: resultDocument.Name,
+			FolderId: resultDocument.FolderId,
+			Type: resultDocument.Type,
 			Details: filtered,
 			UserRoles: permissionEntries
 				.AtState(usage)
