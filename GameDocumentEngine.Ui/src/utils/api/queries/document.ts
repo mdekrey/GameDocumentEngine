@@ -107,11 +107,11 @@ export const getDocument = (gameId: string, documentId: string) => ({
 		const response = await api.getDocument({
 			params: { gameId, id: documentId },
 		});
-		// TODO: apply pending document actions?
 		if (response.statusCode !== 200) return Promise.reject(response);
 		return response.data;
 	},
 });
+export const getDocumentPendingActions = getPendingActions(getDocument);
 
 export async function handleDocumentUpdateEvent(
 	queryClient: QueryClient,
@@ -193,7 +193,7 @@ export function patchDocument(
 	return operationalTransformFromClient(
 		queryClient,
 		getDocument(gameId, documentId),
-		getPendingActions(getDocument, gameId, documentId),
+		getDocumentPendingActions(gameId, documentId),
 		async (patch) => {
 			const response = await api.patchDocument({
 				params: { gameId, id: documentId },
@@ -215,6 +215,7 @@ export function changeDocumentFolder(
 	{ id: string; folderId?: string },
 	unknown
 > {
+	// TODO: operational transform
 	return {
 		mutationFn: async ({ id, folderId }) => {
 			const response = await api.patchDocument({

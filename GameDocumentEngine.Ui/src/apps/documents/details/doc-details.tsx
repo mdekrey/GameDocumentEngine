@@ -21,6 +21,7 @@ import { applyPatch, createPatch } from 'rfc6902';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useTranslation } from 'react-i18next';
+import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
 
 export function DocumentDetails({
 	gameId,
@@ -30,7 +31,7 @@ export function DocumentDetails({
 	documentId: string;
 }) {
 	const user = useQuery(queries.getCurrentUser(useRealtimeApi()));
-	const document = useQuery(queries.getDocument(gameId, documentId));
+	const document = useLocalDocument(gameId, documentId);
 	const gameType = useGameType(gameId);
 
 	if (user.isLoading || document.isLoading || gameType.isLoading) {
@@ -89,14 +90,11 @@ export function DocumentDetailsForm<T = unknown>({
 		async function handleUpdate(
 			recipe: (draft: Draft<EditableDocumentDetails>) => void,
 		) {
-			// TODO - while this waits for the previous  update to be completed, I
-			// think there's still an issue with setting/unsetting the same value
-			// quickly (like pass/fails on the Mouse Guard character).
-			await docDetailsUpdatePromiseRef.current;
-			const latestDocData =
-				queryClient.getQueryData<DocumentDetails>(
-					queries.getDocument(document.data.gameId, document.data.id).queryKey,
-				) ?? document.data;
+			const latestDocData = await fetchLocalDocument(
+				queryClient,
+				document.data.gameId,
+				document.data.id,
+			);
 
 			const patches = produceWithPatches<
 				EditableDocumentDetails,
