@@ -22,6 +22,9 @@ import { useRealtimeApi } from '@/utils/api/realtime-api';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useTranslation } from 'react-i18next';
 import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
+import { IntroText } from '@/components/text/common';
+import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
+import { Section, Sections } from '@/components/sections';
 
 export function DocumentDetails({
 	gameId,
@@ -43,7 +46,24 @@ export function DocumentDetails({
 	const scripts = gameType.data.objectTypes[document.data.type];
 
 	return (
-		<DocumentDetailsForm scripts={scripts} document={document} user={user} />
+		<ErrorBoundary
+			key={`${gameId}-${documentId}`}
+			fallback={<UnhandledDocumentError />}
+		>
+			<DocumentDetailsForm scripts={scripts} document={document} user={user} />
+		</ErrorBoundary>
+	);
+}
+
+export function UnhandledDocumentError() {
+	const { t } = useTranslation(['document-details']);
+	// TODO: better styling
+	return (
+		<Sections>
+			<Section>
+				<IntroText>{t('unhandled-error')}</IntroText>
+			</Section>
+		</Sections>
 	);
 }
 

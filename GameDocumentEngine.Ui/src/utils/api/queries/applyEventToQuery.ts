@@ -16,7 +16,10 @@ export async function applyEventToQuery<T>(
 	{ queryKey }: { queryKey: QueryKey; queryFn?: QueryFunction<T> },
 	event: EntityChangedProps<unknown, T>,
 ) {
-	if ('patch' in event) {
+	if ('removed' in event) {
+		// Sometimes, we get the message that a doc has been deleted before saved to the database, like locally. Putting a delay on removing helps that.
+		setTimeout(() => void queryClient.invalidateQueries(queryKey), 500);
+	} else if ('patch' in event) {
 		return await applyPatchToQuery<T>(queryClient, { queryKey }, event.patch);
 	} else if ('value' in event) {
 		queryClient.setQueryData(queryKey, event.value);

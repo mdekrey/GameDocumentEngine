@@ -100,7 +100,8 @@
 		"sidebar-instructions": "Use the sidebar to access and create character sheets, party trackers, and more!"
 	},
 	"document-details": {
-		"settings": "Settings for {{name}}"
+		"settings": "Settings for {{name}}",
+		"unhandled-error": "An unhandled error occurred in the document."
 	},
 	"game-objects": {
 		"header": "Documents",
