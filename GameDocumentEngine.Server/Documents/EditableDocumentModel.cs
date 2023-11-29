@@ -8,6 +8,7 @@ namespace GameDocumentEngine.Server.Documents;
 class EditableDocumentModel
 {
 	[JsonPropertyName("name")] public string Name { get; set; }
+	[JsonPropertyName("version")] public Guid Version { get; set; }
 	[JsonPropertyName("folderId")] public Guid? FolderId { get; set; }
 	[JsonPropertyName("details")] public JsonNode Details { get; set; }
 
@@ -15,6 +16,7 @@ class EditableDocumentModel
 	public static EditableDocumentModel Create(DocumentModel model) => new EditableDocumentModel
 	{
 		Name = model.Name,
+		Version = model.Version,
 		FolderId = model.FolderId,
 		Details = model.Details,
 	};

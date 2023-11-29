@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace GameDocumentEngine.Server.Documents;
 
 public record PatchError(string? Message);
+public record PatchTestError(string? Message) : PatchError(Message);
 public static class PatchUtils
 {
 
@@ -20,7 +21,12 @@ public static class PatchUtils
 		var result = jsonPatch.Apply(editable);
 		if (!result.IsSuccess)
 		{
-			error = new(result.Error);
+			var testOnlyPatch = new JsonPatch(jsonPatch.Operations.Where(entry => entry.Op == OperationType.Test));
+			var testResult = testOnlyPatch.Apply(editable);
+			if (!testResult.IsSuccess)
+				error = new PatchTestError(testResult.Error);
+			else
+				error = new(result.Error);
 			return false;
 		}
 

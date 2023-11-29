@@ -214,7 +214,9 @@ public class DocumentController : Api.DocumentControllerBase
 
 		using (TracingHelper.StartActivity("Apply Patch"))
 			if (!patchDocumentBody.ApplyModelPatch(document, EditableDocumentModel.Create, dbContext, out var error))
-				return PatchDocumentActionResult.BadRequest(error.Message ?? "Unknown error");
+				return error is PatchTestError
+					? PatchDocumentActionResult.Conflict()
+					: PatchDocumentActionResult.BadRequest(error.Message ?? "Unknown error");
 
 		using (TracingHelper.StartActivity("Validate final document"))
 		{

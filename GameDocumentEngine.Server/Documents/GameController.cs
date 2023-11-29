@@ -1,6 +1,7 @@
 ﻿using GameDocumentEngine.Server;
 using GameDocumentEngine.Server.Api;
 using GameDocumentEngine.Server.Data;
+using GameDocumentEngine.Server.Tracing;
 using GameDocumentEngine.Server.Users;
 using Google.Protobuf.WellKnownTypes;
 using Json.Patch;
@@ -100,10 +101,14 @@ public class GameController : Api.GameControllerBase
 
 		var gameRecord = permissions.GameUser.Game
 			?? await dbContext.Games.FirstAsync(g => g.Id == gameId);
-		if (!patchGameBody.ApplyModelPatch(gameRecord, EditableGameModel.Create, dbContext, out var error))
-			return PatchGameActionResult.BadRequest(error.Message ?? "Unknown error");
+		using (TracingHelper.StartActivity("Apply Patch"))
+			if (!patchGameBody.ApplyModelPatch(gameRecord, EditableGameModel.Create, dbContext, out var error))
+				return error is PatchTestError
+					? PatchGameActionResult.Conflict()
+					: PatchGameActionResult.BadRequest(error.Message ?? "Unknown error");
 
-		await dbContext.SaveChangesAsync();
+		using (TracingHelper.StartActivity("Save changes"))
+			await dbContext.SaveChangesAsync();
 
 		return PatchGameActionResult.Ok(await gameMapper.ToApi(dbContext, gameRecord, permissions, DbContextChangeUsage.AfterChange));
 	}

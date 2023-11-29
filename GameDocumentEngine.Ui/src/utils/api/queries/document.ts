@@ -3,11 +3,16 @@ import type { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { api } from '../fetch-api';
 import type { NavigateFunction } from 'react-router-dom';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import type { Patch } from 'rfc6902';
 import type { EntityChangedProps } from '../EntityChangedProps';
 import type { MapQueryConfig } from './applyEventToQuery';
 import { applyEventToQuery, applyChangeToMapQuery } from './applyEventToQuery';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
+import type { OperationTransformMutation } from './operational-transform';
+import {
+	conflict,
+	getPendingActions,
+	operationalTransformFromClient,
+} from './operational-transform';
 
 export type FolderNode = {
 	/** Undefined if in an unknown loop */
@@ -96,25 +101,24 @@ function mapDocumentsToFolders(
 	}
 }
 
-export const getDocument = (gameId: string, documentId: string) => {
-	const result = {
-		queryKey: ['game', gameId, 'document', documentId] as const,
-		queryFn: async () => {
-			const response = await api.getDocument({
-				params: { gameId, id: documentId },
-			});
-			if (response.statusCode !== 200) return Promise.reject(response);
-			return response.data;
-		},
-	};
-	return result;
-};
+export const getDocument = (gameId: string, documentId: string) => ({
+	queryKey: ['game', gameId, 'document', documentId] as const,
+	queryFn: async () => {
+		const response = await api.getDocument({
+			params: { gameId, id: documentId },
+		});
+		if (response.statusCode !== 200) return Promise.reject(response);
+		return response.data;
+	},
+});
+export const getDocumentPendingActions = getPendingActions(getDocument);
 
 export async function handleDocumentUpdateEvent(
 	queryClient: QueryClient,
 	event: EntityChangedProps<{ gameId: string; id: string }, DocumentDetails>,
 ) {
 	const query = getDocument(event.key.gameId, event.key.id);
+	// TODO: operational transform
 	const resultData = await applyEventToQuery(queryClient, query, event);
 
 	const listQuery = listDocuments(event.key.gameId);
@@ -185,26 +189,21 @@ export function patchDocument(
 	queryClient: QueryClient,
 	gameId: string,
 	documentId: string,
-): UseMutationOptions<DocumentDetails, unknown, Patch, unknown> {
-	return {
-		mutationFn: async (changes: Patch) => {
+): OperationTransformMutation<DocumentDetails> {
+	return operationalTransformFromClient(
+		queryClient,
+		getDocument(gameId, documentId),
+		getDocumentPendingActions(gameId, documentId),
+		async (patch) => {
 			const response = await api.patchDocument({
 				params: { gameId, id: documentId },
-				body: changes,
+				body: patch,
 			});
 			if (response.statusCode === 200) return response.data;
-			else if (response.statusCode === 409)
-				throw new Error(
-					'Other changes were being applied at the same time. Try again later.',
-				);
+			else if (response.statusCode === 409) throw conflict;
 			else throw new Error('Could not save changes');
 		},
-		onError: async () => {
-			await queryClient.invalidateQueries(
-				getDocument(gameId, documentId).queryKey,
-			);
-		},
-	};
+	);
 }
 
 export function changeDocumentFolder(
@@ -216,6 +215,7 @@ export function changeDocumentFolder(
 	{ id: string; folderId?: string },
 	unknown
 > {
+	// TODO: operational transform
 	return {
 		mutationFn: async ({ id, folderId }) => {
 			const response = await api.patchDocument({

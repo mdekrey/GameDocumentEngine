@@ -16,20 +16,22 @@ export function updateFormDefault<T extends Objectish>(
 
 		const prev = form.get();
 
-		// This process prevents changes coming over the network from
-		// repeating local changes, such as adding array elements. Adding array
-		// elements without this filtering creates duplicate entries.
 		/* "userChanges" is the changes the user made to the form values locally */
 		const userChanges = createPatch(oldDefault, prev);
+		// This process prevents changes coming over the network from repeating
+		// local changes, such as adding array elements. Adding array elements
+		// without this filtering creates duplicate entries. This really only
+		// matters in the delay between typing and recording the "local"
+		// mutations, so it needs to operate on the form.defaultValue.current
+		// instead of applying operational transforms. Currently we just take
+		// local user changes, since this means they're actively interacting
+		// with it.
 		const filteredPatch = patch.filter(
-			(p) =>
-				!userChanges.some(
-					(userChange) => createPatch(p, userChange).length === 0,
-				),
+			(p) => !userChanges.some((userChange) => p.path === userChange.path),
 		);
 
-		// TODO: if filteredPatch has the same path as a path in userChanges but is NOT the same,
-		// allow the user to handle conflicts...?
+		// TODO: if filteredPatch has the same path as a path in userChanges but
+		// is NOT the same, allow the user to handle conflicts...?
 		if (filteredPatch.length > 0) {
 			form.set((actualPrev) => {
 				return produce(actualPrev, (draft) => {
