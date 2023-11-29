@@ -11,7 +11,7 @@ import {
 	type EditableDocumentDetails,
 } from '@/documents/defineDocument';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
 import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form';
@@ -56,9 +56,6 @@ export function DocumentDetailsForm<T = unknown>({
 	scripts: GameTypeObjectScripts<T>;
 	user: QueryObserverSuccessResult<UserDetails>;
 }) {
-	const docDetailsUpdatePromiseRef = useRef<Promise<unknown>>(
-		Promise.resolve(),
-	);
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(
 		queries.patchDocument(queryClient, document.data.gameId, document.data.id),
@@ -103,11 +100,7 @@ export function DocumentDetailsForm<T = unknown>({
 
 			if (patches.length === 0) return;
 
-			const next = updateDocument.mutateAsync(
-				patches.map(immerPatchToStandard),
-			);
-			docDetailsUpdatePromiseRef.current = next.catch(() => void 0);
-			await next;
+			await updateDocument.mutateAsync(patches.map(immerPatchToStandard));
 		},
 		[document.data, queryClient, updateDocument],
 	);
