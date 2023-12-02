@@ -145,6 +145,9 @@
 						"base": {
 							"label": "Base"
 						},
+						"total": {
+							"label": "Total"
+						},
 						"modifiers": { "label": "Bonuses/Penalties" }
 					},
 					"speed": {
