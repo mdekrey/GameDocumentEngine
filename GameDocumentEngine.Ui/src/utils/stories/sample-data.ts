@@ -6,6 +6,7 @@ export function randomUser(): UserDetails {
 		id: faker.string.uuid(),
 		name: faker.person.fullName(),
 		profilePhoto: faker.image.avatar(),
+		options: {},
 	};
 }
 export const sampleUser: UserDetails = randomUser();
