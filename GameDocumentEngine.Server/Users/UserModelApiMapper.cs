@@ -17,7 +17,8 @@ class UserModelApiMapper : IApiMapper<UserModel, Api.UserDetails>
 		return new Api.UserDetails(
 					Id: entity.Id,
 					Name: entity.Name,
-					ProfilePhoto: $"https://www.gravatar.com/avatar/{ToMD5(entity.EmailAddress.Trim().ToLowerInvariant())}?s=128"
+					ProfilePhoto: $"https://www.gravatar.com/avatar/{ToMD5(entity.EmailAddress.Trim().ToLowerInvariant())}?s=128",
+					Options: entity.Options
 				);
 	}
 

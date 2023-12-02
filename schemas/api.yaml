@@ -792,10 +792,12 @@ components:
         - id
         - name
         - profilePhoto
+        - options
       properties:
         id: { type: string, format: guid }
         name: { type: string }
         profilePhoto: { type: string }
+        options: { type: object, format: any }
 
     GameTypeSummary:
       type: object

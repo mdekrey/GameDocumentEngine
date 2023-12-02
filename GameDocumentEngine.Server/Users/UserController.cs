@@ -39,6 +39,7 @@ public class UserController : Api.UserControllerBase
 		}
 		var updated = patchUserBody.Apply(await ToUserDetails(user))!;
 		user.Name = updated.Name;
+		user.Options = updated.Options;
 		await dbContext.SaveChangesAsync();
 
 		return PatchUserActionResult.Ok(await ToUserDetails(user));

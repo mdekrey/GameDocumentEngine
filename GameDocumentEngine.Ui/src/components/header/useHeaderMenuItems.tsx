@@ -1,26 +1,39 @@
 import { queries } from '@/utils/api/queries';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { MenuItemsConfiguration } from '../menu-items/menu-items';
 import { useTranslation } from 'react-i18next';
 import { HiPencil, HiSun, HiMoon } from 'react-icons/hi2';
 import type { TFunction } from 'i18next';
 import type { UserDetails } from '@/api/models/UserDetails';
-import { useEffect, useReducer } from 'react';
+import { useEffect } from 'react';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
+
+type UserOptions = {
+	theme?: 'light' | 'dark';
+};
 
 export function useHeader() {
 	const realtimeApi = useRealtimeApi();
+	const queryClient = useQueryClient();
+	const userMutation = useMutation(queries.patchUser(queryClient));
 	const userQuery = useQuery(queries.getCurrentUser(realtimeApi));
 	const { t } = useTranslation(['layout']);
 	const user = userQuery.data;
-	const [, switchMode] = useReducer(
-		(_prev: 'light' | 'dark', mode: 'light' | 'dark') => {
-			if (mode === 'dark') document.documentElement.classList.add('dark');
-			else document.documentElement.classList.remove('dark');
-			return mode;
-		},
-		window.matchMedia('prefers-color-scheme: dark').matches ? 'dark' : 'light',
-	);
+	const options: UserOptions = user?.options ?? {};
+	const switchMode = (mode: 'light' | 'dark') => {
+		if (options.theme !== mode)
+			userMutation.mutate([{ op: 'add', path: '/options/theme', value: mode }]);
+		return mode;
+	};
+	useEffect(() => {
+		const mode =
+			options.theme ??
+			(window.matchMedia('prefers-color-scheme: dark').matches
+				? 'dark'
+				: 'light');
+		if (mode === 'dark') document.documentElement.classList.add('dark');
+		else document.documentElement.classList.remove('dark');
+	}, [options.theme]);
 
 	useEffect(() => {
 		const prefersDark = window.matchMedia('prefers-color-scheme: dark').matches;
