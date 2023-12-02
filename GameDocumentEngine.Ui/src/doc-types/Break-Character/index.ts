@@ -1,4 +1,4 @@
-import { GiSeatedMouse } from 'react-icons/gi';
+import { GiPawn } from 'react-icons/gi';
 import { defineDocument } from '@/documents/defineDocument';
 import { CharacterSheet } from './character-sheet';
 import schema from './schema';
@@ -89,7 +89,7 @@ const template: z.infer<typeof schema> = {
 };
 
 defineDocument('Break-Character', {
-	icon: GiSeatedMouse,
+	icon: GiPawn,
 	template,
 	component: CharacterSheet,
 	schema,
