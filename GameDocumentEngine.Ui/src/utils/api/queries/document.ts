@@ -13,6 +13,8 @@ import {
 	getPendingActions,
 	operationalTransformFromClient,
 } from './operational-transform';
+import { applyPatch } from 'rfc6902';
+import { produce } from 'immer';
 
 export type FolderNode = {
 	/** Undefined if in an unknown loop */
@@ -124,19 +126,35 @@ export async function handleDocumentUpdateEvent(
 	const listQuery = listDocuments(event.key.gameId);
 
 	if ('removed' in event && event.removed) {
-		await applyChangeToMapQuery(queryClient, listQuery, (map) =>
-			map.delete(event.key.id),
+		await applyChangeToMapQuery(
+			queryClient,
+			listQuery,
+			(map) => void map.delete(event.key.id),
 		);
-	} else if (resultData) {
-		await applyChangeToMapQuery(queryClient, listQuery, (map) => {
+		return;
+	}
+
+	await applyChangeToMapQuery(queryClient, listQuery, async (map) => {
+		if (resultData) {
 			map.set(event.key.id, {
 				...resultData,
 				id: event.key.id,
 			});
-		});
-	} else {
-		await queryClient.invalidateQueries(listQuery);
-	}
+			return;
+		}
+		if ('patch' in event) {
+			const prev = map.get(event.key.id);
+			if (!prev) throw new Error('unknown entry');
+			map.set(
+				event.key.id,
+				produce(prev, (d) => {
+					applyPatch(d, event.patch);
+				}),
+			);
+		} else {
+			await queryClient.invalidateQueries(listQuery);
+		}
+	});
 }
 
 export function createDocument(

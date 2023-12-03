@@ -88,14 +88,14 @@ export async function applyChangeToMapQuery<T, TAdditional>(
 		queryKey,
 		mapAdditionalProps,
 	}: Pick<MapQueryConfig<T, TAdditional>, 'queryKey' | 'mapAdditionalProps'>,
-	recipe: (draft: Map<string, T>) => void,
+	recipe: (draft: Map<string, T>) => void | Promise<void>,
 ) {
 	const data =
 		queryClient.getQueryData<MapQueryResult<T, TAdditional>>(queryKey);
 	if (data === undefined) return;
 	try {
 		const map = data.data;
-		recipe(map);
+		await recipe(map);
 		queryClient.setQueryData<MapQueryResult<T, TAdditional>>(queryKey, {
 			data: map,
 			// without this field, react-query does not serve change notifications
