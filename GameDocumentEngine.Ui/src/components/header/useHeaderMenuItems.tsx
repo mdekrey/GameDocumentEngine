@@ -20,29 +20,25 @@ export function useHeader() {
 	const { t } = useTranslation(['layout']);
 	const user = userQuery.data;
 	const options: UserOptions = user?.options ?? {};
+	const darkMode =
+		(options.theme ??
+			(window.matchMedia('prefers-color-scheme: dark').matches
+				? 'dark'
+				: 'light')) === 'dark';
 	const switchMode = (mode: 'light' | 'dark') => {
 		if (options.theme !== mode)
 			userMutation.mutate([{ op: 'add', path: '/options/theme', value: mode }]);
 		return mode;
 	};
 	useEffect(() => {
-		const mode =
-			options.theme ??
-			(window.matchMedia('prefers-color-scheme: dark').matches
-				? 'dark'
-				: 'light');
-		if (mode === 'dark') document.documentElement.classList.add('dark');
+		if (darkMode) document.documentElement.classList.add('dark');
 		else document.documentElement.classList.remove('dark');
-	}, [options.theme]);
-
-	useEffect(() => {
-		const prefersDark = window.matchMedia('prefers-color-scheme: dark').matches;
-		if (prefersDark) document.documentElement.classList.add('dark');
-	}, []);
+	}, [darkMode]);
 
 	const menuItems: MenuItemsConfiguration = getHeaderMenuItems(
 		t,
 		user,
+		darkMode,
 		switchMode,
 	);
 	return { menuItems, user };
@@ -51,9 +47,9 @@ export function useHeader() {
 export function getHeaderMenuItems(
 	t: TFunction,
 	user: UserDetails | undefined,
+	darkMode: boolean,
 	switchMode: (mode: 'light' | 'dark') => void,
 ): MenuItemsConfiguration {
-	const darkMode = document.documentElement.classList.contains('dark');
 	return {
 		itemGroups: [
 			{
