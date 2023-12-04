@@ -90,6 +90,7 @@ function GradientSvg({ total }: { total: Atom<number> }) {
 				.fill(0)
 				.map((_, index) => (
 					<line
+						key={index}
 						x1={(index + 1) * 16 + 5}
 						x2={(index + 1) * 16 + 5}
 						y1={index % 5 == 4 ? 0 : 4}
