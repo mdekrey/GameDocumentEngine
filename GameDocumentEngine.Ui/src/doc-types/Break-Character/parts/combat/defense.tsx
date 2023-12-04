@@ -1,11 +1,18 @@
-import { NumberField } from '@/components/form-fields/text-input/number-field';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import type { Character } from '../../character-types';
-import { CardHint, CardTitle, Container } from './atoms';
+import {
+	CardBase,
+	CardContents,
+	CardHint,
+	CardIcon,
+	CardTitle,
+	Container,
+} from './atoms';
 import { LuShield } from 'react-icons/lu';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
+import { CircularNumberField } from '../CircularNumberField';
 
 export function Defense({
 	form,
@@ -30,13 +37,17 @@ export function DefenseFields({
 
 	return (
 		<Container>
-			<LuShield />
+			<CardIcon icon={LuShield} />
 			<CardTitle>{form.translation('title')}</CardTitle>
 			<CardHint>{form.translation('hint')}</CardHint>
-			<NumberField.Integer field={fields.base} />
-			<NumberField.Integer field={fields.total} />
-			{/* TODO */}
-			<TextareaField field={fields.modifiers} />
+			<CardBase>
+				<CircularNumberField field={fields.base} />
+			</CardBase>
+			<CardContents className="flex flex-row gap-4">
+				<CircularNumberField field={fields.total} />
+				{/* TODO */}
+				<TextareaField field={fields.modifiers} className="flex-1" />
+			</CardContents>
 		</Container>
 	);
 }

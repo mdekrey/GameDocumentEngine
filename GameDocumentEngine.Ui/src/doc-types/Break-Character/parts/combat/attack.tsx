@@ -4,13 +4,20 @@ import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import type { Character } from '../../character-types';
-import { CardHint, CardTitle, Container } from './atoms';
+import {
+	CardBase,
+	CardContents,
+	CardHint,
+	CardIcon,
+	CardTitle,
+	Container,
+} from './atoms';
 import { BasicList } from '../BasicList';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { IconButton } from '@/components/button/icon-button';
 import { HiMinus } from 'react-icons/hi2';
 import styles from './attack.module.css';
-import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import { CircularNumberField } from '../CircularNumberField';
 
 export function Attack({
 	form,
@@ -42,19 +49,21 @@ export function AttackFields({
 
 	return (
 		<Container>
-			<LuSword />
+			<CardIcon icon={LuSword} />
 			<CardTitle>{form.translation('title')}</CardTitle>
 			<CardHint>{form.translation('hint')}</CardHint>
+			<CardBase>
+				<CircularNumberField field={fields.attackBonus} />
+			</CardBase>
 
-			<NumberField.Integer field={fields.attackBonus} />
-			<Fieldset>
+			<CardContents>
 				<h3 className="text-lg">{fields.weapons.translation('title')}</h3>
 				<BasicList
 					defaultValue={newWeapon}
 					field={fields.weapons}
 					fieldComponent={WeaponField}
 				/>
-			</Fieldset>
+			</CardContents>
 		</Container>
 	);
 }

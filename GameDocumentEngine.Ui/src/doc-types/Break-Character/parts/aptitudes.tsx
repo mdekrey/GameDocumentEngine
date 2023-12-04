@@ -10,6 +10,7 @@ import { useId } from 'react';
 import { twMerge } from 'tailwind-merge';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
+import { CircularNumberField } from './CircularNumberField';
 
 export function Aptitudes({ form }: GameObjectFormComponent<Character>) {
 	const fields = useFormFields(form, {
@@ -52,7 +53,7 @@ function Aptitude({
 			<div className={styles.indicator}>
 				<GradientSvg total={fields.total.atom} />
 			</div>
-			<NumberField.Integer className={styles.base} field={fields.base} />
+			<CircularNumberField className={styles.base} field={fields.base} />
 			<NumberField.Integer className={styles.trait} field={fields.trait} />
 			<NumberField.Integer className={styles.total} field={fields.total} />
 			<TextareaField className={styles.modifiers} field={fields.modifiers} />

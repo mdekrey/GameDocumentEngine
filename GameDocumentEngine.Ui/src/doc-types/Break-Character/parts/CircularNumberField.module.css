@@ -1,0 +1,10 @@
+
+.circularNumber {
+	composes: flex flex-row gap-4 from global;
+}
+.circularNumber input {
+	height: 2.5rem;
+	width: 2.5rem;
+	border-radius: 100%;
+	text-align: center;
+}

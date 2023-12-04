@@ -3,9 +3,17 @@ import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import type { Character } from '../../character-types';
-import { CardHint, CardTitle, Container } from './atoms';
+import {
+	CardBase,
+	CardContents,
+	CardHint,
+	CardIcon,
+	CardTitle,
+	Container,
+} from './atoms';
 import { HiOutlineHeart } from 'react-icons/hi2';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
+import { CircularNumberField } from '../CircularNumberField';
 
 export function Hearts({
 	form,
@@ -32,14 +40,19 @@ export function HeartsFields({
 
 	return (
 		<Container>
-			<HiOutlineHeart />
+			<CardIcon icon={HiOutlineHeart} />
 			<CardTitle>{form.translation('title')}</CardTitle>
 			<CardHint>{form.translation('hint')}</CardHint>
-			<NumberField.Integer field={fields.base} />
-			<NumberField.Integer field={fields.total} />
-			<NumberField.Integer field={fields.current} />
-			<TextareaField field={fields.modifiers} />
-			<TextareaField field={fields.injuries} />
+
+			<CardBase>
+				<CircularNumberField field={fields.base} />
+			</CardBase>
+			<CardContents>
+				<NumberField.Integer field={fields.total} />
+				<NumberField.Integer field={fields.current} />
+				<TextareaField field={fields.modifiers} />
+				<TextareaField field={fields.injuries} />
+			</CardContents>
 		</Container>
 	);
 }
