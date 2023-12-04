@@ -7,6 +7,9 @@ export type RequestHubStateMessage = {
 export type RequestReconnectMessage = {
 	type: 'requestReconnect';
 };
+export type ForceDisconnectMessage = {
+	type: 'forceDisconnect';
+};
 export type ForceReconnectMessage = {
 	type: 'forceReconnect';
 };
@@ -35,6 +38,7 @@ export type EntityChangedMessage = {
 export type MessageFromWindow =
 	| RequestHubStateMessage
 	| RequestReconnectMessage
+	| ForceDisconnectMessage
 	| ForceReconnectMessage
 	| VerifyUserMessage;
 export type MessageFromServiceWorker =

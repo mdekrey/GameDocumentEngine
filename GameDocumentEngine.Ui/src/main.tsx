@@ -11,7 +11,7 @@ import {
 	RealtimeApiProvider,
 	createRealtimeApi,
 } from './utils/api/realtime-api.ts';
-import './runtime-api';
+import { setupRuntimeApi } from './runtime-api';
 
 declare global {
 	interface WorkerNavigator {
@@ -30,6 +30,7 @@ const queryClient = new QueryClient({
 });
 
 const realtimeApi = createRealtimeApi(queryClient);
+setupRuntimeApi({ queryClient, realtimeApi });
 
 export const AppElement = (
 	<QueryClientProvider client={queryClient}>

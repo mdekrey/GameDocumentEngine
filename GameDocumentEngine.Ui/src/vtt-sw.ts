@@ -139,6 +139,9 @@ function handleMessageFromWindow(source: Client, data: MessageFromWindow) {
 				void sendToAll(getHubStateMessage());
 			}
 			break;
+		case 'forceDisconnect':
+			forceDisconnect();
+			break;
 		case 'forceReconnect':
 			forceReconnect();
 			break;
@@ -168,6 +171,17 @@ function forceReconnect() {
 				void sendToAll(getHubStateMessage());
 			});
 			void sendToAll(getHubStateMessage());
+		})();
+	}
+}
+
+function forceDisconnect() {
+	// To trigger this, run this in the console:
+	// vaultApi.reconnectHub()
+	// This will allow you to see WS communication
+	if (connection.state !== HubConnectionState.Disconnected) {
+		void (async function () {
+			await connection.stop();
 		})();
 	}
 }

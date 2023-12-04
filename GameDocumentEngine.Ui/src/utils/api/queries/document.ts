@@ -218,7 +218,7 @@ export function patchDocument(
 				body: patch,
 			});
 			if (response.statusCode === 200) return response.data;
-			else if (response.statusCode === 409) throw conflict;
+			else if (response.statusCode === 409) return conflict;
 			else throw new Error('Could not save changes');
 		},
 	);

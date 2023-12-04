@@ -50,7 +50,14 @@ export function operationalTransformFromClient<T extends { version: string }>(
 			if (!submittedChanges) return await queryClient.fetchQuery(dataQuery);
 
 			const result = await mutator(submittedChanges);
-			if (result === conflict) throw conflict;
+			if (result === conflict) {
+				await queryClient.fetchQuery({
+					...dataQuery,
+					staleTime: 0,
+				});
+				throw conflict;
+			}
+			queryClient.setQueryData<T>(dataQuery.queryKey, result);
 			queryClient.setQueryData<Patch>(
 				pendingActionsQuery.queryKey,
 				(prev) =>
