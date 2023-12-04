@@ -1,8 +1,9 @@
 ﻿using GameDocumentEngine.Server.Realtime;
 using Json.Patch;
+using Json.Pointer;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json.Linq;
 using PrincipleStudios.OpenApiCodegen.Json.Extensions;
+using System.Text.Json;
 
 namespace GameDocumentEngine.Server.Api;
 
@@ -26,6 +27,7 @@ interface IApiChangeNotification<TApi>
 
 static class ApiChangeNotification
 {
+	private static readonly JsonPointer VersionPointer = JsonPointer.Parse("/version");
 	public static IClientProxy User<THub>(this IHubContext<THub> context, Guid userId) where THub : Hub =>
 		context.Clients.Group(GroupNames.UserDirect(userId));
 
@@ -39,7 +41,14 @@ static class ApiChangeNotification
 	{
 		var patch = PatchExtensions.CreatePatch(oldApiObject, newApiObject);
 		if (patch.Operations.Count > 0)
+		{
+			if (patch.Operations.FirstOrDefault(op => op.Path == VersionPointer && op.Op == OperationType.Replace) != null)
+			{
+				var originalJson = JsonSerializer.SerializeToNode(oldApiObject)?["version"];
+				patch = new JsonPatch(new[] { PatchOperation.Test(VersionPointer, originalJson) }.Concat(patch.Operations));
+			}
 			return target.SendAsync("EntityChanged", typeName, new { key, patch });
+		}
 		return Task.CompletedTask;
 	}
 }
