@@ -50,7 +50,7 @@ const meta = {
 			<Header
 				connectionState={connectionState$}
 				onReconnect={reconnect}
-				menuItems={getHeaderMenuItems(t, props.user, () => void 0)}
+				menuItems={getHeaderMenuItems(t, props.user, false, () => void 0)}
 				{...props}
 			/>
 		);
