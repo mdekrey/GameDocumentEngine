@@ -18,6 +18,7 @@
 	grid-area: page;
 }
 .removeButton {
+	composes: mt-8 from global;
 	grid-area: remove;
 	place-self: center;
 }

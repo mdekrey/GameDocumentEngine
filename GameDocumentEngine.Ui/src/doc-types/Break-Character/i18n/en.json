@@ -185,7 +185,7 @@
 					"slotsBase": { "label": "Base Slots" },
 					"slotsTotal": { "label": "Total Slots" },
 					"slotsModifiers": { "label": "Additional Slots" },
-					"inventory": { "label": "Item" }
+					"inventory": { "label": "Item", "section-heading": "Inventory Slots" }
 				},
 				"wealth": {
 					"stones": { "label": "Stones" },

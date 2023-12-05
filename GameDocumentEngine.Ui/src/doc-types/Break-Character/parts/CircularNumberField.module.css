@@ -26,3 +26,7 @@
 :global(.dark) .circularNumber.main input {
 	outline-color: theme(colors.slate.800);
 }
+
+.textRight span {
+	order: 1;
+}

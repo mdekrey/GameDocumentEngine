@@ -7,9 +7,7 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
-import { BasicList } from './BasicList';
-import { IconButton } from '@/components/button/icon-button';
-import { HiMinus } from 'react-icons/hi2';
+import { BasicList, BasicListItem } from './BasicList';
 
 const sizes = [
 	undefined,
@@ -86,13 +84,8 @@ function LanguageField({
 	onRemove: () => void;
 }) {
 	return (
-		<div className="flex flex-row gap-2">
+		<BasicListItem onRemove={onRemove}>
 			<TextField field={field} className="flex-1" />
-			<div className="mt-6 self-center">
-				<IconButton.Destructive onClick={onRemove}>
-					<HiMinus />
-				</IconButton.Destructive>
-			</div>
-		</div>
+		</BasicListItem>
 	);
 }

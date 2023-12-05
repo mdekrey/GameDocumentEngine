@@ -5,9 +5,9 @@ import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
-import { BasicList } from './BasicList';
-import { HiMinus } from 'react-icons/hi2';
-import { IconButton } from '@/components/button/icon-button';
+import { BasicList, BasicListItem } from './BasicList';
+import { CircularNumberField } from './CircularNumberField';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 
 const defaultInventoryItem = '';
 
@@ -24,20 +24,29 @@ export function Gear({ form }: GameObjectFormComponent<Character>) {
 	});
 
 	return (
-		<>
+		<Fieldset>
 			<TextField field={fields.worn} />
-			<NumberField.Integer field={fields.slotsBase} />
-			<NumberField.Integer field={fields.slotsTotal} />
-			<TextareaField field={fields.slotsModifiers} />
+			<div className="flex flex-row gap-4">
+				<h3 className="text-lg flex-1">
+					{fields.inventory.translation('section-heading')}
+				</h3>
+				<CircularNumberField field={fields.slotsBase} />
+			</div>
+			<div className="flex flex-row gap-4">
+				<CircularNumberField.Main field={fields.slotsTotal} />
+				<TextareaField field={fields.slotsModifiers} className="flex-1" />
+			</div>
 			<BasicList
 				field={fields.inventory}
 				defaultValue={defaultInventoryItem}
 				fieldComponent={InventoryItemField}
 			/>
-			<NumberField.Integer field={fields.stones} />
-			<NumberField.Integer field={fields.coins} />
-			<NumberField.Integer field={fields.gems} />
-		</>
+			<div className="grid grid-cols-3 gap-4">
+				<NumberField.Integer field={fields.stones} />
+				<NumberField.Integer field={fields.coins} />
+				<NumberField.Integer field={fields.gems} />
+			</div>
+		</Fieldset>
 	);
 }
 
@@ -49,11 +58,8 @@ function InventoryItemField({
 	onRemove: () => void;
 }) {
 	return (
-		<div>
-			<TextareaField field={field} />
-			<IconButton.Destructive onClick={onRemove}>
-				<HiMinus />
-			</IconButton.Destructive>
-		</div>
+		<BasicListItem onRemove={onRemove}>
+			<TextareaField field={field} className="flex-1" />
+		</BasicListItem>
 	);
 }

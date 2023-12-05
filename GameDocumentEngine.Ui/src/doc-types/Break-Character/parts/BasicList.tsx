@@ -1,9 +1,10 @@
 import type { FormFieldReturnType } from '@/utils/form';
 import { IconButton } from '@/components/button/icon-button';
-import { HiPlus } from 'react-icons/hi2';
+import { HiMinus, HiPlus } from 'react-icons/hi2';
 import { useFieldList } from './useFieldList';
 import React from 'react';
 import { ButtonRow } from '@/components/button/button-row';
+import { twMerge } from 'tailwind-merge';
 
 export function BasicList<T>({
 	field: listField,
@@ -44,3 +45,22 @@ export function BasicList<T>({
 		</>
 	);
 }
+
+export const BasicListItem = ({
+	children,
+	className,
+	onRemove,
+}: {
+	children?: React.ReactNode;
+	className?: string;
+	onRemove: () => void;
+}) => (
+	<div className={twMerge('flex flex-row gap-2', className)}>
+		{children}
+		<div className="mt-8">
+			<IconButton.Destructive onClick={onRemove}>
+				<HiMinus />
+			</IconButton.Destructive>
+		</div>
+	</div>
+);

@@ -8,4 +8,5 @@ export const CircularNumberField = elementTemplate<typeof NumberField.Integer>(
 	<NumberField.Integer className={styles.circularNumber} />,
 ).themed({
 	Main: <div className={styles.main} />,
+	TextRight: <div className={styles.textRight} />,
 });
