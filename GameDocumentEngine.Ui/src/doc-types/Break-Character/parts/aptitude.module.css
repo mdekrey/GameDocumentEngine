@@ -41,17 +41,6 @@
 	composes: self-center from global;
 	z-index: theme(zIndex.dropdown);
 }
-.total span {
-	@apply sr-only;
-}
-.total input {
-	height: 3rem;
-	width: 3rem;
-	border-radius: 100%;
-	text-align: center;
-	background-color: theme(colors.white);
-	border-color: theme(colors.slate.800);
-}
 :global(.dark) .total input {
 	background-color: theme(colors.slate.950);
 	border-color: theme(colors.slate.200);

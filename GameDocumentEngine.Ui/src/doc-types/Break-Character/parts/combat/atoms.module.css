@@ -1,5 +1,5 @@
 .container {
-	composes: grid from global;
+	composes: grid gap-x-4 from global;
 	grid-template-columns: auto 1fr auto;
 	grid-template-rows: auto auto 1fr;
 	grid-template-areas: 'icon title base' 'icon hint base' 'content content content';
@@ -21,5 +21,6 @@
 	grid-area: base;
 }
 .contents {
+	composes: mt-4 from global;
 	grid-area: content;
 }

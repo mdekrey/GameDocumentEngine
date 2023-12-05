@@ -44,7 +44,7 @@ export function DefenseFields({
 				<CircularNumberField field={fields.base} />
 			</CardBase>
 			<CardContents className="flex flex-row gap-4">
-				<CircularNumberField field={fields.total} />
+				<CircularNumberField.Main field={fields.total} />
 				{/* TODO */}
 				<TextareaField field={fields.modifiers} className="flex-1" />
 			</CardContents>

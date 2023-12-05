@@ -55,7 +55,7 @@ function Aptitude({
 			</div>
 			<CircularNumberField className={styles.base} field={fields.base} />
 			<NumberField.Integer className={styles.trait} field={fields.trait} />
-			<NumberField.Integer className={styles.total} field={fields.total} />
+			<CircularNumberField.Main className={styles.total} field={fields.total} />
 			<TextareaField className={styles.modifiers} field={fields.modifiers} />
 		</div>
 	);

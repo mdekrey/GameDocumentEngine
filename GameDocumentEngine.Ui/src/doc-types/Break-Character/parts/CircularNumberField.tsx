@@ -1,15 +1,11 @@
 import { NumberField } from '@/components/form-fields/text-input/number-field';
 import styles from './CircularNumberField.module.css';
-import { useTwMerge } from '@/components/jotai/useTwMerge';
+import { elementTemplate } from '@/components/template';
 
-export function CircularNumberField({
-	className,
-	...props
-}: React.ComponentProps<typeof NumberField.Integer>) {
-	return (
-		<NumberField.Integer
-			className={useTwMerge(className, styles.circularNumber)}
-			{...props}
-		/>
-	);
-}
+export const CircularNumberField = elementTemplate<typeof NumberField.Integer>(
+	'CircularNumberField',
+	// @ts-expect-error Used here as a template; do not check all props since they'll still be required
+	<NumberField.Integer className={styles.circularNumber} />,
+).themed({
+	Main: <div className={styles.main} />,
+});
