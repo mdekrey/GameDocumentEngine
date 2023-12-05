@@ -18,6 +18,7 @@ import { IconButton } from '@/components/button/icon-button';
 import { HiMinus } from 'react-icons/hi2';
 import styles from './attack.module.css';
 import { CircularNumberField } from '../CircularNumberField';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 
 export function Attack({
 	form,
@@ -57,12 +58,14 @@ export function AttackFields({
 			</CardBase>
 
 			<CardContents>
-				<h3 className="text-lg">{fields.weapons.translation('title')}</h3>
-				<BasicList
-					defaultValue={newWeapon}
-					field={fields.weapons}
-					fieldComponent={WeaponField}
-				/>
+				<Fieldset>
+					<h3 className="text-lg">{fields.weapons.translation('title')}</h3>
+					<BasicList
+						defaultValue={newWeapon}
+						field={fields.weapons}
+						fieldComponent={WeaponField}
+					/>
+				</Fieldset>
 			</CardContents>
 		</Container>
 	);

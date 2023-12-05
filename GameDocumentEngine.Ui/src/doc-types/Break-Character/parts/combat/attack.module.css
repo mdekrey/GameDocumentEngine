@@ -28,5 +28,6 @@
 	width: 4rem;
 }
 .removeButton {
+	composes: mt-6 from global;
 	grid-area: remove;
 }
