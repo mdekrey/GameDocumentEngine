@@ -59,7 +59,7 @@ function InventoryItemField({
 }) {
 	return (
 		<BasicListItem onRemove={onRemove}>
-			<TextareaField field={field} className="flex-1" />
+			<TextareaField field={field} className="flex-1" inputClassName="h-10" />
 		</BasicListItem>
 	);
 }
