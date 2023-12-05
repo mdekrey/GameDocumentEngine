@@ -11,7 +11,8 @@ import {
 	undefinedAsEmptyStringMapping,
 	undefinedOrIntegerMapping,
 } from '../text-input/text-field';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { useStore } from 'jotai';
 
 export type TextareaFieldPersistentProps = {
 	description?: boolean;
@@ -23,6 +24,7 @@ export type TextareaFieldProps = FieldProps<string> &
 	TextareaFieldPersistentProps;
 
 export function TextareaField(props: TextareaFieldProps) {
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const htmlProps = props.field.htmlProps();
 	const {
 		field: { translation: t, errors },
@@ -36,13 +38,33 @@ export function TextareaField(props: TextareaFieldProps) {
 		useComputedAtom((get) => (get(htmlProps.disabled) ? 'text-slate-500' : '')),
 		labelClassName,
 	);
+	const store = useStore();
+	useEffect(() => {
+		adjustHeight();
+		return store.sub(props.field.value, () => {
+			adjustHeight();
+		});
+
+		function adjustHeight() {
+			const textarea = textareaRef.current;
+			if (!textarea) return;
+			const expectedHeight =
+				textarea.offsetHeight - textarea.clientHeight + textarea.scrollHeight;
+			if (expectedHeight > textarea.offsetHeight)
+				textarea.style.height = `${expectedHeight + 1}px`;
+		}
+	}, [store, props.field.value]);
 	return (
 		<Field {...fieldProps}>
 			<Field.Label className={disabledLabelClassName}>
 				{t(['label'])}
 			</Field.Label>
 			<Field.Contents className={contentsClassName}>
-				<TextareaInput {...htmlProps} className={inputClassName} />
+				<TextareaInput
+					ref={textareaRef}
+					{...htmlProps}
+					className={inputClassName}
+				/>
 				{description && <p className="text-xs italic">{t(['description'])}</p>}
 				<ErrorsList errors={errors} translations={t} />
 			</Field.Contents>
