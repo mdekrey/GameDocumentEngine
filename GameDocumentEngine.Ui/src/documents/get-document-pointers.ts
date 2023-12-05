@@ -28,12 +28,16 @@ export function toEditableDetails<T>(
 		name: target.name,
 		details: target.details,
 	};
-	if (fixup) editableTarget = fixup.toForm(editableTarget);
+	const writablePointers = getWritableDocumentPointers(target, editableTarget);
+	const readablePointers = getReadableDocumentPointers(target, editableTarget);
+
+	if (fixup && readablePointers.pointers.length)
+		editableTarget = fixup.toForm(editableTarget);
 	return {
 		document: target,
 		editable: editableTarget,
-		writablePointers: getWritableDocumentPointers(target, editableTarget),
-		readablePointers: getReadableDocumentPointers(target, editableTarget),
+		writablePointers,
+		readablePointers,
 	};
 }
 

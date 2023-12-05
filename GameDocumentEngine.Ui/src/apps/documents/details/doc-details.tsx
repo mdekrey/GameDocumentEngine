@@ -90,12 +90,12 @@ export function DocumentDetailsForm<T = unknown>({
 		keyPrefix: `document`,
 	});
 	const form = useForm({
-		defaultValue: fixup.toForm(editable.editable),
+		defaultValue: editable.editable,
 		schema: documentSchema(scripts.typeInfo.schema),
 		translation: formTranslation,
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
-	updateFormDefaultMapped(form, editable.document, fixup);
+	updateFormDefaultMapped(form, editable.editable);
 	useEffect(() => {
 		form.store.set(
 			form.readOnlyFields,
@@ -143,7 +143,7 @@ export function DocumentDetailsForm<T = unknown>({
 	);
 
 	return (
-		<div className="p-4">
+		<div className="p-4 h-full w-full">
 			{editable.readablePointers.pointers.length > 0 && (
 				<Component
 					form={form}

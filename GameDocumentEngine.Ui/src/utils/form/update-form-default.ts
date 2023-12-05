@@ -1,8 +1,5 @@
 import { type Objectish, produce } from 'immer';
-import type {
-	UseFormResult,
-	FieldMapping,
-} from '@principlestudios/react-jotai-forms';
+import type { UseFormResult } from '@principlestudios/react-jotai-forms';
 import { applyPatch, createPatch } from 'rfc6902';
 
 export function updateFormDefault<T extends Objectish>(
@@ -42,13 +39,9 @@ export function updateFormDefault<T extends Objectish>(
 	}
 }
 
-export function updateFormDefaultMapped<
-	T extends Objectish,
-	TForm extends Objectish,
->(
+export function updateFormDefaultMapped<TForm extends Objectish>(
 	form: Pick<UseFormResult<TForm>, 'defaultValue' | 'set' | 'get'>,
-	newValue: T,
-	fixupFormValues: FieldMapping<T, TForm>,
+	newValue: TForm,
 ) {
-	updateFormDefault(form, fixupFormValues.toForm(newValue));
+	updateFormDefault(form, newValue);
 }
