@@ -7,6 +7,8 @@ import HttpApi, { type HttpBackendOptions } from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { constructUrl as toLocalizationUrl } from '@/api/operations/getTranslationData';
 
+const reportedKeys = new Set<string>();
+
 export const i18n = i18nextBase
 	.use(MultiloadAdapter)
 	.use(LanguageDetector)
@@ -15,13 +17,16 @@ void i18n.init({
 	// lng: 'en', // if you're using a language detector, do not define the lng option
 	fallbackLng: 'en',
 
-	missingKeyHandler(languages, namespace, key, fallbackValue) {
-		console.warn('missing translation', {
-			languages,
-			namespace,
-			key,
-			fallbackValue,
-		});
+	saveMissing: true,
+	missingKeyHandler(languages, namespace, key) {
+		const fullKeys = languages
+			.map((l) => `${l}::${namespace}::${key}`)
+			.filter((k) => !reportedKeys.has(k));
+		if (!fullKeys.length) return;
+		for (const k of fullKeys) {
+			reportedKeys.add(k);
+		}
+		console.warn('missing translations:', fullKeys);
 	},
 
 	backend: {

@@ -60,12 +60,14 @@ export function Identity({ form }: GameObjectFormComponent<Character>) {
 					{(s) => (s ? fields.size.translation(s) : '-')}
 				</SelectField>
 				<TextField.AllowUndefined field={fields.homeland} />
-				<h3 className="text-lg">{fields.languages.translation('title')}</h3>
-				<BasicList
-					field={fields.languages}
-					defaultValue=""
-					fieldComponent={LanguageField}
-				/>
+				<section className="contents">
+					<h3 className="text-lg">{fields.languages.translation('title')}</h3>
+					<BasicList
+						field={fields.languages}
+						defaultValue=""
+						fieldComponent={LanguageField}
+					/>
+				</section>
 				<TextField.AllowUndefined field={fields.history} />
 				<TextareaField.AllowUndefined field={fields.purviews} />
 				<TextareaField.AllowUndefined field={fields.description} />
@@ -84,11 +86,13 @@ function LanguageField({
 	onRemove: () => void;
 }) {
 	return (
-		<div>
-			<TextField field={field} />
-			<IconButton.Destructive onClick={onRemove}>
-				<HiMinus />
-			</IconButton.Destructive>
+		<div className="flex flex-row gap-2">
+			<TextField field={field} className="flex-1" />
+			<div className="mt-6 self-center">
+				<IconButton.Destructive onClick={onRemove}>
+					<HiMinus />
+				</IconButton.Destructive>
+			</div>
 		</div>
 	);
 }

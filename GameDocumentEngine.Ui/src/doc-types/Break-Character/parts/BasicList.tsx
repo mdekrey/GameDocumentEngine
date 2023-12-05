@@ -3,6 +3,7 @@ import { IconButton } from '@/components/button/icon-button';
 import { HiPlus } from 'react-icons/hi2';
 import { useFieldList } from './useFieldList';
 import React from 'react';
+import { ButtonRow } from '@/components/button/button-row';
 
 export function BasicList<T>({
 	field: listField,
@@ -34,9 +35,12 @@ export function BasicList<T>({
 						onRemove={() => removeItem(index)}
 					/>
 				))}
-			<IconButton onClick={addItem}>
-				<HiPlus />
-			</IconButton>
+
+			<ButtonRow>
+				<IconButton title={listField.translation('add')} onClick={addItem}>
+					<HiPlus />
+				</IconButton>
+			</ButtonRow>
 		</>
 	);
 }

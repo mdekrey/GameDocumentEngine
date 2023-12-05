@@ -3,6 +3,19 @@ import { useAtomValue } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useCallback, useRef } from 'react';
 
+export function useAddItem<T>(
+	field: FormFieldReturnType<T[]>,
+	defaultValue: T,
+): (this: void) => void {
+	const addItem = useCallback(
+		function addItem() {
+			field.onChange((items) => [...items, defaultValue]);
+		},
+		[field, defaultValue],
+	);
+	return addItem;
+}
+
 export function useFieldList<T>(
 	field: FormFieldReturnType<T[]>,
 	defaultValue: T,
@@ -24,14 +37,11 @@ export function useFieldList<T>(
 	});
 	const length = useAtomValue(useComputedAtom((get) => get(field.atom).length));
 	if (keys.current.length !== length) {
-		keys.current = field.get().map((v) => toKey?.(v) ?? crypto.randomUUID());
+		keys.current = field
+			.get()
+			.map((v, i) => keys.current[i] ?? toKey?.(v) ?? crypto.randomUUID());
 	}
-	const addItem = useCallback(
-		function addItem() {
-			field.onChange((items) => [...items, defaultValue]);
-		},
-		[field, defaultValue],
-	);
+	const addItem = useAddItem(field, defaultValue);
 	const removeItem = useCallback(
 		function removeItem(index: number) {
 			field.onChange((items) => items.filter((_, i) => i !== index));

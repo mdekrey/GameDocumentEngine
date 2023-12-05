@@ -55,7 +55,8 @@
 					},
 					"languages": {
 						"title": "Languages",
-						"label": "Language"
+						"label": "Language",
+						"add": "Add Language"
 					},
 					"history": {
 						"label": "History"
