@@ -18,7 +18,7 @@ export function getGameType(
 	};
 }
 
-export type GameTypeScripts = GameTypeDetails & {
+export type GameTypeScripts = Omit<GameTypeDetails, 'objectTypes'> & {
 	objectTypes: Record<string, GameTypeObjectScripts>;
 };
 

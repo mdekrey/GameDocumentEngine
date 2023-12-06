@@ -744,11 +744,15 @@ components:
       - type
       - details
       - folderId
+      - initialRoles
       properties:
         name: { type: string }
         type: { type: string }
         details: { type: object, format: any }
         folderId: { type: string, format: guid, nullable: true }
+        initialRoles:
+          type: object
+          additionalProperties: { type: string }
     DocumentDetails:
       type: object
       required:

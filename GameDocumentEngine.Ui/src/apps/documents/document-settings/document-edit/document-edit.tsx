@@ -53,7 +53,7 @@ export function DocumentEditFields({
 }
 
 const DocumentDetailsSchema = z.object({
-	name: z.string().min(3),
+	name: z.string().min(1),
 	folderId: z.string().nullable(),
 });
 

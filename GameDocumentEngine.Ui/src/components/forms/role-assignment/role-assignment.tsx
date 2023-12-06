@@ -11,7 +11,7 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useTranslation } from 'react-i18next';
 import { RoleAssignmentField } from './role-assignment-field';
 
-export const UserRoleAssignment = z.object({}).catchall(z.string());
+export const UserRoleAssignment = z.record(z.string());
 
 export type RoleAssignmentProps = {
 	userRoles: { [id: string]: string };
