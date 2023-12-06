@@ -5,7 +5,7 @@ import schema from './schema';
 import type { z } from 'zod';
 
 const template: z.infer<typeof schema> = {
-	widgets: [],
+	widgets: {},
 };
 
 defineDocument('Dashboard', {

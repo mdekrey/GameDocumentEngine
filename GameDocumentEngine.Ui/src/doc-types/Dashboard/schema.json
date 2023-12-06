@@ -4,8 +4,8 @@
 	"required": ["widgets"],
 	"properties": {
 		"widgets": {
-			"type": "array",
-			"item": { "$ref": "#/$defs/Widget" }
+			"type": "object",
+			"additionalProperties": { "$ref": "#/$defs/Widget" }
 		},
 		"max": {
 			"type": "integer",

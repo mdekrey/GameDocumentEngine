@@ -5,9 +5,8 @@ export type DraggingMimeTypes = {
 	[documentIdMimeType]: { gameId: string; id: string };
 	[widgetMimeType]: {
 		gameId: string;
-		id: string;
+		documentId: string;
 		widget: string;
-		settings: string;
 	};
 	[userIdMimeType]: { userId: string };
 };
