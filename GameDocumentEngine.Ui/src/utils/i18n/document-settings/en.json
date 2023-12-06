@@ -1,0 +1,10 @@
+{
+	"configure-details": "Details",
+	"configure-roles": "Configure Roles for {{name}}",
+	"submit": "Save Changes",
+	"danger-zone": "Danger Zone",
+	"delete-document": "Delete {{name}}",
+	"roles": {
+		"no-role": { "name": "None" }
+	}
+}

@@ -67,12 +67,25 @@ public class DocumentController : Api.DocumentControllerBase
 		if (docType == null)
 			return CreateDocumentActionResult.BadRequest("Unknown document type for game");
 
-		document.Players.Add(new DocumentUserModel
+		foreach (var entry in createDocumentBody.InitialRoles)
 		{
-			GameId = game.Id,
-			UserId = User.GetUserIdOrThrow(),
-			Role = docType.CreatorPermissionLevel
-		});
+			document.Players.Add(new DocumentUserModel
+			{
+				GameId = game.Id,
+				UserId = Guid.Parse(entry.Key),
+				Role = entry.Value,
+			});
+		}
+		var currentUser = User.GetUserIdOrThrow();
+		if (!document.Players.Any(p => p.UserId == currentUser))
+		{
+			document.Players.Add(new DocumentUserModel
+			{
+				GameId = game.Id,
+				UserId = User.GetUserIdOrThrow(),
+				Role = docType.CreatorPermissionLevel
+			});
+		}
 
 		var schema = await schemaResolver.GetOrLoadSchema(docType);
 		var results = schema.Evaluate(createDocumentBody.Details, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
