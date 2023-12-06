@@ -3,7 +3,7 @@ import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import type { FormFieldReturnType } from '@/utils/form';
+import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import { useForm, useFormFields } from '@/utils/form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -112,6 +112,11 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	}
 }
 
+const defaultEmptyString: FieldMapping<string, string> = {
+	toForm: (v) => v ?? '',
+	fromForm: (v) => v ?? '',
+};
+
 function DocumentRoleAssignment({
 	documentTypeAtom,
 	gameDetails,
@@ -142,6 +147,7 @@ function DocumentRoleAssignment({
 			path: [userId] as const,
 			translationPath: [],
 			disabled,
+			mapping: defaultEmptyString,
 		}),
 	});
 
