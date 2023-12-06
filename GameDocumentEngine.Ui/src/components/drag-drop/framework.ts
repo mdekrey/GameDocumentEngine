@@ -10,13 +10,32 @@ type MimeAndData<T extends keyof DraggingMimeTypes = keyof DraggingMimeTypes> =
 	}[T];
 const draggingGameObject = atom<MimeAndData | undefined>(undefined);
 
-type AllowedDragEffect = DataTransfer['effectAllowed'];
+type AllowedDragEffect = {
+	readonly copy: boolean;
+	readonly move: boolean;
+	readonly link: boolean;
+};
 type DropEffect = DataTransfer['dropEffect'];
+
+const mapAllowedEffect: Record<
+	DataTransfer['effectAllowed'],
+	AllowedDragEffect
+> = {
+	none: { copy: false, move: false, link: false },
+	copy: { copy: true, move: false, link: false },
+	copyLink: { copy: true, move: false, link: true },
+	copyMove: { copy: true, move: true, link: false },
+	link: { copy: false, move: false, link: true },
+	linkMove: { copy: false, move: true, link: true },
+	move: { copy: false, move: true, link: false },
+	all: { copy: true, move: true, link: true },
+	uninitialized: { copy: true, move: true, link: true },
+};
 
 export function useDraggable<T extends keyof DraggingMimeTypes>(
 	mimeType: T,
 	data: DraggingMimeTypes[T],
-	effect: AllowedDragEffect,
+	effect: DataTransfer['effectAllowed'],
 ) {
 	const setDraggingDocument = useSetAtom(draggingGameObject);
 
@@ -61,7 +80,11 @@ function isMimeType(mimeType: string): mimeType is keyof DraggingMimeTypes {
 
 export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 	const store = useStore();
-	return { handleDragOver, handleDrop };
+	return {
+		onDragOver: handleDragOver,
+		onDragEnter: handleDragOver,
+		onDrop: handleDrop,
+	};
 
 	function handleDragOver(ev: React.DragEvent<unknown>) {
 		const currentWindowDragging = store.get(draggingGameObject);
@@ -103,7 +126,10 @@ export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 		handler: DropHandler,
 		data?: DraggingMimeTypes[keyof DraggingMimeTypes],
 	) {
-		const handleResult = handler.canHandle(ev.dataTransfer.effectAllowed, data);
+		const handleResult = handler.canHandle(
+			mapAllowedEffect[ev.dataTransfer.effectAllowed],
+			data,
+		);
 		if (!handleResult) return false;
 		ev.dataTransfer.dropEffect = handleResult;
 		ev.preventDefault();

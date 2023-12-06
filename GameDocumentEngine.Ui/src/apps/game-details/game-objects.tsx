@@ -48,12 +48,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 			</h2>
 
 			<section className="flex flex-col">
-				<div
-					className="flex flex-row gap-3"
-					onDragOver={docMoveToRootEvents.handleDragOver}
-					onDragEnter={docMoveToRootEvents.handleDragOver}
-					onDrop={docMoveToRootEvents.handleDrop}
-				>
+				<div className="flex flex-row gap-3" {...docMoveToRootEvents}>
 					<h3 className="flex-1 text-lg font-bold">{t('header')}</h3>
 					{canCreate && (
 						<IconLinkButton.Save
@@ -203,11 +198,7 @@ function DocumentLink({
 	folderPath?: (string | null)[];
 }) {
 	const Icon = objectTypes[document.type].typeInfo.icon;
-	const { handleDragOver, handleDrop } = useDragTarget(
-		gameId,
-		folderPath,
-		document.id,
-	);
+	const dragTarget = useDragTarget(gameId, folderPath, document.id);
 	const draggable = useDraggable(
 		documentIdMimeType,
 		{ gameId, id: document.id },
@@ -219,9 +210,7 @@ function DocumentLink({
 			className="flex flex-row items-center gap-2 hover:bg-white/25 dark:hover:bg-slate-950/25 p-1"
 			draggable={true}
 			{...draggable}
-			onDragOver={handleDragOver}
-			onDragEnter={handleDragOver}
-			onDrop={handleDrop}
+			{...dragTarget}
 		>
 			<Icon className="h-5 w-5 flex-shrink-0" />
 			{document.name}
@@ -239,7 +228,7 @@ function useDragTarget(
 	);
 	return useDropTarget({
 		[documentIdMimeType]: {
-			canHandle: () => 'move',
+			canHandle: ({ move }) => (move ? 'move' : false),
 			handle: (ev, current) => {
 				if (current.gameId !== gameId) return false;
 				if (folderPath && folderPath.includes(current.id)) return false;
