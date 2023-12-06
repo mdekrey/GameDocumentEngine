@@ -1,0 +1,25 @@
+{
+	"name": "Dashboard",
+	"details": {
+		"delete": "Delete dashboard",
+		"edit-roles": "Edit roles"
+	},
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the dashboard with ability to add, remove, and edit widgets"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the dashboard; may not be able to see all widgets on the dashboard due to other permissions"
+		},
+		"no-role": { "name": "None" }
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			}
+		}
+	}
+}

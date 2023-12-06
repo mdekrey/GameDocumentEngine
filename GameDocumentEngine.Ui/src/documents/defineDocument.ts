@@ -39,6 +39,7 @@ export type GameObjectFormComponent<T = unknown> = {
 };
 
 export type IGameObjectType<T = unknown> = {
+	noContainer?: boolean;
 	icon: IconType;
 	template: T;
 	component: React.ComponentType<GameObjectFormComponent<T>>;

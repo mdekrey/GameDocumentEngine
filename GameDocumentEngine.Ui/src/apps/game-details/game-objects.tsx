@@ -11,11 +11,11 @@ import type { DocumentSummary } from '@/api/models/DocumentSummary';
 import type { FolderNode } from '@/utils/api/queries/document';
 import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import { Prose } from '@/components/text/common';
-import { atom, useSetAtom, useStore } from 'jotai';
-
-type GameObjectKey = { gameId: string; id: string };
-const draggingGameObject = atom<GameObjectKey | undefined>(undefined);
-const documentIdMimeType = 'application/x-vtt-doc-id';
+import {
+	documentIdMimeType,
+	useDraggable,
+	useDropTarget,
+} from '@/components/drag-drop';
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
@@ -208,14 +208,17 @@ function DocumentLink({
 		folderPath,
 		document.id,
 	);
-	const setDraggingDocument = useSetAtom(draggingGameObject);
+	const draggable = useDraggable(
+		documentIdMimeType,
+		{ gameId, id: document.id },
+		'all',
+	);
 	return (
 		<Link
 			to={`/game/${gameId}/document/${document.id}`}
 			className="flex flex-row items-center gap-2 hover:bg-white/25 dark:hover:bg-slate-950/25 p-1"
 			draggable={true}
-			onDragStart={handleDragStart}
-			onDragEnd={handleDragEnd}
+			{...draggable}
 			onDragOver={handleDragOver}
 			onDragEnter={handleDragOver}
 			onDrop={handleDrop}
@@ -224,17 +227,6 @@ function DocumentLink({
 			{document.name}
 		</Link>
 	);
-
-	function handleDragStart(ev: React.DragEvent<unknown>) {
-		const data = { gameId, id: document.id };
-		setDraggingDocument(data);
-		ev.dataTransfer.setData(documentIdMimeType, JSON.stringify(data));
-		ev.dataTransfer.effectAllowed = 'move';
-	}
-
-	function handleDragEnd() {
-		setDraggingDocument(undefined);
-	}
 }
 
 function useDragTarget(
@@ -245,32 +237,16 @@ function useDragTarget(
 	const reordering = useMutation(
 		extraQueries.changeDocumentFolder(useQueryClient(), gameId),
 	);
-	const store = useStore();
-	return { handleDragOver, handleDrop };
+	return useDropTarget({
+		[documentIdMimeType]: {
+			canHandle: () => 'move',
+			handle: (ev, current) => {
+				if (current.gameId !== gameId) return false;
+				if (folderPath && folderPath.includes(current.id)) return false;
 
-	function handleDragOver(ev: React.DragEvent<unknown>) {
-		const isDocumentId = ev.dataTransfer.types.includes(documentIdMimeType);
-		if (isDocumentId) {
-			if (!folderPath) return ev.preventDefault();
-			const current = store.get(draggingGameObject);
-			if (!current) return ev.preventDefault();
-			if (folderPath.includes(current.id)) return;
-			ev.preventDefault();
-		}
-	}
-
-	function handleDrop(ev: React.DragEvent<unknown>) {
-		const isDocumentId = ev.dataTransfer.types.includes(documentIdMimeType);
-		if (isDocumentId) {
-			const current = JSON.parse(
-				ev.dataTransfer.getData(documentIdMimeType),
-			) as GameObjectKey;
-			if (!current) return ev.preventDefault();
-			if (current.gameId !== gameId) return;
-			if (folderPath && folderPath.includes(current.id)) return;
-
-			reordering.mutate({ id: current.id, folderId });
-			ev.preventDefault();
-		}
-	}
+				reordering.mutate({ id: current.id, folderId });
+				return true;
+			},
+		},
+	});
 }

@@ -1,0 +1,41 @@
+{
+	"title": "Dashboard",
+	"type": "object",
+	"required": ["widgets"],
+	"properties": {
+		"widgets": {
+			"type": "array",
+			"item": { "$ref": "#/$defs/Widget" }
+		},
+		"max": {
+			"type": "integer",
+			"description": "The maximum value of the clock.",
+			"minimum": 1
+		}
+	},
+	"$defs": {
+		"Widget": {
+			"type": "object",
+			"required": ["documentId", "position", "widget", "settings"],
+			"properties": {
+				"documentId": { "type": "string" },
+				"position": { "$ref": "#/$defs/WidgetPosition" },
+				"widget": { "type": "string" },
+				"settings": { "type": "object" }
+			}
+		},
+		"WidgetPosition": {
+			"oneOf": [{ "$ref": "#/$defs/WidgetAbsolutePosition" }]
+		},
+		"WidgetAbsolutePosition": {
+			"type": "object",
+			"required": ["x", "y", "width", "height"],
+			"properties": {
+				"x": { "type": "integer" },
+				"y": { "type": "integer" },
+				"width": { "type": "integer" },
+				"height": { "type": "integer" }
+			}
+		}
+	}
+}

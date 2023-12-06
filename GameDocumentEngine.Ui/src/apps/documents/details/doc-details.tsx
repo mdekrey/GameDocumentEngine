@@ -142,18 +142,22 @@ export function DocumentDetailsForm<T = unknown>({
 		[onUpdateDocument, fixup],
 	);
 
-	return (
-		<div className="p-4 h-full w-full">
-			{editable.readablePointers.pointers.length > 0 && (
-				<Component
-					form={form}
-					onSubmit={onSubmit}
-					translation={fullTranslation}
-					readablePointers={editable.readablePointers}
-					writablePointers={editable.writablePointers}
-					objectRole={document.data.userRoles[user.data.id]}
-				/>
-			)}
-		</div>
+	if (!editable.readablePointers.pointers.length) return null;
+
+	const component = (
+		<Component
+			form={form}
+			onSubmit={onSubmit}
+			translation={fullTranslation}
+			readablePointers={editable.readablePointers}
+			writablePointers={editable.writablePointers}
+			objectRole={document.data.userRoles[user.data.id]}
+		/>
+	);
+
+	return scripts.typeInfo.noContainer ? (
+		component
+	) : (
+		<div className="p-4 h-full w-full">{component}</div>
 	);
 }

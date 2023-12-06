@@ -1,0 +1,7 @@
+{
+	"name": "Dashboard",
+	"script": {
+		"type": "manifest",
+		"path": "src/doc-types/Dashboard/index.ts"
+	}
+}
