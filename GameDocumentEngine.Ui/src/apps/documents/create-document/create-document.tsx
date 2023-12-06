@@ -105,9 +105,16 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	function onSubmit(currentValue: Omit<CreateDocumentDetails, 'details'>) {
 		if (!gameType.isSuccess) return; // shouldn't have gotten here
 		const objectInfo = gameType.data.objectTypes[currentValue.type];
+		const initialRoles = Object.fromEntries(
+			Object.entries(currentValue.initialRoles).filter(([, role]) => !!role),
+		);
 
 		createDocument.mutate({
-			document: { ...currentValue, details: objectInfo.typeInfo.template },
+			document: {
+				...currentValue,
+				initialRoles,
+				details: objectInfo.typeInfo.template,
+			},
 		});
 	}
 }
