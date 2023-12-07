@@ -44,11 +44,9 @@ function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
 }
 
-const SectionHeader = Prose.extend(
-	'SectionHeader',
-	<h2 className="text-xl font-bold my-4" />,
-	{ overrideType: true },
-);
+const SectionHeader = Prose.extend('SectionHeader', () => (
+	<h2 className="text-xl font-bold my-4" />
+));
 
 export function DocumentSettings({
 	gameId,

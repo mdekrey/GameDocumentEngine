@@ -7,7 +7,8 @@ export const iconButtonClasses =
 
 const buttonTemplate = elementTemplate<'button'>(
 	'IconButton',
-	<button type="button" className={twMerge(iconButtonClasses)} />,
+	'button',
+	(T) => <T type="button" className={twMerge(iconButtonClasses)} />,
 	{
 		mutateProps: ({ className, disabled, ...rest }) => ({
 			disabled: false,

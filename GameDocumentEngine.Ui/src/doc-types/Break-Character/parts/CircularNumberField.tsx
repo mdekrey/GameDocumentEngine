@@ -2,11 +2,11 @@ import { NumberField } from '@/components/form-fields/text-input/number-field';
 import styles from './CircularNumberField.module.css';
 import { elementTemplate } from '@/components/template';
 
-export const CircularNumberField = elementTemplate<typeof NumberField.Integer>(
+export const CircularNumberField = elementTemplate(
 	'CircularNumberField',
-	// @ts-expect-error Used here as a template; do not check all props since they'll still be required
-	<NumberField.Integer className={styles.circularNumber} />,
+	NumberField.Integer,
+	(T) => <T className={styles.circularNumber} />,
 ).themed({
-	Main: <div className={styles.main} />,
-	TextRight: <div className={styles.textRight} />,
+	Main: (T) => <T className={styles.main} />,
+	TextRight: (T) => <T className={styles.textRight} />,
 });
