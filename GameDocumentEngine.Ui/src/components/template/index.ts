@@ -11,23 +11,44 @@ type PropsOf<TType extends AllowedTypes> =
 		? JSX.IntrinsicElements[TType]
 		: React.ComponentProps<TType>;
 
-type ReactElementOfType<TType extends AllowedTypes> = React.ReactElement<
-	PropsOf<TType>,
-	TType
+type PartialElement<TType extends AllowedTypes> = React.JSXElementConstructor<
+	Partial<PropsOf<TType>>
 >;
 
 const identity = <T>(orig: T) => orig;
 
 export type ExtendOptions<TType extends AllowedTypes> = {
-	overrideType?: boolean;
 	mutateProps?: (props: PropsOf<TType>) => PropsOf<TType>;
 };
 
-type ExtendParams<TType extends AllowedTypes> = [
+type TemplateResolver<TType extends AllowedTypes> = (
+	this: void,
+	template: PartialElement<TType>,
+) => React.ReactElement;
+
+type BaseParams<TType extends AllowedTypes> = [
 	name: string,
-	elem: ReactElementOfType<TType>,
+	type: TType,
+	elem: TemplateResolver<TType>,
 	options?: ExtendOptions<TType> | undefined,
 ];
+
+type ExtendParams<TType extends AllowedTypes> = [
+	name: string,
+	elem: TemplateResolver<TType>,
+	options?: ExtendOptions<TType> | undefined,
+];
+
+export type ThemedTemplateResolver<
+	TKeys extends string,
+	TType extends AllowedTypes,
+> = Record<TKeys, TemplateResolver<TType>>;
+
+export function buildTheme<TKeys extends string, TType extends AllowedTypes>(
+	theme: ThemedTemplateResolver<TKeys, TType>,
+) {
+	return theme;
+}
 
 export interface ElementTemplate<TType extends AllowedTypes>
 	extends React.FC<PropsOf<TType>> {
@@ -35,19 +56,16 @@ export interface ElementTemplate<TType extends AllowedTypes>
 	extend: (...params: ExtendParams<TType>) => ElementTemplate<TType>;
 	themed<TKeys extends string>(
 		this: ElementTemplate<TType>,
-		themes: Record<TKeys, JSX.Element>,
+		themes: Record<TKeys, TemplateResolver<TType>>,
 	): this & Record<TKeys, ElementTemplate<TType>>;
 }
 export function elementTemplate<TType extends AllowedTypes>(
-	...[
-		name,
-		{
-			type,
-			props: { className: defaultClassName, ...defaultProps },
-		},
-		baseOptions = {},
-	]: ExtendParams<TType>
+	...[name, originalType, templateResolver, baseOptions = {}]: BaseParams<TType>
 ): ElementTemplate<TType> {
+	const {
+		type,
+		props: { className: defaultClassName, ...defaultProps },
+	} = templateResolver(originalType as PartialElement<TType>);
 	const mutateProps = baseOptions?.mutateProps ?? identity;
 	const base = forwardRef(
 		({ children, className, ...props }: PropsOf<TType>, ref) =>
@@ -64,23 +82,20 @@ export function elementTemplate<TType extends AllowedTypes>(
 	) as unknown as React.FC<PropsOf<TType>>;
 	return Object.assign(base, {
 		displayName: name,
-		extend(
-			...[
-				name,
-				{
-					type: myType,
-					props: { className, ...props },
-				},
-				options = {},
-			]: ExtendParams<TType>
-		) {
+		extend(...[name, templateResolver, options = {}]: ExtendParams<TType>) {
+			const {
+				type: myType,
+				props: { className, ...props },
+			} = templateResolver(type as PartialElement<TType>);
 			return elementTemplate<TType>(
 				name,
-				createElement(options.overrideType ? myType : type, {
-					...defaultProps,
-					...props,
-					className: twMerge(defaultClassName as string, className as string),
-				}) as ReactElementOfType<TType>,
+				myType as TType,
+				(T) =>
+					createElement(T, {
+						...defaultProps,
+						...props,
+						className: twMerge(defaultClassName as string, className as string),
+					} as PropsOf<TType>),
 				{
 					mutateProps: (orig) =>
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -90,12 +105,12 @@ export function elementTemplate<TType extends AllowedTypes>(
 		},
 		themed<TKeys extends string>(
 			this: ElementTemplate<TType>,
-			themes: Record<TKeys, JSX.Element>,
+			themes: Record<TKeys, TemplateResolver<TType>>,
 		) {
 			const result = Object.assign(
 				this,
 				Object.fromEntries(
-					Object.entries<JSX.Element>(themes).map(
+					Object.entries<TemplateResolver<TType>>(themes).map(
 						([name, example]) =>
 							[
 								name as TKeys,
