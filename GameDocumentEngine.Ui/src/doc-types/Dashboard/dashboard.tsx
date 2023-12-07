@@ -5,13 +5,17 @@ import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import styles from './dashboard.module.css';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
 
+const gridOffset = 16;
+const gridSize = 32;
+
+const toGridCoordinate = (client: number) =>
+	Math.max(0, Math.floor((client - gridOffset) / gridSize));
+
 export function Dashboard({
 	form,
 	onSubmit,
-	readablePointers,
 }: GameObjectFormComponent<Dashboard>) {
 	useSubmitOnChange(form, onSubmit);
-	console.log(readablePointers);
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
@@ -20,16 +24,20 @@ export function Dashboard({
 			},
 			handle(ev, data) {
 				const currentTarget = ev.currentTarget as HTMLDivElement;
-				console.log(
-					data,
-					currentTarget,
-					ev.clientX - currentTarget.clientTop,
-					ev.clientY - currentTarget.clientLeft,
-				);
+				const rect = currentTarget.getBoundingClientRect();
+				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));
+				const y = toGridCoordinate(ev.clientY - Math.round(rect.top));
+				console.log(data, x, y);
 				return true;
 			},
 		},
 	});
 
-	return <div className={styles.dashboardGrid} {...dropTarget}></div>;
+	return (
+		<div
+			className={styles.dashboardGrid}
+			style={{ '--grid-size': gridSize, '--grid-offset': gridOffset }}
+			{...dropTarget}
+		></div>
+	);
 }
