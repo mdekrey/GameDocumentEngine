@@ -34,13 +34,14 @@ export type TemplateResolver<TType extends AllowedTypes = AllowedTypes> = (
 
 export type ThemedTemplateResolver<
 	TKeys extends string,
-	TType extends AllowedTypes,
+	TType extends AllowedTypes = AllowedTypes,
 > = Record<TKeys, TemplateResolver<TType>>;
 
 /** Captures types of a theme without needing to explicitly type. */
-export function buildTheme<TKeys extends string, TType extends AllowedTypes>(
-	theme: ThemedTemplateResolver<TKeys, TType>,
-) {
+export function buildTheme<
+	TKeys extends string,
+	TType extends AllowedTypes = AllowedTypes,
+>(theme: ThemedTemplateResolver<TKeys, TType>) {
 	return theme;
 }
 

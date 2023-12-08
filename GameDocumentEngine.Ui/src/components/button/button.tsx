@@ -2,6 +2,9 @@ import { twMerge } from 'tailwind-merge';
 import type { ButtonTheme } from './buttonThemes';
 import { buildTheme, elementTemplate } from '../template';
 
+/** Not intended for use as a component (though it could be), this is intended
+ * more as a template for a base `button` that moves the "disabled"
+ * functionality to a more appropriate location and applies a base style. */
 export const disabledButtonTemplate = elementTemplate(
 	'disabledButton',
 	'button',
@@ -15,7 +18,11 @@ export const disabledButtonTemplate = elementTemplate(
 	},
 );
 
-export const defaultButtonThemes = buildTheme({
+/**
+ * A default set of themes for buttons of all underlying types. Changes
+ * background colors, text, hover states, and supports dark mode.
+ **/
+export const defaultButtonThemes = buildTheme<ButtonTheme>({
 	Destructive: (T) => (
 		<T className="bg-red-600 text-white focus:bg-red-500 hover:bg-red-500 dark:bg-red-600 dark:text-white dark:focus:bg-red-700 dark:hover:bg-red-700" />
 	),
@@ -28,7 +35,7 @@ export const defaultButtonThemes = buildTheme({
 	DestructiveSecondary: (T) => (
 		<T className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:focus:bg-red-700 dark:hover:bg-red-700" />
 	),
-}) satisfies Record<ButtonTheme, unknown>;
+});
 
 export const Button = disabledButtonTemplate
 	.extend('Button', (T) => (
