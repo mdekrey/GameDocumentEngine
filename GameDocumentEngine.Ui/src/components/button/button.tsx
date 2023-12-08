@@ -1,7 +1,6 @@
 import { twMerge } from 'tailwind-merge';
 import type { ButtonTheme } from './buttonThemes';
-import type { ThemedTemplateResolver } from '../template';
-import { elementTemplate } from '../template';
+import { buildTheme, elementTemplate } from '../template';
 
 const buttonTemplate = elementTemplate(
 	'Button',
@@ -29,10 +28,7 @@ const buttonTemplate = elementTemplate(
 	},
 );
 
-export const defaultButtonThemes: ThemedTemplateResolver<
-	ButtonTheme,
-	React.FC<{ className: string }>
-> = {
+export const defaultButtonThemes = buildTheme({
 	Destructive: (T) => (
 		<T className="bg-red-600 text-white focus:bg-red-500 hover:bg-red-500 dark:bg-red-600 dark:text-white dark:focus:bg-red-700 dark:hover:bg-red-700" />
 	),
@@ -45,6 +41,6 @@ export const defaultButtonThemes: ThemedTemplateResolver<
 	DestructiveSecondary: (T) => (
 		<T className="bg-red-100 text-red-700 focus:bg-red-200 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:focus:bg-red-700 dark:hover:bg-red-700" />
 	),
-};
+}) satisfies Record<ButtonTheme, unknown>;
 
 export const Button = buttonTemplate.themed(defaultButtonThemes);
