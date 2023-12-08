@@ -3,6 +3,11 @@ import { Field } from '@/components/form-fields/field/field';
 import type { SelectInputProps } from '@/components/form-fields/select-input/select-input';
 import { SelectInput } from '@/components/form-fields/select-input/select-input';
 import type { StandardField } from '../FieldProps';
+import { elementTemplate } from '@/components/template';
+
+export const NotSelected = elementTemplate('NotSelected', 'span', (T) => (
+	<T className="text-slate-500" />
+));
 
 export function SelectField<T>(props: {
 	field: StandardField<T>;
