@@ -27,7 +27,7 @@ export type ExtendOptions<TType extends AllowedTypes> = {
 	mutateProps?: (props: PropsOf<TType>) => PropsOf<TType>;
 };
 
-export type TemplateResolver<TType extends AllowedTypes> = (
+export type TemplateResolver<TType extends AllowedTypes = AllowedTypes> = (
 	this: void,
 	template: PartialElement<TType>,
 ) => React.ReactElement;
