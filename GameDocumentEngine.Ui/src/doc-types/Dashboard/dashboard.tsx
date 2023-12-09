@@ -4,7 +4,6 @@ import type { Dashboard } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import styles from './dashboard.module.css';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
-import type { ElementTemplate } from '@/components/template';
 import { elementTemplate } from '@/components/template';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
@@ -53,9 +52,7 @@ export function DashboardDisplay({
 	});
 
 	const editing = true;
-	const Container: ElementTemplate<'div'> = !editing
-		? DashboardContainer
-		: DashboardContainer.Editing;
+	const Container = !editing ? DashboardContainer : DashboardContainer.Editing;
 
 	return <Container {...dropTarget}></Container>;
 }
