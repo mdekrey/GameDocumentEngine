@@ -2,7 +2,7 @@
 .circularNumber {
 	composes: flex flex-row gap-4 from global;
 }
-.circularNumber input {
+.circularNumber .input {
 	height: theme(spacing.10);
 	width: theme(spacing.10);
 	border-radius: 100%;
@@ -10,10 +10,10 @@
 	line-height: 1;
 }
 
-.circularNumber.main span {
+.circularNumber.main .label {
 	@apply sr-only;
 }
-.circularNumber.main input {
+.circularNumber.main .input {
 	height: theme(spacing.12);
 	width: theme(spacing.12);
 	font-size: theme(fontSize.lg);
@@ -23,10 +23,10 @@
 	padding: theme(spacing.1);
 }
 
-:global(.dark) .circularNumber.main input {
+:global(.dark) .circularNumber.main .input {
 	outline-color: theme(colors.slate.800);
 }
 
-.textRight span {
+.textRight .label {
 	order: 1;
 }

@@ -94,6 +94,8 @@
 	},
 	"document-details": {
 		"settings": "Settings for {{name}}",
+		"unknown-doc-type": "This document type is not currently handled by Vault.",
+		"unknown-doc-type-explanation": "Somehow, the document you selected is not supported at this time. Perhaps it's an upcoming feature and you are lucky to see it, or perhaps it was removed. Either way, you can't access it now.",
 		"unhandled-error": "An unhandled error occurred in the document."
 	},
 	"game-objects": {

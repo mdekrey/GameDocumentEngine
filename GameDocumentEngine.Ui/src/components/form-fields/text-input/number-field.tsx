@@ -1,20 +1,18 @@
 import {
-	applyPropsToTextField,
-	applyMappingToTextField,
 	integerMapping,
 	undefinedOrIntegerMapping,
+	TextField,
+	textFieldMappingOptions,
 } from './text-field';
 
-export const NumberField = Object.assign(
-	applyPropsToTextField('NumberField', { type: 'number' }),
-	{
-		Integer: applyMappingToTextField('IntegerNumberField', integerMapping, {
-			type: 'number',
-		}),
-		UndefinedOrInteger: applyMappingToTextField(
-			'NumberFieldWithUndefined',
-			undefinedOrIntegerMapping,
-			{ type: 'number' },
-		),
-	},
-);
+const numberField = TextField.extend('NumberField', (T) => <T type="number" />);
+export const NumberField = Object.assign(numberField, {
+	Integer: numberField.extend('NumberField.Integer', (T) => <T />, {
+		...textFieldMappingOptions(integerMapping),
+	}),
+	UndefinedOrInteger: numberField.extend(
+		'NumberField.UndefinedOrInteger',
+		(T) => <T />,
+		textFieldMappingOptions(undefinedOrIntegerMapping),
+	),
+});

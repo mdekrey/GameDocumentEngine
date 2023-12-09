@@ -55,7 +55,7 @@ const mainRoute: RouteObject[] = [
 		Component: withGameId(CreateDocument),
 	},
 	{
-		path: 'game/:gameId/document/:documentId',
+		path: 'game/:gameId/document/:documentId/*',
 		Component: withDocumentId(withGameId(DocumentDetails)),
 	},
 	{

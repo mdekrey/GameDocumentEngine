@@ -54,9 +54,24 @@ function Aptitude({
 				<GradientSvg total={fields.total.atom} />
 			</div>
 			<CircularNumberField className={styles.base} field={fields.base} />
-			<NumberField.Integer className={styles.trait} field={fields.trait} />
-			<CircularNumberField.Main className={styles.total} field={fields.total} />
-			<TextareaField className={styles.modifiers} field={fields.modifiers} />
+			<NumberField.Integer
+				className={styles.trait}
+				contentsClassName={styles.contents}
+				labelClassName={styles.label}
+				inputClassName={styles.input}
+				field={fields.trait}
+			/>
+			<CircularNumberField.Main
+				className={styles.total}
+				field={fields.total}
+				inputClassName={styles.input}
+			/>
+			<TextareaField
+				className={styles.modifiers}
+				contentsClassName={styles.contents}
+				labelClassName={styles.label}
+				field={fields.modifiers}
+			/>
 		</div>
 	);
 }
@@ -64,13 +79,23 @@ function Aptitude({
 function GradientSvg({ total }: { total: Atom<number> }) {
 	const gradientId = useId();
 	const totalValue = useAtomValue(total);
+	const gridOffset = 5;
+	const gridSize = 16;
+	const maxDisplayedValue = 20;
+	const rectStroke = 2;
+	const rectHeight = 16;
+
+	const width = gridOffset + gridSize * maxDisplayedValue + rectStroke / 2;
+	const height = 24;
+	const rectTop = (height - rectHeight) / 2;
+	const rectBottom = (height + rectHeight) / 2;
 
 	return (
 		<svg
-			width={340}
-			height={24}
+			width={width}
+			height={height}
 			className="fill-transparent stroke-slate-800 dark:stroke-slate-200 -my-1"
-			viewBox="0 0 340 24"
+			viewBox={`0 0 ${width} 24`}
 		>
 			<defs>
 				<linearGradient id={gradientId}>
@@ -80,25 +105,35 @@ function GradientSvg({ total }: { total: Atom<number> }) {
 			</defs>
 			<rect
 				x={0}
-				y={4}
-				height={16}
-				width={5 + 16 * totalValue}
+				y={rectTop}
+				height={rectHeight}
+				width={gridOffset + gridSize * totalValue}
 				className="stroke-transparent transition-all"
 				fill={`url(#${gradientId})`}
 			/>
-			<rect x={0} y={4} height={16} width={325} strokeWidth={2} />
+			<rect
+				x={0}
+				y={rectTop}
+				height={rectHeight}
+				width={gridOffset + gridSize * maxDisplayedValue}
+				strokeWidth={rectStroke}
+			/>
 			{Array(20)
 				.fill(0)
-				.map((_, index) => (
+				.map((_, index) => index + 1)
+				.map((value) => (
 					<line
-						key={index}
-						x1={(index + 1) * 16 + 5}
-						x2={(index + 1) * 16 + 5}
-						y1={index % 5 == 4 ? 0 : 4}
-						y2={index % 5 == 4 ? 24 : 20}
-						strokeWidth={index % 5 == 4 ? 2 : 1}
+						key={value}
+						x1={value * gridSize + gridOffset}
+						x2={value * gridSize + gridOffset}
+						{...(isMajor(value)
+							? { y1: 0, y2: height, strokeWidth: 2 }
+							: { y1: rectTop, y2: rectBottom, strokeWidth: 1 })}
 					/>
 				))}
 		</svg>
 	);
+	function isMajor(index: number) {
+		return index % 5 === 0;
+	}
 }

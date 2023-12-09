@@ -75,10 +75,6 @@ export function DocumentSettings({
 	const docType = gameDetails.typeInfo.objectTypes.find(
 		(t) => t.key == documentResult.data.type,
 	);
-	if (!docType) {
-		return 'Unknown document type';
-	}
-
 	return (
 		<LoadedDocumentSettings
 			gameId={gameId}
@@ -105,12 +101,12 @@ function LoadedDocumentSettings({
 	documentId: string;
 	gameDetails: GameDetails;
 	docData: DocumentDetails;
-	docType: GameObjectTypeDetails;
+	// docType may be missing when support for a doc type was removed... or the branch was changed.
+	docType?: GameObjectTypeDetails;
 	userRoles: Record<string, string>;
 	objectType: GameTypeObjectScripts<unknown>;
 }) {
 	const { t } = useTranslation('document-settings');
-	const actualRoles = ['', ...docType.userRoles];
 
 	const displayDelete = displayDeleteDocument(docData);
 
@@ -131,22 +127,24 @@ function LoadedDocumentSettings({
 				<SectionHeader>{t('configure-details')}</SectionHeader>
 				<DocumentEdit gameId={gameId} documentId={documentId} />
 			</Section>
-			<Section>
-				<SectionHeader>
-					{t('configure-roles', { name: docData.name })}
-				</SectionHeader>
-				<RoleAssignment
-					userRoles={userRoles}
-					playerNames={gameDetails.playerNames}
-					defaultRole=""
-					roles={actualRoles}
-					onSaveRoles={onSaveRoles}
-					translations={t}
-					roleTranslationsNamespace={objectType.translationNamespace}
-					allowUpdate={displayUserPermissions(docData)}
-					allowUpdateSelf={canUpdateOwnPermissions(docData)}
-				/>
-			</Section>
+			{docType && (
+				<Section>
+					<SectionHeader>
+						{t('configure-roles', { name: docData.name })}
+					</SectionHeader>
+					<RoleAssignment
+						userRoles={userRoles}
+						playerNames={gameDetails.playerNames}
+						defaultRole=""
+						roles={['', ...docType.userRoles]}
+						onSaveRoles={onSaveRoles}
+						translations={t}
+						roleTranslationsNamespace={objectType.translationNamespace}
+						allowUpdate={displayUserPermissions(docData)}
+						allowUpdateSelf={canUpdateOwnPermissions(docData)}
+					/>
+				</Section>
+			)}
 			{displayDelete && (
 				<Section className="flex flex-col gap-2">
 					<SectionHeader>{t('danger-zone')}</SectionHeader>
