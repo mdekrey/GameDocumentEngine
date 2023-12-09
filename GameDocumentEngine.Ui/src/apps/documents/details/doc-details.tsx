@@ -144,7 +144,7 @@ export function DocumentDetailsForm<T = unknown>({
 		<Component
 			form={form}
 			onSubmit={onSubmit}
-			gameId={document.data.gameId}
+			document={document.data}
 			translation={fullTranslation}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}

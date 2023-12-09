@@ -25,7 +25,7 @@ const DashboardContainer = elementTemplate('DashboardContainer', 'div', (T) => (
 });
 
 export function DashboardDisplay({
-	gameId,
+	document,
 	form,
 	onSubmit,
 }: GameObjectFormComponent<Dashboard>) {
@@ -39,7 +39,7 @@ export function DashboardDisplay({
 				return 'link';
 			},
 			handle(ev, data) {
-				if (data.gameId !== gameId) return false;
+				if (data.gameId !== document.gameId) return false;
 				const currentTarget = ev.currentTarget as HTMLDivElement;
 				const rect = currentTarget.getBoundingClientRect();
 				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));

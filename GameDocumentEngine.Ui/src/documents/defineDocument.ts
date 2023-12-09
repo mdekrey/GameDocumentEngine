@@ -29,14 +29,17 @@ export type GameObjectWidgetProps<T = unknown> = {
 	translation: TFunction;
 };
 
-export type GameObjectFormComponent<T = unknown> = {
-	gameId: string;
-	form: UseFormResult<EditableDocumentDetails<T>>;
-	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
+export type GameObjectComponentBase<T> = {
+	document: TypedDocumentDetails<T>;
 	translation: TFunction;
 	readablePointers: DocumentPointers;
 	writablePointers: DocumentPointers;
 	objectRole: string | undefined;
+};
+
+export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
+	form: UseFormResult<EditableDocumentDetails<T>>;
+	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
 };
 
 export type GameObjectWidgetDefinition<T> = {
@@ -44,7 +47,7 @@ export type GameObjectWidgetDefinition<T> = {
 		width: number;
 		height: number;
 	};
-	component: React.ComponentType<GameObjectFormComponent<T>>;
+	component: React.ComponentType<GameObjectComponentBase<T>>;
 };
 
 export type IGameObjectType<T = unknown> = {

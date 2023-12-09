@@ -34,8 +34,9 @@ export function AddWidgetModal({
 	if (!gameType.isSuccess || !droppingDoc.isSuccess) return 'Loading...';
 
 	const objScripts = gameType.data.objectTypes[droppingDoc.data.type].typeInfo;
+	console.log(objScripts);
 
-	if (!objScripts.widgets?.length) {
+	if (!objScripts.widgets || !Object.keys(objScripts.widgets).length) {
 		return (
 			<NoWidgets
 				dropped={droppingDoc.data}
