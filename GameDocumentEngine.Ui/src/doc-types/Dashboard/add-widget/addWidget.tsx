@@ -24,7 +24,6 @@ export async function addWidget(
 					height: result.defaults.height,
 				},
 				widget: result.id,
-				settings: result.settings,
 			},
 		}));
 	} catch (ex) {

@@ -16,7 +16,7 @@
 	"$defs": {
 		"Widget": {
 			"type": "object",
-			"required": ["documentId", "position", "widget", "settings"],
+			"required": ["documentId", "position", "widget"],
 			"properties": {
 				"documentId": { "type": "string" },
 				"position": { "$ref": "#/$defs/WidgetPosition" },

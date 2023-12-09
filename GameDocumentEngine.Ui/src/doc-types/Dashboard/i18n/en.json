@@ -27,5 +27,10 @@
 		"intro": "Choose the widget to add.",
 		"cancel": "Cancel",
 		"submit": "Add widget"
+	},
+	"adding-no-widgets": {
+		"title": "No widgets supported",
+		"intro": "The document you dropped, <Icon/>{{name}}, does not support widgets at this time. Try another document type.",
+		"cancel": "Cancel"
 	}
 }
