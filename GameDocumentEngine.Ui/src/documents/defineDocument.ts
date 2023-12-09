@@ -1,5 +1,5 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
+import type { FieldMapping } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
 import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
@@ -39,22 +39,12 @@ export type GameObjectFormComponent<T = unknown> = {
 	objectRole: string | undefined;
 };
 
-export type WidgetSettingsProps<T, TSettings> = {
-	document: TypedDocumentDetails<T>;
-	field: FormFieldReturnType<TSettings>;
-	translation: TFunction;
-};
-
-export type GameObjectWidgetDefinition<T, TSettings> = {
+export type GameObjectWidgetDefinition<T> = {
 	defaults: {
 		width: number;
 		height: number;
-		settings: TSettings;
 	};
 	component: React.ComponentType<GameObjectFormComponent<T>>;
-	settingsComponent: TSettings extends void
-		? null
-		: React.ComponentType<WidgetSettingsProps<T, TSettings>>;
 };
 
 export type IGameObjectType<T = unknown> = {
@@ -64,8 +54,7 @@ export type IGameObjectType<T = unknown> = {
 	component: React.ComponentType<GameObjectFormComponent<T>>;
 	fixup: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>;
 	schema: z.ZodType<T>;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	widgets?: Record<string, GameObjectWidgetDefinition<T, any>>;
+	widgets?: Record<string, GameObjectWidgetDefinition<T>>;
 };
 
 declare global {
@@ -78,7 +67,7 @@ export function documentSchema<T>(
 	schema: z.ZodType<T>,
 ): z.ZodType<EditableDocumentDetails<T>> {
 	return z.object({
-		name: z.string().nonempty(),
+		name: z.string().min(1),
 		details: schema instanceof ZodObject ? schema.deepPartial() : schema,
 	}) as z.ZodType<EditableDocumentDetails<T>>;
 }
