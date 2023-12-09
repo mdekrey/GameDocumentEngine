@@ -10,15 +10,20 @@ const meta = {
 	argTypes: {},
 	args: {
 		tabs: [
-			{ key: 1, icon: HiHome, title: 'Home', content: <div>Home Content</div> },
 			{
-				key: 2,
+				key: 'Home',
+				icon: HiHome,
+				title: 'Home',
+				content: <div>Home Content</div>,
+			},
+			{
+				key: 'Details',
 				icon: HiDocument,
 				title: 'Details',
 				content: <div>Details Content</div>,
 			},
 			{
-				key: 3,
+				key: 'Settings',
 				icon: HiCog,
 				title: 'Settings',
 				content: <div>Settings Content</div>,
