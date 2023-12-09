@@ -1,47 +1,76 @@
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { NoWidgets } from './NoWidgets';
-import { AddWidgetModalForm } from './AddWidgetModalForm';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { IGameObjectType } from '@/documents/defineDocument';
+import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
+import { Button } from '@/components/button/button';
+import { useForm } from '@principlestudios/react-jotai-forms';
+import { NamedIcon } from './NamedIcon';
 
 export type NewWidgetResult = {
 	id: string;
-	defaults: {
-		width: number;
-		height: number;
-	};
 };
 export const newWidgetSchema = z.object({
 	id: z.string().min(1),
 });
 
 export function AddWidgetModal({
+	additional: { docTypeKey, document, icon: Icon, widgets },
 	resolve,
 	reject,
-	additional: { docTypeKey, widgets, icon, document },
 }: ModalContentsProps<
 	NewWidgetResult,
 	{
 		docTypeKey: string;
-		widgets: IGameObjectType['widgets'];
+		widgets: NonNullable<IGameObjectType['widgets']>;
 		icon: IGameObjectType['icon'];
 		document: DocumentDetails;
 	}
 >) {
 	const { t: tDocument } = useTranslation(`doc-types:${docTypeKey}`);
+	const { t } = useTranslation('doc-types:Dashboard', {
+		keyPrefix: 'add-widget-modal',
+	});
 
-	const commonProps = {
-		document,
-		tDocument,
-		icon,
-		resolve,
-		reject,
-	};
+	const form = useForm({
+		defaultValue: { id: '' },
+		schema: newWidgetSchema,
+		translation: t,
+		fields: {
+			id: ['id'],
+		},
+	});
 
-	if (!widgets || !Object.keys(widgets).length)
-		return <NoWidgets {...commonProps} />;
+	const widgetKeys = widgets ? Object.keys(widgets) : [];
 
-	return <AddWidgetModalForm {...commonProps} widgets={widgets} />;
+	return (
+		<form onSubmit={form.handleSubmit(resolve)}>
+			<ModalDialogLayout>
+				<ModalDialogLayout.Title>
+					<Trans
+						i18nKey="title"
+						t={t}
+						components={{
+							Document: (
+								<NamedIcon
+									name={document.name}
+									icon={Icon}
+									typeName={tDocument('name')}
+								/>
+							),
+						}}
+					/>
+				</ModalDialogLayout.Title>
+
+				{widgetKeys.join(', ')}
+				<ModalDialogLayout.Buttons>
+					<Button.Save type="submit">{t('submit')}</Button.Save>
+					<Button.Secondary onClick={() => reject('Cancel')}>
+						{t('cancel')}
+					</Button.Secondary>
+				</ModalDialogLayout.Buttons>
+			</ModalDialogLayout>
+		</form>
+	);
 }
