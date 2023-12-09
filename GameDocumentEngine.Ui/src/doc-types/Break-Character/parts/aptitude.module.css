@@ -83,7 +83,3 @@
 .modifiers div {
 	grid-area: modifiers-field;
 }
-.modifiers textarea {
-	border: none;
-	resize: none;
-}
