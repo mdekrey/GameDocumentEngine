@@ -21,7 +21,7 @@ COPY .editorconfig .editorconfig
 RUN cd ./GameDocumentEngine.Server/ && dotnet build -c Release --no-restore --use-current-runtime --self-contained
 RUN cd ./GameDocumentEngine.Server/ && dotnet publish -c Release -p:PublishReadyToRun=true --use-current-runtime --self-contained
 
-FROM node:18-alpine AS build-ui
+FROM node:18.17-alpine AS build-ui
 WORKDIR /src
 # brotli is added for the `brotli` compression below
 # OpenAPI Codegeneration is using dotnet7-runtime

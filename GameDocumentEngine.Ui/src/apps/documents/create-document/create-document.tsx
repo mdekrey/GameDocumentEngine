@@ -12,7 +12,10 @@ import { z } from 'zod';
 import { useGameType } from '../useGameType';
 import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { SelectField } from '@/components/form-fields/select-input/select-field';
+import {
+	NotSelected,
+	SelectField,
+} from '@/components/form-fields/select-input/select-field';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { RoleAssignmentField } from '@/components/forms/role-assignment/role-assignment-field';
 import type { GameDetails } from '@/api/models/GameDetails';
@@ -80,9 +83,9 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 										i18nKey={'name'}
 									/>
 								) : (
-									<span className="text-slate-500">
+									<NotSelected>
 										{form.fields.type.translation('not-selected')}
-									</span>
+									</NotSelected>
 								)
 							}
 						</SelectField>

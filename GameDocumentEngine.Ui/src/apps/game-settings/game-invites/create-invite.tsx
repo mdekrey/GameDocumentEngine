@@ -10,7 +10,10 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import type { FieldMapping } from '@/utils/form';
 import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 import { useTranslation } from 'react-i18next';
-import { SelectField } from '@/components/form-fields/select-input/select-field';
+import {
+	NotSelected,
+	SelectField,
+} from '@/components/form-fields/select-input/select-field';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { noChange } from '@/utils/form';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
@@ -97,7 +100,9 @@ export function CreateInvite({
 							dt ? (
 								<>{roleTranslations(`roles.${dt}.name`)}</>
 							) : (
-								form.fields.role.translation('not-selected')
+								<NotSelected>
+									{form.fields.role.translation('not-selected')}
+								</NotSelected>
 							)
 						}
 					</SelectField>
