@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { NoWidgets } from './NoWidgets';
 import { AddWidgetModalForm } from './AddWidgetModalForm';
-import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { IGameObjectType } from '@/documents/defineDocument';
 
 export type NewWidgetResult = {
 	id: string;
@@ -20,13 +20,17 @@ export const newWidgetSchema = z.object({
 export function AddWidgetModal({
 	resolve,
 	reject,
-	additional: { docType, document },
+	additional: { docTypeKey, widgets, icon, document },
 }: ModalContentsProps<
 	NewWidgetResult,
-	{ docType: GameTypeObjectScripts; document: DocumentDetails }
+	{
+		docTypeKey: string;
+		widgets: IGameObjectType['widgets'];
+		icon: IGameObjectType['icon'];
+		document: DocumentDetails;
+	}
 >) {
-	const { t: tDocument } = useTranslation(`doc-types:${docType.key}`);
-	const { widgets, icon } = docType.typeInfo;
+	const { t: tDocument } = useTranslation(`doc-types:${docTypeKey}`);
 
 	const commonProps = {
 		document,

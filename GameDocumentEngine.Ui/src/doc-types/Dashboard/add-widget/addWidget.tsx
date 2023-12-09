@@ -10,7 +10,7 @@ export async function addWidget(
 	queryClient: QueryClient,
 	launchModal: ReturnType<typeof useLaunchModal>,
 	documentIds: { gameId: string; id: string },
-	widgets: FormFieldReturnType<Record<string, Widget>>,
+	widgetsField: FormFieldReturnType<Record<string, Widget>>,
 	coordinate: { x: number; y: number },
 ) {
 	const gameType = await getGameType(queryClient, documentIds.gameId);
@@ -20,13 +20,19 @@ export async function addWidget(
 
 	const docType = gameType.objectTypes[document.type];
 	if (!docType) return;
+	const { widgets, icon } = docType.typeInfo;
 
 	try {
 		const result = await launchModal({
 			ModalContents: AddWidgetModal,
-			additional: { docType: gameType.objectTypes[document.type], document },
+			additional: {
+				docTypeKey: docType.key,
+				widgets,
+				icon,
+				document,
+			},
 		});
-		widgets.onChange((prev) => ({
+		widgetsField.onChange((prev) => ({
 			...prev,
 			[crypto.randomUUID()]: {
 				documentId: document.id,
