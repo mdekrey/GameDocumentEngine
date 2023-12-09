@@ -21,5 +21,11 @@
 				"label": "Name"
 			}
 		}
+	},
+	"add-widget-modal": {
+		"title": "Add widget",
+		"intro": "Choose the widget to add.",
+		"cancel": "Cancel",
+		"submit": "Add widget"
 	}
 }

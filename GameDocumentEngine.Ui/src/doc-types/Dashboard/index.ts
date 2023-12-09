@@ -1,6 +1,6 @@
 import { HiOutlineTableCells } from 'react-icons/hi2';
 import { defineDocument } from '@/documents/defineDocument';
-import { Dashboard } from './dashboard';
+import { DashboardDisplay } from './dashboard';
 import schema from './schema';
 import type { z } from 'zod';
 
@@ -12,7 +12,7 @@ defineDocument('Dashboard', {
 	noContainer: true,
 	icon: HiOutlineTableCells,
 	template,
-	component: Dashboard,
+	component: DashboardDisplay,
 	schema,
 	fixup: {
 		toForm: (a) => a,

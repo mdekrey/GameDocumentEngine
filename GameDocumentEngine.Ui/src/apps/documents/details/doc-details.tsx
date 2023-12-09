@@ -1,4 +1,3 @@
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { queries } from '@/utils/api/queries';
 import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -148,6 +147,7 @@ export function DocumentDetailsForm<T = unknown>({
 		<Component
 			form={form}
 			onSubmit={onSubmit}
+			gameId={document.data.gameId}
 			translation={fullTranslation}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
