@@ -8,6 +8,7 @@ import type { JotaiLabel } from '../../jotai/label';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useTwMerge } from '../../jotai/useTwMerge';
 import { useMemo } from 'react';
+import { elementTemplate } from '@/components/template';
 
 export const undefinedAsEmptyStringMapping: FieldMapping<
 	string | undefined,
@@ -46,7 +47,7 @@ export type TextFieldPersistentProps = {
 } & React.ComponentProps<typeof JotaiLabel>;
 export type TextFieldProps = FieldProps<string> & TextFieldPersistentProps;
 
-export function TextField(props: TextFieldProps) {
+function BaseTextField(props: TextFieldProps) {
 	const htmlProps = props.field.htmlProps();
 	const {
 		field: { translation: t, errors },
@@ -75,49 +76,25 @@ export function TextField(props: TextFieldProps) {
 	);
 }
 
-export function applyPropsToTextField<
-	TProps extends Partial<TextFieldPersistentProps>,
->(displayName: string, defaults: TProps) {
-	function Result(props: TextFieldProps) {
-		return <TextField {...{ ...defaults, ...props }} />;
-	}
-	Result.displayName = displayName;
-	return Result as never as (
-		p: Omit<TextFieldProps, keyof TProps>,
-	) => React.ReactNode;
+export function textFieldMappingOptions<T>(mapping: FieldMapping<T, string>) {
+	return {
+		useProps({
+			field,
+			...props
+		}: FieldProps<T> & TextFieldPersistentProps): TextFieldProps {
+			const newField = useMemo(() => field.applyMapping(mapping), [field]);
+			return { field: newField, ...props };
+		},
+	};
 }
 
-export function applyMappingToTextField<
-	T,
-	TDefaults extends Partial<TextFieldPersistentProps>,
->(
-	displayName: string,
-	mapping: FieldMapping<T, string>,
-	defaults: TDefaults,
-): (
-	props: FieldProps<T> & Omit<TextFieldPersistentProps, keyof TDefaults>,
-) => React.ReactNode;
-export function applyMappingToTextField<T>(
-	displayName: string,
-	mapping: FieldMapping<T, string>,
-): (props: FieldProps<T> & TextFieldPersistentProps) => React.ReactNode;
-export function applyMappingToTextField<T>(
-	displayName: string,
-	mapping: FieldMapping<T, string>,
-	defaults?: Partial<TextFieldPersistentProps>,
-) {
-	function Result({
-		field,
-		...props
-	}: FieldProps<T> & TextFieldPersistentProps) {
-		const newField = useMemo(() => field.applyMapping(mapping), [field]);
-		return <TextField field={newField} {...defaults} {...props} />;
-	}
-	Result.displayName = displayName;
-	return Result;
-}
-
-TextField.AllowUndefined = applyMappingToTextField(
-	'TextFieldWithUndefined',
-	undefinedAsEmptyStringMapping,
+const template = elementTemplate(
+	'TextField',
+	BaseTextField as React.FC<TextFieldProps>,
+	(T) => <T />,
 );
+export const TextField = Object.assign(template, {
+	AllowUndefined: template.extend('TextField.AllowUndefined', (T) => <T />, {
+		...textFieldMappingOptions(undefinedAsEmptyStringMapping),
+	}),
+});

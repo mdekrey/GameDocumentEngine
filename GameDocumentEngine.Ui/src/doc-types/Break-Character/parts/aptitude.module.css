@@ -41,7 +41,7 @@
 	composes: self-center from global;
 	z-index: theme(zIndex.dropdown);
 }
-:global(.dark) .total input {
+:global(.dark) .total .input {
 	background-color: theme(colors.slate.950);
 	border-color: theme(colors.slate.200);
 }
@@ -50,15 +50,15 @@
 	grid-area: trait;
 	composes: flex flex-row items-center from global;
 }
-.trait div {
+.trait .contents {
 	display: contents;
 }
-.trait span {
+.trait .label {
 	font-size: 0.75rem;
 	padding-top: 0;
 	width: 2.5rem;
 }
-.trait input {
+.trait .input {
 	font-size: 0.75rem;
 	padding: 0;
 	border: none;
@@ -75,11 +75,11 @@
 .modifiers {
 	display: contents;
 }
-.modifiers span {
+.modifiers .label {
 	grid-area: modifiers-label;
 	font-size: 0.75rem;
 	padding-top: 0;
 }
-.modifiers div {
+.modifiers .contents {
 	grid-area: modifiers-field;
 }

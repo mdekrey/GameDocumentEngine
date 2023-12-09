@@ -54,9 +54,24 @@ function Aptitude({
 				<GradientSvg total={fields.total.atom} />
 			</div>
 			<CircularNumberField className={styles.base} field={fields.base} />
-			<NumberField.Integer className={styles.trait} field={fields.trait} />
-			<CircularNumberField.Main className={styles.total} field={fields.total} />
-			<TextareaField className={styles.modifiers} field={fields.modifiers} />
+			<NumberField.Integer
+				className={styles.trait}
+				contentsClassName={styles.contents}
+				labelClassName={styles.label}
+				inputClassName={styles.input}
+				field={fields.trait}
+			/>
+			<CircularNumberField.Main
+				className={styles.total}
+				field={fields.total}
+				inputClassName={styles.input}
+			/>
+			<TextareaField
+				className={styles.modifiers}
+				contentsClassName={styles.contents}
+				labelClassName={styles.label}
+				field={fields.modifiers}
+			/>
 		</div>
 	);
 }
