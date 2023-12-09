@@ -1,11 +1,10 @@
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { useGameType } from '@/apps/documents/useGameType';
-import { useQuery } from '@tanstack/react-query';
-import { queries } from '@/utils/api/queries';
 import { NoWidgets } from './NoWidgets';
 import { AddWidgetModalForm } from './AddWidgetModalForm';
+import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
+import type { DocumentDetails } from '@/api/models/DocumentDetails';
 
 export type NewWidgetResult = {
 	id: string;
@@ -21,40 +20,24 @@ export const newWidgetSchema = z.object({
 export function AddWidgetModal({
 	resolve,
 	reject,
-	additional: { gameId, id },
-}: ModalContentsProps<NewWidgetResult, { gameId: string; id: string }>) {
-	const gameType = useGameType(gameId);
-	const droppingDoc = useQuery(queries.getDocument(gameId, id));
+	additional: { docType, document },
+}: ModalContentsProps<
+	NewWidgetResult,
+	{ docType: GameTypeObjectScripts; document: DocumentDetails }
+>) {
+	const { t: tDocument } = useTranslation(`doc-types:${docType.key}`);
+	const { widgets, icon } = docType.typeInfo;
 
-	const key =
-		droppingDoc.data?.type &&
-		gameType.data?.objectTypes[droppingDoc.data?.type]?.key;
-	const { t: objT } = useTranslation(`doc-types:${key ?? 'unknown'}`);
+	const commonProps = {
+		document,
+		tDocument,
+		icon,
+		resolve,
+		reject,
+	};
 
-	if (!gameType.isSuccess || !droppingDoc.isSuccess) return 'Loading...';
+	if (!widgets || !Object.keys(widgets).length)
+		return <NoWidgets {...commonProps} />;
 
-	const objScripts = gameType.data.objectTypes[droppingDoc.data.type].typeInfo;
-	console.log(objScripts);
-
-	if (!objScripts.widgets || !Object.keys(objScripts.widgets).length) {
-		return (
-			<NoWidgets
-				dropped={droppingDoc.data}
-				tDocument={objT}
-				icon={objScripts.icon}
-				reject={reject}
-			/>
-		);
-	}
-
-	return (
-		<AddWidgetModalForm
-			dropped={droppingDoc.data}
-			tDocument={objT}
-			icon={objScripts.icon}
-			widgets={objScripts.widgets}
-			resolve={resolve}
-			reject={reject}
-		/>
-	);
+	return <AddWidgetModalForm {...commonProps} widgets={widgets} />;
 }

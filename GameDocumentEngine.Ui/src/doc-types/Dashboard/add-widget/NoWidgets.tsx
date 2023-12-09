@@ -5,14 +5,15 @@ import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { TFunction } from 'i18next';
 import type { IconType } from 'react-icons';
 import { Trans, useTranslation } from 'react-i18next';
+import { NamedIcon } from './NamedIcon';
 
 export function NoWidgets({
-	dropped,
+	document,
 	tDocument: objT,
 	icon: Icon,
 	reject,
 }: {
-	dropped: DocumentDetails;
+	document: DocumentDetails;
 	tDocument: TFunction;
 	icon: IconType;
 	reject: (error: unknown) => void;
@@ -28,9 +29,15 @@ export function NoWidgets({
 				<Trans
 					i18nKey="intro"
 					t={t}
-					values={{ name: dropped.name }}
+					values={{ name: document.name }}
 					components={{
-						Icon: <Icon title={objT('name')} className="inline-block" />,
+						Document: (
+							<NamedIcon
+								name={document.name}
+								icon={Icon}
+								typeName={objT('name')}
+							/>
+						),
 					}}
 				/>
 			</Prose>

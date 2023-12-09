@@ -23,14 +23,13 @@
 		}
 	},
 	"add-widget-modal": {
-		"title": "Add widget",
-		"intro": "Choose the widget to add.",
+		"title": "Add widget for <Document/>",
 		"cancel": "Cancel",
 		"submit": "Add widget"
 	},
 	"adding-no-widgets": {
 		"title": "No widgets supported",
-		"intro": "The document you dropped, <Icon/>{{name}}, does not support widgets at this time. Try another document type.",
+		"intro": "The document you dropped, <Document/>, does not support widgets at this time. Try another document type.",
 		"cancel": "Cancel"
 	}
 }

@@ -8,6 +8,7 @@ import { elementTemplate } from '@/components/template';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
+import { useQueryClient } from '@tanstack/react-query';
 
 const gridOffset = 16;
 const gridSize = 16;
@@ -29,6 +30,7 @@ export function DashboardDisplay({
 	form,
 	onSubmit,
 }: GameObjectFormComponent<Dashboard>) {
+	const queryClient = useQueryClient();
 	useSubmitOnChange(form, onSubmit);
 	const launchModal = useLaunchModal();
 	const { widgets } = useFormFields(form, { widgets: ['details', 'widgets'] });
@@ -44,7 +46,7 @@ export function DashboardDisplay({
 				const rect = currentTarget.getBoundingClientRect();
 				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));
 				const y = toGridCoordinate(ev.clientY - Math.round(rect.top));
-				void addWidget(launchModal, data, widgets, { x, y });
+				void addWidget(queryClient, launchModal, data, widgets, { x, y });
 				console.log(data, x, y);
 				return true;
 			},

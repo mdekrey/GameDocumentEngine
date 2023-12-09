@@ -1,5 +1,4 @@
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import { Prose } from '@/components/text/common';
 import { Button } from '@/components/button/button';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import type { z } from 'zod';
@@ -9,17 +8,18 @@ import type { IconType } from 'react-icons';
 import type { IGameObjectType } from '@/documents/defineDocument';
 import type { NewWidgetResult } from './AddWidgetModal';
 import { newWidgetSchema } from './AddWidgetModal';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { NamedIcon } from './NamedIcon';
 
 export function AddWidgetModalForm({
-	dropped,
+	document,
 	tDocument: objT,
 	icon: Icon,
 	widgets,
 	resolve,
 	reject,
 }: {
-	dropped: DocumentDetails;
+	document: DocumentDetails;
 	tDocument: TFunction;
 	icon: IconType;
 	widgets: NonNullable<IGameObjectType['widgets']>;
@@ -44,9 +44,22 @@ export function AddWidgetModalForm({
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<ModalDialogLayout>
-				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
-				<Icon /> {dropped.name} {objT('name')}
-				<Prose>{t('intro')}</Prose>
+				<ModalDialogLayout.Title>
+					<Trans
+						i18nKey="title"
+						t={t}
+						components={{
+							Document: (
+								<NamedIcon
+									name={document.name}
+									icon={Icon}
+									typeName={objT('name')}
+								/>
+							),
+						}}
+					/>
+				</ModalDialogLayout.Title>
+
 				{widgetKeys.join(', ')}
 				<ModalDialogLayout.Buttons>
 					<Button.Save type="submit">{t('submit')}</Button.Save>
