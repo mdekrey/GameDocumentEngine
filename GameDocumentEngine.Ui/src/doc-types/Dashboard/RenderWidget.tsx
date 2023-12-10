@@ -1,56 +1,53 @@
-import type { Widget } from './types';
 import { useQuery } from '@tanstack/react-query';
 import { useGameType } from '@/apps/documents/useGameType';
 import { queries } from '@/utils/api/queries';
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
 import { useTranslation } from 'react-i18next';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
 import type { UserDetails } from '@/api/models/UserDetails';
-import { WidgetContainer } from './grid-utils';
-import type { RenderWidgetContentsProps } from './RenderWidgetContentsProps';
 import { RenderWidgetContents } from './RenderWidgetContents';
+import { elementTemplate } from '@/components/template';
 
-export function RenderWidget<T>({
-	additional,
-	position,
+const WidgetInnerWrapper = elementTemplate('WidgetContents', 'div', (T) => (
+	<T className="absolute inset-0 overflow-hidden" />
+));
+
+export function RenderWidget({
 	gameId,
 	documentId,
 	widget,
-	widgetContents: WidgetContents = RenderWidgetContents,
-}: Widget & {
+	user,
+}: {
+	documentId: string;
+	widget: string;
 	gameId: string;
 	user: UserDetails;
-	additional: T;
-	widgetContents?: React.FC<RenderWidgetContentsProps<T>>;
 }) {
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'widgets',
 	});
 	const gameType = useGameType(gameId);
 	const document = useQuery(queries.getDocument(gameId, documentId));
-	const user = useQuery(queries.getCurrentUser(useRealtimeApi()));
 
-	if (document.isLoading || gameType.isLoading || user.isLoading)
-		return <WidgetContainer className="bg-slate-500" position={position} />;
+	if (document.isLoading || gameType.isLoading)
+		return <WidgetInnerWrapper className="bg-slate-500" />;
 	const docWidgetConfig =
 		gameType.data?.objectTypes[document.data?.type ?? ''].typeInfo.widgets?.[
 			widget
 		];
-	if (document.isError || gameType.isError || user.isError || !docWidgetConfig)
+	if (document.isError || gameType.isError || !docWidgetConfig)
 		return (
-			<WidgetContainer position={position} className="border-4 border-red-800">
+			<WidgetInnerWrapper className="border-4 border-red-800">
 				<ErrorScreen message={t('widget-load-error')} />
-			</WidgetContainer>
+			</WidgetInnerWrapper>
 		);
 
 	return (
-		<WidgetContainer position={position}>
-			<WidgetContents
-				additional={additional}
+		<WidgetInnerWrapper>
+			<RenderWidgetContents
 				component={docWidgetConfig.component}
 				document={document.data}
-				user={user.data}
+				user={user}
 			/>
-		</WidgetContainer>
+		</WidgetInnerWrapper>
 	);
 }
