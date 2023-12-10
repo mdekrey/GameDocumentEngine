@@ -65,13 +65,13 @@ export const MoveResizeWidget = withSlots<
 			bounds="parent"
 			dragGrid={[gridSize, gridSize]}
 			resizeGrid={[gridSize, gridSize]}
-			onDragStop={(e, d) =>
+			onDragStop={(e, d) => {
 				positionField.onChange((prev) => ({
 					...prev,
-					x: toGridCoordinate(d.x),
-					y: toGridCoordinate(d.y),
-				}))
-			}
+					x: toGridCoordinate(Math.round(d.x)),
+					y: toGridCoordinate(Math.round(d.y)),
+				}));
+			}}
 			onResizeStop={(e, direction, ref, delta, position) => {
 				positionField.onChange((prev) => {
 					const result = {
