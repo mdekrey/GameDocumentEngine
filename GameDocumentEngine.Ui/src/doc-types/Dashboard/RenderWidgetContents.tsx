@@ -5,7 +5,7 @@ export function RenderWidgetContents({
 	component: Component,
 	document,
 	user,
-}: RenderWidgetContentsProps) {
+}: RenderWidgetContentsProps<unknown>) {
 	const { t: fullTranslation } = useTranslation(document.type);
 	return (
 		<Component document={document} user={user} translation={fullTranslation} />

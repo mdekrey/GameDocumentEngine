@@ -10,7 +10,8 @@ import { WidgetContainer } from './grid-utils';
 import type { RenderWidgetContentsProps } from './RenderWidgetContentsProps';
 import { RenderWidgetContents } from './RenderWidgetContents';
 
-export function RenderWidget({
+export function RenderWidget<T>({
+	additional,
 	position,
 	gameId,
 	documentId,
@@ -19,7 +20,8 @@ export function RenderWidget({
 }: Widget & {
 	gameId: string;
 	user: UserDetails;
-	widgetContents?: React.FC<RenderWidgetContentsProps>;
+	additional: T;
+	widgetContents?: React.FC<RenderWidgetContentsProps<T>>;
 }) {
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'widgets',
@@ -44,6 +46,7 @@ export function RenderWidget({
 	return (
 		<WidgetContainer position={position}>
 			<WidgetContents
+				additional={additional}
 				component={docWidgetConfig.component}
 				document={document.data}
 				user={user.data}
