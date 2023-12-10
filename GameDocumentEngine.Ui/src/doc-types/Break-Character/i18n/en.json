@@ -198,5 +198,10 @@
 				}
 			}
 		}
+	},
+	"widgets": {
+		"CombatStats": {
+			"name": "Combat Stats"
+		}
 	}
 }

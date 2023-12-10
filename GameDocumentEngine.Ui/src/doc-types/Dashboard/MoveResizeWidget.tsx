@@ -11,6 +11,7 @@ import { useStore } from 'jotai';
 import { Rnd } from 'react-rnd';
 import { useEffect, useRef } from 'react';
 import { elementTemplate } from '@/components/template';
+import withSlots from 'react-slot-component';
 
 const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	<T className="border-slate-900 dark:border-slate-100 absolute inset-1" />
@@ -21,13 +22,21 @@ const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	BottomRight: (T) => <T className="rounded-br border-b border-r" />,
 });
 
-export function MoveResizeWidget({
-	field,
-	children,
-}: {
+export type MoveResizeWidgetProps = {
 	field: FormFieldReturnType<Widget>;
 	children?: React.ReactNode;
-}) {
+};
+
+export type MoveResizeWidgetSlots = {
+	Buttons: {
+		children?: React.ReactNode;
+	};
+};
+
+export const MoveResizeWidget = withSlots<
+	MoveResizeWidgetSlots,
+	MoveResizeWidgetProps
+>(function MoveResizeWidget({ field, children, slotProps }) {
 	const store = useStore();
 	const rndRef = useRef<Rnd>(null);
 	const { positionField } = useFormFields(field, {
@@ -85,9 +94,11 @@ export function MoveResizeWidget({
 				bottomRight: <DragHandle.BottomRight />,
 			}}
 		>
-			<div className="absolute inset-0 bg-slate-50 dark:bg-slate-950"></div>
+			<div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50 "></div>
 			{children}
-			<div className="absolute inset-0 bg-slate-500/75 border border-black/50"></div>
+			<div className="absolute inset-0 bg-slate-500/75 flex flex-row flex-wrap justify-center items-center">
+				{slotProps.Buttons?.children}
+			</div>
 		</Rnd>
 	);
-}
+});

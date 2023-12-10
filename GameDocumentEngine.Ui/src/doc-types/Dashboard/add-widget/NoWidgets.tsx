@@ -3,7 +3,7 @@ import { Prose } from '@/components/text/common';
 import { Button } from '@/components/button/button';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { Trans, useTranslation } from 'react-i18next';
-import { NamedIcon } from './NamedIcon';
+import { NamedIcon } from '@/components/named-icon/NamedIcon';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import type { IGameObjectType } from '@/documents/defineDocument';
 

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { RenderWidgetContents } from './RenderWidgetContents';
 import { elementTemplate } from '@/components/template';
+import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 
 const WidgetInnerWrapper = elementTemplate('WidgetContents', 'div', (T) => (
 	<T className="absolute inset-0 overflow-hidden" />
@@ -43,11 +44,15 @@ export function RenderWidget({
 
 	return (
 		<WidgetInnerWrapper>
-			<RenderWidgetContents
-				component={docWidgetConfig.component}
-				document={document.data}
-				user={user}
-			/>
+			<ErrorBoundary
+				fallback={<ErrorScreen message={t('widget-runtime-error')} />}
+			>
+				<RenderWidgetContents
+					component={docWidgetConfig.component}
+					document={document.data}
+					user={user}
+				/>
+			</ErrorBoundary>
 		</WidgetInnerWrapper>
 	);
 }

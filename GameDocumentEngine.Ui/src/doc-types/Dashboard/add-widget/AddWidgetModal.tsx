@@ -6,7 +6,7 @@ import type { IGameObjectType } from '@/documents/defineDocument';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Button } from '@/components/button/button';
 import { useForm } from '@principlestudios/react-jotai-forms';
-import { NamedIcon } from './NamedIcon';
+import { NamedIcon } from '@/components/named-icon/NamedIcon';
 
 export type NewWidgetResult = {
 	id: string;

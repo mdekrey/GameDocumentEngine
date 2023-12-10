@@ -32,5 +32,14 @@
 		"intro": "The document you dropped, <Document/>, does not support widgets at this time. Try another document type.",
 		"cancel": "Cancel"
 	},
-	"widgets": { "widget-load-error": "Widget failed to load" }
+	"delete-widget-modal": {
+		"title": "Remove Widget",
+		"are-you-sure": "Are you sure you want to delete the {{widgetType}} widget for <Target />? This action cannot be undone.",
+		"cancel": "Cancel",
+		"submit": "Remove Widget"
+	},
+	"widgets": {
+		"widget-load-error": "Widget failed to load",
+		"widget-runtime-error": "Widget encountered an error"
+	}
 }
