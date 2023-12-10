@@ -148,7 +148,7 @@ export function DocumentDetailsForm<T = unknown>({
 			translation={fullTranslation}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
-			objectRole={document.data.userRoles[user.data.id]}
+			user={user.data}
 		/>
 	);
 

@@ -7,6 +7,7 @@ import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
 import type { DocumentPointers } from './get-document-pointers';
+import type { UserDetails } from '@/api/models/UserDetails';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
 	details: T;
@@ -32,22 +33,24 @@ export type GameObjectWidgetProps<T = unknown> = {
 export type GameObjectComponentBase<T> = {
 	document: TypedDocumentDetails<T>;
 	translation: TFunction;
-	readablePointers: DocumentPointers;
-	writablePointers: DocumentPointers;
-	objectRole: string | undefined;
+	user: UserDetails;
 };
 
 export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
+	readablePointers: DocumentPointers;
+	writablePointers: DocumentPointers;
 	form: UseFormResult<EditableDocumentDetails<T>>;
 	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
 };
+
+export type WidgetComponentProps<T> = GameObjectComponentBase<T>;
 
 export type GameObjectWidgetDefinition<T> = {
 	defaults: {
 		width: number;
 		height: number;
 	};
-	component: React.ComponentType<GameObjectComponentBase<T>>;
+	component: React.ComponentType<WidgetComponentProps<T>>;
 };
 
 export type IGameObjectType<T = unknown> = {
