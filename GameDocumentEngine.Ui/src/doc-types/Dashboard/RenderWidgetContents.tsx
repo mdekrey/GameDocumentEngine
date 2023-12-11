@@ -6,11 +6,19 @@ export function RenderWidgetContents({
 	document,
 	user,
 	translationKeyPrefix,
+	gameType,
+	docType,
 }: RenderWidgetContentsProps) {
 	const { t: fullTranslation } = useTranslation(`doc-types:${document.type}`, {
 		keyPrefix: translationKeyPrefix,
 	});
 	return (
-		<Component document={document} user={user} translation={fullTranslation} />
+		<Component
+			document={document}
+			user={user}
+			translation={fullTranslation}
+			gameType={gameType}
+			docType={docType}
+		/>
 	);
 }

@@ -12,7 +12,10 @@ import {
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { useCallback, useEffect, useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
-import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
+import type {
+	GameTypeObjectScripts,
+	GameTypeScripts,
+} from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form';
@@ -58,16 +61,23 @@ export function DocumentDetails({
 			key={`${gameId}-${documentId}`}
 			fallback={<ErrorScreen message={t('unhandled-error')} />}
 		>
-			<DocumentDetailsForm scripts={scripts} document={document} user={user} />
+			<DocumentDetailsForm
+				gameType={gameType.data}
+				scripts={scripts}
+				document={document}
+				user={user}
+			/>
 		</ErrorBoundary>
 	);
 }
 
 export function DocumentDetailsForm<T = unknown>({
+	gameType,
 	scripts,
 	document,
 	user,
 }: {
+	gameType: GameTypeScripts;
 	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
 	scripts: GameTypeObjectScripts<T>;
 	user: QueryObserverSuccessResult<UserDetails>;
@@ -146,6 +156,8 @@ export function DocumentDetailsForm<T = unknown>({
 			onSubmit={onSubmit}
 			document={document.data}
 			translation={fullTranslation}
+			gameType={gameType}
+			docType={scripts}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
 			user={user.data}

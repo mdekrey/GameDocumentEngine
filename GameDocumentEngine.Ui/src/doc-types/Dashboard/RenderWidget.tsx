@@ -31,11 +31,9 @@ export function RenderWidget({
 
 	if (document.isLoading || gameType.isLoading)
 		return <WidgetInnerWrapper className="bg-slate-500" />;
-	const docWidgetConfig =
-		gameType.data?.objectTypes[document.data?.type ?? ''].typeInfo.widgets?.[
-			widget
-		];
-	if (document.isError || gameType.isError || !docWidgetConfig)
+	const docType = gameType.data?.objectTypes[document.data?.type ?? ''];
+	const docWidgetConfig = docType?.typeInfo.widgets?.[widget];
+	if (document.isError || gameType.isError || !docType || !docWidgetConfig)
 		return (
 			<WidgetInnerWrapper className="border-4 border-red-800">
 				<ErrorScreen message={t('widget-load-error')} />
@@ -51,6 +49,8 @@ export function RenderWidget({
 					component={docWidgetConfig.component}
 					translationKeyPrefix={docWidgetConfig.translation}
 					document={document.data}
+					gameType={gameType.data}
+					docType={docType}
 					user={user}
 				/>
 			</ErrorBoundary>
