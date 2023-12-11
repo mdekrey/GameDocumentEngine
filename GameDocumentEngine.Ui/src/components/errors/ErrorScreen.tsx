@@ -29,24 +29,48 @@ export function ErrorScreen({ message, explanation }: ErrorScreenProps) {
 	);
 }
 
-ErrorScreen.Icon = function () {
+ErrorScreen.Icon = function ({ message, explanation }) {
 	return (
-		<Centered className="justify-center text-2xl">
-			<HiXCircle />
+		<Centered className="justify-center text-4xl text-red-800 dark:text-red-200">
+			<HiXCircle title={explanation ? `${message}. ${explanation}` : message} />
 		</Centered>
 	);
 } as React.FC<ErrorScreenProps>;
 ErrorScreen.Icon.displayName = 'ErrorScreen.Icon';
 
-ErrorScreen.Widget = function ({ message }) {
+ErrorScreen.Widget = function ({ message, explanation }) {
 	return (
-		<Centered className="justify-center text-2xl">
+		<Centered
+			className="justify-center text-2xl border rounded-md border-red-600 bg-red-50 dark:bg-red-950"
+			title={explanation}
+		>
 			<HiXCircle className="text-red-800 dark:text-red-200" />
 			<Prose>{message}</Prose>
 		</Centered>
 	);
 } as React.FC<ErrorScreenProps>;
 ErrorScreen.Widget.displayName = 'ErrorScreen.Widget';
+
+function sized<Props>(
+	name: string,
+	target: React.FC<Props> & Record<'Icon' | 'Widget', React.FC<Props>>,
+) {
+	const result: React.FC<Props & { size: 'icon' | 'widget' | 'screen' }> = ({
+		size,
+		...props
+	}) => {
+		const Component =
+			size === 'icon'
+				? target.Icon
+				: size === 'widget'
+				? target.Widget
+				: target;
+		return <Component {...(props as JSX.IntrinsicAttributes & Props)} />;
+	};
+	result.displayName = name;
+	return result;
+}
+ErrorScreen.Sized = sized('ErrorScreen.Sized', ErrorScreen);
 
 type TranslatedProps = {
 	namespace: string;
@@ -68,13 +92,17 @@ ErrorScreen.translated = function translated(
 	name: string,
 	{ namespace }: TranslatedProps,
 ) {
-	const result = Translated.extend<Record<string, never>>(name, (T) => <T />, {
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	const result = Translated.extend<{}>(name, (T) => <T />, {
 		useProps: () => ({ namespace }),
 	});
-	return result.themed({
+	const withTheme = result.themed({
 		// @ts-expect-error partial widget for template
 		Icon: () => <ErrorScreen.Icon />,
 		// @ts-expect-error partial widget for template
 		Widget: () => <ErrorScreen.Widget />,
+	});
+	return Object.assign(withTheme, {
+		Sized: sized(`${name}.Sized`, withTheme),
 	});
 };

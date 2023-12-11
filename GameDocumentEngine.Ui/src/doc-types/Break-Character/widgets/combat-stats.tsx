@@ -40,7 +40,7 @@ export function CombatStats({
 		},
 	});
 	if (!document.details.combatValues) {
-		return <ErrorScreen.NoAccess.Widget />;
+		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}
 	return (
 		<div
