@@ -4,6 +4,8 @@ import { LuShield, LuSword } from 'react-icons/lu';
 import { HiHeart } from 'react-icons/hi2';
 import { GiRun } from 'react-icons/gi';
 import { elementTemplate } from '@/components/template';
+import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
+import { ErrorScreen } from '@/components/errors';
 
 const asModifier = new Intl.NumberFormat('en', {
 	signDisplay: 'always',
@@ -24,8 +26,27 @@ export function CombatStats({
 	document,
 	translation: t,
 }: GameObjectComponentBase<Character>) {
+	const dropTarget = useDropTarget({
+		[documentIdMimeType]: {
+			canHandle({ link }) {
+				if (!link) return false;
+				return 'link';
+			},
+			handle(ev, data) {
+				console.log({ ev, data });
+				if (data.gameId !== document.gameId) return false;
+				return true;
+			},
+		},
+	});
+	if (!document.details.combatValues) {
+		return <ErrorScreen.NoAccess.Widget />;
+	}
 	return (
-		<div className="grid gap-2 grid-cols-[1fr,auto,1fr] grid-rows-[1fr,auto,1fr] h-full w-full">
+		<div
+			className="grid gap-2 grid-cols-[1fr,auto,1fr] grid-rows-[1fr,auto,1fr] h-full w-full"
+			{...dropTarget}
+		>
 			<Section>
 				<FirstRow>
 					<LuSword />
