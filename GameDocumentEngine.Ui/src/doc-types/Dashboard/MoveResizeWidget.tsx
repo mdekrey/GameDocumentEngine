@@ -96,7 +96,7 @@ export const MoveResizeWidget = withSlots<
 		>
 			<div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50 "></div>
 			{children}
-			<div className="absolute inset-0 bg-slate-500/75 flex flex-row flex-wrap justify-center items-center">
+			<div className="absolute inset-0 bg-slate-500/75 flex flex-row flex-wrap justify-center items-center gap-4">
 				{slotProps.Buttons?.children}
 			</div>
 		</Rnd>

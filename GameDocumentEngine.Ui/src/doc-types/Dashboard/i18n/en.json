@@ -47,5 +47,9 @@
 	"widgets": {
 		"widget-load-error": "Widget failed to load",
 		"widget-runtime-error": "Widget encountered an error"
+	},
+	"info-widget-modal": {
+		"title": "Widget Info",
+		"ok": "Ok"
 	}
 }
