@@ -1,9 +1,6 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
-import type {
-	GameObjectFormComponent,
-	TypedDocumentDetails,
-} from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
@@ -11,7 +8,6 @@ import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
-import type { QueryClient } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
