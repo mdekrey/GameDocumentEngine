@@ -2,6 +2,7 @@ import { elementTemplate } from '@/components/template';
 import { twMerge } from 'tailwind-merge';
 import styles from './dashboard.module.css';
 import type { Widget } from './types';
+import { JotaiDiv } from '@/components/jotai/div';
 
 export const gridSize = 16;
 
@@ -12,7 +13,7 @@ export const toGridCoordinate = (client: number) =>
 
 export const DashboardContainer = elementTemplate(
 	'DashboardContainer',
-	'div',
+	JotaiDiv,
 	(T) => (
 		<T
 			className={twMerge(styles.dashboardGrid, 'relative')}
