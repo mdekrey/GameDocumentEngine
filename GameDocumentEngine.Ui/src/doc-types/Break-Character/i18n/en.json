@@ -201,7 +201,19 @@
 	},
 	"widgets": {
 		"CombatStats": {
-			"name": "Combat Stats"
+			"name": "Combat Stats",
+			"sections": {
+				"attack": "Attack",
+				"hearts": "Hearts",
+				"defense": "Defense",
+				"speed": "Speed"
+			},
+			"speed": {
+				"slow": "Slow",
+				"average": "Average",
+				"fast": "Fast",
+				"very-fast": "V. Fast"
+			}
 		}
 	}
 }

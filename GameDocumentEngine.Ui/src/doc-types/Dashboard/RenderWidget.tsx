@@ -49,6 +49,7 @@ export function RenderWidget({
 			>
 				<RenderWidgetContents
 					component={docWidgetConfig.component}
+					translationKeyPrefix={docWidgetConfig.translation}
 					document={document.data}
 					user={user}
 				/>

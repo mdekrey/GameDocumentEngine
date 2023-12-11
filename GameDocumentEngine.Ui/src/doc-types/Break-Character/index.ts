@@ -99,6 +99,7 @@ defineDocument('Break-Character', {
 		CombatStats: {
 			component: CombatStats,
 			defaults: { width: 10, height: 10 },
+			translation: 'widgets.CombatStats',
 		},
 	},
 });

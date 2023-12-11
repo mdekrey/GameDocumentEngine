@@ -51,6 +51,7 @@ export type GameObjectWidgetDefinition<T> = {
 		height: number;
 	};
 	component: React.ComponentType<WidgetComponentProps<T>>;
+	translation: string;
 };
 
 export type IGameObjectType<T = unknown> = {
