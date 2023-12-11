@@ -25,7 +25,13 @@
 	"add-widget-modal": {
 		"title": "Add widget for <Document/>",
 		"cancel": "Cancel",
-		"submit": "Add widget"
+		"submit": "Add widget",
+		"fields": {
+			"id": {
+				"label": "Widget to add",
+				"not-selected": "Not Selected"
+			}
+		}
 	},
 	"adding-no-widgets": {
 		"title": "No widgets supported",

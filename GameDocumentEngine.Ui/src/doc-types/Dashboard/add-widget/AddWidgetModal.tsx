@@ -2,11 +2,19 @@ import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import type { IGameObjectType } from '@/documents/defineDocument';
+import type {
+	GameObjectWidgetDefinition,
+	IGameObjectType,
+} from '@/documents/defineDocument';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Button } from '@/components/button/button';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import {
+	NotSelected,
+	SelectField,
+} from '@/components/form-fields/select-input/select-field';
 
 export type NewWidgetResult = {
 	id: string;
@@ -62,8 +70,20 @@ export function AddWidgetModal({
 						}}
 					/>
 				</ModalDialogLayout.Title>
+				<Fieldset>
+					<SelectField field={form.fields.id} items={widgetKeys}>
+						{(dt) =>
+							dt ? (
+								<WidgetName target={widgets[dt]} docTypeKey={docTypeKey} />
+							) : (
+								<NotSelected>
+									{form.fields.id.translation('not-selected')}
+								</NotSelected>
+							)
+						}
+					</SelectField>
+				</Fieldset>
 
-				{widgetKeys.join(', ')}
 				<ModalDialogLayout.Buttons>
 					<Button.Save type="submit">{t('submit')}</Button.Save>
 					<Button.Secondary onClick={() => reject('Cancel')}>
@@ -73,4 +93,21 @@ export function AddWidgetModal({
 			</ModalDialogLayout>
 		</form>
 	);
+}
+
+function WidgetName({
+	target,
+	docTypeKey,
+}: {
+	target: GameObjectWidgetDefinition<unknown>;
+	docTypeKey: string;
+}) {
+	const { t } = useTranslation(
+		target.translationNamespace ?? `doc-types:${docTypeKey}`,
+		{
+			keyPrefix: target.translation,
+		},
+	);
+
+	return <>{t('name')}</>;
 }

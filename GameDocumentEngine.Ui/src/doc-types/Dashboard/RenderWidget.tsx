@@ -47,6 +47,7 @@ export function RenderWidget({
 			>
 				<RenderWidgetContents
 					component={docWidgetConfig.component}
+					translationNamespace={docWidgetConfig.translationNamespace}
 					translationKeyPrefix={docWidgetConfig.translation}
 					document={document.data}
 					gameType={gameType.data}

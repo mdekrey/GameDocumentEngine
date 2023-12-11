@@ -34,7 +34,7 @@ export type GameObjectWidgetProps<T = unknown> = {
 	translation: TFunction;
 };
 
-export type GameObjectComponentBase<T> = {
+export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
 	translation: TFunction;
 	user: UserDetails;
@@ -57,6 +57,7 @@ export type GameObjectWidgetDefinition<T> = {
 		height: number;
 	};
 	component: React.ComponentType<WidgetComponentProps<T>>;
+	translationNamespace?: string;
 	translation: string;
 };
 

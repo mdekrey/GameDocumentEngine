@@ -5,13 +5,17 @@ export function RenderWidgetContents({
 	component: Component,
 	document,
 	user,
+	translationNamespace,
 	translationKeyPrefix,
 	gameType,
 	docType,
 }: RenderWidgetContentsProps) {
-	const { t: fullTranslation } = useTranslation(`doc-types:${document.type}`, {
-		keyPrefix: translationKeyPrefix,
-	});
+	const { t: fullTranslation } = useTranslation(
+		translationNamespace ?? `doc-types:${document.type}`,
+		{
+			keyPrefix: translationKeyPrefix,
+		},
+	);
 	return (
 		<Component
 			document={document}

@@ -8,6 +8,7 @@ import type {
 
 export type RenderWidgetContentsProps = {
 	component: React.ComponentType<WidgetComponentProps<unknown>>;
+	translationNamespace?: string;
 	translationKeyPrefix: string;
 	document: DocumentDetails;
 	user: UserDetails;
