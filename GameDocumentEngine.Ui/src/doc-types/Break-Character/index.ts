@@ -6,6 +6,7 @@ import type { z } from 'zod';
 import { characterFixup } from './fixupCharacter';
 import { CombatStats } from './widgets/combat-stats';
 import { NamedIconWidget } from '@/components/named-icon/named-icon-widget';
+import { AptitudeStats } from './widgets/aptitude-stats';
 
 const template: z.infer<typeof schema> = {
 	identity: {},
@@ -107,6 +108,11 @@ defineDocument('Break-Character', {
 			component: CombatStats,
 			defaults: { width: 10, height: 5 },
 			translation: 'widgets.CombatStats',
+		},
+		AptitudeStats: {
+			component: AptitudeStats,
+			defaults: { width: 10, height: 5 },
+			translation: 'widgets.AptitudeStats',
 		},
 	},
 });
