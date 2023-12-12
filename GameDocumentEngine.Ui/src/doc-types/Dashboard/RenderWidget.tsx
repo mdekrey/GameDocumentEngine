@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useGameType } from '@/apps/documents/useGameType';
 import { queries } from '@/utils/api/queries';
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
 import { useTranslation } from 'react-i18next';
@@ -7,17 +6,20 @@ import type { UserDetails } from '@/api/models/UserDetails';
 import { RenderWidgetContents } from './RenderWidgetContents';
 import { elementTemplate } from '@/components/template';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
+import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 
 const WidgetInnerWrapper = elementTemplate('WidgetContents', 'div', (T) => (
 	<T className="absolute inset-0 overflow-hidden" />
 ));
 
 export function RenderWidget({
+	gameType,
 	gameId,
 	documentId,
 	widget,
 	user,
 }: {
+	gameType: GameTypeScripts;
 	documentId: string;
 	widget: string;
 	gameId: string;
@@ -26,14 +28,13 @@ export function RenderWidget({
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'widgets',
 	});
-	const gameType = useGameType(gameId);
 	const document = useQuery(queries.getDocument(gameId, documentId));
 
-	if (document.isLoading || gameType.isLoading)
+	if (document.isLoading)
 		return <WidgetInnerWrapper className="bg-slate-500" />;
-	const docType = gameType.data?.objectTypes[document.data?.type ?? ''];
+	const docType = gameType.objectTypes[document.data?.type ?? ''];
 	const docWidgetConfig = docType?.typeInfo.widgets?.[widget];
-	if (document.isError || gameType.isError || !docType || !docWidgetConfig)
+	if (document.isError || !docType || !docWidgetConfig)
 		return (
 			<WidgetInnerWrapper className="border-4 border-red-800">
 				<ErrorScreen message={t('widget-load-error')} />
@@ -50,7 +51,7 @@ export function RenderWidget({
 					translationNamespace={docWidgetConfig.translationNamespace}
 					translationKeyPrefix={docWidgetConfig.translation}
 					document={document.data}
-					gameType={gameType.data}
+					gameType={gameType}
 					docType={docType}
 					user={user}
 				/>

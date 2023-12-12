@@ -3,7 +3,11 @@ import { useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
-import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
+import {
+	documentIdMimeType,
+	isDraggingAtom,
+	useDropTarget,
+} from '@/components/drag-drop';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
@@ -25,11 +29,16 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { UserDetails } from '@/api/models/UserDetails';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { showWidgetInfo } from './info/info';
+import { JotaiDiv } from '@/components/jotai/div';
+import { atom } from 'jotai';
+import { elementTemplate } from '@/components/template';
+import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 
 export function DashboardDisplay({
 	document,
 	form,
 	user,
+	gameType,
 	onSubmit,
 }: GameObjectFormComponent<Dashboard>) {
 	const queryClient = useQueryClient();
@@ -58,6 +67,7 @@ export function DashboardDisplay({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
 				if (!link) return false;
+				if (!editing) toggleEditing();
 				return 'link';
 			},
 			handle(ev, data) {
@@ -84,6 +94,7 @@ export function DashboardDisplay({
 						<WidgetContainer key={key} position={config.position}>
 							<RenderWidget
 								key={key}
+								gameType={gameType}
 								gameId={document.gameId}
 								user={user}
 								{...config}
@@ -109,6 +120,7 @@ export function DashboardDisplay({
 				([key, config]: [string, Widget]) => (
 					<EditingWidget
 						key={key}
+						gameType={gameType}
 						widget={widget(key)}
 						dashboard={document}
 						user={user}
@@ -140,7 +152,12 @@ export function DashboardDisplay({
 	}
 }
 
+const Inset = elementTemplate('Inset', JotaiDiv, (T) => (
+	<T className="absolute inset-0" />
+));
+const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));
 function EditingWidget({
+	gameType,
 	widget,
 	dashboard: { gameId },
 	user,
@@ -148,6 +165,7 @@ function EditingWidget({
 	onDelete,
 	onInfo,
 }: {
+	gameType: GameTypeScripts;
 	widget: FormFieldReturnType<Widget>;
 	dashboard: DocumentDetails;
 	user: UserDetails;
@@ -155,19 +173,43 @@ function EditingWidget({
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
+	const stopDragging = useDropTarget({
+		[documentIdMimeType]: {
+			canHandle: (effect) => (effect.link ? 'none' : false),
+			handle: () => true,
+		},
+	});
 	return (
 		<ErrorBoundary fallback={<></>}>
 			<MoveResizeWidget field={widget.field(['position'])}>
-				<div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50" />
-				<RenderWidget gameId={gameId} user={user} {...config} />
-				<div className="absolute inset-0 bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300">
+				<Inset
+					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"
+					{...stopDragging}
+				/>
+				<Inset
+					style={{
+						// TODO: only disable pointerEvents if the widget doesn't allow contents
+						pointerEvents: hoverVisibility,
+					}}
+				>
+					<RenderWidget
+						gameType={gameType}
+						gameId={gameId}
+						user={user}
+						{...config}
+					/>
+				</Inset>
+				<Inset
+					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"
+					style={{ display: hoverVisibility }}
+				>
 					<IconButton.Destructive onClick={onDelete}>
 						<HiOutlineTrash />
 					</IconButton.Destructive>
 					<IconButton onClick={onInfo}>
 						<BsInfoLg />
 					</IconButton>
-				</div>
+				</Inset>
 			</MoveResizeWidget>
 		</ErrorBoundary>
 	);

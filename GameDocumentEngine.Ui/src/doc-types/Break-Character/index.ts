@@ -99,13 +99,13 @@ defineDocument('Break-Character', {
 	widgets: {
 		Name: {
 			component: NamedIconWidget,
-			defaults: { width: 10, height: 4 },
+			defaults: { width: 10, height: 2 },
 			translationNamespace: 'widgets/name',
 			translation: '',
 		},
 		CombatStats: {
 			component: CombatStats,
-			defaults: { width: 10, height: 10 },
+			defaults: { width: 10, height: 5 },
 			translation: 'widgets.CombatStats',
 		},
 	},

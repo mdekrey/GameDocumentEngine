@@ -9,6 +9,7 @@ type MimeAndData<T extends keyof DraggingMimeTypes = keyof DraggingMimeTypes> =
 		} & DraggingMimeTypes[K];
 	}[T];
 const draggingGameObject = atom<MimeAndData | undefined>(undefined);
+export const isDraggingAtom = atom((get) => !!get(draggingGameObject));
 
 type AllowedDragEffect = {
 	readonly copy: boolean;
@@ -114,6 +115,7 @@ export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 						getData(mimeType, ev.dataTransfer) as any,
 					)
 				) {
+					ev.stopPropagation();
 					ev.preventDefault();
 					return;
 				}
@@ -132,6 +134,7 @@ export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 		);
 		if (!handleResult) return false;
 		ev.dataTransfer.dropEffect = handleResult;
+		ev.stopPropagation();
 		ev.preventDefault();
 		return true;
 	}
