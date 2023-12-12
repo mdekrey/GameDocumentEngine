@@ -1,0 +1,55 @@
+{
+	"name": "Dashboard",
+	"details": {
+		"delete": "Delete dashboard",
+		"edit-roles": "Edit roles"
+	},
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the dashboard with ability to add, remove, and edit widgets"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the dashboard; may not be able to see all widgets on the dashboard due to other permissions"
+		},
+		"no-role": { "name": "None" }
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			}
+		}
+	},
+	"add-widget-modal": {
+		"title": "Add widget for <Document/>",
+		"cancel": "Cancel",
+		"submit": "Add widget",
+		"fields": {
+			"id": {
+				"label": "Widget to add",
+				"not-selected": "Not Selected"
+			}
+		}
+	},
+	"adding-no-widgets": {
+		"title": "No widgets supported",
+		"intro": "The document you dropped, <Document/>, does not support widgets at this time. Try another document type.",
+		"cancel": "Cancel"
+	},
+	"delete-widget-modal": {
+		"title": "Remove Widget",
+		"are-you-sure": "Are you sure you want to delete the {{widgetType}} widget for <Target />? This action cannot be undone.",
+		"cancel": "Cancel",
+		"submit": "Remove Widget"
+	},
+	"widgets": {
+		"widget-load-error": "Widget failed to load",
+		"widget-runtime-error": "Widget encountered an error"
+	},
+	"info-widget-modal": {
+		"title": "Widget Info",
+		"ok": "Ok"
+	}
+}

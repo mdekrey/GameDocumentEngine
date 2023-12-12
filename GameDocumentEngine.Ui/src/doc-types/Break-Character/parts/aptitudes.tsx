@@ -6,6 +6,7 @@ import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 import { Prose } from '@/components/text/common';
 import styles from './aptitude.module.css';
+import aptitudeColors from '../aptitude-colors.module.css';
 import { useId } from 'react';
 import { twMerge } from 'tailwind-merge';
 import type { Atom } from 'jotai';
@@ -23,11 +24,11 @@ export function Aptitudes({ form }: GameObjectFormComponent<Character>) {
 
 	return (
 		<div className="flex flex-col md:grid md:grid-cols-2 gap-8 justify-items-center items-center">
-			<Aptitude field={fields.might} className={styles.might} />
-			<Aptitude field={fields.deftness} className={styles.deftness} />
-			<Aptitude field={fields.grit} className={styles.grit} />
-			<Aptitude field={fields.insight} className={styles.insight} />
-			<Aptitude field={fields.aura} className={styles.aura} />
+			<Aptitude field={fields.might} className={aptitudeColors.might} />
+			<Aptitude field={fields.deftness} className={aptitudeColors.deftness} />
+			<Aptitude field={fields.grit} className={aptitudeColors.grit} />
+			<Aptitude field={fields.insight} className={aptitudeColors.insight} />
+			<Aptitude field={fields.aura} className={aptitudeColors.aura} />
 		</div>
 	);
 }
@@ -99,8 +100,8 @@ function GradientSvg({ total }: { total: Atom<number> }) {
 		>
 			<defs>
 				<linearGradient id={gradientId}>
-					<stop className={styles.stop1} offset="0%" />
-					<stop className={styles.stop2} offset="100%" />
+					<stop className={aptitudeColors.stop1} offset="0%" />
+					<stop className={aptitudeColors.stop2} offset="100%" />
 				</linearGradient>
 			</defs>
 			<rect

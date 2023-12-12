@@ -1,0 +1,9 @@
+.dashboardGrid {
+	min-height: max(100%, calc(1px * var(--grid-size) * (var(--h) + 5)));
+	min-width: max(100%, calc(1px * var(--grid-size) * (var(--w) + 5)));
+}
+.dashboardGrid.editing {
+	background-image: linear-gradient(to right, theme(colors.slate.500 / 25%) 1px, transparent 1px), linear-gradient(to bottom, theme(colors.slate.500 / 25%) 1px, transparent 1px);
+	background-size: calc(1px * var(--grid-size)) calc(1px * var(--grid-size));
+	background-position: 1rem 1rem;
+}

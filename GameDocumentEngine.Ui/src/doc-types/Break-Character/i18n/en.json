@@ -198,5 +198,32 @@
 				}
 			}
 		}
+	},
+	"widgets": {
+		"CombatStats": {
+			"name": "Combat Stats",
+			"sections": {
+				"attack": "Attack",
+				"hearts": "Hearts",
+				"defense": "Defense",
+				"speed": "Speed"
+			},
+			"speed": {
+				"slow": "Slow",
+				"average": "Average",
+				"fast": "Fast",
+				"very-fast": "V. Fast"
+			}
+		},
+		"AptitudeStats": {
+			"name": "Aptitude Stats",
+			"aptitudes": {
+				"might": "Might",
+				"deftness": "Deft",
+				"grit": "Grit",
+				"insight": "Insight",
+				"aura": "Aura"
+			}
+		}
 	}
 }

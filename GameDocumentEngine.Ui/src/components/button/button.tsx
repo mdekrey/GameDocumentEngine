@@ -10,9 +10,23 @@ export const disabledButtonTemplate = elementTemplate(
 	'button',
 	(T) => <T type="button" />,
 	{
-		useProps: ({ className, disabled, ...rest }) => ({
+		useProps: ({
+			className,
+			disabled,
+			onMouseDown,
+			onTouchStart,
+			...rest
+		}) => ({
 			disabled: false,
 			className: twMerge(disabled && 'opacity-20', className),
+			onMouseDown(ev) {
+				ev.stopPropagation();
+				onMouseDown?.(ev);
+			},
+			onTouchStart(ev) {
+				ev.stopPropagation();
+				onTouchStart?.(ev);
+			},
 			...rest,
 		}),
 	},

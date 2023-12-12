@@ -1,4 +1,3 @@
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { queries } from '@/utils/api/queries';
 import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,7 +12,10 @@ import {
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { useCallback, useEffect, useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
-import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
+import type {
+	GameTypeObjectScripts,
+	GameTypeScripts,
+} from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form';
@@ -59,16 +61,23 @@ export function DocumentDetails({
 			key={`${gameId}-${documentId}`}
 			fallback={<ErrorScreen message={t('unhandled-error')} />}
 		>
-			<DocumentDetailsForm scripts={scripts} document={document} user={user} />
+			<DocumentDetailsForm
+				gameType={gameType.data}
+				scripts={scripts}
+				document={document}
+				user={user}
+			/>
 		</ErrorBoundary>
 	);
 }
 
 export function DocumentDetailsForm<T = unknown>({
+	gameType,
 	scripts,
 	document,
 	user,
 }: {
+	gameType: GameTypeScripts;
 	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
 	scripts: GameTypeObjectScripts<T>;
 	user: QueryObserverSuccessResult<UserDetails>;
@@ -139,18 +148,25 @@ export function DocumentDetailsForm<T = unknown>({
 		[onUpdateDocument, fixup],
 	);
 
-	return (
-		<div className="p-4 h-full w-full">
-			{editable.readablePointers.pointers.length > 0 && (
-				<Component
-					form={form}
-					onSubmit={onSubmit}
-					translation={fullTranslation}
-					readablePointers={editable.readablePointers}
-					writablePointers={editable.writablePointers}
-					objectRole={document.data.userRoles[user.data.id]}
-				/>
-			)}
-		</div>
+	if (!editable.readablePointers.pointers.length) return null;
+
+	const component = (
+		<Component
+			form={form}
+			onSubmit={onSubmit}
+			document={document.data}
+			translation={fullTranslation}
+			gameType={gameType}
+			docType={scripts}
+			readablePointers={editable.readablePointers}
+			writablePointers={editable.writablePointers}
+			user={user.data}
+		/>
+	);
+
+	return scripts.typeInfo.noContainer ? (
+		component
+	) : (
+		<div className="p-4 h-full w-full">{component}</div>
 	);
 }

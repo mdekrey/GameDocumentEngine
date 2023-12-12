@@ -7,6 +7,11 @@ import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
 import type { DocumentPointers } from './get-document-pointers';
+import type { UserDetails } from '@/api/models/UserDetails';
+import type {
+	GameTypeObjectScripts,
+	GameTypeScripts,
+} from '@/utils/api/queries/game-types';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
 	details: T;
@@ -29,22 +34,41 @@ export type GameObjectWidgetProps<T = unknown> = {
 	translation: TFunction;
 };
 
-export type GameObjectFormComponent<T = unknown> = {
-	form: UseFormResult<EditableDocumentDetails<T>>;
-	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
+export type GameObjectComponentBase<T = unknown> = {
+	document: TypedDocumentDetails<T>;
 	translation: TFunction;
+	user: UserDetails;
+	gameType: GameTypeScripts;
+	docType: GameTypeObjectScripts<T>;
+};
+
+export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
 	readablePointers: DocumentPointers;
 	writablePointers: DocumentPointers;
-	objectRole: string | undefined;
+	form: UseFormResult<EditableDocumentDetails<T>>;
+	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
+};
+
+export type WidgetComponentProps<T> = GameObjectComponentBase<T>;
+
+export type GameObjectWidgetDefinition<T> = {
+	defaults: {
+		width: number;
+		height: number;
+	};
+	component: React.ComponentType<WidgetComponentProps<T>>;
+	translationNamespace?: string;
+	translation: string;
 };
 
 export type IGameObjectType<T = unknown> = {
+	noContainer?: boolean;
 	icon: IconType;
 	template: T;
 	component: React.ComponentType<GameObjectFormComponent<T>>;
 	fixup: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>;
 	schema: z.ZodType<T>;
-	widgets?: Record<string, GameObjectWidgetProps<T>>;
+	widgets?: Record<string, GameObjectWidgetDefinition<T>>;
 };
 
 declare global {
@@ -57,7 +81,7 @@ export function documentSchema<T>(
 	schema: z.ZodType<T>,
 ): z.ZodType<EditableDocumentDetails<T>> {
 	return z.object({
-		name: z.string().nonempty(),
+		name: z.string().min(1),
 		details: schema instanceof ZodObject ? schema.deepPartial() : schema,
 	}) as z.ZodType<EditableDocumentDetails<T>>;
 }
