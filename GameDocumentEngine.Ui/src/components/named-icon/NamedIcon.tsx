@@ -9,8 +9,7 @@ export const NamedIcon = ({
 	name: string;
 	typeName: string;
 }) => (
-	<span className="font-semibold whitespace-nowrap">
-		<Icon title={typeName} className="inline-block align-baseline" />
-		{name}
+	<span className="font-semibold whitespace-nowrap inline-flex flex-row items-center">
+		<Icon title={typeName} className="inline-block align-baseline" /> {name}
 	</span>
 );
