@@ -143,6 +143,7 @@ export function DashboardDisplay({
 			);
 	}
 }
+
 function EditingWidget({
 	widget,
 	document,
@@ -160,16 +161,17 @@ function EditingWidget({
 }) {
 	return (
 		<ErrorBoundary fallback={<></>}>
-			<MoveResizeWidget field={widget}>
+			<MoveResizeWidget field={widget.field(['position'])}>
+				<div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50" />
 				<RenderWidget gameId={document.gameId} user={user} {...config} />
-				<MoveResizeWidget.Buttons>
+				<div className="absolute inset-0 bg-slate-500/75 flex flex-row flex-wrap justify-center items-center gap-4 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300">
 					<IconButton.Destructive onClick={onDelete}>
 						<HiOutlineTrash />
 					</IconButton.Destructive>
 					<IconButton>
 						<HiMiniInformationCircle onClick={onInfo} />
 					</IconButton>
-				</MoveResizeWidget.Buttons>
+				</div>
 			</MoveResizeWidget>
 		</ErrorBoundary>
 	);

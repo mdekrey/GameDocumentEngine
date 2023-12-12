@@ -1,6 +1,4 @@
-import type { Widget } from './types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import { useFormFields } from '@principlestudios/react-jotai-forms';
 import {
 	applyGridScale,
 	fromGridCoordinate,
@@ -11,7 +9,6 @@ import { useStore } from 'jotai';
 import { Rnd } from 'react-rnd';
 import { useEffect, useRef } from 'react';
 import { elementTemplate } from '@/components/template';
-import withSlots from 'react-slot-component';
 
 const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	<T className="border-slate-900 dark:border-slate-100 absolute inset-1" />
@@ -22,26 +19,24 @@ const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	BottomRight: (T) => <T className="rounded-br border-b border-r" />,
 });
 
+type Position = {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+};
+
 export type MoveResizeWidgetProps = {
-	field: FormFieldReturnType<Widget>;
+	field: FormFieldReturnType<Position>;
 	children?: React.ReactNode;
 };
 
-export type MoveResizeWidgetSlots = {
-	Buttons: {
-		children?: React.ReactNode;
-	};
-};
-
-export const MoveResizeWidget = withSlots<
-	MoveResizeWidgetSlots,
-	MoveResizeWidgetProps
->(function MoveResizeWidget({ field, children, slotProps }) {
+export function MoveResizeWidget({
+	field: positionField,
+	children,
+}: MoveResizeWidgetProps) {
 	const store = useStore();
 	const rndRef = useRef<Rnd>(null);
-	const { positionField } = useFormFields(field, {
-		positionField: ['position'] as const,
-	});
 	const initialPosition = store.get(positionField.value);
 	const positionAtom = positionField.value;
 
@@ -94,11 +89,7 @@ export const MoveResizeWidget = withSlots<
 				bottomRight: <DragHandle.BottomRight />,
 			}}
 		>
-			<div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50 "></div>
 			{children}
-			<div className="absolute inset-0 bg-slate-500/75 flex flex-row flex-wrap justify-center items-center gap-4 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300">
-				{slotProps.Buttons?.children}
-			</div>
 		</Rnd>
 	);
-});
+}
