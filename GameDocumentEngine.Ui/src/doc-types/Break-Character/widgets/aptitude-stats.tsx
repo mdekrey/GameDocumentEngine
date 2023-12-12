@@ -26,6 +26,10 @@ function AptitudeStat({
 	t: TFunction;
 	name: keyof Aptitudes;
 }) {
+	const min = Math.max(
+		0,
+		Math.min(5, ...Object.values(aptitudes).map((a) => a.total - 2)),
+	);
 	const largestTotal = Math.max(
 		...Object.values(aptitudes).map((a) => a.total),
 	);
@@ -36,7 +40,7 @@ function AptitudeStat({
 			<AptitudeName>{t(`aptitudes.${name}`)}</AptitudeName>
 			<AptitudeBar
 				className={aptitudeColors[name]}
-				fraction={thisTotal / largestTotal}
+				fraction={(thisTotal - min) / (largestTotal - min)}
 			/>
 		</>
 	);

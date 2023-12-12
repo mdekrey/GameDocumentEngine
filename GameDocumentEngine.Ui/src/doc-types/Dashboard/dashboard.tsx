@@ -39,8 +39,10 @@ export function DashboardDisplay({
 	form,
 	user,
 	gameType,
+	writablePointers,
 	onSubmit,
 }: GameObjectFormComponent<Dashboard>) {
+	const canUpdateWidgets = writablePointers.contains('details', 'widgets');
 	const queryClient = useQueryClient();
 	useSubmitOnChange(form, onSubmit);
 	const launchModal = useLaunchModal();
@@ -62,10 +64,14 @@ export function DashboardDisplay({
 			),
 		).toFixed(0);
 	});
-	const [editing, toggleEditing] = useReducer((prev) => !prev, false);
+	const [editing, toggleEditing] = useReducer(
+		canUpdateWidgets ? (prev) => !prev : () => false,
+		false,
+	);
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
+				if (!canUpdateWidgets) return false;
 				if (!link) return false;
 				if (!editing) toggleEditing();
 				return 'link';
@@ -103,9 +109,11 @@ export function DashboardDisplay({
 					),
 				)}
 				<div className="fixed right-4 bottom-4">
-					<IconButton onClick={toggleEditing}>
-						<HiPencil />
-					</IconButton>
+					{canUpdateWidgets && (
+						<IconButton onClick={toggleEditing}>
+							<HiPencil />
+						</IconButton>
+					)}
 				</div>
 			</DashboardContainer>
 		);
