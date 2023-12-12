@@ -6,14 +6,15 @@ import type {
 import { ClockSvg } from '../clock-svg';
 import type { Clock } from '../clock-types';
 
-export function ClockDisplay({ document }: WidgetComponentProps<Clock>) {
+export function ClockDisplay({ document, size }: WidgetComponentProps<Clock>) {
+	const radius = Math.min(size.width, size.height);
 	return (
 		<ClockSvg
 			className="self-center mx-auto"
 			currentTicks={document.details.current}
 			totalTicks={document.details.max}
-			padding={2}
-			radius={70}
+			padding={0.2}
+			radius={radius}
 			width="100%"
 			height="100%"
 		/>
@@ -25,6 +26,6 @@ export const ClockDisplayWidgetDefinition: GameObjectWidgetDefinition<Clock> = {
 	defaults: { width: 10, height: 10 },
 	translationKeyPrefix: '',
 	getConstraints() {
-		return { min: { width: 2, height: 2 } };
+		return { min: { width: 1, height: 1 } };
 	},
 };

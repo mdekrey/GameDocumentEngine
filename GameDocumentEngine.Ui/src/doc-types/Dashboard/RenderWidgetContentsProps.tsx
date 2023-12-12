@@ -5,6 +5,7 @@ import type {
 	GameTypeObjectScripts,
 	GameTypeScripts,
 } from '@/utils/api/queries/game-types';
+import type { Widget } from './types';
 
 export type RenderWidgetContentsProps = {
 	component: React.ComponentType<WidgetComponentProps<unknown>>;
@@ -14,4 +15,5 @@ export type RenderWidgetContentsProps = {
 	user: UserDetails;
 	gameType: GameTypeScripts;
 	docType: GameTypeObjectScripts;
+	widgetConfig: Widget;
 };

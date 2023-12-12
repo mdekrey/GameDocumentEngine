@@ -9,6 +9,7 @@ export function RenderWidgetContents({
 	translationKeyPrefix,
 	gameType,
 	docType,
+	widgetConfig,
 }: RenderWidgetContentsProps) {
 	const { t: fullTranslation } = useTranslation(
 		translationNamespace ?? `doc-types:${document.type}`,
@@ -23,6 +24,7 @@ export function RenderWidgetContents({
 			translation={fullTranslation}
 			gameType={gameType}
 			docType={docType}
+			size={widgetConfig.position}
 		/>
 	);
 }

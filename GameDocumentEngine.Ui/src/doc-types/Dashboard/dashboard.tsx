@@ -110,7 +110,7 @@ export function DashboardDisplay({
 								gameType={gameType}
 								gameId={document.gameId}
 								user={user}
-								{...config}
+								widgetConfig={config}
 							/>
 						</WidgetContainer>
 					),
@@ -224,7 +224,7 @@ function EditingWidget({
 						gameType={gameType}
 						gameId={gameId}
 						user={user}
-						{...config}
+						widgetConfig={config}
 					/>
 				</Inset>
 				<Inset

@@ -7,6 +7,7 @@ import { RenderWidgetContents } from './RenderWidgetContents';
 import { elementTemplate } from '@/components/template';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
+import type { Widget } from './types';
 
 const WidgetInnerWrapper = elementTemplate('WidgetContents', 'div', (T) => (
 	<T className="absolute inset-0 overflow-hidden" />
@@ -15,26 +16,26 @@ const WidgetInnerWrapper = elementTemplate('WidgetContents', 'div', (T) => (
 export function RenderWidget({
 	gameType,
 	gameId,
-	documentId,
-	widget,
 	user,
+	widgetConfig,
 }: {
 	gameType: GameTypeScripts;
-	documentId: string;
-	widget: string;
 	gameId: string;
 	user: UserDetails;
+	widgetConfig: Widget;
 }) {
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'widgets',
 	});
-	const document = useQuery(queries.getDocument(gameId, documentId));
+	const document = useQuery(
+		queries.getDocument(gameId, widgetConfig.documentId),
+	);
 
 	if (document.isLoading)
 		return <WidgetInnerWrapper className="bg-slate-500" />;
 	const docType = gameType.objectTypes[document.data?.type ?? ''];
-	const docWidgetConfig = docType?.typeInfo.widgets?.[widget];
-	if (document.isError || !docType || !docWidgetConfig)
+	const docWidgetDefinition = docType?.typeInfo.widgets?.[widgetConfig.widget];
+	if (document.isError || !docType || !docWidgetDefinition)
 		return (
 			<WidgetInnerWrapper className="border-4 border-red-800">
 				<ErrorScreen message={t('widget-load-error')} />
@@ -47,13 +48,14 @@ export function RenderWidget({
 				fallback={<ErrorScreen message={t('widget-runtime-error')} />}
 			>
 				<RenderWidgetContents
-					component={docWidgetConfig.component}
-					translationNamespace={docWidgetConfig.translationNamespace}
-					translationKeyPrefix={docWidgetConfig.translationKeyPrefix}
+					component={docWidgetDefinition.component}
+					translationNamespace={docWidgetDefinition.translationNamespace}
+					translationKeyPrefix={docWidgetDefinition.translationKeyPrefix}
 					document={document.data}
 					gameType={gameType}
 					docType={docType}
 					user={user}
+					widgetConfig={widgetConfig}
 				/>
 			</ErrorBoundary>
 		</WidgetInnerWrapper>

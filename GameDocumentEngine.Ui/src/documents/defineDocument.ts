@@ -53,7 +53,9 @@ export type Size = {
 	width: number;
 	height: number;
 };
-export type WidgetComponentProps<T> = GameObjectComponentBase<T>;
+export type WidgetComponentProps<T> = GameObjectComponentBase<T> & {
+	size: Size;
+};
 
 export type GameObjectWidgetDefinition<T> = {
 	defaults: Size;
