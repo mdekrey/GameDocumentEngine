@@ -19,7 +19,7 @@ const FirstRow = elementTemplate('FirstRow', 'div', (T) => (
 	<T className="flex flex-row gap-0.5 items-center leading-4 font-bold" />
 ));
 const SecondRow = elementTemplate('SecondRow', 'div', (T) => (
-	<T className="uppercase text-xs font-bold tracking-widest" />
+	<T className="uppercase text-xs tracking-widest" />
 ));
 
 export function CombatStats({
