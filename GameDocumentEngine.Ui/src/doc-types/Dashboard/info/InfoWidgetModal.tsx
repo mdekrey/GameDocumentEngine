@@ -1,12 +1,12 @@
 import { Button } from '@/components/button/button';
 import { Prose } from '@/components/text/common';
-import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { Widget } from '../types';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
+import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 
 export function InfoWidgetModal({
 	resolve,
@@ -28,19 +28,19 @@ export function InfoWidgetModal({
 		keyPrefix: `widgets.${widget.widget}`,
 	});
 	return (
-		<ModalAlertLayout>
-			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
+		<ModalDialogLayout>
+			<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
 			<Prose>
-				{tWidget('name')}
+				{tWidget('name')}{' '}
 				<NamedIcon
 					name={document.name}
 					icon={Icon}
 					typeName={tDocument('name')}
 				/>
 			</Prose>
-			<ModalAlertLayout.Buttons>
+			<ModalDialogLayout.Buttons>
 				<Button onClick={() => resolve()}>{t('ok')}</Button>
-			</ModalAlertLayout.Buttons>
-		</ModalAlertLayout>
+			</ModalDialogLayout.Buttons>
+		</ModalDialogLayout>
 	);
 }
