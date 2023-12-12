@@ -9,13 +9,14 @@ export function ClockSvg({
 	padding,
 	currentTicks,
 	totalTicks,
+	...props
 }: {
 	className?: string;
 	radius: number;
 	padding: number;
 	currentTicks: number;
 	totalTicks: number;
-}) {
+} & JSX.IntrinsicElements['svg']) {
 	const { t } = useTranslation('doc-types:Clock', { keyPrefix: 'view-clock' });
 	const clockArc = useMemo(
 		() => arc<void, PieArcDatum<unknown>>().innerRadius(0).outerRadius(radius),
@@ -28,9 +29,9 @@ export function ClockSvg({
 
 	return (
 		<svg
-			width={radius * 2 + padding}
-			height={radius * 2 + padding}
 			className={className}
+			viewBox={`0 0 ${radius * 2 + padding} ${radius * 2 + padding}`}
+			{...props}
 		>
 			<title>
 				{t('clock-title', { current: currentTicks, max: totalTicks })}
