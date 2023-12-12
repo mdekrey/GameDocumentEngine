@@ -1,4 +1,7 @@
-import type { GameObjectComponentBase } from '@/documents/defineDocument';
+import type {
+	GameObjectComponentBase,
+	GameObjectWidgetDefinition,
+} from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
@@ -13,7 +16,7 @@ const AptitudeName = elementTemplate('AptitudeName', 'span', (T) => (
 	<T className="text-left uppercase" />
 ));
 const AptitudeBar = elementTemplate('AptitudeBar', GradientSvg, (T) => (
-	<T className="h-3 w-20 bg-slate-300 dark:bg-slate-700" />
+	<T className="h-3 w-full bg-slate-300 dark:bg-slate-700" />
 ));
 
 type Aptitudes = Character['aptitudes'];
@@ -58,7 +61,7 @@ export function AptitudeStats({
 		t,
 	};
 	return (
-		<div className="grid gap-x-2 grid-cols-[auto,1fr,auto] grid-rows-5 h-full w-full text-xs items-center">
+		<div className="grid gap-x-2 grid-cols-[auto,1fr,1fr] grid-rows-5 h-full w-full text-xs items-center">
 			<AptitudeStat {...props} name="might" />
 			<AptitudeStat {...props} name="deftness" />
 			<AptitudeStat {...props} name="grit" />
@@ -100,3 +103,13 @@ function GradientSvg({
 		</svg>
 	);
 }
+
+export const AptitudeStatsWidgetDefinition: GameObjectWidgetDefinition<Character> =
+	{
+		component: AptitudeStats,
+		defaults: { width: 10, height: 5 },
+		translationKeyPrefix: 'widgets.AptitudeStats',
+		getConstraints() {
+			return { min: { width: 6, height: 5 } };
+		},
+	};

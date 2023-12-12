@@ -3,8 +3,8 @@ import { defineDocument } from '@/documents/defineDocument';
 import { Clock } from './clock-widget';
 import clockSchema from './schema';
 import type { z } from 'zod';
-import { ClockDisplay } from './widgets/display';
-import { NamedIconWidget } from '@/components/named-icon/named-icon-widget';
+import { ClockDisplayWidgetDefinition } from './widgets/display';
+import { NamedIconWidgetDefinition } from '@/components/named-icon/named-icon-widget';
 
 defineDocument('Clock', {
 	icon: HiOutlineClock,
@@ -19,16 +19,7 @@ defineDocument('Clock', {
 		fromForm: (a) => a,
 	},
 	widgets: {
-		Name: {
-			component: NamedIconWidget,
-			defaults: { width: 10, height: 2 },
-			translationNamespace: 'widgets/name',
-			translation: '',
-		},
-		Clock: {
-			component: ClockDisplay,
-			defaults: { width: 10, height: 10 },
-			translation: '',
-		},
+		Name: NamedIconWidgetDefinition,
+		Clock: ClockDisplayWidgetDefinition,
 	},
 });

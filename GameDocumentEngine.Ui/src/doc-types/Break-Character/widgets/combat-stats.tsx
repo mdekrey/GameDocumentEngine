@@ -1,4 +1,7 @@
-import type { GameObjectComponentBase } from '@/documents/defineDocument';
+import type {
+	GameObjectComponentBase,
+	GameObjectWidgetDefinition,
+} from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { LuShield, LuSword } from 'react-icons/lu';
 import { HiHeart } from 'react-icons/hi2';
@@ -66,3 +69,13 @@ export function CombatStats({
 		</div>
 	);
 }
+
+export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<Character> =
+	{
+		component: CombatStats,
+		defaults: { width: 10, height: 5 },
+		translationKeyPrefix: 'widgets.CombatStats',
+		getConstraints() {
+			return { min: { width: 9, height: 5 } };
+		},
+	};

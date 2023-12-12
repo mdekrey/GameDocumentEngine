@@ -1,6 +1,12 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
+import {
+	missingDocumentType,
+	missingDocumentTypeName,
+	missingWidgetTypeName,
+	defaultMissingWidgetDefinition,
+} from '@/documents/defaultMissingWidgetDefinition';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import {
@@ -12,7 +18,7 @@ import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
 	WidgetContainer,
@@ -33,6 +39,7 @@ import { JotaiDiv } from '@/components/jotai/div';
 import { atom } from 'jotai';
 import { elementTemplate } from '@/components/template';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
+import { queries } from '@/utils/api/queries';
 
 export function DashboardDisplay({
 	document,
@@ -187,9 +194,22 @@ function EditingWidget({
 			handle: () => true,
 		},
 	});
+	const document = useQuery(queries.getDocument(gameId, config.documentId));
+
+	const gameObjectType =
+		gameType.objectTypes[document.data?.type ?? missingDocumentTypeName]
+			?.typeInfo ?? missingDocumentType;
+	const widgetDefinition =
+		gameObjectType.widgets?.[config.widget ?? missingWidgetTypeName] ??
+		defaultMissingWidgetDefinition;
 	return (
 		<ErrorBoundary fallback={<></>}>
-			<MoveResizeWidget field={widget.field(['position'])}>
+			<MoveResizeWidget
+				field={widget.field(['position'])}
+				widgetDefinition={widgetDefinition}
+				widgetConfig={config}
+				gameObjectType={gameObjectType}
+			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"
 					{...stopDragging}

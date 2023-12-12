@@ -49,16 +49,21 @@ export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
 	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
 };
 
+export type Size = {
+	width: number;
+	height: number;
+};
 export type WidgetComponentProps<T> = GameObjectComponentBase<T>;
 
 export type GameObjectWidgetDefinition<T> = {
-	defaults: {
-		width: number;
-		height: number;
-	};
+	defaults: Size;
 	component: React.ComponentType<WidgetComponentProps<T>>;
 	translationNamespace?: string;
-	translation: string;
+	translationKeyPrefix: string;
+	getConstraints(gameObjectType: IGameObjectType<T>): {
+		min: Size;
+		max?: Partial<Size>;
+	};
 };
 
 export type IGameObjectType<T = unknown> = {

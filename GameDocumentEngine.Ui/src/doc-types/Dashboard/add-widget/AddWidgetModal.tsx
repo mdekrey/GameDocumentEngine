@@ -105,7 +105,7 @@ function WidgetName({
 	const { t } = useTranslation(
 		target.translationNamespace ?? `doc-types:${docTypeKey}`,
 		{
-			keyPrefix: target.translation,
+			keyPrefix: target.translationKeyPrefix,
 		},
 	);
 
