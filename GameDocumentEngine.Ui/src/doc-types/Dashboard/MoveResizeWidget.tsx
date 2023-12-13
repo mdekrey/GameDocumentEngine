@@ -13,6 +13,7 @@ import type {
 	GameObjectWidgetDefinition,
 	IGameObjectType,
 	WidgetBase,
+	WidgetSettings,
 } from '@/documents/defineDocument';
 import type { Widget } from './types';
 
@@ -45,6 +46,7 @@ export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 	children,
 	widgetDefinition,
 	gameObjectType,
+	widgetConfig,
 }: MoveResizeWidgetProps<T, TWidget>) {
 	const store = useStore();
 	const rndRef = useRef<Rnd>(null);
@@ -64,7 +66,10 @@ export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 			});
 		});
 	}, [store, positionAtom]);
-	const constraints = widgetDefinition.getConstraints(gameObjectType);
+	const constraints = widgetDefinition.getConstraints(
+		gameObjectType,
+		widgetConfig.settings as WidgetSettings<TWidget>,
+	);
 	return (
 		<Rnd
 			ref={rndRef}
