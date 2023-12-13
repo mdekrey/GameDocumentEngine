@@ -23,12 +23,17 @@ export const missingDocumentType: IGameObjectType = {
 	template: null,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const defaultMissingWidgetDefinition: GameObjectWidgetDefinition<any> = {
+export const defaultMissingWidgetDefinition: GameObjectWidgetDefinition<
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	any,
+	void
+> = {
 	defaults: { width: 1, height: 1 },
 	component: () => <></>,
 	translationKeyPrefix: '',
 	getConstraints: function () {
 		return { min: { width: 1, height: 1 } };
 	},
+	settingsComponent: undefined,
+	defaultSettings: {},
 };

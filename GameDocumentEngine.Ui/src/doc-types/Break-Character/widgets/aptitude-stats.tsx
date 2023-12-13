@@ -104,12 +104,16 @@ function GradientSvg({
 	);
 }
 
-export const AptitudeStatsWidgetDefinition: GameObjectWidgetDefinition<Character> =
-	{
-		component: AptitudeStats,
-		defaults: { width: 10, height: 5 },
-		translationKeyPrefix: 'widgets.AptitudeStats',
-		getConstraints() {
-			return { min: { width: 6, height: 5 } };
-		},
-	};
+export const AptitudeStatsWidgetDefinition: GameObjectWidgetDefinition<
+	Character,
+	void
+> = {
+	component: AptitudeStats,
+	defaults: { width: 10, height: 5 },
+	translationKeyPrefix: 'widgets.AptitudeStats',
+	getConstraints() {
+		return { min: { width: 6, height: 5 } };
+	},
+	settingsComponent: undefined,
+	defaultSettings: {},
+};

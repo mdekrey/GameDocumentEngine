@@ -10,7 +10,7 @@ export function NamedIconWidget({
 	},
 	translation: t,
 	size,
-}: WidgetComponentProps<unknown>) {
+}: WidgetComponentProps<unknown, void>) {
 	if (size.width === 2) {
 		return (
 			<div className="h-full text-xl font-bold flex flex-row items-center justify-center">
@@ -32,12 +32,15 @@ export function NamedIconWidget({
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const NamedIconWidgetDefinition: GameObjectWidgetDefinition<any> = {
-	component: NamedIconWidget,
-	defaults: { width: 10, height: 2 },
-	translationNamespace: 'widgets/name',
-	translationKeyPrefix: '',
-	getConstraints() {
-		return { min: { width: 2, height: 2 }, max: { height: 2 } };
-	},
-};
+export const NamedIconWidgetDefinition: GameObjectWidgetDefinition<any, void> =
+	{
+		component: NamedIconWidget,
+		defaults: { width: 10, height: 2 },
+		translationNamespace: 'widgets/name',
+		translationKeyPrefix: '',
+		getConstraints() {
+			return { min: { width: 2, height: 2 }, max: { height: 2 } };
+		},
+		settingsComponent: undefined,
+		defaultSettings: {},
+	};

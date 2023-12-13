@@ -70,12 +70,16 @@ export function CombatStats({
 	);
 }
 
-export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<Character> =
-	{
-		component: CombatStats,
-		defaults: { width: 10, height: 5 },
-		translationKeyPrefix: 'widgets.CombatStats',
-		getConstraints() {
-			return { min: { width: 9, height: 5 } };
-		},
-	};
+export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
+	Character,
+	void
+> = {
+	component: CombatStats,
+	defaults: { width: 10, height: 5 },
+	translationKeyPrefix: 'widgets.CombatStats',
+	getConstraints() {
+		return { min: { width: 9, height: 5 } };
+	},
+	settingsComponent: undefined,
+	defaultSettings: {},
+};

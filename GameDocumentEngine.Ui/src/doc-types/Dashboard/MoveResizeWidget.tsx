@@ -12,6 +12,7 @@ import { elementTemplate } from '@/components/template';
 import type {
 	GameObjectWidgetDefinition,
 	IGameObjectType,
+	WidgetBase,
 } from '@/documents/defineDocument';
 import type { Widget } from './types';
 
@@ -31,20 +32,20 @@ type Position = {
 	height: number;
 };
 
-export type MoveResizeWidgetProps<T = unknown> = {
+export type MoveResizeWidgetProps<T, TWidget extends WidgetBase> = {
 	field: FormFieldReturnType<Position>;
 	children?: React.ReactNode;
-	widgetDefinition: GameObjectWidgetDefinition<T>;
+	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
 	widgetConfig: Widget;
-	gameObjectType: IGameObjectType;
+	gameObjectType: IGameObjectType<T>;
 };
 
-export function MoveResizeWidget({
+export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 	field: positionField,
 	children,
 	widgetDefinition,
 	gameObjectType,
-}: MoveResizeWidgetProps) {
+}: MoveResizeWidgetProps<T, TWidget>) {
 	const store = useStore();
 	const rndRef = useRef<Rnd>(null);
 	const initialPosition = store.get(positionField.value);
