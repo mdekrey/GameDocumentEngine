@@ -163,6 +163,7 @@ export function DashboardDisplay({
 				launchModal,
 				document.gameId,
 				document.details.widgets[id],
+				user,
 			);
 	}
 }

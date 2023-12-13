@@ -1,6 +1,7 @@
-import type {
-	WidgetComponentProps,
-	GameObjectWidgetDefinition,
+import {
+	type WidgetComponentProps,
+	type GameObjectWidgetDefinition,
+	noSettingsWidgetParts,
 } from '@/documents/defineDocument';
 
 export function NamedIconWidget({
@@ -41,6 +42,5 @@ export const NamedIconWidgetDefinition: GameObjectWidgetDefinition<any, void> =
 		getConstraints() {
 			return { min: { width: 2, height: 2 }, max: { height: 2 } };
 		},
-		settingsComponent: undefined,
-		defaultSettings: {},
+		...noSettingsWidgetParts,
 	};

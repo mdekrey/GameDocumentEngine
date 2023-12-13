@@ -1,7 +1,8 @@
 import '@/utils/api/queries';
-import type {
-	GameObjectWidgetDefinition,
-	WidgetComponentProps,
+import {
+	noSettingsWidgetParts,
+	type GameObjectWidgetDefinition,
+	type WidgetComponentProps,
 } from '@/documents/defineDocument';
 import { ClockSvg } from '../clock-svg';
 import type { Clock } from '../clock-types';
@@ -26,7 +27,7 @@ export function ClockDisplay({
 
 export const ClockDisplayWidgetDefinition: GameObjectWidgetDefinition<
 	Clock,
-	void
+	undefined
 > = {
 	component: ClockDisplay,
 	defaults: { width: 10, height: 10 },
@@ -34,6 +35,5 @@ export const ClockDisplayWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints() {
 		return { min: { width: 1, height: 1 } };
 	},
-	defaultSettings: {},
-	settingsComponent: undefined,
+	...noSettingsWidgetParts,
 };

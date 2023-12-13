@@ -1,7 +1,6 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { FieldMapping } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
-import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
@@ -26,14 +25,6 @@ export type Updater<T> = (
 	updates: (draft: Draft<EditableDocumentDetails<T>>) => void,
 ) => Promise<void>;
 
-export type GameObjectWidgetProps<T = unknown> = {
-	gameId: string;
-	documentId: string;
-	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
-	onUpdateDocument: Updater<T>;
-	translation: TFunction;
-};
-
 export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
 	translation: TFunction;
@@ -55,9 +46,9 @@ export type Size = {
 };
 
 export type WidgetBase = void | object;
-export type WidgetSettings<TWidget extends WidgetBase> = TWidget extends void
-	? Record<string, never>
-	: TWidget;
+export type WidgetSettings<TWidget extends WidgetBase> = TWidget extends object
+	? TWidget
+	: Record<string, never>;
 export type WidgetComponentProps<
 	T,
 	TWidget extends WidgetBase,
@@ -70,8 +61,7 @@ export type WidgetSettingsComponentProps<
 	TWidget extends WidgetBase,
 > = GameObjectComponentBase<T> & {
 	size: Size;
-	form: UseFormResult<EditableDocumentDetails<TWidget>>;
-	onSubmit: (document: EditableDocumentDetails<TWidget>) => Promise<void>;
+	field: UseFormResult<WidgetSettings<TWidget>>;
 };
 
 export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
@@ -86,10 +76,20 @@ export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
 		min: Size;
 		max?: Partial<Size>;
 	};
-	settingsComponent: TWidget extends void
-		? void
-		: React.ComponentType<WidgetSettingsComponentProps<T, TWidget>>;
+	settingsSchema: z.ZodType<WidgetSettings<TWidget>>;
+	settingsComponent: React.ComponentType<
+		WidgetSettingsComponentProps<T, TWidget>
+	>;
 	defaultSettings: WidgetSettings<TWidget>;
+};
+export const noSettingsWidgetParts: Pick<
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	GameObjectWidgetDefinition<any, undefined>,
+	'settingsSchema' | 'settingsComponent' | 'defaultSettings'
+> = {
+	settingsSchema: z.object({}),
+	settingsComponent: () => null,
+	defaultSettings: {},
 };
 
 export type IGameObjectType<T = unknown> = {

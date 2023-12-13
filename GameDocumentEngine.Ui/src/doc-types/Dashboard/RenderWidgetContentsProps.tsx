@@ -18,5 +18,5 @@ export type RenderWidgetContentsProps<T, TWidget extends WidgetBase> = {
 	user: UserDetails;
 	gameType: GameTypeScripts;
 	docType: GameTypeObjectScripts<T>;
-	widgetConfig: Widget;
+	widgetConfig: Widget<TWidget>;
 };

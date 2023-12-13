@@ -1,7 +1,8 @@
 import { HiQuestionMarkCircle } from 'react-icons/hi2';
-import type {
-	IGameObjectType,
-	GameObjectWidgetDefinition,
+import {
+	type IGameObjectType,
+	type GameObjectWidgetDefinition,
+	noSettingsWidgetParts,
 } from './defineDocument';
 import { z } from 'zod';
 
@@ -34,6 +35,5 @@ export const defaultMissingWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints: function () {
 		return { min: { width: 1, height: 1 } };
 	},
-	settingsComponent: undefined,
-	defaultSettings: {},
+	...noSettingsWidgetParts,
 };

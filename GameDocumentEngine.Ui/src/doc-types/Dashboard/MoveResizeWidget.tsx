@@ -37,7 +37,7 @@ export type MoveResizeWidgetProps<T, TWidget extends WidgetBase> = {
 	field: FormFieldReturnType<Position>;
 	children?: React.ReactNode;
 	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
-	widgetConfig: Widget;
+	widgetConfig: Widget<TWidget>;
 	gameObjectType: IGameObjectType<T>;
 };
 

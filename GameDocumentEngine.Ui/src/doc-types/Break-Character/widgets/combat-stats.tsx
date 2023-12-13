@@ -1,6 +1,7 @@
 import type {
 	GameObjectComponentBase,
 	GameObjectWidgetDefinition,
+	WidgetSettingsComponentProps,
 } from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { LuShield, LuSword } from 'react-icons/lu';
@@ -8,6 +9,9 @@ import { HiHeart } from 'react-icons/hi2';
 import { GiRun } from 'react-icons/gi';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
+import { useFormFields } from '@principlestudios/react-jotai-forms';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
+import { z } from 'zod';
 
 const asModifier = new Intl.NumberFormat('en', {
 	signDisplay: 'always',
@@ -70,9 +74,28 @@ export function CombatStats({
 	);
 }
 
+const modes: Array<CombatStatsSettings['mode']> = [
+	undefined,
+	'vertical',
+	'horizontal',
+];
+function CombatStatsSettings({
+	field,
+}: WidgetSettingsComponentProps<Character, CombatStatsSettings>) {
+	const fields = useFormFields(field, { mode: ['mode'] as const });
+	return (
+		<>
+			<SelectField field={fields.mode} items={modes}>
+				{(mode) => mode ?? '2x2'}
+			</SelectField>
+		</>
+	);
+}
+
+type CombatStatsSettings = { mode?: 'vertical' | 'horizontal' };
 export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
 	Character,
-	void
+	CombatStatsSettings
 > = {
 	component: CombatStats,
 	defaults: { width: 10, height: 5 },
@@ -80,6 +103,9 @@ export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints() {
 		return { min: { width: 9, height: 5 } };
 	},
-	settingsComponent: undefined,
+	settingsSchema: z.object({
+		mode: z.enum(['vertical', 'horizontal']).optional(),
+	}),
+	settingsComponent: CombatStatsSettings,
 	defaultSettings: {},
 };

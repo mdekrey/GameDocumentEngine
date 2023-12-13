@@ -1,6 +1,7 @@
-import type {
-	GameObjectComponentBase,
-	GameObjectWidgetDefinition,
+import {
+	noSettingsWidgetParts,
+	type GameObjectComponentBase,
+	type GameObjectWidgetDefinition,
 } from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { elementTemplate } from '@/components/template';
@@ -114,6 +115,5 @@ export const AptitudeStatsWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints() {
 		return { min: { width: 6, height: 5 } };
 	},
-	settingsComponent: undefined,
-	defaultSettings: {},
+	...noSettingsWidgetParts,
 };
