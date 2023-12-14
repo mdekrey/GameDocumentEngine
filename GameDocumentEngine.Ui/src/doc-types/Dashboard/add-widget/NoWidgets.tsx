@@ -5,7 +5,7 @@ import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { Trans, useTranslation } from 'react-i18next';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import type { IGameObjectType } from '@/documents/defineDocument';
+import type { IconType } from 'react-icons';
 
 export function NoWidgetsModal({
 	additional: { docTypeKey, icon: Icon, document },
@@ -14,7 +14,7 @@ export function NoWidgetsModal({
 	never,
 	{
 		docTypeKey: string;
-		icon: IGameObjectType['icon'];
+		icon: IconType;
 		document: DocumentDetails;
 	}
 >) {

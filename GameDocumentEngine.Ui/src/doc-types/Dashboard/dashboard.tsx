@@ -1,6 +1,9 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
-import type { GameObjectFormComponent } from '@/documents/defineDocument';
+import {
+	hasSettings,
+	type GameObjectFormComponent,
+} from '@/documents/defineDocument';
 import {
 	missingDocumentType,
 	missingDocumentTypeName,
@@ -27,7 +30,12 @@ import {
 import { RenderWidget } from './RenderWidget';
 import { MoveResizeWidget } from './MoveResizeWidget';
 import { IconButton } from '@/components/button/icon-button';
-import { HiCheck, HiOutlineTrash, HiPencil } from 'react-icons/hi2';
+import {
+	HiCheck,
+	HiOutlineCog6Tooth,
+	HiOutlineTrash,
+	HiPencil,
+} from 'react-icons/hi2';
 import { BsInfoLg } from 'react-icons/bs';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
@@ -40,6 +48,7 @@ import { atom } from 'jotai';
 import { elementTemplate } from '@/components/template';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { queries } from '@/utils/api/queries';
+import { IconLinkButton } from '@/components/button/icon-link-button';
 
 export function DashboardDisplay({
 	document,
@@ -136,6 +145,7 @@ export function DashboardDisplay({
 					<EditingWidget
 						key={key}
 						gameType={gameType}
+						widgetId={key}
 						widget={widget(key)}
 						dashboard={document}
 						user={user}
@@ -175,6 +185,7 @@ const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));
 function EditingWidget({
 	gameType,
 	widget,
+	widgetId,
 	dashboard: { gameId },
 	user,
 	config,
@@ -183,6 +194,7 @@ function EditingWidget({
 }: {
 	gameType: GameTypeScripts;
 	widget: FormFieldReturnType<Widget>;
+	widgetId: string;
 	dashboard: DocumentDetails;
 	user: UserDetails;
 	config: Widget;
@@ -235,6 +247,11 @@ function EditingWidget({
 					<IconButton.Destructive onClick={onDelete}>
 						<HiOutlineTrash />
 					</IconButton.Destructive>
+					{hasSettings(widgetDefinition) ? (
+						<IconLinkButton to={`widget/${widgetId}`}>
+							<HiOutlineCog6Tooth />
+						</IconLinkButton>
+					) : null}
 					<IconButton onClick={onInfo}>
 						<BsInfoLg />
 					</IconButton>

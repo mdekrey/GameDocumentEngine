@@ -82,15 +82,23 @@ export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
 	>;
 	defaultSettings: WidgetSettings<TWidget>;
 };
-export const noSettingsWidgetParts: Pick<
+export type GameObjectWidgetDefinitionNoSettings = GameObjectWidgetDefinition<
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	GameObjectWidgetDefinition<any, undefined>,
+	any,
+	undefined
+>;
+export const noSettingsWidgetParts: Pick<
+	GameObjectWidgetDefinitionNoSettings,
 	'settingsSchema' | 'settingsComponent' | 'defaultSettings'
 > = {
 	settingsSchema: z.object({}),
 	settingsComponent: () => null,
 	defaultSettings: {},
 };
+export function hasSettings(widget: GameObjectWidgetDefinitionNoSettings) {
+	// TODO: there has to be a better way
+	return widget.settingsSchema !== noSettingsWidgetParts.settingsSchema;
+}
 
 export type IGameObjectType<T = unknown> = {
 	noContainer?: boolean;

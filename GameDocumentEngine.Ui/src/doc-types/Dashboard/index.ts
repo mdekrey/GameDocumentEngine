@@ -1,9 +1,9 @@
 import { HiOutlineTableCells } from 'react-icons/hi2';
 import { defineDocument } from '@/documents/defineDocument';
-import { DashboardDisplay } from './dashboard';
 import schema from './schema';
 import type { z } from 'zod';
 import { produce } from 'immer';
+import { DashboardRouter } from './router';
 
 const template: z.infer<typeof schema> = {
 	widgets: {},
@@ -13,7 +13,7 @@ defineDocument('Dashboard', {
 	noContainer: true,
 	icon: HiOutlineTableCells,
 	template,
-	component: DashboardDisplay,
+	component: DashboardRouter,
 	schema,
 	fixup: {
 		toForm: (dashboard) =>

@@ -6,7 +6,6 @@ import { Profile } from '@/apps/profile/profile';
 import { CreateGame } from './apps/create-game/create-game';
 import { ListGames } from './apps/list-games/list-games';
 import { GameDetails } from './apps/game-details/game-details';
-import { GetParams } from './utils/routing/getParams';
 import { CreateDocument } from './apps/documents/create-document/create-document';
 import { DocumentDetails } from './apps/documents/details/doc-details';
 import { GameInvites } from './apps/game-settings/game-invites/game-invites';
@@ -20,24 +19,7 @@ import { GameSubheader } from './apps/game-details/game-subheader';
 import { GameSettings } from './apps/game-settings/game-settings';
 import { DocumentSubheader } from './apps/documents/subheader/document-subheader';
 import { Suspense } from 'react';
-
-function withParamsValue<const T extends string>(prop: T) {
-	return <TProps extends { [P in T]: string }>(
-		Component: React.ComponentType<TProps>,
-	): React.ComponentType<Omit<TProps, T>> => {
-		return (props: Omit<TProps, T>) => (
-			<GetParams>
-				{(params: { [P in T]: string }) => (
-					// key is provided here to prvent reuse of a component when changing pages
-					<Component
-						key={params[prop]}
-						{...({ ...props, [prop]: params[prop] } as TProps)}
-					/>
-				)}
-			</GetParams>
-		);
-	};
-}
+import { withParamsValue } from '@/components/router/withParamsValue';
 
 const withGameId = withParamsValue('gameId');
 const withDocumentId = withParamsValue('documentId');
