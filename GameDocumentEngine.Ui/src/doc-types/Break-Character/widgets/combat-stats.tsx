@@ -103,9 +103,11 @@ export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints() {
 		return { min: { width: 9, height: 5 } };
 	},
-	settingsSchema: z.object({
-		mode: z.enum(['vertical', 'horizontal']).optional(),
-	}),
-	settingsComponent: CombatStatsSettings,
-	defaultSettings: {},
+	settings: {
+		schema: z.object({
+			mode: z.enum(['vertical', 'horizontal']).optional(),
+		}),
+		component: CombatStatsSettings,
+		default: {},
+	},
 };

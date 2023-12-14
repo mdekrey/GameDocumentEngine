@@ -1,6 +1,5 @@
 import '@/utils/api/queries';
 import {
-	noSettingsWidgetParts,
 	type GameObjectWidgetDefinition,
 	type WidgetComponentProps,
 } from '@/documents/defineDocument';
@@ -35,5 +34,5 @@ export const ClockDisplayWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints() {
 		return { min: { width: 1, height: 1 } };
 	},
-	...noSettingsWidgetParts,
+	settings: null,
 };

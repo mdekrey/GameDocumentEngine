@@ -1,4 +1,7 @@
-import type { GameObjectFormComponent } from '@/documents/defineDocument';
+import type {
+	GameObjectFormComponent,
+	GameObjectWidgetSettings,
+} from '@/documents/defineDocument';
 import type { Dashboard } from './types';
 import { useTranslation } from 'react-i18next';
 import type { Widget } from './types';
@@ -10,15 +13,14 @@ import type { WidgetSettings } from '@/documents/defineDocument';
 import type {
 	GameObjectWidgetDefinition,
 	TypedDocumentDetails,
-	WidgetBase,
 } from '@/documents/defineDocument';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { type TFunction } from 'i18next';
-import type { z } from 'zod';
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
 import { useQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
+import { Navigate } from 'react-router-dom';
 
 export function WidgetSettings({
 	widgetId,
@@ -47,6 +49,7 @@ export function WidgetSettings({
 
 	if (!document.isSuccess) return 'Loading...';
 	if (!widgetDefinition) return <ErrorScreen message={t('widget-not-found')} />;
+	if (!widgetDefinition.settings) return <Navigate to="../" />;
 
 	return (
 		<>
@@ -63,7 +66,7 @@ export function WidgetSettings({
 	);
 }
 
-function WidgetSettingsComponent<T, TWidget extends WidgetBase>({
+function WidgetSettingsComponent<T, TWidget extends object>({
 	translation,
 	gameType,
 	docType,
@@ -80,14 +83,15 @@ function WidgetSettingsComponent<T, TWidget extends WidgetBase>({
 	document: TypedDocumentDetails<T>;
 	widget: Widget<TWidget>;
 }) {
-	const Settings = widgetDefinition.settingsComponent;
-	console.log(widgetDefinition);
+	const settings = widgetDefinition.settings as GameObjectWidgetSettings<
+		T,
+		TWidget
+	>;
+	const Settings = settings.component;
 
 	const form = useForm<WidgetSettings<TWidget>>({
 		defaultValue: widget.settings,
-		schema: widgetDefinition.settingsSchema as z.ZodType<
-			WidgetSettings<TWidget>
-		>,
+		schema: settings.schema,
 		translation,
 	});
 	return (

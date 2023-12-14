@@ -1,5 +1,4 @@
 import {
-	noSettingsWidgetParts,
 	type GameObjectComponentBase,
 	type GameObjectWidgetDefinition,
 } from '@/documents/defineDocument';
@@ -115,5 +114,5 @@ export const AptitudeStatsWidgetDefinition: GameObjectWidgetDefinition<
 	getConstraints() {
 		return { min: { width: 6, height: 5 } };
 	},
-	...noSettingsWidgetParts,
+	settings: null,
 };

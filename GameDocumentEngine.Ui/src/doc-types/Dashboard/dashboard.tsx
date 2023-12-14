@@ -1,9 +1,6 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
-import {
-	hasSettings,
-	type GameObjectFormComponent,
-} from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import {
 	missingDocumentType,
 	missingDocumentTypeName,
@@ -247,7 +244,7 @@ function EditingWidget({
 					<IconButton.Destructive onClick={onDelete}>
 						<HiOutlineTrash />
 					</IconButton.Destructive>
-					{hasSettings(widgetDefinition) ? (
+					{widgetDefinition.settings ? (
 						<IconLinkButton to={`widget/${widgetId}`}>
 							<HiOutlineCog6Tooth />
 						</IconLinkButton>

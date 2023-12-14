@@ -56,7 +56,7 @@ export async function addWidget(
 					height: widgets[result.id].defaults.height,
 				},
 				widget: result.id,
-				settings: widgets[result.id].defaultSettings,
+				settings: widgets[result.id].settings?.default ?? {},
 			},
 		}));
 	}

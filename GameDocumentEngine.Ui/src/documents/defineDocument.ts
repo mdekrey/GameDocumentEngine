@@ -64,6 +64,12 @@ export type WidgetSettingsComponentProps<
 	field: UseFormResult<WidgetSettings<TWidget>>;
 };
 
+export type GameObjectWidgetSettings<T, TWidget extends object> = {
+	schema: z.ZodType<WidgetSettings<TWidget>>;
+	component: React.ComponentType<WidgetSettingsComponentProps<T, TWidget>>;
+	default: WidgetSettings<TWidget>;
+};
+
 export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
 	defaults: Size;
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
@@ -76,29 +82,10 @@ export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
 		min: Size;
 		max?: Partial<Size>;
 	};
-	settingsSchema: z.ZodType<WidgetSettings<TWidget>>;
-	settingsComponent: React.ComponentType<
-		WidgetSettingsComponentProps<T, TWidget>
-	>;
-	defaultSettings: WidgetSettings<TWidget>;
+	settings: TWidget extends object
+		? GameObjectWidgetSettings<T, TWidget>
+		: null;
 };
-export type GameObjectWidgetDefinitionNoSettings = GameObjectWidgetDefinition<
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	any,
-	undefined
->;
-export const noSettingsWidgetParts: Pick<
-	GameObjectWidgetDefinitionNoSettings,
-	'settingsSchema' | 'settingsComponent' | 'defaultSettings'
-> = {
-	settingsSchema: z.object({}),
-	settingsComponent: () => null,
-	defaultSettings: {},
-};
-export function hasSettings(widget: GameObjectWidgetDefinitionNoSettings) {
-	// TODO: there has to be a better way
-	return widget.settingsSchema !== noSettingsWidgetParts.settingsSchema;
-}
 
 export type IGameObjectType<T = unknown> = {
 	noContainer?: boolean;
