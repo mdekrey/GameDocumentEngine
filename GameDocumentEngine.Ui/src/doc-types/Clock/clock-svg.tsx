@@ -46,7 +46,7 @@ export function ClockSvg({
 						fill="currentcolor"
 						stroke="black"
 						strokeWidth={Math.min(
-							padding,
+							padding / 2,
 							totalTicks <= 8 ? 2 : totalTicks <= 20 ? 1 : 0.5,
 						)}
 						className={

@@ -1,7 +1,7 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { extraQueries, queries } from '@/utils/api/queries';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { HiPlus, HiChevronRight, HiQuestionMarkCircle } from 'react-icons/hi2';
+import { HiPlus, HiChevronRight } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { useGameType } from '../documents/useGameType';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import {
 	useDraggable,
 	useDropTarget,
 } from '@/components/drag-drop';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
@@ -197,8 +198,8 @@ function DocumentLink({
 	objectTypes: Record<string, GameTypeObjectScripts>;
 	folderPath?: (string | null)[];
 }) {
-	const Icon =
-		objectTypes[document.type]?.typeInfo.icon ?? HiQuestionMarkCircle;
+	const Icon = (objectTypes[document.type]?.typeInfo ?? missingDocumentType)
+		.icon;
 	const dragTarget = useDragTarget(gameId, folderPath, document.id);
 	const draggable = useDraggable(
 		documentIdMimeType,

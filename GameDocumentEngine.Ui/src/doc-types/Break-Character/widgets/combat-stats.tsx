@@ -1,10 +1,17 @@
-import type { GameObjectComponentBase } from '@/documents/defineDocument';
+import type {
+	GameObjectWidgetDefinition,
+	WidgetComponentProps,
+	WidgetSettingsComponentProps,
+} from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { LuShield, LuSword } from 'react-icons/lu';
 import { HiHeart } from 'react-icons/hi2';
 import { GiRun } from 'react-icons/gi';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
+import { useFormFields } from '@principlestudios/react-jotai-forms';
+import { SelectField } from '@/components/form-fields/select-input/select-field';
+import { z } from 'zod';
 
 const asModifier = new Intl.NumberFormat('en', {
 	signDisplay: 'always',
@@ -21,15 +28,39 @@ const SecondRow = elementTemplate('SecondRow', 'div', (T) => (
 	<T className="uppercase text-xs tracking-widest" />
 ));
 
+const styles: Record<
+	'vertical' | 'horizontal' | '2x2',
+	Record<'container' | 'edge' | 'middle', string>
+> = {
+	horizontal: {
+		container: 'flex flex-row gap-2 h-full w-full justify-around',
+		edge: 'border-l',
+		middle: 'border-l',
+	},
+	vertical: {
+		container: 'flex flex-col gap-2 h-full w-full justify-around',
+		edge: 'border-t',
+		middle: 'border-t',
+	},
+	'2x2': {
+		container:
+			'grid grid-cols-[1fr,auto,1fr] grid-rows-[1fr,auto,1fr] gap-2 h-full w-full',
+		edge: 'border-l',
+		middle: 'border-t col-span-3',
+	},
+};
+
 export function CombatStats({
 	document,
 	translation: t,
-}: GameObjectComponentBase<Character>) {
+	widgetSettings,
+}: WidgetComponentProps<Character, CombatStatsSettings>) {
 	if (!document.details.combatValues) {
 		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}
+	const { container, edge, middle } = styles[widgetSettings.mode ?? '2x2'];
 	return (
-		<div className="grid gap-2 grid-cols-[1fr,auto,1fr] grid-rows-[1fr,auto,1fr] h-full w-full">
+		<div className={container}>
 			<Section>
 				<FirstRow>
 					<LuSword />
@@ -37,7 +68,7 @@ export function CombatStats({
 				</FirstRow>
 				<SecondRow>{t('sections.attack')}</SecondRow>
 			</Section>
-			<div className="border-l" />
+			<div className={edge} />
 			<Section>
 				<FirstRow>
 					<HiHeart />
@@ -45,7 +76,7 @@ export function CombatStats({
 				</FirstRow>
 				<SecondRow>{t('sections.hearts')}</SecondRow>
 			</Section>
-			<div className="border-t col-span-3" />
+			<div className={middle} />
 			<Section>
 				<FirstRow>
 					<LuShield />
@@ -53,7 +84,7 @@ export function CombatStats({
 				</FirstRow>
 				<SecondRow>{t('sections.defense')}</SecondRow>
 			</Section>
-			<div className="border-l" />
+			<div className={edge} />
 			<Section>
 				<FirstRow>
 					<GiRun />
@@ -66,3 +97,43 @@ export function CombatStats({
 		</div>
 	);
 }
+
+const modes: Array<CombatStatsSettings['mode']> = [
+	undefined,
+	'vertical',
+	'horizontal',
+];
+function CombatStatsSettings({
+	field,
+}: WidgetSettingsComponentProps<Character, CombatStatsSettings>) {
+	const fields = useFormFields(field, { mode: ['mode'] as const });
+	return (
+		<SelectField field={fields.mode} items={modes}>
+			{(mode) => fields.mode.translation(mode ?? '2x2')}
+		</SelectField>
+	);
+}
+
+type CombatStatsSettings = { mode?: 'vertical' | 'horizontal' };
+export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
+	Character,
+	CombatStatsSettings
+> = {
+	component: CombatStats,
+	defaults: { width: 10, height: 5 },
+	translationKeyPrefix: 'widgets.CombatStats',
+	getConstraints(g, settings) {
+		return settings.mode === 'horizontal'
+			? { min: { width: 17, height: 2 } }
+			: settings.mode === 'vertical'
+			? { min: { width: 4, height: 11 } }
+			: { min: { width: 9, height: 5 } };
+	},
+	settings: {
+		schema: z.object({
+			mode: z.enum(['vertical', 'horizontal']).optional(),
+		}),
+		component: CombatStatsSettings,
+		default: {},
+	},
+};

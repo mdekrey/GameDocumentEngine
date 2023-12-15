@@ -1,7 +1,4 @@
-import type {
-	GameObjectFormComponent,
-	GameObjectWidgetProps,
-} from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { useMemo } from 'react';
 import type { UseFormResult } from '@/utils/form';
 import type { Character } from './character-types';
@@ -25,10 +22,11 @@ import type { TabConfig } from '@/components/tabs/tabs';
 import { Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
+import type { TFunction } from 'i18next';
 
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
-	translation: GameObjectWidgetProps<CharacterDocument>['translation'];
+	translation: TFunction;
 }>;
 const BioTab: TabContent = ({ form, translation: t }) => (
 	<>

@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import styles from './dashboard.module.css';
 import type { Widget } from './types';
 import { JotaiDiv } from '@/components/jotai/div';
+import type { Size } from '@/documents/defineDocument';
 
 export const gridSize = 16;
 
@@ -24,6 +25,12 @@ export const DashboardContainer = elementTemplate(
 	Editing: (T) => <T className={styles.editing} />,
 });
 
+function applyGridScaleSize(size: Size) {
+	return {
+		width: size.width * gridSize,
+		height: size.height * gridSize,
+	};
+}
 export function applyGridScale(position: Widget['position']) {
 	return {
 		width: position.width * gridSize,
@@ -35,16 +42,31 @@ export function applyGridScale(position: Widget['position']) {
 
 export const WidgetContainer = elementTemplate<
 	'div',
-	{ position: Widget['position'] } & JSX.IntrinsicElements['div']
->('WidgetContainer', 'div', (T) => <T className="absolute" />, {
-	useProps({ position, style, ...props }) {
-		const scaled = applyGridScale(position);
+	{ size: Size } & JSX.IntrinsicElements['div']
+>('WidgetContainer', 'div', (T) => <T />, {
+	useProps({ size, style, ...props }) {
+		const scaled = applyGridScaleSize(size);
 		return {
 			...props,
 			style: {
 				...style,
 				width: `${scaled.width}px`,
 				height: `${scaled.height}px`,
+			},
+		};
+	},
+});
+
+export const PositionedWidgetContainer = WidgetContainer.extend<
+	{ position: Widget['position'] } & JSX.IntrinsicElements['div']
+>('PositionedWidgetContainer', (T) => <T className="absolute" />, {
+	useProps({ position, style, ...props }) {
+		const scaled = applyGridScale(position);
+		return {
+			size: position,
+			...props,
+			style: {
+				...style,
 				left: `${scaled.x}px`,
 				top: `${scaled.y}px`,
 			},

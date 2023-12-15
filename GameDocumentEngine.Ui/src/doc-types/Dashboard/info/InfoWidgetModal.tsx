@@ -1,46 +1,83 @@
 import { Button } from '@/components/button/button';
 import { Prose } from '@/components/text/common';
-import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { Widget } from '../types';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
+import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
+import type {
+	GameTypeObjectScripts,
+	GameTypeScripts,
+} from '@/utils/api/queries/game-types';
+import type {
+	GameObjectWidgetDefinition,
+	TypedDocumentDetails,
+	WidgetBase,
+} from '@/documents/defineDocument';
+import type { UserDetails } from '@/api/models/UserDetails';
+import { WidgetContainer } from '../grid-utils';
 
-export function InfoWidgetModal({
+export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 	resolve,
-	additional: { docTypeKey, widget, icon: Icon, document },
+	additional: {
+		gameType,
+		docType,
+		widgetDefinition,
+		user,
+		document,
+		widget,
+		icon: Icon,
+	},
 }: ModalContentsProps<
 	void,
 	{
-		docTypeKey: string;
-		widget: Widget;
+		gameType: GameTypeScripts;
+		docType: GameTypeObjectScripts<T>;
+		widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
+		user: UserDetails;
+		document: TypedDocumentDetails<T>;
+		widget: Widget<TWidget>;
 		icon: IconType;
-		document: DocumentDetails;
 	}
 >) {
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'info-widget-modal',
 	});
-	const { t: tDocument } = useTranslation(`doc-types:${docTypeKey}`);
-	const { t: tWidget } = useTranslation(`doc-types:${docTypeKey}`, {
-		keyPrefix: `widgets.${widget.widget}`,
+	const { t: tDocument } = useTranslation(`doc-types:${docType.key}`);
+	const { t: tWidget } = useTranslation(widgetDefinition.translationNamespace, {
+		keyPrefix: widgetDefinition.translationKeyPrefix,
 	});
+	const Component = widgetDefinition.component;
+	// TODO: better layout
 	return (
-		<ModalAlertLayout>
-			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<Prose>
-				{tWidget('name')}
-				<NamedIcon
-					name={document.name}
-					icon={Icon}
-					typeName={tDocument('name')}
-				/>
-			</Prose>
-			<ModalAlertLayout.Buttons>
+		<ModalDialogLayout>
+			<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
+			<div className="flex flex-row-reverse flex-wrap justify-end gap-4">
+				<Prose>
+					<NamedIcon
+						name={document.name}
+						icon={Icon}
+						typeName={tDocument('name')}
+					/>
+					<br />
+					{tWidget('name')}
+				</Prose>
+				<WidgetContainer size={widget.position}>
+					<Component
+						document={document}
+						translation={tWidget}
+						docType={docType}
+						gameType={gameType}
+						user={user}
+						size={widget.position}
+						widgetSettings={widget.settings}
+					/>
+				</WidgetContainer>
+			</div>
+			<ModalDialogLayout.Buttons>
 				<Button onClick={() => resolve()}>{t('ok')}</Button>
-			</ModalAlertLayout.Buttons>
-		</ModalAlertLayout>
+			</ModalDialogLayout.Buttons>
+		</ModalDialogLayout>
 	);
 }

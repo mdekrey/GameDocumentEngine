@@ -1,7 +1,6 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { FieldMapping } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
-import type { QueryObserverSuccessResult } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
@@ -26,14 +25,6 @@ export type Updater<T> = (
 	updates: (draft: Draft<EditableDocumentDetails<T>>) => void,
 ) => Promise<void>;
 
-export type GameObjectWidgetProps<T = unknown> = {
-	gameId: string;
-	documentId: string;
-	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
-	onUpdateDocument: Updater<T>;
-	translation: TFunction;
-};
-
 export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
 	translation: TFunction;
@@ -49,16 +40,51 @@ export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
 	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
 };
 
-export type WidgetComponentProps<T> = GameObjectComponentBase<T>;
+export type Size = {
+	width: number;
+	height: number;
+};
 
-export type GameObjectWidgetDefinition<T> = {
-	defaults: {
-		width: number;
-		height: number;
-	};
-	component: React.ComponentType<WidgetComponentProps<T>>;
+export type WidgetBase = void | object;
+export type WidgetSettings<TWidget extends WidgetBase> = TWidget extends object
+	? TWidget
+	: Record<string, never>;
+export type WidgetComponentProps<
+	T,
+	TWidget extends WidgetBase,
+> = GameObjectComponentBase<T> & {
+	size: Size;
+	widgetSettings: WidgetSettings<TWidget>;
+};
+export type WidgetSettingsComponentProps<
+	T,
+	TWidget extends WidgetBase,
+> = GameObjectComponentBase<T> & {
+	size: Size;
+	field: UseFormResult<WidgetSettings<TWidget>>;
+};
+
+export type GameObjectWidgetSettings<T, TWidget extends object> = {
+	schema: z.ZodType<WidgetSettings<TWidget>>;
+	component: React.ComponentType<WidgetSettingsComponentProps<T, TWidget>>;
+	default: WidgetSettings<TWidget>;
+};
+
+export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
+	defaults: Size;
+	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
-	translation: string;
+	translationKeyPrefix: string;
+	getConstraints(
+		gameObjectType: IGameObjectType<T>,
+		widgetSettings: WidgetSettings<TWidget>,
+	): {
+		min: Size;
+		max?: Partial<Size>;
+	};
+	settings: TWidget extends object
+		? GameObjectWidgetSettings<T, TWidget>
+		: null;
 };
 
 export type IGameObjectType<T = unknown> = {
@@ -68,7 +94,8 @@ export type IGameObjectType<T = unknown> = {
 	component: React.ComponentType<GameObjectFormComponent<T>>;
 	fixup: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>;
 	schema: z.ZodType<T>;
-	widgets?: Record<string, GameObjectWidgetDefinition<T>>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	widgets?: Record<string, GameObjectWidgetDefinition<T, any>>;
 };
 
 declare global {

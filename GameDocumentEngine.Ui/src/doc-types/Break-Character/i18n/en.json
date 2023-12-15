@@ -213,6 +213,14 @@
 				"average": "Average",
 				"fast": "Fast",
 				"very-fast": "V. Fast"
+			},
+			"fields": {
+				"mode": {
+					"label": "Mode",
+					"2x2": "2x2",
+					"horizontal": "Horizontal",
+					"vertical": "Vertical"
+				}
 			}
 		},
 		"AptitudeStats": {

@@ -1,6 +1,12 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
+import {
+	missingDocumentType,
+	missingDocumentTypeName,
+	missingWidgetTypeName,
+	defaultMissingWidgetDefinition,
+} from '@/documents/defaultMissingWidgetDefinition';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import {
@@ -12,16 +18,21 @@ import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
-	WidgetContainer,
+	PositionedWidgetContainer,
 	toGridCoordinate,
 } from './grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { MoveResizeWidget } from './MoveResizeWidget';
 import { IconButton } from '@/components/button/icon-button';
-import { HiCheck, HiOutlineTrash, HiPencil } from 'react-icons/hi2';
+import {
+	HiCheck,
+	HiOutlineCog6Tooth,
+	HiOutlineTrash,
+	HiPencil,
+} from 'react-icons/hi2';
 import { BsInfoLg } from 'react-icons/bs';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
@@ -33,6 +44,8 @@ import { JotaiDiv } from '@/components/jotai/div';
 import { atom } from 'jotai';
 import { elementTemplate } from '@/components/template';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
+import { queries } from '@/utils/api/queries';
+import { IconLinkButton } from '@/components/button/icon-link-button';
 
 export function DashboardDisplay({
 	document,
@@ -97,15 +110,15 @@ export function DashboardDisplay({
 			>
 				{Object.entries(document.details.widgets).map(
 					([key, config]: [string, Widget]) => (
-						<WidgetContainer key={key} position={config.position}>
+						<PositionedWidgetContainer key={key} position={config.position}>
 							<RenderWidget
 								key={key}
 								gameType={gameType}
 								gameId={document.gameId}
 								user={user}
-								{...config}
+								widgetConfig={config}
 							/>
-						</WidgetContainer>
+						</PositionedWidgetContainer>
 					),
 				)}
 				<div className="fixed right-4 bottom-4">
@@ -129,6 +142,7 @@ export function DashboardDisplay({
 					<EditingWidget
 						key={key}
 						gameType={gameType}
+						widgetId={key}
 						widget={widget(key)}
 						dashboard={document}
 						user={user}
@@ -156,6 +170,7 @@ export function DashboardDisplay({
 				launchModal,
 				document.gameId,
 				document.details.widgets[id],
+				user,
 			);
 	}
 }
@@ -167,6 +182,7 @@ const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));
 function EditingWidget({
 	gameType,
 	widget,
+	widgetId,
 	dashboard: { gameId },
 	user,
 	config,
@@ -175,6 +191,7 @@ function EditingWidget({
 }: {
 	gameType: GameTypeScripts;
 	widget: FormFieldReturnType<Widget>;
+	widgetId: string;
 	dashboard: DocumentDetails;
 	user: UserDetails;
 	config: Widget;
@@ -187,9 +204,22 @@ function EditingWidget({
 			handle: () => true,
 		},
 	});
+	const document = useQuery(queries.getDocument(gameId, config.documentId));
+
+	const gameObjectType =
+		gameType.objectTypes[document.data?.type ?? missingDocumentTypeName]
+			?.typeInfo ?? missingDocumentType;
+	const widgetDefinition =
+		gameObjectType.widgets?.[config.widget ?? missingWidgetTypeName] ??
+		defaultMissingWidgetDefinition;
 	return (
 		<ErrorBoundary fallback={<></>}>
-			<MoveResizeWidget field={widget.field(['position'])}>
+			<MoveResizeWidget
+				field={widget.field(['position'])}
+				widgetDefinition={widgetDefinition}
+				widgetConfig={config}
+				gameObjectType={gameObjectType}
+			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"
 					{...stopDragging}
@@ -204,7 +234,7 @@ function EditingWidget({
 						gameType={gameType}
 						gameId={gameId}
 						user={user}
-						{...config}
+						widgetConfig={config}
 					/>
 				</Inset>
 				<Inset
@@ -214,6 +244,11 @@ function EditingWidget({
 					<IconButton.Destructive onClick={onDelete}>
 						<HiOutlineTrash />
 					</IconButton.Destructive>
+					{widgetDefinition.settings ? (
+						<IconLinkButton to={`widget/${widgetId}`}>
+							<HiOutlineCog6Tooth />
+						</IconLinkButton>
+					) : null}
 					<IconButton onClick={onInfo}>
 						<BsInfoLg />
 					</IconButton>

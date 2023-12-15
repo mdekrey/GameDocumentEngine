@@ -9,6 +9,13 @@ import { useStore } from 'jotai';
 import { Rnd } from 'react-rnd';
 import { useEffect, useRef } from 'react';
 import { elementTemplate } from '@/components/template';
+import type {
+	GameObjectWidgetDefinition,
+	IGameObjectType,
+	WidgetBase,
+	WidgetSettings,
+} from '@/documents/defineDocument';
+import type { Widget } from './types';
 
 const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	<T className="border-slate-900 dark:border-slate-100 absolute inset-1" />
@@ -26,15 +33,21 @@ type Position = {
 	height: number;
 };
 
-export type MoveResizeWidgetProps = {
+export type MoveResizeWidgetProps<T, TWidget extends WidgetBase> = {
 	field: FormFieldReturnType<Position>;
 	children?: React.ReactNode;
+	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
+	widgetConfig: Widget<TWidget>;
+	gameObjectType: IGameObjectType<T>;
 };
 
-export function MoveResizeWidget({
+export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 	field: positionField,
 	children,
-}: MoveResizeWidgetProps) {
+	widgetDefinition,
+	gameObjectType,
+	widgetConfig,
+}: MoveResizeWidgetProps<T, TWidget>) {
 	const store = useStore();
 	const rndRef = useRef<Rnd>(null);
 	const initialPosition = store.get(positionField.value);
@@ -53,6 +66,10 @@ export function MoveResizeWidget({
 			});
 		});
 	}, [store, positionAtom]);
+	const constraints = widgetDefinition.getConstraints(
+		gameObjectType,
+		widgetConfig.settings as WidgetSettings<TWidget>,
+	);
 	return (
 		<Rnd
 			ref={rndRef}
@@ -60,6 +77,10 @@ export function MoveResizeWidget({
 			bounds="parent"
 			dragGrid={[gridSize, gridSize]}
 			resizeGrid={[gridSize, gridSize]}
+			minWidth={constraints.min.width * gridSize}
+			minHeight={constraints.min.height * gridSize}
+			maxWidth={constraints.max?.width && constraints.max?.width * gridSize}
+			maxHeight={constraints.max?.height && constraints.max?.height * gridSize}
 			onDragStop={(e, d) => {
 				positionField.onChange((prev) => ({
 					...prev,
