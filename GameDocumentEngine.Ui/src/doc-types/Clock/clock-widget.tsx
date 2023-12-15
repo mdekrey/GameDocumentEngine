@@ -8,6 +8,8 @@ import { AtomContents } from '@/components/jotai/atom-contents';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 
+const radius = 70;
+const padding = 2;
 export function Clock({
 	form,
 	onSubmit,
@@ -25,8 +27,10 @@ export function Clock({
 								className="self-center mx-auto"
 								currentTicks={get(form.atom).details.current}
 								totalTicks={get(form.atom).details.max}
-								padding={2}
-								radius={70}
+								padding={padding}
+								radius={radius}
+								width={radius * 2 + padding}
+								height={radius * 2 + padding}
 							/>
 						))}
 					</AtomContents>
