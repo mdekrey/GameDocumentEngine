@@ -50,6 +50,9 @@
 	},
 	"info-widget-modal": {
 		"title": "Widget Info",
-		"ok": "Ok"
+		"ok": "OK"
+	},
+	"widget-settings": {
+		"submit": "Sumbit"
 	}
 }

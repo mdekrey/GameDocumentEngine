@@ -16,6 +16,7 @@ import type {
 	WidgetBase,
 } from '@/documents/defineDocument';
 import type { UserDetails } from '@/api/models/UserDetails';
+import { WidgetContainer } from '../grid-utils';
 
 export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 	resolve,
@@ -44,34 +45,36 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 		keyPrefix: 'info-widget-modal',
 	});
 	const { t: tDocument } = useTranslation(`doc-types:${docType.key}`);
-	const { t: tWidget } = useTranslation(
-		widgetDefinition.translationNamespace ?? `doc-types:${docType.key}`,
-		{
-			keyPrefix: widgetDefinition.translationKeyPrefix,
-		},
-	);
+	const { t: tWidget } = useTranslation(widgetDefinition.translationNamespace, {
+		keyPrefix: widgetDefinition.translationKeyPrefix,
+	});
 	const Component = widgetDefinition.component;
 	// TODO: better layout
 	return (
 		<ModalDialogLayout>
 			<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
-			<Prose>
-				{tWidget('name')}{' '}
-				<NamedIcon
-					name={document.name}
-					icon={Icon}
-					typeName={tDocument('name')}
-				/>
-			</Prose>
-			<Component
-				document={document}
-				translation={tWidget}
-				docType={docType}
-				gameType={gameType}
-				user={user}
-				size={widget.position}
-				widgetSettings={widget.settings}
-			/>
+			<div className="flex flex-row-reverse flex-wrap justify-end gap-4">
+				<Prose>
+					<NamedIcon
+						name={document.name}
+						icon={Icon}
+						typeName={tDocument('name')}
+					/>
+					<br />
+					{tWidget('name')}
+				</Prose>
+				<WidgetContainer size={widget.position}>
+					<Component
+						document={document}
+						translation={tWidget}
+						docType={docType}
+						gameType={gameType}
+						user={user}
+						size={widget.position}
+						widgetSettings={widget.settings}
+					/>
+				</WidgetContainer>
+			</div>
 			<ModalDialogLayout.Buttons>
 				<Button onClick={() => resolve()}>{t('ok')}</Button>
 			</ModalDialogLayout.Buttons>

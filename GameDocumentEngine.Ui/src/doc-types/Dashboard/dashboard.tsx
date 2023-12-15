@@ -21,7 +21,7 @@ import { addWidget } from './add-widget/addWidget';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
-	WidgetContainer,
+	PositionedWidgetContainer,
 	toGridCoordinate,
 } from './grid-utils';
 import { RenderWidget } from './RenderWidget';
@@ -110,7 +110,7 @@ export function DashboardDisplay({
 			>
 				{Object.entries(document.details.widgets).map(
 					([key, config]: [string, Widget]) => (
-						<WidgetContainer key={key} position={config.position}>
+						<PositionedWidgetContainer key={key} position={config.position}>
 							<RenderWidget
 								key={key}
 								gameType={gameType}
@@ -118,7 +118,7 @@ export function DashboardDisplay({
 								user={user}
 								widgetConfig={config}
 							/>
-						</WidgetContainer>
+						</PositionedWidgetContainer>
 					),
 				)}
 				<div className="fixed right-4 bottom-4">
