@@ -57,7 +57,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 
 	const createDocument = useCreateDocument(gameId);
 
-	if (game.isLoading || gameType.isLoading) {
+	if (game.isPending || gameType.isPending) {
 		return <>Loading...</>;
 	} else if (game.isError || gameType.isError) {
 		return <>Error while loading...</>;

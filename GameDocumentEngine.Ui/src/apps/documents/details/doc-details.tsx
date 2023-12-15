@@ -39,7 +39,7 @@ export function DocumentDetails({
 	const document = useLocalDocument(gameId, documentId);
 	const gameType = useGameType(gameId);
 
-	if (user.isLoading || document.isLoading || gameType.isLoading) {
+	if (user.isPending || document.isPending || gameType.isPending) {
 		return <>Loading...</>;
 	} else if (user.isError || document.isError || gameType.isError) {
 		return <>Error while loading...</>;

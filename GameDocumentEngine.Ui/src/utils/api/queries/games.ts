@@ -38,7 +38,7 @@ export const listGames = {
 };
 
 export async function invalidateGameList(queryClient: QueryClient) {
-	await queryClient.invalidateQueries(listGames.queryKey);
+	await queryClient.invalidateQueries({ queryKey: listGames.queryKey });
 }
 
 export function createGame(
@@ -84,7 +84,7 @@ export async function handleGameUpdateEvent(
 			};
 		});
 	} else {
-		await queryClient.invalidateQueries(listGames.queryKey);
+		await queryClient.invalidateQueries({ queryKey: listGames.queryKey });
 	}
 }
 
@@ -106,7 +106,9 @@ export function patchGame(
 			else throw new Error('Could not save changes');
 		},
 		onError: async () => {
-			await queryClient.invalidateQueries(getGameDetails(gameId).queryKey);
+			await queryClient.invalidateQueries({
+				queryKey: getGameDetails(gameId).queryKey,
+			});
 		},
 	};
 }

@@ -190,10 +190,8 @@ export function deleteDocument(
 			else throw new Error('Could not save changes');
 		},
 		onError: async () => {
-			await queryClient.invalidateQueries(listDocuments(gameId).queryKey);
-			await queryClient.invalidateQueries(
-				getDocument(gameId, documentId).queryKey,
-			);
+			await queryClient.invalidateQueries(listDocuments(gameId));
+			await queryClient.invalidateQueries(getDocument(gameId, documentId));
 		},
 	};
 }
@@ -247,7 +245,7 @@ export function changeDocumentFolder(
 			else throw new Error('Could not save changes');
 		},
 		onError: async (err, { id }) => {
-			await queryClient.invalidateQueries(getDocument(gameId, id).queryKey);
+			await queryClient.invalidateQueries(getDocument(gameId, id));
 		},
 	};
 }

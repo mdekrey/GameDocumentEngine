@@ -45,6 +45,6 @@ export function patchUser(
 				);
 			else throw new Error('Could not save changes');
 		},
-		onError: () => queryClient.invalidateQueries(queryKey),
+		onError: () => queryClient.invalidateQueries({ queryKey }),
 	};
 }

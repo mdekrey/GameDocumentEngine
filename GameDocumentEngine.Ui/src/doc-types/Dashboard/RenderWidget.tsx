@@ -31,7 +31,7 @@ export function RenderWidget({
 		queries.getDocument(gameId, widgetConfig.documentId),
 	);
 
-	if (document.isLoading)
+	if (document.isPending)
 		return <WidgetInnerWrapper className="bg-slate-500" />;
 	const docType = gameType.objectTypes[document.data?.type ?? ''];
 	const docWidgetDefinition = docType?.typeInfo.widgets?.[widgetConfig.widget];

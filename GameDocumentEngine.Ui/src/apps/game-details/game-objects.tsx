@@ -25,7 +25,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 	const gameType = useGameType(gameId);
 	const docMoveToRootEvents = useDragTarget(gameId);
 
-	if (gameDetails.isLoading || docsResult.isLoading || gameType.isLoading) {
+	if (gameDetails.isPending || docsResult.isPending || gameType.isPending) {
 		return 'Loading';
 	} else if (gameDetails.isError || docsResult.isError || gameType.isError) {
 		return 'Error';

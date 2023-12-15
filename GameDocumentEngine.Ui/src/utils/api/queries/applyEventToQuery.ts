@@ -13,19 +13,19 @@ import type { EntityChangedProps } from '../EntityChangedProps';
  */
 export async function applyEventToQuery<T>(
 	queryClient: QueryClient,
-	{ queryKey }: { queryKey: QueryKey; queryFn?: QueryFunction<T> },
+	target: { queryKey: QueryKey; queryFn?: QueryFunction<T> },
 	event: EntityChangedProps<unknown, T>,
 ) {
 	if ('removed' in event) {
 		// Sometimes, we get the message that a doc has been deleted before saved to the database, like locally. Putting a delay on removing helps that.
-		setTimeout(() => void queryClient.invalidateQueries(queryKey), 500);
+		setTimeout(() => void queryClient.invalidateQueries(target), 500);
 	} else if ('patch' in event) {
-		return await applyPatchToQuery<T>(queryClient, { queryKey }, event.patch);
+		return await applyPatchToQuery<T>(queryClient, target, event.patch);
 	} else if ('value' in event) {
-		queryClient.setQueryData(queryKey, event.value);
+		queryClient.setQueryData(target.queryKey, event.value);
 		return event.value;
 	} else {
-		await queryClient.invalidateQueries(queryKey);
+		await queryClient.invalidateQueries(target);
 	}
 }
 
@@ -43,7 +43,7 @@ export async function applyPatchToQuery<T>(
 	const errors = applyPatch(result, patch);
 	if (errors.some((v) => !!v)) {
 		console.error('failed to apply patch', { queryKey, patch, data });
-		await queryClient.invalidateQueries(queryKey);
+		await queryClient.invalidateQueries({ queryKey });
 	} else {
 		queryClient.setQueryData(queryKey, result);
 		return result;
@@ -65,7 +65,7 @@ export async function applyChangeToQuery<T = unknown>(
 		queryClient.setQueryData(queryKey, result);
 	} catch (ex) {
 		console.error(ex);
-		await queryClient.invalidateQueries(queryKey);
+		await queryClient.invalidateQueries({ queryKey });
 	}
 }
 
@@ -104,6 +104,6 @@ export async function applyChangeToMapQuery<T, TAdditional>(
 		});
 	} catch (ex) {
 		console.error(ex);
-		await queryClient.invalidateQueries(queryKey);
+		await queryClient.invalidateQueries({ queryKey });
 	}
 }

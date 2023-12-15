@@ -17,7 +17,7 @@ export function DocumentSubheader({
 	const documentResult = useQuery(queries.getDocument(gameId, documentId));
 	const gameResult = useQuery(queries.getGameDetails(gameId));
 
-	if (gameResult.isLoading || documentResult.isLoading) {
+	if (gameResult.isPending || documentResult.isPending) {
 		return 'Loading';
 	}
 	if (gameResult.isError || documentResult.isError) {
