@@ -1,7 +1,6 @@
 import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import type { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { api } from '../fetch-api';
-import type { NavigateFunction } from 'react-router-dom';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { EntityChangedProps } from '../EntityChangedProps';
 import type { MapQueryConfig } from './applyEventToQuery';
@@ -158,7 +157,6 @@ export async function handleDocumentUpdateEvent(
 }
 
 export function createDocument(
-	navigate: NavigateFunction,
 	gameId: string,
 ): UseMutationOptions<
 	DocumentDetails,
@@ -174,9 +172,6 @@ export function createDocument(
 			});
 			if (response.statusCode === 200) return response.data;
 			else throw new Error('Could not save changes');
-		},
-		onSuccess: (document) => {
-			navigate(`/game/${gameId}/document/${document.id}`);
 		},
 	};
 }

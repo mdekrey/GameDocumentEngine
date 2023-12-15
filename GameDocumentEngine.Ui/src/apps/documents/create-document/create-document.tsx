@@ -30,8 +30,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useEffect } from 'react';
 
 function useCreateDocument(gameId: string) {
-	const navigate = useNavigate();
-	return useMutation(queries.createDocument(navigate, gameId));
+	return useMutation(queries.createDocument(gameId));
 }
 
 const CreateDocumentDetails = z.object({
@@ -42,6 +41,7 @@ const CreateDocumentDetails = z.object({
 }) satisfies ZodType<Omit<CreateDocumentDetails, 'details'>>;
 
 export function CreateDocument({ gameId }: { gameId: string }) {
+	const navigate = useNavigate();
 	const { t } = useTranslation(['create-document']);
 	const form = useForm({
 		defaultValue: { name: '', type: '', folderId: null, initialRoles: {} },
@@ -105,20 +105,23 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 		</SingleColumnSections>
 	);
 
-	function onSubmit(currentValue: Omit<CreateDocumentDetails, 'details'>) {
+	async function onSubmit(
+		currentValue: Omit<CreateDocumentDetails, 'details'>,
+	) {
 		if (!gameType.isSuccess) return; // shouldn't have gotten here
 		const objectInfo = gameType.data.objectTypes[currentValue.type];
 		const initialRoles = Object.fromEntries(
 			Object.entries(currentValue.initialRoles).filter(([, role]) => !!role),
 		);
 
-		createDocument.mutate({
+		const document = await createDocument.mutateAsync({
 			document: {
 				...currentValue,
 				initialRoles,
 				details: objectInfo.typeInfo.template,
 			},
 		});
+		navigate(`/game/${gameId}/document/${document.id}`);
 	}
 }
 
