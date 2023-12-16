@@ -1,5 +1,5 @@
 import { queries } from '@/utils/api/queries';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { useTranslation } from 'react-i18next';
 import { useGameType } from '@/apps/documents/useGameType';
@@ -12,18 +12,9 @@ function useUpdateGameRoleAssignments(gameId: string) {
 
 export function GameRoles({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-roles');
-	const gameResult = useQuery(queries.getGameDetails(gameId));
+	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
 	const updateGameRoleAssignments = useUpdateGameRoleAssignments(gameId);
 	const gameType = useGameType(gameId);
-
-	if (gameResult.isLoading || gameType.isLoading) {
-		return 'Loading';
-	}
-	if (!gameResult.isSuccess || !gameType.isSuccess) {
-		return 'An error occurred loading the game.';
-	}
-
-	const gameDetails = gameResult.data;
 
 	return (
 		<RoleAssignment
@@ -31,7 +22,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 			playerNames={gameDetails.playerNames}
 			roles={gameDetails.typeInfo.userRoles}
 			onSaveRoles={onSaveRoles}
-			roleTranslationsNamespace={gameType.data.translationNamespace}
+			roleTranslationsNamespace={gameType.translationNamespace}
 			translations={t}
 			allowUpdate={hasGamePermission(gameDetails, updateGameUserAccess)}
 		/>

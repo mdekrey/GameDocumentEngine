@@ -1,7 +1,7 @@
 import { queries } from '@/utils/api/queries';
 import { getDocumentPendingActions } from '@/utils/api/queries/document';
 import type { QueryClient } from '@tanstack/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { produce } from 'immer';
 import type { Patch } from 'rfc6902';
@@ -16,20 +16,18 @@ function combinePendingActions(pendingActions: Patch) {
 	};
 }
 
-const emptyPendingActions = [] as Patch;
 export function useLocalDocument(gameId: string, documentId: string) {
-	const documentPendingUpdates = useQuery(
+	const pendingActions = useSuspenseQuery(
 		getDocumentPendingActions(gameId, documentId),
-	);
-	const pendingActions = documentPendingUpdates.data ?? emptyPendingActions;
-	const documentResult = useQuery({
+	).data;
+	const documentResult = useSuspenseQuery({
 		...queries.getDocument(gameId, documentId),
 		select: useCallback(
 			(rawData: DocumentDetails) =>
 				combinePendingActions(pendingActions)(rawData),
 			[pendingActions],
 		),
-	});
+	}).data;
 
 	return documentResult;
 }

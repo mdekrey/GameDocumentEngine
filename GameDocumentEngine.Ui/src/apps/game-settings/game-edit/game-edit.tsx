@@ -1,7 +1,11 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+	useSuspenseQuery,
+	useMutation,
+	useQueryClient,
+} from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
@@ -54,16 +58,8 @@ export function GameEdit({ gameId }: { gameId: string }) {
 		},
 	});
 
-	const gameQueryResult = useQuery(queries.getGameDetails(gameId));
+	const gameData = useSuspenseQuery(queries.getGameDetails(gameId)).data;
 	const saveGame = usePatchGame(gameId);
-
-	if (!gameQueryResult.isSuccess) {
-		if (gameQueryResult.isLoadingError) {
-			return 'Failed to load';
-		}
-		return 'Loading';
-	}
-	const gameData = gameQueryResult.data;
 	updateFormDefault(gameForm, gameData);
 	const canEdit = hasGamePermission(gameData, updateGame);
 	gameForm.store.set(gameForm.readOnlyFields, !canEdit);

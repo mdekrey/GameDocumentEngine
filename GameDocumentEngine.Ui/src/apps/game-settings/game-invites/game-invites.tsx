@@ -1,7 +1,11 @@
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	useMutation,
+	useSuspenseQuery,
+	useQueryClient,
+} from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
@@ -19,8 +23,10 @@ import {
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
 
-	const gameData = useQuery(queries.getGameDetails(gameId));
-	const invitationsResult = useQuery(queries.listInvitations(gameId));
+	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const invitations = Object.values(
+		useSuspenseQuery(queries.listInvitations(gameId)).data,
+	);
 	const launchModal = useLaunchModal();
 	const copyLink = useMutation({
 		mutationFn: async (invitation: GameInvite) => {
@@ -32,26 +38,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const deleteInvite = useMutation(
 		queries.cancelInvitation(queryClient, gameId),
 	);
-	const gameTypeInfo = useGameType(gameId);
-
-	if (
-		invitationsResult.isLoading ||
-		gameData.isLoading ||
-		gameTypeInfo.isLoading
-	) {
-		return 'Loading';
-	}
-	if (
-		!invitationsResult.isSuccess ||
-		!gameData.isSuccess ||
-		!gameTypeInfo.isSuccess
-	) {
-		return 'An error occurred loading invitations.';
-	}
-
-	const gameDetails = gameData.data;
-	const invitations = Object.values(invitationsResult.data);
-	const gameType = gameTypeInfo.data;
+	const gameType = useGameType(gameId);
 
 	const allowCreate = gameDetails.typeInfo.userRoles.some((role) =>
 		hasGamePermission(gameDetails, (id) => createInvitation(id, role)),

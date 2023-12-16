@@ -5,7 +5,7 @@ import { queries } from '@/utils/api/queries';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import { useForm, useFormFields } from '@/utils/form';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
@@ -30,8 +30,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useEffect } from 'react';
 
 function useCreateDocument(gameId: string) {
-	const navigate = useNavigate();
-	return useMutation(queries.createDocument(navigate, gameId));
+	return useMutation(queries.createDocument(gameId));
 }
 
 const CreateDocumentDetails = z.object({
@@ -42,6 +41,7 @@ const CreateDocumentDetails = z.object({
 }) satisfies ZodType<Omit<CreateDocumentDetails, 'details'>>;
 
 export function CreateDocument({ gameId }: { gameId: string }) {
+	const navigate = useNavigate();
 	const { t } = useTranslation(['create-document']);
 	const form = useForm({
 		defaultValue: { name: '', type: '', folderId: null, initialRoles: {} },
@@ -52,16 +52,9 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 			allRoles: ['initialRoles'],
 		},
 	});
-	const game = useQuery(queries.getGameDetails(gameId));
+	const game = useSuspenseQuery(queries.getGameDetails(gameId)).data;
 	const gameType = useGameType(gameId);
-
 	const createDocument = useCreateDocument(gameId);
-
-	if (game.isLoading || gameType.isLoading) {
-		return <>Loading...</>;
-	} else if (game.isError || gameType.isError) {
-		return <>Error while loading...</>;
-	}
 
 	return (
 		<SingleColumnSections>
@@ -71,15 +64,13 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						<TextField field={form.field(['name'])} />
 						<SelectField
 							field={form.fields.type}
-							items={
-								gameType.isSuccess ? Object.keys(gameType.data.objectTypes) : []
-							}
-							key={gameType.data ? 1 : 0}
+							items={Object.keys(gameType.objectTypes)}
+							key={gameType ? 1 : 0}
 						>
 							{(key) =>
-								gameType.isSuccess && gameType.data.objectTypes[key] ? (
+								gameType.objectTypes[key] ? (
 									<Trans
-										ns={gameType.data.objectTypes[key].translationNamespace}
+										ns={gameType.objectTypes[key].translationNamespace}
 										i18nKey={'name'}
 									/>
 								) : (
@@ -91,8 +82,8 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						</SelectField>
 						<DocumentRoleAssignment
 							documentTypeAtom={form.fields.type.value}
-							gameDetails={game.data}
-							gameType={gameType.data}
+							gameDetails={game}
+							gameType={gameType}
 							rolesField={form.fields.allRoles}
 						/>
 						{/* TODO: create doc wizard options? */}
@@ -105,20 +96,22 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 		</SingleColumnSections>
 	);
 
-	function onSubmit(currentValue: Omit<CreateDocumentDetails, 'details'>) {
-		if (!gameType.isSuccess) return; // shouldn't have gotten here
-		const objectInfo = gameType.data.objectTypes[currentValue.type];
+	async function onSubmit(
+		currentValue: Omit<CreateDocumentDetails, 'details'>,
+	) {
+		const objectInfo = gameType.objectTypes[currentValue.type];
 		const initialRoles = Object.fromEntries(
 			Object.entries(currentValue.initialRoles).filter(([, role]) => !!role),
 		);
 
-		createDocument.mutate({
+		const document = await createDocument.mutateAsync({
 			document: {
 				...currentValue,
 				initialRoles,
 				details: objectInfo.typeInfo.template,
 			},
 		});
+		navigate(`/game/${gameId}/document/${document.id}`);
 	}
 }
 
@@ -139,7 +132,7 @@ function DocumentRoleAssignment({
 	rolesField: FormFieldReturnType<Record<string, string>>;
 }) {
 	const realtimeApi = useRealtimeApi();
-	const userQuery = useQuery(queries.getCurrentUser(realtimeApi));
+	const user = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
 
 	const disabled = useComputedAtom((get) => !get(documentTypeAtom));
 	const documentTypeName = useAtomValue(documentTypeAtom);
@@ -161,7 +154,7 @@ function DocumentRoleAssignment({
 		}),
 	});
 
-	const currentUserId = userQuery.data?.id;
+	const currentUserId = user.id;
 
 	const otherPlayers = Object.fromEntries(
 		Object.entries(gameDetails.playerNames).filter(

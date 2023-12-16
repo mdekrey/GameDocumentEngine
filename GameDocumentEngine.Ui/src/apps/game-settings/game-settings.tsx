@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { GameRoles } from './game-roles/game-roles';
 import { GameInvites } from './game-invites/game-invites';
@@ -37,16 +37,7 @@ export function displayGameSettings(gameDetails: GameDetails) {
 
 export function GameSettings({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-settings');
-	const gameResult = useQuery(queries.getGameDetails(gameId));
-
-	if (gameResult.isLoading) {
-		return 'Loading';
-	}
-	if (!gameResult.isSuccess) {
-		return 'An error occurred loading the game.';
-	}
-
-	const gameDetails = gameResult.data;
+	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
 	const showInvites = displayInvites(gameDetails);
 
 	return (

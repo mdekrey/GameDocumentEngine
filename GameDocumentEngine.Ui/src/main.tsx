@@ -38,7 +38,7 @@ export const AppElement = (
 			<StrictMode>
 				<App />
 			</StrictMode>
-			<ReactQueryDevtools initialIsOpen={false} />
+			<ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
 		</RealtimeApiProvider>
 	</QueryClientProvider>
 );

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
@@ -38,7 +38,7 @@ export function RoleAssignment({
 	allowUpdateSelf,
 	translations: t,
 }: RoleAssignmentProps) {
-	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
+	const user = useSuspenseQuery(queries.getCurrentUser(useRealtimeApi())).data;
 	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace);
 
 	const formData =
@@ -62,17 +62,15 @@ export function RoleAssignment({
 		readOnly: !allowUpdate,
 	});
 	updateFormDefault(form, formData);
-	if (userResult.data?.id) {
-		form.store.set(form.readOnlyFields, (prev) => {
-			if (!allowUpdate) return true;
-			if (allowUpdateSelf) return false;
-			if (typeof prev === 'object' && prev[userResult.data.id]) return prev;
-			return {
-				[userResult.data.id]: true,
-				[defaultField]: false,
-			};
-		});
-	}
+	form.store.set(form.readOnlyFields, (prev) => {
+		if (!allowUpdate) return true;
+		if (allowUpdateSelf) return false;
+		if (typeof prev === 'object' && prev[user.id]) return prev;
+		return {
+			[user.id]: true,
+			[defaultField]: false,
+		};
+	});
 
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)}>

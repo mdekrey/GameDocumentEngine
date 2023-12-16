@@ -1,7 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	useMutation,
+	useSuspenseQuery,
+	useQueryClient,
+} from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { Button } from '@/components/button/button';
@@ -55,25 +59,14 @@ export function DocumentSettings({
 	gameId: string;
 	documentId: string;
 }) {
-	const gameResult = useQuery(queries.getGameDetails(gameId));
-	const documentResult = useQuery(queries.getDocument(gameId, documentId));
+	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const docData = useSuspenseQuery(
+		queries.getDocument(gameId, documentId),
+	).data;
 	const gameType = useGameType(gameId);
 
-	if (gameResult.isLoading || documentResult.isLoading || gameType.isLoading) {
-		return 'Loading';
-	}
-	if (
-		!gameResult.isSuccess ||
-		!documentResult.isSuccess ||
-		!gameType.isSuccess
-	) {
-		return 'An error occurred loading the game.';
-	}
-
-	const docData = documentResult.data;
-	const gameDetails = gameResult.data;
 	const docType = gameDetails.typeInfo.objectTypes.find(
-		(t) => t.key == documentResult.data.type,
+		(t) => t.key == docData.type,
 	);
 	return (
 		<LoadedDocumentSettings
@@ -82,8 +75,8 @@ export function DocumentSettings({
 			gameDetails={gameDetails}
 			docData={docData}
 			docType={docType}
-			userRoles={documentResult.data.userRoles}
-			objectType={gameType.data.objectTypes[documentResult.data.type]}
+			userRoles={docData.userRoles}
+			objectType={gameType.objectTypes[docData.type]}
 		/>
 	);
 }

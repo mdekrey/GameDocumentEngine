@@ -3,8 +3,6 @@ import { useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import {
 	missingDocumentType,
-	missingDocumentTypeName,
-	missingWidgetTypeName,
 	defaultMissingWidgetDefinition,
 } from '@/documents/defaultMissingWidgetDefinition';
 import type { Dashboard, Widget } from './types';
@@ -18,7 +16,7 @@ import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
 	PositionedWidgetContainer,
@@ -204,14 +202,14 @@ function EditingWidget({
 			handle: () => true,
 		},
 	});
-	const document = useQuery(queries.getDocument(gameId, config.documentId));
+	const document = useSuspenseQuery(
+		queries.getDocument(gameId, config.documentId),
+	).data;
 
 	const gameObjectType =
-		gameType.objectTypes[document.data?.type ?? missingDocumentTypeName]
-			?.typeInfo ?? missingDocumentType;
+		gameType.objectTypes[document.type]?.typeInfo ?? missingDocumentType;
 	const widgetDefinition =
-		gameObjectType.widgets?.[config.widget ?? missingWidgetTypeName] ??
-		defaultMissingWidgetDefinition;
+		gameObjectType.widgets?.[config.widget] ?? defaultMissingWidgetDefinition;
 	return (
 		<ErrorBoundary fallback={<></>}>
 			<MoveResizeWidget

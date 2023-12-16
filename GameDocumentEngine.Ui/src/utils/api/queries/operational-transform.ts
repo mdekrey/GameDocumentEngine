@@ -29,7 +29,7 @@ export const getPendingActions =
 			queryFn: () => {
 				return [] as Patch;
 			},
-			cacheTime: Number.POSITIVE_INFINITY,
+			gcTime: Number.POSITIVE_INFINITY,
 		}) satisfies FetchQueryOptions<Patch>;
 
 export function operationalTransformFromClient<T extends { version: string }>(
