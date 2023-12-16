@@ -23,7 +23,7 @@ import type { FieldsConfig } from '@/utils/form';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
-	role: z.string().nonempty(),
+	role: z.string().min(1),
 });
 
 function useCreateInvite(gameId: string) {

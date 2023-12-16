@@ -1,11 +1,7 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
@@ -19,7 +15,7 @@ import { hasDocumentPermission } from '@/utils/security/match-permission';
 import { writeDocumentDetailsPrefix } from '@/utils/security/permission-strings';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
-import { useDocument } from '@/utils/api/hooks';
+import { useAllDocuments, useDocument } from '@/utils/api/hooks';
 
 function usePatchDocument(gameId: string, documentId: string) {
 	const queryClient = useQueryClient();
@@ -80,7 +76,7 @@ export function DocumentEdit({
 		},
 	});
 
-	const documentsList = useSuspenseQuery(queries.listDocuments(gameId)).data;
+	const documentsList = useAllDocuments(gameId);
 	const documentData = useDocument(gameId, documentId);
 	const saveDocument = usePatchDocument(gameId, documentId);
 
@@ -92,15 +88,13 @@ export function DocumentEdit({
 	documentForm.store.set(documentForm.readOnlyFields, !canEdit);
 
 	return (
-		<>
-			<form onSubmit={documentForm.handleSubmit(onSubmit)}>
-				<DocumentEditFields
-					{...documentForm.fields}
-					canEdit={canEdit}
-					allFolders={documentsList.data}
-				/>
-			</form>
-		</>
+		<form onSubmit={documentForm.handleSubmit(onSubmit)}>
+			<DocumentEditFields
+				{...documentForm.fields}
+				canEdit={canEdit}
+				allFolders={documentsList.data}
+			/>
+		</form>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof DocumentDetailsSchema>) {

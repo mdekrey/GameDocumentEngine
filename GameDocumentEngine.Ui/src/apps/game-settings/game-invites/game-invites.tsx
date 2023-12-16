@@ -1,11 +1,7 @@
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import {
-	useMutation,
-	useSuspenseQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
@@ -13,7 +9,7 @@ import type { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
 import { Trans, useTranslation } from 'react-i18next';
-import { useGame, useGameType } from '@/utils/api/hooks';
+import { useGame, useGameType, useInvitations } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	createInvitation,
@@ -24,9 +20,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
 
 	const gameDetails = useGame(gameId);
-	const invitations = Object.values(
-		useSuspenseQuery(queries.listInvitations(gameId)).data,
-	);
+	const invitations = useInvitations(gameId);
 	const launchModal = useLaunchModal();
 	const copyLink = useMutation({
 		mutationFn: async (invitation: GameInvite) => {

@@ -1,14 +1,13 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { SingleColumnSections } from '@/components/sections';
-import { queries } from '@/utils/api/queries';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useAllGames } from '@/utils/api/hooks';
 import { useTranslation } from 'react-i18next';
 import { HiArrowRight, HiPlus } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
 export function ListGames() {
 	const { t } = useTranslation(['list-games']);
-	const games = useSuspenseQuery(queries.listGames).data;
+	const games = useAllGames();
 
 	return (
 		<SingleColumnSections>
