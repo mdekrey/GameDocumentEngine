@@ -45,6 +45,13 @@ import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { queries } from '@/utils/api/queries';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 
+const positionTotalX = (p: Widget) => p.position.x + p.position.width;
+const positionTotalY = (p: Widget) => p.position.y + p.position.height;
+const widgetsTotal = (
+	widgets: Record<string, Widget>,
+	v: (p: Widget) => number,
+) => Math.max(...Object.values(widgets).map(v)).toFixed(0);
+
 export function DashboardDisplay({
 	document,
 	form,
@@ -61,20 +68,12 @@ export function DashboardDisplay({
 		widgets: ['details', 'widgets'],
 		widget: (id: string) => ['details', 'widgets', id],
 	});
-	const dashboardHeight = useComputedAtom((get) => {
-		return Math.max(
-			...Object.values(get(widgets.atom)).map(
-				(w) => w.position.y + w.position.height,
-			),
-		).toFixed(0);
-	});
-	const dashboardWidth = useComputedAtom((get) => {
-		return Math.max(
-			...Object.values(get(widgets.atom)).map(
-				(w) => w.position.x + w.position.width,
-			),
-		).toFixed(0);
-	});
+	const dashboardHeight = useComputedAtom((get) =>
+		widgetsTotal(get(widgets.atom), positionTotalY),
+	);
+	const dashboardWidth = useComputedAtom((get) =>
+		widgetsTotal(get(widgets.atom), positionTotalX),
+	);
 	const [editing, toggleEditing] = useReducer(
 		canUpdateWidgets ? (prev) => !prev : () => false,
 		false,
@@ -110,7 +109,6 @@ export function DashboardDisplay({
 					([key, config]: [string, Widget]) => (
 						<PositionedWidgetContainer key={key} position={config.position}>
 							<RenderWidget
-								key={key}
 								gameType={gameType}
 								gameId={document.gameId}
 								user={user}
