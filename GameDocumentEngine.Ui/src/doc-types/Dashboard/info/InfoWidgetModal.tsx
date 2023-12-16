@@ -14,6 +14,7 @@ import type {
 } from '@/documents/defineDocument';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { WidgetContainer } from '../grid-utils';
+import { useTranslationForDocument } from '@/utils/api/hooks';
 
 export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 	resolve,
@@ -33,9 +34,7 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 		keyPrefix: 'info-widget-modal',
 	});
 	const { t: tDocument } = useTranslation(`doc-types:${docType.key}`);
-	const { t: tWidget } = useTranslation(widgetDefinition.translationNamespace, {
-		keyPrefix: widgetDefinition.translationKeyPrefix,
-	});
+	const tWidget = useTranslationForDocument(document, widget.widget);
 	const Component = widgetDefinition.component;
 	// TODO: better layout
 	return (
