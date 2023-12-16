@@ -2,8 +2,7 @@ import type { Widget } from '../types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import type { useLaunchModal } from '@/utils/modal/modal-service';
 import type { QueryClient } from '@tanstack/react-query';
-import { getDocumentType, getGameType } from '@/utils/api/hooks';
-import { queries } from '@/utils/api/queries';
+import { fetchDocument, fetchDocumentType } from '@/utils/api/loaders';
 import { produce } from 'immer';
 import { DeleteWidgetModal } from './DeleteWidgetModal';
 
@@ -14,13 +13,10 @@ export async function deleteWidget(
 	widgetsField: FormFieldReturnType<Record<string, Widget>>,
 	key: string,
 ) {
-	const gameType = await getGameType(queryClient, gameId);
 	const targetWidget = widgetsField.getValue()[key];
-	const document = await queryClient.fetchQuery(
-		queries.getDocument(gameId, targetWidget.documentId),
-	);
-
-	const docType = getDocumentType(gameType, document.type);
+	const docId = targetWidget.documentId;
+	const document = await fetchDocument(queryClient, gameId, docId);
+	const docType = await fetchDocumentType(queryClient, gameId, docId);
 	const additional = {
 		docTypeKey: docType.key,
 		icon: docType.typeInfo.icon,

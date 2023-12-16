@@ -7,6 +7,7 @@ import { produce } from 'immer';
 import type { Patch } from 'rfc6902';
 import { applyPatch } from 'rfc6902';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import { fetchDocument } from '@/utils/api/loaders';
 
 function combinePendingActions(pendingActions: Patch) {
 	return <T>(rawData: T) => {
@@ -40,8 +41,6 @@ export async function fetchLocalDocument(
 	const pendingActions = await queryClient.fetchQuery(
 		getDocumentPendingActions(gameId, documentId),
 	);
-	const latestDocData = await queryClient.fetchQuery(
-		queries.getDocument(gameId, documentId),
-	);
+	const latestDocData = await fetchDocument(queryClient, gameId, documentId);
 	return combinePendingActions(pendingActions)(latestDocData);
 }

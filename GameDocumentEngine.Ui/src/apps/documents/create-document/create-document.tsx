@@ -9,7 +9,8 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
-import { getDocumentType, useGameType } from '@/utils/api/hooks';
+import { getDocumentType } from '@/utils/api/accessors';
+import { useGameType } from '@/utils/api/hooks';
 import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import {
@@ -62,7 +63,6 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						<SelectField
 							field={form.fields.type}
 							items={Object.keys(gameType.objectTypes)}
-							key={gameType ? 1 : 0}
 						>
 							{(key) =>
 								getDocumentType(gameType, key) ? (
