@@ -1,7 +1,11 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+	useSuspenseQuery,
+	useMutation,
+	useQueryClient,
+} from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
@@ -48,16 +52,9 @@ export function Profile() {
 	});
 
 	const realtimeApi = useRealtimeApi();
-	const userQueryResult = useQuery(queries.getCurrentUser(realtimeApi));
+	const userData = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
 	const saveUser = usePatchUser();
 
-	if (!userQueryResult.isSuccess) {
-		if (userQueryResult.isLoadingError) {
-			return 'Failed to load';
-		}
-		return 'Loading';
-	}
-	const userData = userQueryResult.data;
 	updateFormDefault(userForm, userData);
 
 	return (

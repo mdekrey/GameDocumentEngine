@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
@@ -39,19 +39,13 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
 	const launchModal = useLaunchModal();
 	const { t } = useTranslation('game-settings');
-	const gameResult = useQuery(queries.getGameDetails(gameId));
-	const userResult = useQuery(queries.getCurrentUser(useRealtimeApi()));
+	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const userDetails = useSuspenseQuery(
+		queries.getCurrentUser(useRealtimeApi()),
+	).data;
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
 
-	if (gameResult.isLoading || userResult.isLoading) {
-		return 'Loading';
-	}
-	if (!gameResult.isSuccess || !userResult.isSuccess) {
-		return 'An error occurred loading the game.';
-	}
-	const gameDetails = gameResult.data;
-	const userDetails = userResult.data;
 	return (
 		<>
 			{displayRemoveUser(gameDetails) && (
