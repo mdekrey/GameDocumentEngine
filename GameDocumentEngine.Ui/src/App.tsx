@@ -62,6 +62,10 @@ const subheaderRoutes: RouteObject[] = [
 	},
 ];
 
+function LoadingSection({ children }: { children?: React.ReactNode }) {
+	return <Suspense fallback={<>Loading...</>}>{children}</Suspense>;
+}
+
 function App() {
 	const networkIndicator = useNetworkIndicator();
 	const header = useHeader();
@@ -71,11 +75,15 @@ function App() {
 	return (
 		<Layout {...header} {...networkIndicator}>
 			{subheaderRoute ? (
-				<Layout.Subheader>{subheaderRoute}</Layout.Subheader>
+				<Layout.Subheader>
+					<LoadingSection>{subheaderRoute}</LoadingSection>
+				</Layout.Subheader>
 			) : null}
-			<Suspense fallback={<>Loading...</>}>{useRoutes(mainRoute)}</Suspense>
+			<LoadingSection>{useRoutes(mainRoute)}</LoadingSection>
 			{leftSidebar ? (
-				<Layout.LeftSidebar>{leftSidebar}</Layout.LeftSidebar>
+				<Layout.LeftSidebar>
+					<LoadingSection>{leftSidebar}</LoadingSection>
+				</Layout.LeftSidebar>
 			) : null}
 		</Layout>
 	);
