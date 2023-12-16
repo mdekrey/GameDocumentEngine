@@ -1,8 +1,8 @@
 import { queries } from '@/utils/api/queries';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { getGameTypeScripts } from '@/utils/api/queries/game-types';
-import type { QueryClient, UseQueryResult } from '@tanstack/react-query';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 
 export async function getGameType(
 	queryClient: QueryClient,
@@ -14,13 +14,10 @@ export async function getGameType(
 	);
 }
 
-export function useGameType(
-	gameId: string,
-): UseQueryResult<GameTypeScripts, unknown> {
+export function useGameType(gameId: string): GameTypeScripts {
 	const queryClient = useQueryClient();
-	const game = useQuery(queries.getGameDetails(gameId));
-	return useQuery({
-		...getGameTypeScripts(game.data?.typeInfo.key ?? 'none', queryClient),
-		enabled: game.isSuccess,
-	});
+	const game = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	return useSuspenseQuery(
+		getGameTypeScripts(game.typeInfo.key ?? 'none', queryClient),
+	).data;
 }

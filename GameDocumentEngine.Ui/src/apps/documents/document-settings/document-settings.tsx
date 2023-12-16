@@ -59,14 +59,10 @@ export function DocumentSettings({
 	const documentResult = useQuery(queries.getDocument(gameId, documentId));
 	const gameType = useGameType(gameId);
 
-	if (gameResult.isLoading || documentResult.isLoading || gameType.isLoading) {
+	if (gameResult.isLoading || documentResult.isLoading) {
 		return 'Loading';
 	}
-	if (
-		!gameResult.isSuccess ||
-		!documentResult.isSuccess ||
-		!gameType.isSuccess
-	) {
+	if (!gameResult.isSuccess || !documentResult.isSuccess) {
 		return 'An error occurred loading the game.';
 	}
 
@@ -83,7 +79,7 @@ export function DocumentSettings({
 			docData={docData}
 			docType={docType}
 			userRoles={documentResult.data.userRoles}
-			objectType={gameType.data.objectTypes[documentResult.data.type]}
+			objectType={gameType.objectTypes[documentResult.data.type]}
 		/>
 	);
 }

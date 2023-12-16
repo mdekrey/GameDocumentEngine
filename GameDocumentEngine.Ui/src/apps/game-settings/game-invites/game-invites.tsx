@@ -32,26 +32,17 @@ export function GameInvites({ gameId }: { gameId: string }) {
 	const deleteInvite = useMutation(
 		queries.cancelInvitation(queryClient, gameId),
 	);
-	const gameTypeInfo = useGameType(gameId);
+	const gameType = useGameType(gameId);
 
-	if (
-		invitationsResult.isLoading ||
-		gameData.isLoading ||
-		gameTypeInfo.isLoading
-	) {
+	if (invitationsResult.isLoading || gameData.isLoading) {
 		return 'Loading';
 	}
-	if (
-		!invitationsResult.isSuccess ||
-		!gameData.isSuccess ||
-		!gameTypeInfo.isSuccess
-	) {
+	if (!invitationsResult.isSuccess || !gameData.isSuccess) {
 		return 'An error occurred loading invitations.';
 	}
 
 	const gameDetails = gameData.data;
 	const invitations = Object.values(invitationsResult.data);
-	const gameType = gameTypeInfo.data;
 
 	const allowCreate = gameDetails.typeInfo.userRoles.some((role) =>
 		hasGamePermission(gameDetails, (id) => createInvitation(id, role)),

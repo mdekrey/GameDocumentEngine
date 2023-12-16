@@ -1,6 +1,10 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { extraQueries, queries } from '@/utils/api/queries';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query';
 import { HiPlus, HiChevronRight } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { useGameType } from '../documents/useGameType';
@@ -20,20 +24,12 @@ import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition'
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
-	const docsResult = useQuery(queries.listDocuments(gameId));
-	const gameDetails = useQuery(queries.getGameDetails(gameId));
+	const docsResult = useSuspenseQuery(queries.listDocuments(gameId)).data;
+	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
 	const gameType = useGameType(gameId);
 	const docMoveToRootEvents = useDragTarget(gameId);
 
-	if (gameDetails.isPending || docsResult.isPending || gameType.isPending) {
-		return 'Loading';
-	} else if (gameDetails.isError || docsResult.isError || gameType.isError) {
-		return 'Error';
-	}
-
-	const canCreate = hasGamePermission(gameDetails.data, createDocument);
-
-	docsResult.data.additional.unrootedFolderIds;
+	const canCreate = hasGamePermission(gameDetails, createDocument);
 
 	return (
 		<div className="h-full p-4 flex flex-col gap-2">
@@ -42,7 +38,7 @@ export function GameObjects({ gameId }: { gameId: string }) {
 					to={`/game/${gameId}`}
 					className="flex flex-row justify-between items-center gap-2"
 				>
-					{gameDetails.data.name}
+					{gameDetails.name}
 
 					<HiChevronRight className="h-5 w-5" />
 				</Link>
@@ -62,27 +58,27 @@ export function GameObjects({ gameId }: { gameId: string }) {
 				</div>
 				<Folder
 					gameId={gameId}
-					hierarchy={docsResult.data.additional.hierarchy}
+					hierarchy={docsResult.additional.hierarchy}
 					id={null}
-					allDocuments={docsResult.data.data}
-					objectTypes={gameType.data.objectTypes}
+					allDocuments={docsResult.data}
+					objectTypes={gameType.objectTypes}
 				/>
 			</section>
-			{docsResult.data.additional.unrootedFolderIds.length ? (
+			{docsResult.additional.unrootedFolderIds.length ? (
 				<section>
 					<h3 className="flex-1 text-lg font-bold">{t('unrooted-header')}</h3>
 					<Prose className="text-xs">{t('unrooted')}</Prose>
 
 					<ul className="flex flex-col divide-y">
-						{docsResult.data.additional.unrootedFolderIds.map((id) => {
+						{docsResult.additional.unrootedFolderIds.map((id) => {
 							return (
 								<li key={id}>
 									<FolderEntry
 										gameId={gameId}
-										hierarchy={docsResult.data.additional.hierarchy}
+										hierarchy={docsResult.additional.hierarchy}
 										documentId={id}
-										allDocuments={docsResult.data.data}
-										objectTypes={gameType.data.objectTypes}
+										allDocuments={docsResult.data}
+										objectTypes={gameType.objectTypes}
 										recursive={false}
 									/>
 								</li>

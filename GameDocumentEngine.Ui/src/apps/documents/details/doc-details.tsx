@@ -1,6 +1,9 @@
 import { queries } from '@/utils/api/queries';
-import type { QueryObserverSuccessResult } from '@tanstack/react-query';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query';
 import { useGameType } from '../useGameType';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
@@ -35,17 +38,11 @@ export function DocumentDetails({
 	documentId: string;
 }) {
 	const { t } = useTranslation(['document-details']);
-	const user = useQuery(queries.getCurrentUser(useRealtimeApi()));
+	const user = useSuspenseQuery(queries.getCurrentUser(useRealtimeApi())).data;
 	const document = useLocalDocument(gameId, documentId);
 	const gameType = useGameType(gameId);
 
-	if (user.isPending || document.isPending || gameType.isPending) {
-		return <>Loading...</>;
-	} else if (user.isError || document.isError || gameType.isError) {
-		return <>Error while loading...</>;
-	}
-
-	const scripts = gameType.data.objectTypes[document.data.type];
+	const scripts = gameType.objectTypes[document.type];
 
 	if (!scripts) {
 		return (
@@ -62,7 +59,7 @@ export function DocumentDetails({
 			fallback={<ErrorScreen message={t('unhandled-error')} />}
 		>
 			<DocumentDetailsForm
-				gameType={gameType.data}
+				gameType={gameType}
 				scripts={scripts}
 				document={document}
 				user={user}
@@ -78,18 +75,18 @@ export function DocumentDetailsForm<T = unknown>({
 	user,
 }: {
 	gameType: GameTypeScripts;
-	document: QueryObserverSuccessResult<TypedDocumentDetails<T>>;
+	document: TypedDocumentDetails<T>;
 	scripts: GameTypeObjectScripts<T>;
-	user: QueryObserverSuccessResult<UserDetails>;
+	user: UserDetails;
 }) {
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(
-		queries.patchDocument(queryClient, document.data.gameId, document.data.id),
+		queries.patchDocument(queryClient, document.gameId, document.id),
 	);
 	const { fixup, component: Component } = scripts.typeInfo;
 	const editable = useMemo(
-		() => toEditableDetails(document.data, fixup),
-		[document.data, fixup],
+		() => toEditableDetails(document, fixup),
+		[document, fixup],
 	);
 	const { t: fullTranslation } = useTranslation(scripts.translationNamespace);
 	const { t: formTranslation } = useTranslation(scripts.translationNamespace, {
@@ -115,8 +112,8 @@ export function DocumentDetailsForm<T = unknown>({
 		) {
 			const latestDocData = await fetchLocalDocument(
 				queryClient,
-				document.data.gameId,
-				document.data.id,
+				document.gameId,
+				document.id,
 			);
 
 			const patches = produceWithPatches<
@@ -128,7 +125,7 @@ export function DocumentDetailsForm<T = unknown>({
 
 			await updateDocument.mutateAsync(patches.map(immerPatchToStandard));
 		},
-		[document.data, queryClient, updateDocument],
+		[document, queryClient, updateDocument],
 	);
 
 	const onSubmit = useCallback(
@@ -154,13 +151,13 @@ export function DocumentDetailsForm<T = unknown>({
 		<Component
 			form={form}
 			onSubmit={onSubmit}
-			document={document.data}
+			document={document}
 			translation={fullTranslation}
 			gameType={gameType}
 			docType={scripts}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
-			user={user.data}
+			user={user}
 		/>
 	);
 

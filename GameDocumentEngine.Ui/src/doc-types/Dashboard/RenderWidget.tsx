@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
 import { useTranslation } from 'react-i18next';
@@ -27,15 +27,13 @@ export function RenderWidget({
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'widgets',
 	});
-	const document = useQuery(
+	const document = useSuspenseQuery(
 		queries.getDocument(gameId, widgetConfig.documentId),
-	);
+	).data;
 
-	if (document.isPending)
-		return <WidgetInnerWrapper className="bg-slate-500" />;
-	const docType = gameType.objectTypes[document.data?.type ?? ''];
+	const docType = gameType.objectTypes[document.type ?? ''];
 	const docWidgetDefinition = docType?.typeInfo.widgets?.[widgetConfig.widget];
-	if (document.isError || !docType || !docWidgetDefinition)
+	if (!docType || !docWidgetDefinition)
 		return (
 			<WidgetInnerWrapper className="border-4 border-red-800">
 				<ErrorScreen message={t('widget-load-error')} />
@@ -51,7 +49,7 @@ export function RenderWidget({
 					component={docWidgetDefinition.component}
 					translationNamespace={docWidgetDefinition.translationNamespace}
 					translationKeyPrefix={docWidgetDefinition.translationKeyPrefix}
-					document={document.data}
+					document={document}
 					gameType={gameType}
 					docType={docType}
 					user={user}

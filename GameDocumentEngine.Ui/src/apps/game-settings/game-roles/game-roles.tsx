@@ -16,10 +16,10 @@ export function GameRoles({ gameId }: { gameId: string }) {
 	const updateGameRoleAssignments = useUpdateGameRoleAssignments(gameId);
 	const gameType = useGameType(gameId);
 
-	if (gameResult.isLoading || gameType.isLoading) {
+	if (gameResult.isLoading) {
 		return 'Loading';
 	}
-	if (!gameResult.isSuccess || !gameType.isSuccess) {
+	if (!gameResult.isSuccess) {
 		return 'An error occurred loading the game.';
 	}
 
@@ -31,7 +31,7 @@ export function GameRoles({ gameId }: { gameId: string }) {
 			playerNames={gameDetails.playerNames}
 			roles={gameDetails.typeInfo.userRoles}
 			onSaveRoles={onSaveRoles}
-			roleTranslationsNamespace={gameType.data.translationNamespace}
+			roleTranslationsNamespace={gameType.translationNamespace}
 			translations={t}
 			allowUpdate={hasGamePermission(gameDetails, updateGameUserAccess)}
 		/>
