@@ -5,7 +5,7 @@ import { queries } from '@/utils/api/queries';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import { useForm, useFormFields } from '@/utils/form';
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
@@ -132,7 +132,7 @@ function DocumentRoleAssignment({
 	rolesField: FormFieldReturnType<Record<string, string>>;
 }) {
 	const realtimeApi = useRealtimeApi();
-	const userQuery = useQuery(queries.getCurrentUser(realtimeApi));
+	const user = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
 
 	const disabled = useComputedAtom((get) => !get(documentTypeAtom));
 	const documentTypeName = useAtomValue(documentTypeAtom);
@@ -154,7 +154,7 @@ function DocumentRoleAssignment({
 		}),
 	});
 
-	const currentUserId = userQuery.data?.id;
+	const currentUserId = user.id;
 
 	const otherPlayers = Object.fromEntries(
 		Object.entries(gameDetails.playerNames).filter(

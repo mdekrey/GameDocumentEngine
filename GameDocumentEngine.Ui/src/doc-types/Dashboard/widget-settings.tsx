@@ -17,7 +17,7 @@ import type {
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { WidgetContainer } from './grid-utils';
@@ -42,14 +42,13 @@ export function WidgetSettings({
 	});
 
 	const widget = dashboardDocument.details.widgets[widgetId];
-	const document = useQuery(
+	const document = useSuspenseQuery(
 		queries.getDocument(dashboardDocument.gameId, widget.documentId),
-	);
-	const docType = document.data && gameType.objectTypes[document.data.type];
+	).data;
+	const docType = document && gameType.objectTypes[document.type];
 	const widgetDefinition = docType?.typeInfo.widgets?.[widget.widget];
 	const navigate = useNavigate();
 
-	if (!document.isSuccess) return 'Loading...';
 	if (!widgetDefinition) return <ErrorScreen message={t('widget-not-found')} />;
 	if (!widgetDefinition.settings) return <Navigate to="../" />;
 
@@ -60,7 +59,7 @@ export function WidgetSettings({
 				docType={docType}
 				widgetDefinition={widgetDefinition}
 				user={user}
-				document={document.data}
+				document={document}
 				widget={widget}
 				t={t}
 				onSubmit={(widgetValue) => {

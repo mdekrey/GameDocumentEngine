@@ -1,7 +1,11 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
@@ -75,17 +79,12 @@ export function DocumentEdit({
 		},
 	});
 
-	const documentsListResult = useQuery(queries.listDocuments(gameId));
-	const documentQueryResult = useQuery(queries.getDocument(gameId, documentId));
+	const documentsList = useSuspenseQuery(queries.listDocuments(gameId)).data;
+	const documentData = useSuspenseQuery(
+		queries.getDocument(gameId, documentId),
+	).data;
 	const saveDocument = usePatchDocument(gameId, documentId);
 
-	if (!documentQueryResult.isSuccess || !documentsListResult.isSuccess) {
-		if (documentQueryResult.isError || documentsListResult.isError) {
-			return 'Failed to load';
-		}
-		return 'Loading';
-	}
-	const documentData = documentQueryResult.data;
 	updateFormDefault(documentForm, documentData);
 	const canEdit = hasDocumentPermission(
 		documentData,
@@ -99,7 +98,7 @@ export function DocumentEdit({
 				<DocumentEditFields
 					{...documentForm.fields}
 					canEdit={canEdit}
-					allFolders={documentsListResult.data.data}
+					allFolders={documentsList.data}
 				/>
 			</form>
 		</>

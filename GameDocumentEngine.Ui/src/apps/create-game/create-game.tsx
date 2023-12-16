@@ -9,7 +9,7 @@ import {
 	SelectField,
 } from '@/components/form-fields/select-input/select-field';
 import { useForm } from '@/utils/form';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
@@ -34,7 +34,7 @@ export function CreateGame() {
 		translation: t,
 	});
 
-	const gameTypesResult = useQuery(queries.listGameTypes());
+	const gameTypes = useSuspenseQuery(queries.listGameTypes()).data;
 	const createGame = useCreateGame();
 
 	return (
@@ -45,13 +45,12 @@ export function CreateGame() {
 						<TextField field={gameForm.field(['name'])} />
 						<SelectField
 							field={gameForm.field(['type'])}
-							items={Object.keys(gameTypesResult.data ?? {})}
-							key={gameTypesResult.data ? 1 : 0}
+							items={Object.keys(gameTypes)}
 						>
 							{(gt) =>
 								gt ? (
 									<Trans
-										ns={gameTypesResult.data?.[gt].translationNamespace}
+										ns={gameTypes[gt].translationNamespace}
 										i18nKey={'name'}
 									/>
 								) : (

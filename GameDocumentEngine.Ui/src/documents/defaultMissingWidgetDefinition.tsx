@@ -5,9 +5,6 @@ import {
 } from './defineDocument';
 import { z } from 'zod';
 
-export const missingDocumentTypeName = 'missing-document';
-export const missingWidgetTypeName = 'missing-widget';
-
 export const missingDocumentType: IGameObjectType = {
 	component: () => <></>,
 	fixup: {
