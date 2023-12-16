@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
 import { getDocumentType } from '@/utils/api/accessors';
-import { useGameType } from '@/utils/api/hooks';
+import { useCurrentUser, useGameType } from '@/utils/api/hooks';
 import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import {
@@ -23,7 +23,6 @@ import type { GameDetails } from '@/api/models/GameDetails';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useEffect } from 'react';
 
@@ -128,8 +127,7 @@ function DocumentRoleAssignment({
 	gameType: GameTypeScripts;
 	rolesField: FormFieldReturnType<Record<string, string>>;
 }) {
-	const realtimeApi = useRealtimeApi();
-	const user = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
+	const user = useCurrentUser();
 
 	const disabled = useComputedAtom((get) => !get(documentTypeAtom));
 	const documentTypeName = useAtomValue(documentTypeAtom);

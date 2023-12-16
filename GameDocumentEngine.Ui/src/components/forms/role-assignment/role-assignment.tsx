@@ -1,15 +1,13 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { updateFormDefault } from '@/utils/form';
 import { useForm } from '@/utils/form';
-import { queries } from '@/utils/api/queries';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { defaultField } from '@/utils/form';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useTranslation } from 'react-i18next';
 import { RoleAssignmentField } from './role-assignment-field';
+import { useCurrentUser } from '@/utils/api/hooks';
 
 export const UserRoleAssignment = z.record(z.string());
 
@@ -38,7 +36,7 @@ export function RoleAssignment({
 	allowUpdateSelf,
 	translations: t,
 }: RoleAssignmentProps) {
-	const user = useSuspenseQuery(queries.getCurrentUser(useRealtimeApi())).data;
+	const user = useCurrentUser();
 	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace);
 
 	const formData =

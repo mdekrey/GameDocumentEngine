@@ -14,7 +14,7 @@ import {
 	deleteGame,
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
+import { useCurrentUser } from '@/utils/api/hooks';
 
 function displayRemoveUser(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, updateGameUserAccess);
@@ -40,9 +40,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const launchModal = useLaunchModal();
 	const { t } = useTranslation('game-settings');
 	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
-	const userDetails = useSuspenseQuery(
-		queries.getCurrentUser(useRealtimeApi()),
-	).data;
+	const userDetails = useCurrentUser();
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
 

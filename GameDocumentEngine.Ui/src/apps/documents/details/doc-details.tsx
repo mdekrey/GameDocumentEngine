@@ -1,10 +1,10 @@
 import { queries } from '@/utils/api/queries';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query';
-import { useDocumentType, useGameType } from '@/utils/api/hooks';
+	useCurrentUser,
+	useDocumentType,
+	useGameType,
+} from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
@@ -23,7 +23,6 @@ import { useForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form';
 import { applyPatch, createPatch } from 'rfc6902';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useTranslation } from 'react-i18next';
 import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
@@ -38,7 +37,7 @@ export function DocumentDetails({
 	documentId: string;
 }) {
 	const { t } = useTranslation(['document-details']);
-	const user = useSuspenseQuery(queries.getCurrentUser(useRealtimeApi())).data;
+	const user = useCurrentUser();
 	const document = useLocalDocument(gameId, documentId);
 	const gameType = useGameType(gameId);
 	const scripts = useDocumentType(gameId, documentId);

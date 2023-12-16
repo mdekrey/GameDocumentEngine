@@ -1,31 +1,29 @@
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
 import { useTranslation } from 'react-i18next';
-import type { UserDetails } from '@/api/models/UserDetails';
 import { RenderWidgetContents } from './RenderWidgetContents';
-import { elementTemplate } from '@/components/template';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import type { Widget } from './types';
-import { useDocument, useDocumentType, useWidgetType } from '@/utils/api/hooks';
-
-const WidgetInnerWrapper = elementTemplate('WidgetContents', 'div', (T) => (
-	<T className="absolute inset-0 overflow-hidden" />
-));
+import {
+	useCurrentUser,
+	useDocument,
+	useDocumentType,
+	useGameType,
+	useWidgetType,
+} from '@/utils/api/hooks';
+import { LimitingInset } from './Inset';
 
 export function RenderWidget({
-	gameType,
 	gameId,
-	user,
 	widgetConfig,
 }: {
-	gameType: GameTypeScripts;
 	gameId: string;
-	user: UserDetails;
 	widgetConfig: Widget;
 }) {
 	const { t } = useTranslation('doc-types:Dashboard', {
 		keyPrefix: 'widgets',
 	});
+	const user = useCurrentUser();
+	const gameType = useGameType(gameId);
 	const document = useDocument(gameId, widgetConfig.documentId);
 	const docType = useDocumentType(gameId, widgetConfig.documentId);
 	const docWidgetDefinition = useWidgetType(
@@ -35,7 +33,7 @@ export function RenderWidget({
 	);
 
 	return (
-		<WidgetInnerWrapper>
+		<LimitingInset>
 			<ErrorBoundary
 				fallback={<ErrorScreen message={t('widget-runtime-error')} />}
 			>
@@ -50,6 +48,6 @@ export function RenderWidget({
 					widgetConfig={widgetConfig}
 				/>
 			</ErrorBoundary>
-		</WidgetInnerWrapper>
+		</LimitingInset>
 	);
 }

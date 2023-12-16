@@ -1,11 +1,7 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { queries } from '@/utils/api/queries';
-import {
-	useSuspenseQuery,
-	useMutation,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
@@ -17,7 +13,7 @@ import { updateFormDefault } from '@/utils/form';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { SingleColumnSections } from '@/components/sections';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
+import { useCurrentUser } from '@/utils/api/hooks';
 
 function usePatchUser() {
 	const queryClient = useQueryClient();
@@ -51,8 +47,7 @@ export function Profile() {
 		},
 	});
 
-	const realtimeApi = useRealtimeApi();
-	const userData = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
+	const userData = useCurrentUser();
 	const saveUser = usePatchUser();
 
 	updateFormDefault(userForm, userData);

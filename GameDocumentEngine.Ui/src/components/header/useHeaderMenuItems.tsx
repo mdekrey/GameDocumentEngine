@@ -1,26 +1,21 @@
 import { queries } from '@/utils/api/queries';
-import {
-	useMutation,
-	useSuspenseQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { MenuItemsConfiguration } from '../menu-items/menu-items';
 import { useTranslation } from 'react-i18next';
 import { HiPencil, HiSun, HiMoon } from 'react-icons/hi2';
 import type { TFunction } from 'i18next';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useEffect } from 'react';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
+import { useCurrentUser } from '@/utils/api/hooks';
 
 type UserOptions = {
 	theme?: 'light' | 'dark';
 };
 
 export function useHeader() {
-	const realtimeApi = useRealtimeApi();
 	const queryClient = useQueryClient();
 	const userMutation = useMutation(queries.patchUser(queryClient));
-	const user = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
+	const user = useCurrentUser();
 	const { t } = useTranslation(['layout']);
 	const options: UserOptions = user?.options ?? {};
 	const darkMode =

@@ -31,15 +31,16 @@ import { BsInfoLg } from 'react-icons/bs';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import type { UserDetails } from '@/api/models/UserDetails';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { showWidgetInfo } from './info/info';
-import { JotaiDiv } from '@/components/jotai/div';
 import { atom } from 'jotai';
-import { elementTemplate } from '@/components/template';
-import type { GameTypeScripts } from '@/utils/api/queries/game-types';
-import { useDocumentType, useWidgetType } from '@/utils/api/hooks';
+import {
+	useCurrentUser,
+	useDocumentType,
+	useWidgetType,
+} from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
+import { Inset } from './Inset';
 
 const positionTotalX = (p: Widget) => p.position.x + p.position.width;
 const positionTotalY = (p: Widget) => p.position.y + p.position.height;
@@ -51,8 +52,6 @@ const widgetsTotal = (
 export function DashboardDisplay({
 	document,
 	form,
-	user,
-	gameType,
 	writablePointers,
 	onSubmit,
 }: GameObjectFormComponent<Dashboard>) {
@@ -94,6 +93,7 @@ export function DashboardDisplay({
 			},
 		},
 	});
+	const user = useCurrentUser();
 
 	if (!editing) {
 		return (
@@ -104,12 +104,7 @@ export function DashboardDisplay({
 				{Object.entries(document.details.widgets).map(
 					([key, config]: [string, Widget]) => (
 						<PositionedWidgetContainer key={key} position={config.position}>
-							<RenderWidget
-								gameType={gameType}
-								gameId={document.gameId}
-								user={user}
-								widgetConfig={config}
-							/>
+							<RenderWidget gameId={document.gameId} widgetConfig={config} />
 						</PositionedWidgetContainer>
 					),
 				)}
@@ -133,11 +128,9 @@ export function DashboardDisplay({
 				([key, config]: [string, Widget]) => (
 					<EditingWidget
 						key={key}
-						gameType={gameType}
 						widgetId={key}
 						widget={widget(key)}
 						dashboard={document}
-						user={user}
 						config={config}
 						onDelete={onDelete(key)}
 						onInfo={onInfo(key)}
@@ -167,25 +160,18 @@ export function DashboardDisplay({
 	}
 }
 
-const Inset = elementTemplate('Inset', JotaiDiv, (T) => (
-	<T className="absolute inset-0" />
-));
 const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));
 function EditingWidget({
-	gameType,
 	widget,
 	widgetId,
 	dashboard: { gameId },
-	user,
 	config,
 	onDelete,
 	onInfo,
 }: {
-	gameType: GameTypeScripts;
 	widget: FormFieldReturnType<Widget>;
 	widgetId: string;
 	dashboard: DocumentDetails;
-	user: UserDetails;
 	config: Widget;
 	onDelete: () => void;
 	onInfo: () => void;
@@ -216,16 +202,10 @@ function EditingWidget({
 				/>
 				<Inset
 					style={{
-						// TODO: only disable pointerEvents if the widget doesn't allow contents
 						pointerEvents: hoverVisibility,
 					}}
 				>
-					<RenderWidget
-						gameType={gameType}
-						gameId={gameId}
-						user={user}
-						widgetConfig={config}
-					/>
+					<RenderWidget gameId={gameId} widgetConfig={config} />
 				</Inset>
 				<Inset
 					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"
