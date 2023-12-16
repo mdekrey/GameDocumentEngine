@@ -14,7 +14,6 @@ import type {
 	GameObjectWidgetDefinition,
 	TypedDocumentDetails,
 } from '@/documents/defineDocument';
-import type { UserDetails } from '@/api/models/UserDetails';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { WidgetContainer } from './grid-utils';
@@ -31,7 +30,6 @@ export function WidgetSettings({
 	widgetId,
 	document: dashboardDocument,
 	gameType,
-	user,
 	onSubmit,
 	form,
 }: GameObjectFormComponent<Dashboard> & { widgetId: string }) {
@@ -57,7 +55,6 @@ export function WidgetSettings({
 				gameType={gameType}
 				docType={docType}
 				widgetDefinition={widgetDefinition}
-				user={user}
 				document={document}
 				widget={widget}
 				t={t}
@@ -78,7 +75,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 	gameType,
 	docType,
 	widgetDefinition,
-	user,
 	document,
 	widget,
 	t,
@@ -87,7 +83,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 	gameType: GameTypeScripts;
 	docType: GameTypeObjectScripts<T>;
 	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
-	user: UserDetails;
 	document: TypedDocumentDetails<T>;
 	widget: Widget<TWidget>;
 	t: TFunction;
@@ -116,7 +111,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 		<Component
 			document={document}
 			translation={translation}
-			user={user}
 			gameType={gameType}
 			docType={docType}
 			size={widget.position}
@@ -135,7 +129,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 						translation={translation}
 						docType={docType}
 						gameType={gameType}
-						user={user}
 						size={widget.position}
 						field={form}
 					/>

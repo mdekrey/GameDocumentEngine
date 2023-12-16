@@ -5,7 +5,6 @@ import type { WidgetBase, WidgetSettings } from '@/documents/defineDocument';
 export function RenderWidgetContents<T, TWidget extends WidgetBase>({
 	component: Component,
 	document,
-	user,
 	translationNamespace,
 	translationKeyPrefix,
 	gameType,
@@ -21,7 +20,6 @@ export function RenderWidgetContents<T, TWidget extends WidgetBase>({
 	return (
 		<Component
 			document={document}
-			user={user}
 			translation={fullTranslation}
 			gameType={gameType}
 			docType={docType}

@@ -6,7 +6,6 @@ import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
 import type { DocumentPointers } from './get-document-pointers';
-import type { UserDetails } from '@/api/models/UserDetails';
 import type {
 	GameTypeObjectScripts,
 	GameTypeScripts,
@@ -28,7 +27,6 @@ export type Updater<T> = (
 export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
 	translation: TFunction;
-	user: UserDetails;
 	gameType: GameTypeScripts;
 	docType: GameTypeObjectScripts<T>;
 };

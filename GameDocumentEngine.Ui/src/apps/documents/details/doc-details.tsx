@@ -1,10 +1,6 @@
 import { queries } from '@/utils/api/queries';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-	useCurrentUser,
-	useDocumentType,
-	useGameType,
-} from '@/utils/api/hooks';
+import { useDocumentType, useGameType } from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
@@ -23,7 +19,6 @@ import { useForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form';
 import { applyPatch, createPatch } from 'rfc6902';
-import type { UserDetails } from '@/api/models/UserDetails';
 import { useTranslation } from 'react-i18next';
 import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
@@ -37,7 +32,6 @@ export function DocumentDetails({
 	documentId: string;
 }) {
 	const { t } = useTranslation(['document-details']);
-	const user = useCurrentUser();
 	const document = useLocalDocument(gameId, documentId);
 	const gameType = useGameType(gameId);
 	const scripts = useDocumentType(gameId, documentId);
@@ -51,7 +45,6 @@ export function DocumentDetails({
 				gameType={gameType}
 				scripts={scripts}
 				document={document}
-				user={user}
 			/>
 		</ErrorBoundary>
 	);
@@ -61,12 +54,10 @@ export function DocumentDetailsForm<T = unknown>({
 	gameType,
 	scripts,
 	document,
-	user,
 }: {
 	gameType: GameTypeScripts;
 	document: TypedDocumentDetails<T>;
 	scripts: GameTypeObjectScripts<T>;
-	user: UserDetails;
 }) {
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(
@@ -146,7 +137,6 @@ export function DocumentDetailsForm<T = unknown>({
 			docType={scripts}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
-			user={user}
 		/>
 	);
 

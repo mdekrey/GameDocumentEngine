@@ -24,7 +24,6 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 		gameType,
 		docType,
 		widgetDefinition,
-		user,
 		document,
 		widget,
 		icon: Icon,
@@ -69,7 +68,6 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 						translation={tWidget}
 						docType={docType}
 						gameType={gameType}
-						user={user}
 						size={widget.position}
 						widgetSettings={widget.settings}
 					/>
