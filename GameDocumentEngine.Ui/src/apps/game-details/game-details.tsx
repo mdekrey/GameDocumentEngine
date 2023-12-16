@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { queries } from '@/utils/api/queries';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { IntroText } from '@/components/text/common';
 import { ReactComponent as Arrow } from './arrow.svg';
+import { useGame } from '@/utils/api/hooks';
 
 export function GameDetails({ gameId }: { gameId: string }) {
 	// TODO: display things here
-	useSuspenseQuery(queries.getGameDetails(gameId));
+	useGame(gameId);
 	const { t } = useTranslation(['game-details']);
 
 	return (

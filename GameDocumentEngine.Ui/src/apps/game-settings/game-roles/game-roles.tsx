@@ -1,8 +1,8 @@
 import { queries } from '@/utils/api/queries';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { useTranslation } from 'react-i18next';
-import { useGameType } from '@/utils/api/hooks';
+import { useGame, useGameType } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import { updateGameUserAccess } from '@/utils/security/permission-strings';
 
@@ -12,7 +12,7 @@ function useUpdateGameRoleAssignments(gameId: string) {
 
 export function GameRoles({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-roles');
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const gameDetails = useGame(gameId);
 	const updateGameRoleAssignments = useUpdateGameRoleAssignments(gameId);
 	const gameType = useGameType(gameId);
 

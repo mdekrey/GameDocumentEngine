@@ -13,7 +13,7 @@ import type { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
 import { Trans, useTranslation } from 'react-i18next';
-import { useGameType } from '@/utils/api/hooks';
+import { useGame, useGameType } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	createInvitation,
@@ -23,7 +23,7 @@ import {
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
 
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const gameDetails = useGame(gameId);
 	const invitations = Object.values(
 		useSuspenseQuery(queries.listInvitations(gameId)).data,
 	);

@@ -4,11 +4,15 @@ import { queries } from '../queries';
 import { getGameTypeScripts } from '../queries/game-types';
 import { getDocumentType, getWidgetType } from '../accessors';
 
+export async function fetchGame(queryClient: QueryClient, gameId: string) {
+	return await queryClient.fetchQuery(queries.getGameDetails(gameId));
+}
+
 export async function fetchGameType(
 	queryClient: QueryClient,
 	gameId: string,
 ): Promise<GameTypeScripts> {
-	const game = await queryClient.fetchQuery(queries.getGameDetails(gameId));
+	const game = await fetchGame(queryClient, gameId);
 	return await queryClient.fetchQuery(
 		getGameTypeScripts(game.typeInfo.key ?? 'none', queryClient),
 	);

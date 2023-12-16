@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
@@ -14,7 +14,7 @@ import {
 	deleteGame,
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
-import { useCurrentUser } from '@/utils/api/hooks';
+import { useCurrentUser, useGame } from '@/utils/api/hooks';
 
 function displayRemoveUser(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, updateGameUserAccess);
@@ -39,7 +39,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
 	const launchModal = useLaunchModal();
 	const { t } = useTranslation('game-settings');
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const gameDetails = useGame(gameId);
 	const userDetails = useCurrentUser();
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();

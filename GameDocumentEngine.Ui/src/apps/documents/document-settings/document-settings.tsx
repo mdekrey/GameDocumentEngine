@@ -1,16 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import {
-	useMutation,
-	useSuspenseQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useDocument, useDocumentType } from '@/utils/api/hooks';
+import { useDocument, useDocumentType, useGame } from '@/utils/api/hooks';
 import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
 import { Prose } from '@/components/text/common';
 import {
@@ -59,7 +55,7 @@ export function DocumentSettings({
 	gameId: string;
 	documentId: string;
 }) {
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const gameDetails = useGame(gameId);
 	const docData = useDocument(gameId, documentId);
 	const docType = useDocumentType(gameId, documentId);
 

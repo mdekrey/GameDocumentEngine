@@ -1,6 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { queries } from '@/utils/api/queries';
 import { GameRoles } from './game-roles/game-roles';
 import { GameInvites } from './game-invites/game-invites';
 import { GameEdit } from './game-edit/game-edit';
@@ -21,6 +19,7 @@ import {
 } from './game-danger-zone/game-danger-zone';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { Suspense } from 'react';
+import { useGame } from '@/utils/api/hooks';
 
 function displayInvites(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, listInvitations);
@@ -37,7 +36,7 @@ export function displayGameSettings(gameDetails: GameDetails) {
 
 export function GameSettings({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-settings');
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const gameDetails = useGame(gameId);
 	const showInvites = displayInvites(gameDetails);
 
 	return (
