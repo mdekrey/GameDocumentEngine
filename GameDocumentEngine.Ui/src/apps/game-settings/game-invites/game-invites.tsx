@@ -13,7 +13,7 @@ import type { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
 import { Trans, useTranslation } from 'react-i18next';
-import { useGameType } from '../../documents/useGameType';
+import { useGameType } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	createInvitation,

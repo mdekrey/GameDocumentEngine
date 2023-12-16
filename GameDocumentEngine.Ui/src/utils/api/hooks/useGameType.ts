@@ -1,6 +1,6 @@
-import { queries } from '@/utils/api/queries';
-import type { GameTypeScripts } from '@/utils/api/queries/game-types';
-import { getGameTypeScripts } from '@/utils/api/queries/game-types';
+import { queries } from '../queries';
+import type { GameTypeScripts } from '../queries/game-types';
+import { getGameTypeScripts } from '../queries/game-types';
 import type { QueryClient } from '@tanstack/react-query';
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 

@@ -9,7 +9,7 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
-import { useGameType } from '../useGameType';
+import { getDocumentType, useGameType } from '@/utils/api/hooks';
 import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import {
@@ -21,10 +21,7 @@ import { RoleAssignmentField } from '@/components/forms/role-assignment/role-ass
 import type { GameDetails } from '@/api/models/GameDetails';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
+import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useEffect } from 'react';
@@ -68,9 +65,9 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 							key={gameType ? 1 : 0}
 						>
 							{(key) =>
-								gameType.objectTypes[key] ? (
+								getDocumentType(gameType, key) ? (
 									<Trans
-										ns={gameType.objectTypes[key].translationNamespace}
+										ns={getDocumentType(gameType, key).translationNamespace}
 										i18nKey={'name'}
 									/>
 								) : (
@@ -99,7 +96,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	async function onSubmit(
 		currentValue: Omit<CreateDocumentDetails, 'details'>,
 	) {
-		const objectInfo = gameType.objectTypes[currentValue.type];
+		const objectInfo = getDocumentType(gameType, currentValue.type);
 		const initialRoles = Object.fromEntries(
 			Object.entries(currentValue.initialRoles).filter(([, role]) => !!role),
 		);
@@ -136,9 +133,7 @@ function DocumentRoleAssignment({
 
 	const disabled = useComputedAtom((get) => !get(documentTypeAtom));
 	const documentTypeName = useAtomValue(documentTypeAtom);
-	const docType = gameType.objectTypes[documentTypeName] as
-		| GameTypeObjectScripts<unknown>
-		| undefined;
+	const docType = getDocumentType(gameType, documentTypeName);
 	const actualRoles = ['', ...(docType?.userRoles ?? [])];
 
 	const { t } = useTranslation(

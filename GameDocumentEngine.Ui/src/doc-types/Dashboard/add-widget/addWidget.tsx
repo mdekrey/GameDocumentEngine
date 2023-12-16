@@ -4,7 +4,7 @@ import type { useLaunchModal } from '@/utils/modal/modal-service';
 import type { NewWidgetResult } from './AddWidgetModal';
 import { AddWidgetModal } from './AddWidgetModal';
 import type { QueryClient } from '@tanstack/react-query';
-import { getGameType } from '@/apps/documents/useGameType';
+import { getDocumentType, getGameType } from '@/utils/api/hooks';
 import { queries } from '@/utils/api/queries';
 import { NoWidgetsModal } from './NoWidgets';
 
@@ -20,8 +20,7 @@ export async function addWidget(
 		queries.getDocument(documentIds.gameId, documentIds.id),
 	);
 
-	const docType = gameType.objectTypes[document.type];
-	if (!docType) return;
+	const docType = getDocumentType(gameType, document.type);
 	const { widgets = {}, icon } = docType.typeInfo;
 	const additional = {
 		docTypeKey: docType.key,

@@ -16,9 +16,6 @@ import type {
 } from '@/documents/defineDocument';
 import type { UserDetails } from '@/api/models/UserDetails';
 import { useForm } from '@principlestudios/react-jotai-forms';
-import { ErrorScreen } from '@/components/errors/ErrorScreen';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { queries } from '@/utils/api/queries';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { WidgetContainer } from './grid-utils';
 import { ButtonRow } from '@/components/button/button-row';
@@ -28,6 +25,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { AtomContents } from '@/components/jotai/atom-contents';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { produce } from 'immer';
+import { useDocument, useDocumentType, useWidgetType } from '@/utils/api/hooks';
 
 export function WidgetSettings({
 	widgetId,
@@ -42,14 +40,15 @@ export function WidgetSettings({
 	});
 
 	const widget = dashboardDocument.details.widgets[widgetId];
-	const document = useSuspenseQuery(
-		queries.getDocument(dashboardDocument.gameId, widget.documentId),
-	).data;
-	const docType = document && gameType.objectTypes[document.type];
-	const widgetDefinition = docType?.typeInfo.widgets?.[widget.widget];
+	const document = useDocument(dashboardDocument.gameId, widget.documentId);
+	const docType = useDocumentType(dashboardDocument.gameId, widget.documentId);
+	const widgetDefinition = useWidgetType(
+		dashboardDocument.gameId,
+		widget.documentId,
+		widget.widget,
+	);
 	const navigate = useNavigate();
 
-	if (!widgetDefinition) return <ErrorScreen message={t('widget-not-found')} />;
 	if (!widgetDefinition.settings) return <Navigate to="../" />;
 
 	return (

@@ -4,7 +4,7 @@ import {
 	useQueryClient,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useGameType } from '../useGameType';
+import { useDocumentType, useGameType } from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
@@ -41,17 +41,7 @@ export function DocumentDetails({
 	const user = useSuspenseQuery(queries.getCurrentUser(useRealtimeApi())).data;
 	const document = useLocalDocument(gameId, documentId);
 	const gameType = useGameType(gameId);
-
-	const scripts = gameType.objectTypes[document.type];
-
-	if (!scripts) {
-		return (
-			<ErrorScreen
-				message={t('unknown-doc-type')}
-				explanation={t('unknown-doc-type-explanation')}
-			/>
-		);
-	}
+	const scripts = useDocumentType(gameId, documentId);
 
 	return (
 		<ErrorBoundary

@@ -19,6 +19,7 @@ import { hasDocumentPermission } from '@/utils/security/match-permission';
 import { writeDocumentDetailsPrefix } from '@/utils/security/permission-strings';
 import type { DocumentSummary } from '@/api/models/DocumentSummary';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
+import { useDocument } from '@/utils/api/hooks';
 
 function usePatchDocument(gameId: string, documentId: string) {
 	const queryClient = useQueryClient();
@@ -80,9 +81,7 @@ export function DocumentEdit({
 	});
 
 	const documentsList = useSuspenseQuery(queries.listDocuments(gameId)).data;
-	const documentData = useSuspenseQuery(
-		queries.getDocument(gameId, documentId),
-	).data;
+	const documentData = useDocument(gameId, documentId);
 	const saveDocument = usePatchDocument(gameId, documentId);
 
 	updateFormDefault(documentForm, documentData);

@@ -10,7 +10,7 @@ import { queries } from '@/utils/api/queries';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useGameType } from '../useGameType';
+import { useDocument, useDocumentType } from '@/utils/api/hooks';
 import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
 import { Prose } from '@/components/text/common';
 import {
@@ -60,14 +60,9 @@ export function DocumentSettings({
 	documentId: string;
 }) {
 	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
-	const docData = useSuspenseQuery(
-		queries.getDocument(gameId, documentId),
-	).data;
-	const gameType = useGameType(gameId);
+	const docData = useDocument(gameId, documentId);
+	const docType = useDocumentType(gameId, documentId);
 
-	const docType = gameDetails.typeInfo.objectTypes.find(
-		(t) => t.key == docData.type,
-	);
 	return (
 		<LoadedDocumentSettings
 			gameId={gameId}
@@ -76,7 +71,7 @@ export function DocumentSettings({
 			docData={docData}
 			docType={docType}
 			userRoles={docData.userRoles}
-			objectType={gameType.objectTypes[docData.type]}
+			objectType={docType}
 		/>
 	);
 }
@@ -94,8 +89,7 @@ function LoadedDocumentSettings({
 	documentId: string;
 	gameDetails: GameDetails;
 	docData: DocumentDetails;
-	// docType may be missing when support for a doc type was removed... or the branch was changed.
-	docType?: GameObjectTypeDetails;
+	docType: GameObjectTypeDetails;
 	userRoles: Record<string, string>;
 	objectType: GameTypeObjectScripts<unknown>;
 }) {
@@ -120,24 +114,22 @@ function LoadedDocumentSettings({
 				<SectionHeader>{t('configure-details')}</SectionHeader>
 				<DocumentEdit gameId={gameId} documentId={documentId} />
 			</Section>
-			{docType && (
-				<Section>
-					<SectionHeader>
-						{t('configure-roles', { name: docData.name })}
-					</SectionHeader>
-					<RoleAssignment
-						userRoles={userRoles}
-						playerNames={gameDetails.playerNames}
-						defaultRole=""
-						roles={['', ...docType.userRoles]}
-						onSaveRoles={onSaveRoles}
-						translations={t}
-						roleTranslationsNamespace={objectType.translationNamespace}
-						allowUpdate={displayUserPermissions(docData)}
-						allowUpdateSelf={canUpdateOwnPermissions(docData)}
-					/>
-				</Section>
-			)}
+			<Section>
+				<SectionHeader>
+					{t('configure-roles', { name: docData.name })}
+				</SectionHeader>
+				<RoleAssignment
+					userRoles={userRoles}
+					playerNames={gameDetails.playerNames}
+					defaultRole=""
+					roles={['', ...docType.userRoles]}
+					onSaveRoles={onSaveRoles}
+					translations={t}
+					roleTranslationsNamespace={objectType.translationNamespace}
+					allowUpdate={displayUserPermissions(docData)}
+					allowUpdateSelf={canUpdateOwnPermissions(docData)}
+				/>
+			</Section>
 			{displayDelete && (
 				<Section className="flex flex-col gap-2">
 					<SectionHeader>{t('danger-zone')}</SectionHeader>

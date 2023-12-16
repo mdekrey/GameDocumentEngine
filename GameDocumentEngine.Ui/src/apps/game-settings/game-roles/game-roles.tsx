@@ -2,7 +2,7 @@ import { queries } from '@/utils/api/queries';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { useTranslation } from 'react-i18next';
-import { useGameType } from '@/apps/documents/useGameType';
+import { useGameType } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import { updateGameUserAccess } from '@/utils/security/permission-strings';
 

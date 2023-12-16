@@ -2,7 +2,7 @@ import type { Widget } from '../types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import type { useLaunchModal } from '@/utils/modal/modal-service';
 import type { QueryClient } from '@tanstack/react-query';
-import { getGameType } from '@/apps/documents/useGameType';
+import { getDocumentType, getGameType } from '@/utils/api/hooks';
 import { queries } from '@/utils/api/queries';
 import { produce } from 'immer';
 import { DeleteWidgetModal } from './DeleteWidgetModal';
@@ -20,12 +20,10 @@ export async function deleteWidget(
 		queries.getDocument(gameId, targetWidget.documentId),
 	);
 
-	const docType = gameType.objectTypes[document.type];
-	if (!docType) return;
-	const { icon } = docType.typeInfo;
+	const docType = getDocumentType(gameType, document.type);
 	const additional = {
 		docTypeKey: docType.key,
-		icon,
+		icon: docType.typeInfo.icon,
 		document,
 		widget: targetWidget,
 	};

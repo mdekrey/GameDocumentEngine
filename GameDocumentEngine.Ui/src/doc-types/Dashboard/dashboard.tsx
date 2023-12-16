@@ -1,10 +1,6 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
-import {
-	missingDocumentType,
-	defaultMissingWidgetDefinition,
-} from '@/documents/defaultMissingWidgetDefinition';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import {
@@ -16,7 +12,7 @@ import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
 	PositionedWidgetContainer,
@@ -42,7 +38,7 @@ import { JotaiDiv } from '@/components/jotai/div';
 import { atom } from 'jotai';
 import { elementTemplate } from '@/components/template';
 import type { GameTypeScripts } from '@/utils/api/queries/game-types';
-import { queries } from '@/utils/api/queries';
+import { useDocumentType, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 
 const positionTotalX = (p: Widget) => p.position.x + p.position.width;
@@ -200,14 +196,12 @@ function EditingWidget({
 			handle: () => true,
 		},
 	});
-	const document = useSuspenseQuery(
-		queries.getDocument(gameId, config.documentId),
-	).data;
-
-	const gameObjectType =
-		gameType.objectTypes[document.type]?.typeInfo ?? missingDocumentType;
-	const widgetDefinition =
-		gameObjectType.widgets?.[config.widget] ?? defaultMissingWidgetDefinition;
+	const gameObjectType = useDocumentType(gameId, config.documentId).typeInfo;
+	const widgetDefinition = useWidgetType(
+		gameId,
+		config.documentId,
+		config.widget,
+	);
 	return (
 		<ErrorBoundary fallback={<></>}>
 			<MoveResizeWidget
