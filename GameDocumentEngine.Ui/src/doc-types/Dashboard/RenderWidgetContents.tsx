@@ -7,8 +7,6 @@ export function RenderWidgetContents<T, TWidget extends WidgetBase>({
 	document,
 	translationNamespace,
 	translationKeyPrefix,
-	gameType,
-	docType,
 	widgetConfig,
 }: RenderWidgetContentsProps<T, TWidget>) {
 	const { t: fullTranslation } = useTranslation(
@@ -21,8 +19,6 @@ export function RenderWidgetContents<T, TWidget extends WidgetBase>({
 		<Component
 			document={document}
 			translation={fullTranslation}
-			gameType={gameType}
-			docType={docType}
 			size={widgetConfig.position}
 			widgetSettings={widgetConfig.settings as WidgetSettings<TWidget>}
 		/>

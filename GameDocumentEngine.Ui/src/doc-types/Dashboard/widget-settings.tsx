@@ -5,10 +5,7 @@ import type {
 import type { Dashboard } from './types';
 import { useTranslation } from 'react-i18next';
 import type { Widget } from './types';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
+import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import type { WidgetSettings } from '@/documents/defineDocument';
 import type {
 	GameObjectWidgetDefinition,
@@ -29,7 +26,6 @@ import { useDocument, useDocumentType, useWidgetType } from '@/utils/api/hooks';
 export function WidgetSettings({
 	widgetId,
 	document: dashboardDocument,
-	gameType,
 	onSubmit,
 	form,
 }: GameObjectFormComponent<Dashboard> & { widgetId: string }) {
@@ -52,7 +48,6 @@ export function WidgetSettings({
 	return (
 		<>
 			<WidgetSettingsComponent
-				gameType={gameType}
 				docType={docType}
 				widgetDefinition={widgetDefinition}
 				document={document}
@@ -72,7 +67,6 @@ export function WidgetSettings({
 }
 
 function WidgetSettingsComponent<T, TWidget extends object>({
-	gameType,
 	docType,
 	widgetDefinition,
 	document,
@@ -80,7 +74,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 	t,
 	onSubmit,
 }: {
-	gameType: GameTypeScripts;
 	docType: GameTypeObjectScripts<T>;
 	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
 	document: TypedDocumentDetails<T>;
@@ -111,8 +104,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 		<Component
 			document={document}
 			translation={translation}
-			gameType={gameType}
-			docType={docType}
 			size={widget.position}
 			widgetSettings={get(form.atom)}
 		/>
@@ -127,8 +118,6 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 					<Settings
 						document={document}
 						translation={translation}
-						docType={docType}
-						gameType={gameType}
 						size={widget.position}
 						field={form}
 					/>

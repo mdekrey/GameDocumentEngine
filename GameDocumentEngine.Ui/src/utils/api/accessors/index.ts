@@ -7,8 +7,12 @@ import type {
 	GameTypeScripts,
 } from '../queries/game-types';
 
-export function getDocumentType(gameType: GameTypeScripts, docType: string) {
-	return gameType.objectTypes[docType] ?? missingDocumentType;
+export function getDocumentType<T = unknown>(
+	gameType: GameTypeScripts,
+	docType: string,
+) {
+	return (gameType.objectTypes[docType] ??
+		missingDocumentType) as GameTypeObjectScripts<T>;
 }
 
 export function getWidgetType(

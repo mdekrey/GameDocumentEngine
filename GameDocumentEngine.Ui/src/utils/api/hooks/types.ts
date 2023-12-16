@@ -3,6 +3,7 @@ import { getGameTypeScripts } from '../queries/game-types';
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import { getDocumentType, getWidgetType } from '../accessors';
 import { useDocument, useGame } from './data';
+import type { TypedDocumentDetails } from '@/documents/defineDocument';
 
 export function useGameType(gameId: string): GameTypeScripts {
 	const queryClient = useQueryClient();
@@ -12,10 +13,17 @@ export function useGameType(gameId: string): GameTypeScripts {
 	).data;
 }
 
-export function useDocumentType(gameId: string, documentId: string) {
+export function useTypeOfDocument<T>(document: TypedDocumentDetails<T>) {
+	return useDocumentType<T>(document.gameId, document.id);
+}
+
+export function useDocumentType<T = unknown>(
+	gameId: string,
+	documentId: string,
+) {
 	const gameType = useGameType(gameId);
 	const doc = useDocument(gameId, documentId);
-	return getDocumentType(gameType, doc.type);
+	return getDocumentType<T>(gameType, doc.type);
 }
 
 export function useWidgetType(

@@ -6,10 +6,6 @@ import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
 import type { DocumentPointers } from './get-document-pointers';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
 	details: T;
@@ -27,8 +23,6 @@ export type Updater<T> = (
 export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
 	translation: TFunction;
-	gameType: GameTypeScripts;
-	docType: GameTypeObjectScripts<T>;
 };
 
 export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {

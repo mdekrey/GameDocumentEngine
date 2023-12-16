@@ -6,10 +6,7 @@ import type { IconType } from 'react-icons';
 import type { Widget } from '../types';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
+import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import type {
 	GameObjectWidgetDefinition,
 	TypedDocumentDetails,
@@ -20,18 +17,10 @@ import { WidgetContainer } from '../grid-utils';
 
 export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 	resolve,
-	additional: {
-		gameType,
-		docType,
-		widgetDefinition,
-		document,
-		widget,
-		icon: Icon,
-	},
+	additional: { docType, widgetDefinition, document, widget, icon: Icon },
 }: ModalContentsProps<
 	void,
 	{
-		gameType: GameTypeScripts;
 		docType: GameTypeObjectScripts<T>;
 		widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
 		user: UserDetails;
@@ -66,8 +55,6 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 					<Component
 						document={document}
 						translation={tWidget}
-						docType={docType}
-						gameType={gameType}
 						size={widget.position}
 						widgetSettings={widget.settings}
 					/>

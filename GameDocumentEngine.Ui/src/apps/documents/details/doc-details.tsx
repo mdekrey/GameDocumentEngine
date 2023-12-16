@@ -1,6 +1,6 @@
 import { queries } from '@/utils/api/queries';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDocumentType, useGameType } from '@/utils/api/hooks';
+import { useTypeOfDocument } from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
@@ -11,10 +11,6 @@ import {
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { useCallback, useEffect, useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form';
@@ -33,32 +29,23 @@ export function DocumentDetails({
 }) {
 	const { t } = useTranslation(['document-details']);
 	const document = useLocalDocument(gameId, documentId);
-	const gameType = useGameType(gameId);
-	const scripts = useDocumentType(gameId, documentId);
 
 	return (
 		<ErrorBoundary
 			key={`${gameId}-${documentId}`}
 			fallback={<ErrorScreen message={t('unhandled-error')} />}
 		>
-			<DocumentDetailsForm
-				gameType={gameType}
-				scripts={scripts}
-				document={document}
-			/>
+			<DocumentDetailsForm document={document} />
 		</ErrorBoundary>
 	);
 }
 
 export function DocumentDetailsForm<T = unknown>({
-	gameType,
-	scripts,
 	document,
 }: {
-	gameType: GameTypeScripts;
 	document: TypedDocumentDetails<T>;
-	scripts: GameTypeObjectScripts<T>;
 }) {
+	const scripts = useTypeOfDocument(document);
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(
 		queries.patchDocument(queryClient, document.gameId, document.id),
@@ -133,8 +120,6 @@ export function DocumentDetailsForm<T = unknown>({
 			onSubmit={onSubmit}
 			document={document}
 			translation={fullTranslation}
-			gameType={gameType}
-			docType={scripts}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
 		/>
