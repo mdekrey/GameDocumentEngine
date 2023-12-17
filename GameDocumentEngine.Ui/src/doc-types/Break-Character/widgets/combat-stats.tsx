@@ -12,6 +12,7 @@ import { ErrorScreen } from '@/components/errors';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { z } from 'zod';
+import { useTranslationForDocument } from '@/utils/api/hooks';
 
 const asModifier = new Intl.NumberFormat('en', {
 	signDisplay: 'always',
@@ -52,9 +53,10 @@ const styles: Record<
 
 export function CombatStats({
 	document,
-	translation: t,
+	widgetType,
 	widgetSettings,
 }: WidgetComponentProps<Character, CombatStatsSettings>) {
+	const t = useTranslationForDocument(document, widgetType);
 	if (!document.details.combatValues) {
 		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}

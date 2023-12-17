@@ -2,13 +2,17 @@ import {
 	type WidgetComponentProps,
 	type GameObjectWidgetDefinition,
 } from '@/documents/defineDocument';
-import { useTypeOfDocument } from '@/utils/api/hooks';
+import {
+	useTranslationForDocument,
+	useTypeOfDocument,
+} from '@/utils/api/hooks';
 
 export function NamedIconWidget({
 	document,
-	translation: t,
+	widgetType,
 	size,
 }: WidgetComponentProps<unknown, void>) {
+	const t = useTranslationForDocument(document, widgetType);
 	const Icon = useTypeOfDocument(document).typeInfo.icon;
 	if (size.width === 2) {
 		return (

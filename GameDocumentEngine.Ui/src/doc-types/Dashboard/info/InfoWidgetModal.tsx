@@ -53,9 +53,9 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 				<WidgetContainer size={widget.position}>
 					<Component
 						document={document}
-						translation={tWidget}
 						size={widget.position}
 						widgetSettings={widget.settings}
+						widgetType={widget.widget}
 					/>
 				</WidgetContainer>
 			</div>

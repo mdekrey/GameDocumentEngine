@@ -1,10 +1,10 @@
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import type { ConflictDocument, SideState } from '../conflict-types';
-import type { TFunction } from 'i18next';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { FormFieldReturnType } from '@/utils/form';
 import { SideSummary } from './SideSummary';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 function skillsList(skills: string[]) {
 	return skills
@@ -14,17 +14,16 @@ function skillsList(skills: string[]) {
 
 export function GeneralDisplay({
 	conflictAtom,
-	translation: t,
 	sideA,
 	sideB,
 	isSideBFirst,
 }: {
 	conflictAtom: Atom<ConflictDocument>;
-	translation: TFunction;
 	sideA: FormFieldReturnType<SideState>;
 	sideB: FormFieldReturnType<SideState>;
 	isSideBFirst: boolean;
 }) {
+	const t = useDocTypeTranslation('MouseGuard-Conflict');
 	const skillsValue = useAtomValue(
 		useComputedAtom((get) => get(conflictAtom).details.general.skills),
 	);

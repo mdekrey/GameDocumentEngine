@@ -17,13 +17,17 @@ export function useTypeOfDocument<T>(document: TypedDocumentDetails<T>) {
 	return useDocumentType<T>(document.gameId, document.id);
 }
 
+export function useDocumentTypeKey(gameId: string, documentId: string) {
+	return useDocument(gameId, documentId).type;
+}
+
 export function useDocumentType<T = unknown>(
 	gameId: string,
 	documentId: string,
 ) {
 	const gameType = useGameType(gameId);
-	const doc = useDocument(gameId, documentId);
-	return getDocumentType<T>(gameType, doc.type);
+	const docType = useDocumentTypeKey(gameId, documentId);
+	return getDocumentType<T>(gameType, docType);
 }
 
 export function useWidgetType(

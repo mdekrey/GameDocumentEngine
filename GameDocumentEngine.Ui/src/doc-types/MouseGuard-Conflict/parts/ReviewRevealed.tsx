@@ -11,18 +11,18 @@ import { useTranslation } from 'react-i18next';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Prose } from '@/components/text/common';
 import type { TFunction } from 'i18next';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 export function ReviewRevealed({
 	yourSide,
 	yourSideRevealed,
 	otherSideRevealed,
-	translation,
 }: {
 	yourSide: null | FormFieldReturnType<SideState>;
 	yourSideRevealed: undefined | ActionChoice[];
 	otherSideRevealed: undefined | ActionChoice[];
-	translation: TFunction;
 }) {
+	const translation = useDocTypeTranslation('MouseGuard-Conflict');
 	return (
 		<section className="flex flex-col gap-4">
 			<table className="grid grid-rows-3 md:grid-rows-none grid-flow-col md:grid-cols-3 md:grid-flow-row auto-rows-min auto-cols-fr justify-items-center items-center justify-center gap-4">

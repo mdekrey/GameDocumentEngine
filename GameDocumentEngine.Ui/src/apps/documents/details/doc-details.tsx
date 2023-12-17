@@ -55,7 +55,6 @@ export function DocumentDetailsForm<T = unknown>({
 		() => toEditableDetails(document, fixup),
 		[document, fixup],
 	);
-	const { t: fullTranslation } = useTranslation(scripts.translationNamespace);
 	const { t: formTranslation } = useTranslation(scripts.translationNamespace, {
 		keyPrefix: `document`,
 	});
@@ -119,7 +118,6 @@ export function DocumentDetailsForm<T = unknown>({
 			form={form}
 			onSubmit={onSubmit}
 			document={document}
-			translation={fullTranslation}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
 		/>

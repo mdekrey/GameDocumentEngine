@@ -14,6 +14,7 @@ import feintCard from '@/doc-types/mouseguard-assets/deck/ActionDeckfeint.webp';
 import maneuverCard from '@/doc-types/mouseguard-assets/deck/ActionDeckmaneuver.webp';
 import type { FormFieldReturnType } from '@/utils/form';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 export const defaultNullActionChoice: FieldMapping<
 	ActionChoice | null | undefined,
@@ -50,17 +51,16 @@ export function displayChoice(
 
 export function SelectAction({
 	action,
-	translation,
 }: {
 	action: FormFieldReturnType<ActionChoice | null>;
-	translation: (key: string) => string;
 }) {
+	const t = useDocTypeTranslation('MouseGuard-Conflict');
 	return (
 		<SelectField
 			field={action}
 			items={cardChoices}
 			selectInput={CardInput}
-			children={(item) => displayChoice(item, translation)}
+			children={(item) => displayChoice(item, t)}
 		/>
 	);
 }

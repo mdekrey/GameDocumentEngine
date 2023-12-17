@@ -103,9 +103,9 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 	const widgetJsx = useComputedAtom((get) => (
 		<Component
 			document={document}
-			translation={translation}
 			size={widget.position}
 			widgetSettings={get(form.atom)}
+			widgetType={widget.widget}
 		/>
 	));
 	return (
@@ -115,12 +115,7 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 			</WidgetContainer>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
 				<Fieldset>
-					<Settings
-						document={document}
-						translation={translation}
-						size={widget.position}
-						field={form}
-					/>
+					<Settings document={document} size={widget.position} field={form} />
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>
 					</ButtonRow>

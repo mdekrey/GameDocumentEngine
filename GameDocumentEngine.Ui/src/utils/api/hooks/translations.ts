@@ -4,6 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useDocumentType } from './types';
 import { getWidgetType } from '../accessors';
 
+function getDocTypeTranslationNamespace(docType: string) {
+	return `doc-types:${docType}`;
+}
+
+export function useDocTypeTranslation(docType: string) {
+	return useTranslation(getDocTypeTranslationNamespace(docType)).t;
+}
+
 export function useTranslationFor(
 	gameId: string,
 	documentId: string,
@@ -16,12 +24,13 @@ export function useTranslationFor(
 
 	const params: Parameters<typeof useTranslation> = widgetType
 		? [
-				widgetType.translationNamespace ?? `doc-types:${docType.key}`,
+				widgetType.translationNamespace ??
+					getDocTypeTranslationNamespace(docType.key),
 				{
 					keyPrefix: widgetType.translationKeyPrefix,
 				},
 		  ]
-		: [docType.translationNamespace];
+		: [getDocTypeTranslationNamespace(docType.key)];
 
 	return useTranslation(...params).t;
 }

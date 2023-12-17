@@ -15,7 +15,6 @@ import { useCurrentUser } from '@/utils/api/hooks';
 export function ConflictSheet({
 	form,
 	onSubmit,
-	translation: t,
 	document,
 }: GameObjectFormComponent<Conflict>) {
 	useSubmitOnChange(form, onSubmit);
@@ -64,7 +63,6 @@ export function ConflictSheet({
 				<Fragment key={objectRole}>
 					<GeneralDisplay
 						conflictAtom={form.atom}
-						translation={t}
 						isSideBFirst={isSideB}
 						sideA={fields.sideA}
 						sideB={fields.sideB}
@@ -80,10 +78,9 @@ export function ConflictSheet({
 							yourSide={yourSide ?? null}
 							yourSideRevealed={yourSideRevealed}
 							otherSideRevealed={otherSideRevealed}
-							translation={t}
 						/>
 					) : (
-						yourSide && <ManageSide side={yourSide} translation={t} />
+						yourSide && <ManageSide side={yourSide} />
 					)}
 				</Fragment>
 			)}

@@ -8,6 +8,7 @@ import { ErrorScreen } from '@/components/errors';
 import type { TFunction } from 'i18next';
 import aptitudeColors from '../aptitude-colors.module.css';
 import { useId } from 'react';
+import { useTranslationForDocument } from '@/utils/api/hooks';
 
 const AptitudeValue = elementTemplate('AptitudeValue', 'span', (T) => (
 	<T className="text-right font-bold" />
@@ -51,8 +52,8 @@ function AptitudeStat({
 
 export function AptitudeStats({
 	document,
-	translation: t,
 }: GameObjectComponentBase<Character>) {
+	const t = useTranslationForDocument(document);
 	if (!document.details.aptitudes) {
 		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}

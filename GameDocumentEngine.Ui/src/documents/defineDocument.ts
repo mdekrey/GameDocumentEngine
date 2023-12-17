@@ -1,7 +1,6 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { FieldMapping } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
-import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
@@ -22,7 +21,6 @@ export type Updater<T> = (
 
 export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
-	translation: TFunction;
 };
 
 export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
@@ -45,6 +43,7 @@ export type WidgetComponentProps<
 	T,
 	TWidget extends WidgetBase,
 > = GameObjectComponentBase<T> & {
+	widgetType: string;
 	size: Size;
 	widgetSettings: WidgetSettings<TWidget>;
 };
