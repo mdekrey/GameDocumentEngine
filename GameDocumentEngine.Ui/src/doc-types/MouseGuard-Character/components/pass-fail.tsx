@@ -2,10 +2,10 @@ import type { FormFieldReturnType } from '@/utils/form';
 import { useFormFields } from '@/utils/form';
 import type { Atom } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import { useTranslation } from 'react-i18next';
 import { CheckboxList } from './CheckboxList';
 import { twMerge } from 'tailwind-merge';
 import { NumberField } from '@/components/form-fields/text-input/number-field';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 export function PassFail({
 	advancement,
@@ -20,9 +20,7 @@ export function PassFail({
 	padToCount: Atom<number>;
 	className?: string;
 }) {
-	const { t } = useTranslation('doc-types:MouseGuard-Character', {
-		keyPrefix: 'character-sheet.passes-and-fails',
-	});
+	const t = useDocTypeTranslation('MouseGuard-Character');
 	const fields = useFormFields(advancement, {
 		passes: ['passes'],
 		fails: ['fails'],
@@ -49,7 +47,7 @@ export function PassFail({
 			)}
 		>
 			<div className="flex gap-2 items-center">
-				<span>{t('pass-abbrev')}:</span>
+				<span>{t('character-sheet.passes-and-fails.pass-abbrev')}:</span>
 				<NumberField.Integer field={fields.passes} className="sr-only" />
 				<CheckboxList
 					checkedCount={fields.passes.value}
@@ -62,7 +60,7 @@ export function PassFail({
 				/>
 			</div>
 			<div className="flex gap-2 items-center">
-				<span>{t('fail-abbrev')}:</span>
+				<span>{t('character-sheet.passes-and-failsfail-abbrev')}:</span>
 				<NumberField.Integer field={fields.fails} className="sr-only" />
 				<CheckboxList
 					checkedCount={fields.fails.value}

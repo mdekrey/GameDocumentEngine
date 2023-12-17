@@ -7,7 +7,6 @@ import { useFormFields } from '@/utils/form';
 import { useAtomValue } from 'jotai';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useTranslation } from 'react-i18next';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Prose } from '@/components/text/common';
 import type { TFunction } from 'i18next';
@@ -95,18 +94,16 @@ export function ClearChoicesModal({
 	resolve,
 	reject,
 }: ModalContentsProps<boolean>) {
-	const { t } = useTranslation('doc-types:MouseGuard-Conflict', {
-		keyPrefix: 'clear-modal',
-	});
+	const t = useDocTypeTranslation('MouseGuard-Conflict');
 
 	return (
 		<ModalAlertLayout>
-			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<Prose>{t('are-you-sure')}</Prose>
+			<ModalAlertLayout.Title>{t('clear-modal.title')}</ModalAlertLayout.Title>
+			<Prose>{t('clear-modal.are-you-sure')}</Prose>
 			<ModalAlertLayout.Buttons>
-				<Button onClick={onSubmit}>{t('submit')}</Button>
+				<Button onClick={onSubmit}>{t('clear-modal.submit')}</Button>
 				<Button.Secondary onClick={() => reject('Cancel')}>
-					{t('cancel')}
+					{t('clear-modal.cancel')}
 				</Button.Secondary>
 			</ModalAlertLayout.Buttons>
 		</ModalAlertLayout>

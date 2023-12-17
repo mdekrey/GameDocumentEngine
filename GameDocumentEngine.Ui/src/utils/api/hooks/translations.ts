@@ -31,11 +31,13 @@ export function useTranslationForGame(
 export function useTranslationFor(
 	gameId: string,
 	documentId: string,
-	options?: string | TranslationOptions,
+	optionsOrWidgetType?: string | TranslationOptions,
 ) {
 	const docType = useDocumentType(gameId, documentId);
 	const widgetType =
-		typeof options === 'string' ? getWidgetType(docType, options) : null;
+		typeof optionsOrWidgetType === 'string'
+			? getWidgetType(docType, optionsOrWidgetType)
+			: null;
 
 	const params: Parameters<typeof useTranslation> = widgetType
 		? [
@@ -47,7 +49,9 @@ export function useTranslationFor(
 		  ]
 		: [
 				getDocTypeTranslationNamespace(docType.key),
-				typeof options === 'object' ? options : undefined,
+				typeof optionsOrWidgetType === 'object'
+					? optionsOrWidgetType
+					: undefined,
 		  ];
 
 	return useTranslation(...params).t;

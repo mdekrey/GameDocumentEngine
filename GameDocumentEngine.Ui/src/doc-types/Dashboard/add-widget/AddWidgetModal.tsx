@@ -15,6 +15,7 @@ import {
 	NotSelected,
 	SelectField,
 } from '@/components/form-fields/select-input/select-field';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 export type NewWidgetResult = {
 	id: string;
@@ -36,8 +37,8 @@ export function AddWidgetModal({
 		document: DocumentDetails;
 	}
 >) {
-	const { t: tDocument } = useTranslation(`doc-types:${docTypeKey}`);
-	const { t } = useTranslation('doc-types:Dashboard', {
+	const tDocument = useDocTypeTranslation(docTypeKey);
+	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'add-widget-modal',
 	});
 

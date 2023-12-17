@@ -1,9 +1,12 @@
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
-import { useTranslation } from 'react-i18next';
 import { RenderWidgetContents } from './RenderWidgetContents';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { Widget } from './types';
-import { useDocument, useWidgetType } from '@/utils/api/hooks';
+import {
+	useDocTypeTranslation,
+	useDocument,
+	useWidgetType,
+} from '@/utils/api/hooks';
 import { LimitingInset } from './Inset';
 
 export function RenderWidget({
@@ -13,9 +16,7 @@ export function RenderWidget({
 	gameId: string;
 	widgetConfig: Widget;
 }) {
-	const { t } = useTranslation('doc-types:Dashboard', {
-		keyPrefix: 'widgets',
-	});
+	const t = useDocTypeTranslation('Dashboard');
 	const document = useDocument(gameId, widgetConfig.documentId);
 	const docWidgetDefinition = useWidgetType(
 		gameId,
@@ -26,7 +27,7 @@ export function RenderWidget({
 	return (
 		<LimitingInset>
 			<ErrorBoundary
-				fallback={<ErrorScreen message={t('widget-runtime-error')} />}
+				fallback={<ErrorScreen message={t('widgets.widget-runtime-error')} />}
 			>
 				<RenderWidgetContents
 					component={docWidgetDefinition.component}
