@@ -16,6 +16,7 @@ import type { ZodType } from 'zod';
 import { z } from 'zod';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { useAllGameTypes } from '@/utils/api/hooks';
+import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
 
 function useCreateGame() {
 	const navigate = useNavigate();
@@ -51,7 +52,7 @@ export function CreateGame() {
 							{(gt) =>
 								gt ? (
 									<Trans
-										ns={gameTypes[gt].translationNamespace}
+										ns={getGameTypeTranslationNamespace(gt)}
 										i18nKey={'name'}
 									/>
 								) : (

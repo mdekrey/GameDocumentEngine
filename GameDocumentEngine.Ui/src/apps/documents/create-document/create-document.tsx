@@ -9,8 +9,16 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
-import { getDocumentType } from '@/utils/api/accessors';
-import { useCurrentUser, useGame, useGameType } from '@/utils/api/hooks';
+import {
+	getDocTypeTranslationNamespace,
+	getDocumentType,
+} from '@/utils/api/accessors';
+import {
+	useCurrentUser,
+	useDocTypeTranslation,
+	useGame,
+	useGameType,
+} from '@/utils/api/hooks';
 import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import {
@@ -64,9 +72,9 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 							items={Object.keys(gameType.objectTypes)}
 						>
 							{(key) =>
-								getDocumentType(gameType, key) ? (
+								key ? (
 									<Trans
-										ns={getDocumentType(gameType, key).translationNamespace}
+										ns={getDocTypeTranslationNamespace(key)}
 										i18nKey={'name'}
 									/>
 								) : (
@@ -133,10 +141,7 @@ function DocumentRoleAssignment({
 	const documentTypeName = useAtomValue(documentTypeAtom);
 	const docType = getDocumentType(gameType, documentTypeName);
 	const actualRoles = ['', ...(docType?.userRoles ?? [])];
-
-	const { t } = useTranslation(
-		docType?.translationNamespace ?? 'document-settings',
-	);
+	const t = useDocTypeTranslation(documentTypeName);
 
 	const { eachRole } = useFormFields(rolesField, {
 		eachRole: (userId: string) => ({

@@ -24,3 +24,10 @@ export function getWidgetType(
 		defaultMissingWidgetDefinition
 	);
 }
+
+export function getDocTypeTranslationNamespace(docType: string) {
+	return `doc-types:${docType}`;
+}
+export function getGameTypeTranslationNamespace(docType: string) {
+	return `game-types:${docType}`;
+}

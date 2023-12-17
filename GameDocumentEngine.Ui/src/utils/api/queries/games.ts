@@ -11,6 +11,7 @@ import {
 	applyPatchToQuery,
 } from './applyEventToQuery';
 import { i18n } from '@/utils/i18n/setup';
+import { getGameTypeTranslationNamespace } from '../accessors';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -21,7 +22,7 @@ export const listGameTypes = () => ({
 		}
 		await Promise.all(
 			Object.values(response.data).map(async (gt) =>
-				i18n.loadNamespaces(gt.translationNamespace),
+				i18n.loadNamespaces(getGameTypeTranslationNamespace(gt.key)),
 			),
 		);
 		return response.data;

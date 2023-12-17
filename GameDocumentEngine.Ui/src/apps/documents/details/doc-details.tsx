@@ -1,6 +1,9 @@
 import { queries } from '@/utils/api/queries';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTypeOfDocument } from '@/utils/api/hooks';
+import {
+	useTranslationForDocument,
+	useTypeOfDocument,
+} from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
@@ -45,23 +48,22 @@ export function DocumentDetailsForm<T = unknown>({
 }: {
 	document: TypedDocumentDetails<T>;
 }) {
-	const scripts = useTypeOfDocument(document);
+	const docType = useTypeOfDocument(document).typeInfo;
+	const { schema, fixup, component: Component } = docType;
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(
 		queries.patchDocument(queryClient, document.gameId, document.id),
 	);
-	const { fixup, component: Component } = scripts.typeInfo;
 	const editable = useMemo(
 		() => toEditableDetails(document, fixup),
 		[document, fixup],
 	);
-	const { t: formTranslation } = useTranslation(scripts.translationNamespace, {
-		keyPrefix: `document`,
-	});
 	const form = useForm({
 		defaultValue: editable.editable,
-		schema: documentSchema(scripts.typeInfo.schema),
-		translation: formTranslation,
+		schema: documentSchema(schema),
+		translation: useTranslationForDocument(document, {
+			keyPrefix: `document`,
+		}),
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
 	updateFormDefaultMapped(form, editable.editable);
@@ -123,7 +125,7 @@ export function DocumentDetailsForm<T = unknown>({
 		/>
 	);
 
-	return scripts.typeInfo.noContainer ? (
+	return docType.noContainer ? (
 		component
 	) : (
 		<div className="p-4 h-full w-full">{component}</div>

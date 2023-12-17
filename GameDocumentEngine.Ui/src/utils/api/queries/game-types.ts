@@ -4,6 +4,7 @@ import { api } from '../fetch-api';
 import type { IGameObjectType } from '@/documents/defineDocument';
 import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
 import { i18n } from '@/utils/i18n/setup';
+import { getDocTypeTranslationNamespace } from '../accessors';
 
 export function getGameType(
 	gameType: string,
@@ -91,7 +92,7 @@ function getObjectType(objectType: GameObjectTypeDetails) {
 								reject(error);
 							}
 						}),
-					i18n.loadNamespaces(objectType.translationNamespace),
+					i18n.loadNamespaces(getDocTypeTranslationNamespace(objectType.key)),
 				),
 			);
 
