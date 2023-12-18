@@ -27,10 +27,8 @@ import {
 } from '@/components/form-fields/select-input/select-field';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { RoleAssignmentField } from '@/components/forms/role-assignment/role-assignment-field';
-import type { GameDetails } from '@/api/models/GameDetails';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
-import type { GameTypeScripts } from '@/utils/api/queries/game-types';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useEffect } from 'react';
 
@@ -57,7 +55,6 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 			allRoles: ['initialRoles'],
 		},
 	});
-	const game = useGame(gameId);
 	const gameType = useGameType(gameId);
 	const createDocument = useCreateDocument(gameId);
 
@@ -86,8 +83,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						</SelectField>
 						<DocumentRoleAssignment
 							documentTypeAtom={form.fields.type.value}
-							gameDetails={game}
-							gameType={gameType}
+							gameId={gameId}
 							rolesField={form.fields.allRoles}
 						/>
 						{/* TODO: create doc wizard options? */}
@@ -126,19 +122,19 @@ const defaultEmptyString: FieldMapping<string, string> = {
 
 function DocumentRoleAssignment({
 	documentTypeAtom,
-	gameDetails,
-	gameType,
+	gameId,
 	rolesField,
 }: {
 	documentTypeAtom: Atom<string>;
-	gameDetails: GameDetails;
-	gameType: GameTypeScripts;
+	gameId: string;
 	rolesField: FormFieldReturnType<Record<string, string>>;
 }) {
 	const user = useCurrentUser();
 
 	const disabled = useComputedAtom((get) => !get(documentTypeAtom));
 	const documentTypeName = useAtomValue(documentTypeAtom);
+	const gameDetails = useGame(gameId);
+	const gameType = useGameType(gameId);
 	const docType = getDocumentType(gameType, documentTypeName);
 	const actualRoles = ['', ...(docType?.userRoles ?? [])];
 	const t = useDocTypeTranslation(documentTypeName);
