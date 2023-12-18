@@ -34,11 +34,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { showWidgetInfo } from './info/info';
 import { atom } from 'jotai';
-import {
-	useCurrentUser,
-	useDocumentType,
-	useWidgetType,
-} from '@/utils/api/hooks';
+import { useCurrentUser, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
 
@@ -182,7 +178,6 @@ function EditingWidget({
 			handle: () => true,
 		},
 	});
-	const gameObjectType = useDocumentType(gameId, config.documentId).typeInfo;
 	const widgetDefinition = useWidgetType(
 		gameId,
 		config.documentId,
@@ -194,7 +189,6 @@ function EditingWidget({
 				field={widget.field(['position'])}
 				widgetDefinition={widgetDefinition}
 				widgetConfig={config}
-				gameObjectType={gameObjectType}
 			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"

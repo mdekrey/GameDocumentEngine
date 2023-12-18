@@ -11,7 +11,6 @@ import { useEffect, useRef } from 'react';
 import { elementTemplate } from '@/components/template';
 import type {
 	GameObjectWidgetDefinition,
-	IGameObjectType,
 	WidgetBase,
 	WidgetSettings,
 } from '@/documents/defineDocument';
@@ -38,14 +37,12 @@ export type MoveResizeWidgetProps<T, TWidget extends WidgetBase> = {
 	children?: React.ReactNode;
 	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
 	widgetConfig: Widget<TWidget>;
-	gameObjectType: IGameObjectType<T>;
 };
 
 export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 	field: positionField,
 	children,
 	widgetDefinition,
-	gameObjectType,
 	widgetConfig,
 }: MoveResizeWidgetProps<T, TWidget>) {
 	const store = useStore();
@@ -67,7 +64,6 @@ export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 		});
 	}, [store, positionAtom]);
 	const constraints = widgetDefinition.getConstraints(
-		gameObjectType,
 		widgetConfig.settings as WidgetSettings<TWidget>,
 	);
 	return (

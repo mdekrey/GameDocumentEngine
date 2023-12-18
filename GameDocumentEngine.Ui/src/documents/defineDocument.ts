@@ -66,10 +66,7 @@ export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
 	translationKeyPrefix: string;
-	getConstraints(
-		gameObjectType: IGameObjectType<T>,
-		widgetSettings: WidgetSettings<TWidget>,
-	): {
+	getConstraints(widgetSettings: WidgetSettings<TWidget>): {
 		min: Size;
 		max?: Partial<Size>;
 	};
