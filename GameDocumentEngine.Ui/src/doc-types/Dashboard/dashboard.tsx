@@ -34,7 +34,7 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { showWidgetInfo } from './info/info';
 import { atom } from 'jotai';
-import { useCurrentUser, useWidgetType } from '@/utils/api/hooks';
+import { useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
 
@@ -89,7 +89,6 @@ export function DashboardDisplay({
 			},
 		},
 	});
-	const user = useCurrentUser();
 
 	if (!editing) {
 		return (
@@ -141,17 +140,14 @@ export function DashboardDisplay({
 		</DashboardContainer.Editing>
 	);
 	function onDelete(id: string) {
-		return () =>
-			void deleteWidget(queryClient, launchModal, document.gameId, widgets, id);
+		return () => void deleteWidget(launchModal, document.gameId, widgets, id);
 	}
 	function onInfo(id: string) {
 		return () =>
 			void showWidgetInfo(
-				queryClient,
 				launchModal,
 				document.gameId,
 				document.details.widgets[id],
-				user,
 			);
 	}
 }

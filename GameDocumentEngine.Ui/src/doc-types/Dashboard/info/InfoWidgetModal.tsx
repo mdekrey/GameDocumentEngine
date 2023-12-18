@@ -1,41 +1,39 @@
 import { Button } from '@/components/button/button';
 import { Prose } from '@/components/text/common';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import type { IconType } from 'react-icons';
 import type { Widget } from '../types';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
-import type {
-	GameObjectWidgetDefinition,
-	TypedDocumentDetails,
-	WidgetBase,
-} from '@/documents/defineDocument';
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { WidgetBase } from '@/documents/defineDocument';
 import { WidgetContainer } from '../grid-utils';
 import {
 	useDocTypeTranslation,
-	useTranslationForDocument,
+	useDocument,
+	useDocumentType,
+	useTranslationFor,
+	useWidgetType,
 } from '@/utils/api/hooks';
 
-export function InfoWidgetModal<T, TWidget extends WidgetBase>({
+export function InfoWidgetModal<TWidget extends WidgetBase>({
 	resolve,
-	additional: { docType, widgetDefinition, document, widget, icon: Icon },
+	additional: { gameId, widget },
 }: ModalContentsProps<
 	void,
 	{
-		docType: GameTypeObjectScripts<T>;
-		widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
-		user: UserDetails;
-		document: TypedDocumentDetails<T>;
+		gameId: string;
 		widget: Widget<TWidget>;
-		icon: IconType;
 	}
 >) {
+	const document = useDocument(gameId, widget.documentId);
+	const { icon: Icon } = useDocumentType(gameId, widget.documentId).typeInfo;
+	const Component = useWidgetType(
+		gameId,
+		widget.documentId,
+		widget.widget,
+	).component;
 	const t = useDocTypeTranslation('Dashboard');
-	const tDocument = useDocTypeTranslation(docType.key);
-	const tWidget = useTranslationForDocument(document, widget.widget);
-	const Component = widgetDefinition.component;
+	const tDocument = useTranslationFor(gameId, widget.documentId);
+	const tWidget = useTranslationFor(gameId, widget.documentId, widget.widget);
 	// TODO: better layout
 	return (
 		<ModalDialogLayout>
