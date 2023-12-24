@@ -41,20 +41,18 @@ export function WidgetSettings({
 	if (!widgetDefinition.settings) return <Navigate to="../" />;
 
 	return (
-		<>
-			<WidgetSettingsComponent
-				document={document}
-				widget={widget}
-				onSubmit={(widgetValue) => {
-					navigate('../');
-					void onSubmit(
-						produce(form.get(), (v) => {
-							v.details.widgets[widgetId].settings = widgetValue;
-						}),
-					);
-				}}
-			/>
-		</>
+		<WidgetSettingsComponent
+			document={document}
+			widget={widget}
+			onSubmit={(widgetValue) => {
+				navigate('../');
+				void onSubmit(
+					produce(form.get(), (v) => {
+						v.details.widgets[widgetId].settings = widgetValue;
+					}),
+				);
+			}}
+		/>
 	);
 }
 
