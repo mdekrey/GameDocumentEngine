@@ -1,7 +1,5 @@
-import {
-	type GameObjectComponentBase,
-	type GameObjectWidgetDefinition,
-} from '@/documents/defineDocument';
+import type { WidgetComponentProps } from '@/documents/defineDocument';
+import { type GameObjectWidgetDefinition } from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
@@ -52,8 +50,9 @@ function AptitudeStat({
 
 export function AptitudeStats({
 	document,
-}: GameObjectComponentBase<Character>) {
-	const t = useTranslationForDocument(document);
+	widgetType,
+}: WidgetComponentProps<Character, void>) {
+	const t = useTranslationForDocument(document, widgetType);
 	if (!document.details.aptitudes) {
 		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}
