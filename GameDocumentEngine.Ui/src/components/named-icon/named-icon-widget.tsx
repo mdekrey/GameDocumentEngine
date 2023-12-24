@@ -6,6 +6,12 @@ import {
 	useTranslationForDocument,
 	useTypeOfDocument,
 } from '@/utils/api/hooks';
+import { Link } from 'react-router-dom';
+import { elementTemplate } from '../template';
+
+const NamedLink = elementTemplate('NamedLink', Link, (T) => (
+	<T className="h-full text-xl font-bold flex flex-row items-center" />
+));
 
 export function NamedIconWidget({
 	document,
@@ -14,15 +20,16 @@ export function NamedIconWidget({
 }: WidgetComponentProps<unknown, void>) {
 	const t = useTranslationForDocument(document, widgetType);
 	const Icon = useTypeOfDocument(document).typeInfo.icon;
+	const path = `/game/${document.gameId}/document/${document.id}`;
 	if (size.width === 2) {
 		return (
-			<div className="h-full text-xl font-bold flex flex-row items-center justify-center">
+			<NamedLink to={path} className="justify-center">
 				<Icon title={t('name')} className="flex-shrink-0" />
-			</div>
+			</NamedLink>
 		);
 	}
 	return (
-		<div className="h-full text-xl font-bold flex flex-row items-center overflow-hidden">
+		<NamedLink to={path} className="overflow-hidden">
 			<Icon title={t('name')} className="flex-shrink-0" />
 			{size.width > 2 && (
 				<span className="flex-1 overflow-ellipsis whitespace-nowrap overflow-hidden">
@@ -30,7 +37,7 @@ export function NamedIconWidget({
 					{document.name}
 				</span>
 			)}
-		</div>
+		</NamedLink>
 	);
 }
 
