@@ -3,65 +3,48 @@ import type {
 	GameObjectWidgetSettings,
 } from '@/documents/defineDocument';
 import type { Dashboard } from './types';
-import { useTranslation } from 'react-i18next';
 import type { Widget } from './types';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
 import type { WidgetSettings } from '@/documents/defineDocument';
-import type {
-	GameObjectWidgetDefinition,
-	TypedDocumentDetails,
-} from '@/documents/defineDocument';
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { TypedDocumentDetails } from '@/documents/defineDocument';
 import { useForm } from '@principlestudios/react-jotai-forms';
-import { ErrorScreen } from '@/components/errors/ErrorScreen';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { queries } from '@/utils/api/queries';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { WidgetContainer } from './grid-utils';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
-import type { TFunction } from 'i18next';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { AtomContents } from '@/components/jotai/atom-contents';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { produce } from 'immer';
+import {
+	useDocTypeTranslation,
+	useDocument,
+	useTranslationFor,
+	useTypeOfDocument,
+	useWidgetType,
+} from '@/utils/api/hooks';
 
 export function WidgetSettings({
 	widgetId,
 	document: dashboardDocument,
-	gameType,
-	user,
 	onSubmit,
 	form,
 }: GameObjectFormComponent<Dashboard> & { widgetId: string }) {
-	const { t } = useTranslation('doc-types:Dashboard', {
-		keyPrefix: 'widget-settings',
-	});
-
 	const widget = dashboardDocument.details.widgets[widgetId];
-	const document = useSuspenseQuery(
-		queries.getDocument(dashboardDocument.gameId, widget.documentId),
-	).data;
-	const docType = document && gameType.objectTypes[document.type];
-	const widgetDefinition = docType?.typeInfo.widgets?.[widget.widget];
+	const document = useDocument(dashboardDocument.gameId, widget.documentId);
+	const widgetDefinition = useWidgetType(
+		dashboardDocument.gameId,
+		widget.documentId,
+		widget.widget,
+	);
 	const navigate = useNavigate();
 
-	if (!widgetDefinition) return <ErrorScreen message={t('widget-not-found')} />;
 	if (!widgetDefinition.settings) return <Navigate to="../" />;
 
 	return (
 		<>
 			<WidgetSettingsComponent
-				gameType={gameType}
-				docType={docType}
-				widgetDefinition={widgetDefinition}
-				user={user}
 				document={document}
 				widget={widget}
-				t={t}
 				onSubmit={(widgetValue) => {
 					navigate('../');
 					void onSubmit(
@@ -76,29 +59,25 @@ export function WidgetSettings({
 }
 
 function WidgetSettingsComponent<T, TWidget extends object>({
-	gameType,
-	docType,
-	widgetDefinition,
-	user,
 	document,
 	widget,
-	t,
 	onSubmit,
 }: {
-	gameType: GameTypeScripts;
-	docType: GameTypeObjectScripts<T>;
-	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
-	user: UserDetails;
 	document: TypedDocumentDetails<T>;
 	widget: Widget<TWidget>;
-	t: TFunction;
 	onSubmit: (newSettings: WidgetSettings<TWidget>) => void;
 }) {
-	const { t: translation } = useTranslation(
-		widgetDefinition.translationNamespace ?? `doc-types:${docType.key}`,
-		{
-			keyPrefix: widgetDefinition.translationKeyPrefix,
-		},
+	const docType = useTypeOfDocument(document);
+	const widgetDefinition = useWidgetType(
+		document.gameId,
+		document.id,
+		widget.widget,
+	);
+	const t = useDocTypeTranslation(docType.key);
+	const translation = useTranslationFor(
+		document.gameId,
+		document.id,
+		widget.widget,
 	);
 
 	const settings = widgetDefinition.settings as GameObjectWidgetSettings<
@@ -111,17 +90,14 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 	const form = useForm<WidgetSettings<TWidget>>({
 		defaultValue: widget.settings,
 		schema: settings.schema,
-		translation: translation,
+		translation,
 	});
 	const widgetJsx = useComputedAtom((get) => (
 		<Component
 			document={document}
-			translation={translation}
-			user={user}
-			gameType={gameType}
-			docType={docType}
 			size={widget.position}
 			widgetSettings={get(form.atom)}
+			widgetType={widget.widget}
 		/>
 	));
 	return (
@@ -131,15 +107,7 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 			</WidgetContainer>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
 				<Fieldset>
-					<Settings
-						document={document}
-						translation={translation}
-						docType={docType}
-						gameType={gameType}
-						user={user}
-						size={widget.position}
-						field={form}
-					/>
+					<Settings document={document} size={widget.position} field={form} />
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>
 					</ButtonRow>

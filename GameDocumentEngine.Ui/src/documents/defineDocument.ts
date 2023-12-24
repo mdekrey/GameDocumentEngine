@@ -1,16 +1,10 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type { FieldMapping } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
-import type { TFunction } from 'i18next';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
 import { ZodObject, z } from 'zod';
 import type { DocumentPointers } from './get-document-pointers';
-import type { UserDetails } from '@/api/models/UserDetails';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
 
 export type TypedDocumentDetails<T> = Omit<DocumentDetails, 'details'> & {
 	details: T;
@@ -27,10 +21,6 @@ export type Updater<T> = (
 
 export type GameObjectComponentBase<T = unknown> = {
 	document: TypedDocumentDetails<T>;
-	translation: TFunction;
-	user: UserDetails;
-	gameType: GameTypeScripts;
-	docType: GameTypeObjectScripts<T>;
 };
 
 export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
@@ -53,6 +43,7 @@ export type WidgetComponentProps<
 	T,
 	TWidget extends WidgetBase,
 > = GameObjectComponentBase<T> & {
+	widgetType: string;
 	size: Size;
 	widgetSettings: WidgetSettings<TWidget>;
 };
@@ -75,10 +66,7 @@ export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
 	translationKeyPrefix: string;
-	getConstraints(
-		gameObjectType: IGameObjectType<T>,
-		widgetSettings: WidgetSettings<TWidget>,
-	): {
+	getConstraints(widgetSettings: WidgetSettings<TWidget>): {
 		min: Size;
 		max?: Partial<Size>;
 	};

@@ -7,22 +7,21 @@ import { useFormFields } from '@/utils/form';
 import { useAtomValue } from 'jotai';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useTranslation } from 'react-i18next';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import { Prose } from '@/components/text/common';
 import type { TFunction } from 'i18next';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 export function ReviewRevealed({
 	yourSide,
 	yourSideRevealed,
 	otherSideRevealed,
-	translation,
 }: {
 	yourSide: null | FormFieldReturnType<SideState>;
 	yourSideRevealed: undefined | ActionChoice[];
 	otherSideRevealed: undefined | ActionChoice[];
-	translation: TFunction;
 }) {
+	const translation = useDocTypeTranslation('MouseGuard-Conflict');
 	return (
 		<section className="flex flex-col gap-4">
 			<table className="grid grid-rows-3 md:grid-rows-none grid-flow-col md:grid-cols-3 md:grid-flow-row auto-rows-min auto-cols-fr justify-items-center items-center justify-center gap-4">
@@ -95,18 +94,16 @@ export function ClearChoicesModal({
 	resolve,
 	reject,
 }: ModalContentsProps<boolean>) {
-	const { t } = useTranslation('doc-types:MouseGuard-Conflict', {
-		keyPrefix: 'clear-modal',
-	});
+	const t = useDocTypeTranslation('MouseGuard-Conflict');
 
 	return (
 		<ModalAlertLayout>
-			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<Prose>{t('are-you-sure')}</Prose>
+			<ModalAlertLayout.Title>{t('clear-modal.title')}</ModalAlertLayout.Title>
+			<Prose>{t('clear-modal.are-you-sure')}</Prose>
 			<ModalAlertLayout.Buttons>
-				<Button onClick={onSubmit}>{t('submit')}</Button>
+				<Button onClick={onSubmit}>{t('clear-modal.submit')}</Button>
 				<Button.Secondary onClick={() => reject('Cancel')}>
-					{t('cancel')}
+					{t('clear-modal.cancel')}
 				</Button.Secondary>
 			</ModalAlertLayout.Buttons>
 		</ModalAlertLayout>

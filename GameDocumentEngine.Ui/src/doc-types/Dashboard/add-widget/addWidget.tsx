@@ -4,32 +4,24 @@ import type { useLaunchModal } from '@/utils/modal/modal-service';
 import type { NewWidgetResult } from './AddWidgetModal';
 import { AddWidgetModal } from './AddWidgetModal';
 import type { QueryClient } from '@tanstack/react-query';
-import { getGameType } from '@/apps/documents/useGameType';
-import { queries } from '@/utils/api/queries';
+import { fetchDocument, fetchDocumentType } from '@/utils/api/loaders';
 import { NoWidgetsModal } from './NoWidgets';
 
 export async function addWidget(
 	queryClient: QueryClient,
 	launchModal: ReturnType<typeof useLaunchModal>,
-	documentIds: { gameId: string; id: string },
+	{ gameId, id }: { gameId: string; id: string },
 	widgetsField: FormFieldReturnType<Record<string, Widget>>,
 	coordinate: { x: number; y: number },
 ) {
-	const gameType = await getGameType(queryClient, documentIds.gameId);
-	const document = await queryClient.fetchQuery(
-		queries.getDocument(documentIds.gameId, documentIds.id),
-	);
-
-	const docType = gameType.objectTypes[document.type];
-	if (!docType) return;
-	const { widgets = {}, icon } = docType.typeInfo;
+	const document = await fetchDocument(queryClient, gameId, id);
+	const docType = await fetchDocumentType(queryClient, gameId, id);
 	const additional = {
-		docTypeKey: docType.key,
-		widgets,
-		icon,
-		document,
+		gameId,
+		documentId: id,
+		widgets: docType.typeInfo.widgets ?? {},
 	};
-	const widgetKeys = Object.keys(widgets);
+	const widgetKeys = Object.keys(additional.widgets);
 
 	if (widgetKeys.length === 0)
 		return await launchModal({ ModalContents: NoWidgetsModal, additional });
@@ -38,7 +30,11 @@ export async function addWidget(
 	try {
 		const result = await launchModal({
 			ModalContents: AddWidgetModal,
-			additional,
+			additional: {
+				gameId,
+				documentId: id,
+				widgets: docType.typeInfo.widgets ?? {},
+			},
 		});
 		applyChange(result);
 	} catch (ex) {
@@ -52,11 +48,11 @@ export async function addWidget(
 				documentId: document.id,
 				position: {
 					...coordinate,
-					width: widgets[result.id].defaults.width,
-					height: widgets[result.id].defaults.height,
+					width: additional.widgets[result.id].defaults.width,
+					height: additional.widgets[result.id].defaults.height,
 				},
 				widget: result.id,
-				settings: widgets[result.id].settings?.default ?? {},
+				settings: additional.widgets[result.id].settings?.default ?? {},
 			},
 		}));
 	}

@@ -10,13 +10,12 @@ import { ReadyWatcher } from './parts/ReadyWatcher';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useAtomValue } from 'jotai';
 import { ReviewRevealed } from './parts/ReviewRevealed';
+import { useCurrentUser } from '@/utils/api/hooks';
 
 export function ConflictSheet({
 	form,
 	onSubmit,
-	translation: t,
 	document,
-	user,
 }: GameObjectFormComponent<Conflict>) {
 	useSubmitOnChange(form, onSubmit);
 	const fields = useFormFields(form, {
@@ -27,7 +26,7 @@ export function ConflictSheet({
 		sideA: { path: ['details', 'sideA'], translationPath: ['details', 'side'] },
 		sideB: { path: ['details', 'sideB'], translationPath: ['details', 'side'] },
 	});
-	const objectRole = document.userRoles[user.id];
+	const objectRole = document.userRoles[useCurrentUser().id];
 	const isSideB = objectRole?.includes('side-b') ?? false;
 
 	const yourSide = objectRole?.includes('side-a')
@@ -64,7 +63,6 @@ export function ConflictSheet({
 				<Fragment key={objectRole}>
 					<GeneralDisplay
 						conflictAtom={form.atom}
-						translation={t}
 						isSideBFirst={isSideB}
 						sideA={fields.sideA}
 						sideB={fields.sideB}
@@ -80,10 +78,9 @@ export function ConflictSheet({
 							yourSide={yourSide ?? null}
 							yourSideRevealed={yourSideRevealed}
 							otherSideRevealed={otherSideRevealed}
-							translation={t}
 						/>
 					) : (
-						yourSide && <ManageSide side={yourSide} translation={t} />
+						yourSide && <ManageSide side={yourSide} />
 					)}
 				</Fragment>
 			)}

@@ -1,13 +1,9 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
-import { extraQueries, queries } from '@/utils/api/queries';
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query';
+import { extraQueries } from '@/utils/api/queries';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiChevronRight } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
-import { useGameType } from '../documents/useGameType';
+import { useAllDocuments, useGame, useGameType } from '@/utils/api/hooks';
 import { useTranslation } from 'react-i18next';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import { createDocument } from '@/utils/security/permission-strings';
@@ -24,8 +20,8 @@ import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition'
 
 export function GameObjects({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
-	const docsResult = useSuspenseQuery(queries.listDocuments(gameId)).data;
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
+	const docsResult = useAllDocuments(gameId);
+	const gameDetails = useGame(gameId);
 	const gameType = useGameType(gameId);
 	const docMoveToRootEvents = useDragTarget(gameId);
 

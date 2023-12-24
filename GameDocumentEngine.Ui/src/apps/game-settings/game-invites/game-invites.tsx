@@ -1,11 +1,7 @@
 import { IconButton } from '@/components/button/icon-button';
 import { queries } from '@/utils/api/queries';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import {
-	useMutation,
-	useSuspenseQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
@@ -13,32 +9,29 @@ import type { GameInvite } from '@/api/models/GameInvite';
 import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
 import { DeleteInviteModal } from './delete-invite';
 import { Trans, useTranslation } from 'react-i18next';
-import { useGameType } from '../../documents/useGameType';
+import { useGame, useInvitations } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	createInvitation,
 	cancelInvitation,
 } from '@/utils/security/permission-strings';
+import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
 
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
 
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
-	const invitations = Object.values(
-		useSuspenseQuery(queries.listInvitations(gameId)).data,
-	);
+	const gameDetails = useGame(gameId);
+	const invitations = useInvitations(gameId);
 	const launchModal = useLaunchModal();
 	const copyLink = useMutation({
 		mutationFn: async (invitation: GameInvite) => {
 			await navigator.clipboard.writeText(getInviteUrl(invitation));
 		},
 	});
-
 	const queryClient = useQueryClient();
 	const deleteInvite = useMutation(
 		queries.cancelInvitation(queryClient, gameId),
 	);
-	const gameType = useGameType(gameId);
 
 	const allowCreate = gameDetails.typeInfo.userRoles.some((role) =>
 		hasGamePermission(gameDetails, (id) => createInvitation(id, role)),
@@ -84,7 +77,9 @@ export function GameInvites({ gameId }: { gameId: string }) {
 									<>
 										<td>
 											<Trans
-												ns={gameType.translationNamespace}
+												ns={getGameTypeTranslationNamespace(
+													gameDetails.typeInfo.key,
+												)}
 												i18nKey={`roles.${invite.role}.name`}
 											/>
 										</td>
@@ -132,11 +127,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 
 	function createInvite() {
 		void launchModal({
-			additional: {
-				gameId,
-				gameData: gameDetails,
-				gameType,
-			},
+			additional: { gameId },
 			ModalContents: CreateInvite,
 		});
 	}

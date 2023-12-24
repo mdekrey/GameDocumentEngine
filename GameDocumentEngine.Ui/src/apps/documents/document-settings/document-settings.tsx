@@ -1,16 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import {
-	useMutation,
-	useSuspenseQuery,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { RoleAssignment } from '@/components/forms/role-assignment/role-assignment';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useGameType } from '../useGameType';
+import { useDocument, useDocumentType, useGame } from '@/utils/api/hooks';
 import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
 import { Prose } from '@/components/text/common';
 import {
@@ -22,9 +18,7 @@ import { hasDocumentPermission } from '@/utils/security/match-permission';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { DocumentEdit } from './document-edit/document-edit';
-import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
-import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
-import type { GameDetails } from '@/api/models/GameDetails';
+import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
 
 function displayUserPermissions(documentDetails: DocumentDetails) {
 	return hasDocumentPermission(documentDetails, updateDocumentUserAccess);
@@ -59,50 +53,11 @@ export function DocumentSettings({
 	gameId: string;
 	documentId: string;
 }) {
-	const gameDetails = useSuspenseQuery(queries.getGameDetails(gameId)).data;
-	const docData = useSuspenseQuery(
-		queries.getDocument(gameId, documentId),
-	).data;
-	const gameType = useGameType(gameId);
-
-	const docType = gameDetails.typeInfo.objectTypes.find(
-		(t) => t.key == docData.type,
-	);
-	return (
-		<LoadedDocumentSettings
-			gameId={gameId}
-			documentId={documentId}
-			gameDetails={gameDetails}
-			docData={docData}
-			docType={docType}
-			userRoles={docData.userRoles}
-			objectType={gameType.objectTypes[docData.type]}
-		/>
-	);
-}
-
-function LoadedDocumentSettings({
-	gameId,
-	documentId,
-	gameDetails,
-	docData,
-	docType,
-	userRoles,
-	objectType,
-}: {
-	gameId: string;
-	documentId: string;
-	gameDetails: GameDetails;
-	docData: DocumentDetails;
-	// docType may be missing when support for a doc type was removed... or the branch was changed.
-	docType?: GameObjectTypeDetails;
-	userRoles: Record<string, string>;
-	objectType: GameTypeObjectScripts<unknown>;
-}) {
+	const gameDetails = useGame(gameId);
+	const docData = useDocument(gameId, documentId);
+	const docType = useDocumentType(gameId, documentId);
 	const { t } = useTranslation('document-settings');
-
 	const displayDelete = displayDeleteDocument(docData);
-
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 	const launchModal = useLaunchModal();
@@ -120,24 +75,24 @@ function LoadedDocumentSettings({
 				<SectionHeader>{t('configure-details')}</SectionHeader>
 				<DocumentEdit gameId={gameId} documentId={documentId} />
 			</Section>
-			{docType && (
-				<Section>
-					<SectionHeader>
-						{t('configure-roles', { name: docData.name })}
-					</SectionHeader>
-					<RoleAssignment
-						userRoles={userRoles}
-						playerNames={gameDetails.playerNames}
-						defaultRole=""
-						roles={['', ...docType.userRoles]}
-						onSaveRoles={onSaveRoles}
-						translations={t}
-						roleTranslationsNamespace={objectType.translationNamespace}
-						allowUpdate={displayUserPermissions(docData)}
-						allowUpdateSelf={canUpdateOwnPermissions(docData)}
-					/>
-				</Section>
-			)}
+			<Section>
+				<SectionHeader>
+					{t('configure-roles', { name: docData.name })}
+				</SectionHeader>
+				<RoleAssignment
+					userRoles={docData.userRoles}
+					playerNames={gameDetails.playerNames}
+					defaultRole=""
+					roles={['', ...docType.userRoles]}
+					onSaveRoles={onSaveRoles}
+					translations={t}
+					roleTranslationsNamespace={getDocTypeTranslationNamespace(
+						docType.key,
+					)}
+					allowUpdate={displayUserPermissions(docData)}
+					allowUpdateSelf={canUpdateOwnPermissions(docData)}
+				/>
+			</Section>
 			{displayDelete && (
 				<Section className="flex flex-col gap-2">
 					<SectionHeader>{t('danger-zone')}</SectionHeader>
@@ -157,7 +112,9 @@ function LoadedDocumentSettings({
 					([key, newValue]) =>
 						[key, newValue === '' ? null : newValue] as const,
 				)
-				.filter(([key, newValue]) => newValue !== (userRoles[key] ?? null)),
+				.filter(
+					([key, newValue]) => newValue !== (docData.userRoles[key] ?? null),
+				),
 		);
 		updateDocumentRoleAssignments.mutate(changed);
 	}

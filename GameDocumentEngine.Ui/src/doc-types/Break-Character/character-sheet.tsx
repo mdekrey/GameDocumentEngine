@@ -15,6 +15,7 @@ import { LuBackpack, LuSword } from 'react-icons/lu';
 import { Abilities } from './parts/abilities';
 import { Social } from './parts/social';
 import { Gear } from './parts/gear';
+import { useTranslationForDocument } from '@/utils/api/hooks';
 
 const tabInfo: [
 	id: string,
@@ -32,23 +33,16 @@ const tabInfo: [
 export function CharacterSheet({
 	form,
 	onSubmit,
-	translation: t,
 	...remaining
 }: GameObjectFormComponent<Character>) {
+	const t = useTranslationForDocument(remaining.document);
 	useSubmitOnChange(form, onSubmit);
 
 	const tabs = tabInfo.map(([key, icon, Component]) => ({
 		key,
 		icon,
 		title: t(`character-sheet.tabs.${key}`),
-		content: (
-			<Component
-				form={form}
-				translation={t}
-				onSubmit={onSubmit}
-				{...remaining}
-			/>
-		),
+		content: <Component form={form} onSubmit={onSubmit} {...remaining} />,
 	}));
 
 	return (

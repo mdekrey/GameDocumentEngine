@@ -9,12 +9,14 @@ import {
 	SelectField,
 } from '@/components/form-fields/select-input/select-field';
 import { useForm } from '@/utils/form';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
 import { Section, SingleColumnSections } from '@/components/sections';
+import { useAllGameTypes } from '@/utils/api/hooks';
+import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
 
 function useCreateGame() {
 	const navigate = useNavigate();
@@ -22,8 +24,8 @@ function useCreateGame() {
 }
 
 const CreateGameDetails = z.object({
-	name: z.string().nonempty(),
-	type: z.string().nonempty(),
+	name: z.string().min(1),
+	type: z.string().min(1),
 }) satisfies ZodType<CreateGameDetails>;
 
 export function CreateGame() {
@@ -34,7 +36,7 @@ export function CreateGame() {
 		translation: t,
 	});
 
-	const gameTypes = useSuspenseQuery(queries.listGameTypes()).data;
+	const gameTypes = useAllGameTypes();
 	const createGame = useCreateGame();
 
 	return (
@@ -50,7 +52,7 @@ export function CreateGame() {
 							{(gt) =>
 								gt ? (
 									<Trans
-										ns={gameTypes[gt].translationNamespace}
+										ns={getGameTypeTranslationNamespace(gt)}
 										i18nKey={'name'}
 									/>
 								) : (

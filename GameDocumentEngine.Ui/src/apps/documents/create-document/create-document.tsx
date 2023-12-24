@@ -5,11 +5,20 @@ import { queries } from '@/utils/api/queries';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import { useForm, useFormFields } from '@/utils/form';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
-import { useGameType } from '../useGameType';
+import {
+	getDocTypeTranslationNamespace,
+	getDocumentType,
+} from '@/utils/api/accessors';
+import {
+	useCurrentUser,
+	useDocTypeTranslation,
+	useGame,
+	useGameType,
+} from '@/utils/api/hooks';
 import { Trans, useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import {
@@ -18,14 +27,8 @@ import {
 } from '@/components/form-fields/select-input/select-field';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { RoleAssignmentField } from '@/components/forms/role-assignment/role-assignment-field';
-import type { GameDetails } from '@/api/models/GameDetails';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import { useEffect } from 'react';
 
@@ -52,7 +55,6 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 			allRoles: ['initialRoles'],
 		},
 	});
-	const game = useSuspenseQuery(queries.getGameDetails(gameId)).data;
 	const gameType = useGameType(gameId);
 	const createDocument = useCreateDocument(gameId);
 
@@ -65,12 +67,11 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						<SelectField
 							field={form.fields.type}
 							items={Object.keys(gameType.objectTypes)}
-							key={gameType ? 1 : 0}
 						>
 							{(key) =>
-								gameType.objectTypes[key] ? (
+								key ? (
 									<Trans
-										ns={gameType.objectTypes[key].translationNamespace}
+										ns={getDocTypeTranslationNamespace(key)}
 										i18nKey={'name'}
 									/>
 								) : (
@@ -82,8 +83,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 						</SelectField>
 						<DocumentRoleAssignment
 							documentTypeAtom={form.fields.type.value}
-							gameDetails={game}
-							gameType={gameType}
+							gameId={gameId}
 							rolesField={form.fields.allRoles}
 						/>
 						{/* TODO: create doc wizard options? */}
@@ -99,7 +99,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	async function onSubmit(
 		currentValue: Omit<CreateDocumentDetails, 'details'>,
 	) {
-		const objectInfo = gameType.objectTypes[currentValue.type];
+		const objectInfo = getDocumentType(gameType, currentValue.type);
 		const initialRoles = Object.fromEntries(
 			Object.entries(currentValue.initialRoles).filter(([, role]) => !!role),
 		);
@@ -122,28 +122,22 @@ const defaultEmptyString: FieldMapping<string, string> = {
 
 function DocumentRoleAssignment({
 	documentTypeAtom,
-	gameDetails,
-	gameType,
+	gameId,
 	rolesField,
 }: {
 	documentTypeAtom: Atom<string>;
-	gameDetails: GameDetails;
-	gameType: GameTypeScripts;
+	gameId: string;
 	rolesField: FormFieldReturnType<Record<string, string>>;
 }) {
-	const realtimeApi = useRealtimeApi();
-	const user = useSuspenseQuery(queries.getCurrentUser(realtimeApi)).data;
+	const user = useCurrentUser();
 
 	const disabled = useComputedAtom((get) => !get(documentTypeAtom));
 	const documentTypeName = useAtomValue(documentTypeAtom);
-	const docType = gameType.objectTypes[documentTypeName] as
-		| GameTypeObjectScripts<unknown>
-		| undefined;
+	const gameDetails = useGame(gameId);
+	const gameType = useGameType(gameId);
+	const docType = getDocumentType(gameType, documentTypeName);
 	const actualRoles = ['', ...(docType?.userRoles ?? [])];
-
-	const { t } = useTranslation(
-		docType?.translationNamespace ?? 'document-settings',
-	);
+	const t = useDocTypeTranslation(documentTypeName);
 
 	const { eachRole } = useFormFields(rolesField, {
 		eachRole: (userId: string) => ({

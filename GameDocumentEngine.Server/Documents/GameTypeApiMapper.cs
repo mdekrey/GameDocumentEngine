@@ -40,8 +40,7 @@ class GameTypeApiMapper : IApiMapper<IGameType, Api.GameTypeDetails>
 					UserRoles: gameType.Roles,
 					ObjectTypes: await Task.WhenAll(
 						gameType.ObjectTypes.Select(obj => GetGameObjectTypeFromCache(gameType, obj))
-					),
-					TranslationNamespace: $"{gameTypeNsPrefix}{gameType.Key}"
+					)
 				);
 	}
 

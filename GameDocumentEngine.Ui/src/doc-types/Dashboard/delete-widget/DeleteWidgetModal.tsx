@@ -2,32 +2,35 @@ import { Button } from '@/components/button/button';
 import { Prose } from '@/components/text/common';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { Trans, useTranslation } from 'react-i18next';
-import type { IconType } from 'react-icons';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import { Trans } from 'react-i18next';
 import type { Widget } from '../types';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
+import {
+	useDocTypeTranslation,
+	useDocument,
+	useDocumentType,
+	useTranslationFor,
+	useTranslationForDocument,
+} from '@/utils/api/hooks';
 
 export function DeleteWidgetModal({
 	resolve,
 	reject,
-	additional: { docTypeKey, widget, icon: Icon, document },
+	additional: { gameId, widget },
 }: ModalContentsProps<
 	boolean,
 	{
-		docTypeKey: string;
+		gameId: string;
 		widget: Widget;
-		icon: IconType;
-		document: DocumentDetails;
 	}
 >) {
-	const { t } = useTranslation('doc-types:Dashboard', {
+	const document = useDocument(gameId, widget.documentId);
+	const { icon: Icon } = useDocumentType(gameId, widget.documentId).typeInfo;
+	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'delete-widget-modal',
 	});
-	const { t: tDocument } = useTranslation(`doc-types:${docTypeKey}`);
-	const { t: tWidget } = useTranslation(`doc-types:${docTypeKey}`, {
-		keyPrefix: `widgets.${widget.widget}`,
-	});
+	const tDocument = useTranslationForDocument(document);
+	const tWidget = useTranslationFor(gameId, widget.documentId, widget.widget);
 	return (
 		<ModalAlertLayout>
 			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>

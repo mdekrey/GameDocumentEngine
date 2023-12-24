@@ -23,6 +23,7 @@ import { Tabs } from '@/components/tabs/tabs';
 import { Sections, Section, SectionHeader } from '@/components/sections';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import type { TFunction } from 'i18next';
+import { useTranslationForDocument } from '@/utils/api/hooks';
 
 type TabContent = React.FC<{
 	form: UseFormResult<CharacterDocument>;
@@ -99,9 +100,10 @@ const tabInfo: [id: string, icon: typeof HiOutlineUser, content: TabContent][] =
 
 export function CharacterSheet({
 	form,
+	document,
 	onSubmit,
-	translation: t,
 }: GameObjectFormComponent<Character>) {
+	const t = useTranslationForDocument(document);
 	useSubmitOnChange(form, onSubmit);
 
 	const tabs = useMemo(

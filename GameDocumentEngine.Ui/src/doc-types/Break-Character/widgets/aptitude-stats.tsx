@@ -1,13 +1,12 @@
-import {
-	type GameObjectComponentBase,
-	type GameObjectWidgetDefinition,
-} from '@/documents/defineDocument';
+import type { WidgetComponentProps } from '@/documents/defineDocument';
+import { type GameObjectWidgetDefinition } from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
 import type { TFunction } from 'i18next';
 import aptitudeColors from '../aptitude-colors.module.css';
 import { useId } from 'react';
+import { useTranslationForDocument } from '@/utils/api/hooks';
 
 const AptitudeValue = elementTemplate('AptitudeValue', 'span', (T) => (
 	<T className="text-right font-bold" />
@@ -51,8 +50,9 @@ function AptitudeStat({
 
 export function AptitudeStats({
 	document,
-	translation: t,
-}: GameObjectComponentBase<Character>) {
+	widgetType,
+}: WidgetComponentProps<Character, void>) {
+	const t = useTranslationForDocument(document, widgetType);
 	if (!document.details.aptitudes) {
 		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}

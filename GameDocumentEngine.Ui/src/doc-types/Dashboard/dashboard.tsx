@@ -1,10 +1,6 @@
 import '@/utils/api/queries';
 import { useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
-import {
-	missingDocumentType,
-	defaultMissingWidgetDefinition,
-} from '@/documents/defaultMissingWidgetDefinition';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import {
@@ -16,7 +12,7 @@ import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
 	DashboardContainer,
 	PositionedWidgetContainer,
@@ -35,21 +31,23 @@ import { BsInfoLg } from 'react-icons/bs';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
-import type { UserDetails } from '@/api/models/UserDetails';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { showWidgetInfo } from './info/info';
-import { JotaiDiv } from '@/components/jotai/div';
 import { atom } from 'jotai';
-import { elementTemplate } from '@/components/template';
-import type { GameTypeScripts } from '@/utils/api/queries/game-types';
-import { queries } from '@/utils/api/queries';
+import { useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
+import { Inset } from './Inset';
+
+const positionTotalX = (p: Widget) => p.position.x + p.position.width;
+const positionTotalY = (p: Widget) => p.position.y + p.position.height;
+const widgetsTotal = (
+	widgets: Record<string, Widget>,
+	v: (p: Widget) => number,
+) => Math.max(...Object.values(widgets).map(v)).toFixed(0);
 
 export function DashboardDisplay({
 	document,
 	form,
-	user,
-	gameType,
 	writablePointers,
 	onSubmit,
 }: GameObjectFormComponent<Dashboard>) {
@@ -61,20 +59,12 @@ export function DashboardDisplay({
 		widgets: ['details', 'widgets'],
 		widget: (id: string) => ['details', 'widgets', id],
 	});
-	const dashboardHeight = useComputedAtom((get) => {
-		return Math.max(
-			...Object.values(get(widgets.atom)).map(
-				(w) => w.position.y + w.position.height,
-			),
-		).toFixed(0);
-	});
-	const dashboardWidth = useComputedAtom((get) => {
-		return Math.max(
-			...Object.values(get(widgets.atom)).map(
-				(w) => w.position.x + w.position.width,
-			),
-		).toFixed(0);
-	});
+	const dashboardHeight = useComputedAtom((get) =>
+		widgetsTotal(get(widgets.atom), positionTotalY),
+	);
+	const dashboardWidth = useComputedAtom((get) =>
+		widgetsTotal(get(widgets.atom), positionTotalX),
+	);
 	const [editing, toggleEditing] = useReducer(
 		canUpdateWidgets ? (prev) => !prev : () => false,
 		false,
@@ -109,13 +99,7 @@ export function DashboardDisplay({
 				{Object.entries(document.details.widgets).map(
 					([key, config]: [string, Widget]) => (
 						<PositionedWidgetContainer key={key} position={config.position}>
-							<RenderWidget
-								key={key}
-								gameType={gameType}
-								gameId={document.gameId}
-								user={user}
-								widgetConfig={config}
-							/>
+							<RenderWidget gameId={document.gameId} widgetConfig={config} />
 						</PositionedWidgetContainer>
 					),
 				)}
@@ -139,11 +123,9 @@ export function DashboardDisplay({
 				([key, config]: [string, Widget]) => (
 					<EditingWidget
 						key={key}
-						gameType={gameType}
 						widgetId={key}
 						widget={widget(key)}
 						dashboard={document}
-						user={user}
 						config={config}
 						onDelete={onDelete(key)}
 						onInfo={onInfo(key)}
@@ -158,40 +140,30 @@ export function DashboardDisplay({
 		</DashboardContainer.Editing>
 	);
 	function onDelete(id: string) {
-		return () =>
-			void deleteWidget(queryClient, launchModal, document.gameId, widgets, id);
+		return () => void deleteWidget(launchModal, document.gameId, widgets, id);
 	}
 	function onInfo(id: string) {
 		return () =>
 			void showWidgetInfo(
-				queryClient,
 				launchModal,
 				document.gameId,
 				document.details.widgets[id],
-				user,
 			);
 	}
 }
 
-const Inset = elementTemplate('Inset', JotaiDiv, (T) => (
-	<T className="absolute inset-0" />
-));
 const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));
 function EditingWidget({
-	gameType,
 	widget,
 	widgetId,
 	dashboard: { gameId },
-	user,
 	config,
 	onDelete,
 	onInfo,
 }: {
-	gameType: GameTypeScripts;
 	widget: FormFieldReturnType<Widget>;
 	widgetId: string;
 	dashboard: DocumentDetails;
-	user: UserDetails;
 	config: Widget;
 	onDelete: () => void;
 	onInfo: () => void;
@@ -202,21 +174,17 @@ function EditingWidget({
 			handle: () => true,
 		},
 	});
-	const document = useSuspenseQuery(
-		queries.getDocument(gameId, config.documentId),
-	).data;
-
-	const gameObjectType =
-		gameType.objectTypes[document.type]?.typeInfo ?? missingDocumentType;
-	const widgetDefinition =
-		gameObjectType.widgets?.[config.widget] ?? defaultMissingWidgetDefinition;
+	const widgetDefinition = useWidgetType(
+		gameId,
+		config.documentId,
+		config.widget,
+	);
 	return (
 		<ErrorBoundary fallback={<></>}>
 			<MoveResizeWidget
 				field={widget.field(['position'])}
 				widgetDefinition={widgetDefinition}
 				widgetConfig={config}
-				gameObjectType={gameObjectType}
 			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"
@@ -224,16 +192,10 @@ function EditingWidget({
 				/>
 				<Inset
 					style={{
-						// TODO: only disable pointerEvents if the widget doesn't allow contents
 						pointerEvents: hoverVisibility,
 					}}
 				>
-					<RenderWidget
-						gameType={gameType}
-						gameId={gameId}
-						user={user}
-						widgetConfig={config}
-					/>
+					<RenderWidget gameId={gameId} widgetConfig={config} />
 				</Inset>
 				<Inset
 					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"

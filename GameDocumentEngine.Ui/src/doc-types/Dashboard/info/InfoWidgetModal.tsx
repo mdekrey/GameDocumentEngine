@@ -1,58 +1,45 @@
 import { Button } from '@/components/button/button';
 import { Prose } from '@/components/text/common';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { useTranslation } from 'react-i18next';
-import type { IconType } from 'react-icons';
 import type { Widget } from '../types';
 import { NamedIcon } from '@/components/named-icon/NamedIcon';
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
-import type {
-	GameObjectWidgetDefinition,
-	TypedDocumentDetails,
-	WidgetBase,
-} from '@/documents/defineDocument';
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { WidgetBase } from '@/documents/defineDocument';
 import { WidgetContainer } from '../grid-utils';
+import {
+	useDocTypeTranslation,
+	useDocument,
+	useDocumentType,
+	useTranslationFor,
+	useWidgetType,
+} from '@/utils/api/hooks';
 
-export function InfoWidgetModal<T, TWidget extends WidgetBase>({
+export function InfoWidgetModal<TWidget extends WidgetBase>({
 	resolve,
-	additional: {
-		gameType,
-		docType,
-		widgetDefinition,
-		user,
-		document,
-		widget,
-		icon: Icon,
-	},
+	additional: { gameId, widget },
 }: ModalContentsProps<
 	void,
 	{
-		gameType: GameTypeScripts;
-		docType: GameTypeObjectScripts<T>;
-		widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
-		user: UserDetails;
-		document: TypedDocumentDetails<T>;
+		gameId: string;
 		widget: Widget<TWidget>;
-		icon: IconType;
 	}
 >) {
-	const { t } = useTranslation('doc-types:Dashboard', {
-		keyPrefix: 'info-widget-modal',
-	});
-	const { t: tDocument } = useTranslation(`doc-types:${docType.key}`);
-	const { t: tWidget } = useTranslation(widgetDefinition.translationNamespace, {
-		keyPrefix: widgetDefinition.translationKeyPrefix,
-	});
-	const Component = widgetDefinition.component;
+	const document = useDocument(gameId, widget.documentId);
+	const { icon: Icon } = useDocumentType(gameId, widget.documentId).typeInfo;
+	const Component = useWidgetType(
+		gameId,
+		widget.documentId,
+		widget.widget,
+	).component;
+	const t = useDocTypeTranslation('Dashboard');
+	const tDocument = useTranslationFor(gameId, widget.documentId);
+	const tWidget = useTranslationFor(gameId, widget.documentId, widget.widget);
 	// TODO: better layout
 	return (
 		<ModalDialogLayout>
-			<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
+			<ModalDialogLayout.Title>
+				{t('info-widget-modal.title')}
+			</ModalDialogLayout.Title>
 			<div className="flex flex-row-reverse flex-wrap justify-end gap-4">
 				<Prose>
 					<NamedIcon
@@ -66,17 +53,14 @@ export function InfoWidgetModal<T, TWidget extends WidgetBase>({
 				<WidgetContainer size={widget.position}>
 					<Component
 						document={document}
-						translation={tWidget}
-						docType={docType}
-						gameType={gameType}
-						user={user}
 						size={widget.position}
 						widgetSettings={widget.settings}
+						widgetType={widget.widget}
 					/>
 				</WidgetContainer>
 			</div>
 			<ModalDialogLayout.Buttons>
-				<Button onClick={() => resolve()}>{t('ok')}</Button>
+				<Button onClick={() => resolve()}>{t('info-widget-modal.ok')}</Button>
 			</ModalDialogLayout.Buttons>
 		</ModalDialogLayout>
 	);

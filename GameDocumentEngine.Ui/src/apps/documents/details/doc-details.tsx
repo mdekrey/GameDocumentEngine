@@ -1,10 +1,9 @@
 import { queries } from '@/utils/api/queries';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query';
-import { useGameType } from '../useGameType';
+	useTranslationForDocument,
+	useTypeOfDocument,
+} from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
@@ -15,16 +14,10 @@ import {
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { useCallback, useEffect, useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
-import type {
-	GameTypeObjectScripts,
-	GameTypeScripts,
-} from '@/utils/api/queries/game-types';
 import { useForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { updateFormDefaultMapped } from '@/utils/form';
 import { applyPatch, createPatch } from 'rfc6902';
-import { useRealtimeApi } from '@/utils/api/realtime-api';
-import type { UserDetails } from '@/api/models/UserDetails';
 import { useTranslation } from 'react-i18next';
 import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
@@ -38,64 +31,39 @@ export function DocumentDetails({
 	documentId: string;
 }) {
 	const { t } = useTranslation(['document-details']);
-	const user = useSuspenseQuery(queries.getCurrentUser(useRealtimeApi())).data;
 	const document = useLocalDocument(gameId, documentId);
-	const gameType = useGameType(gameId);
-
-	const scripts = gameType.objectTypes[document.type];
-
-	if (!scripts) {
-		return (
-			<ErrorScreen
-				message={t('unknown-doc-type')}
-				explanation={t('unknown-doc-type-explanation')}
-			/>
-		);
-	}
 
 	return (
 		<ErrorBoundary
 			key={`${gameId}-${documentId}`}
 			fallback={<ErrorScreen message={t('unhandled-error')} />}
 		>
-			<DocumentDetailsForm
-				gameType={gameType}
-				scripts={scripts}
-				document={document}
-				user={user}
-			/>
+			<DocumentDetailsForm document={document} />
 		</ErrorBoundary>
 	);
 }
 
 export function DocumentDetailsForm<T = unknown>({
-	gameType,
-	scripts,
 	document,
-	user,
 }: {
-	gameType: GameTypeScripts;
 	document: TypedDocumentDetails<T>;
-	scripts: GameTypeObjectScripts<T>;
-	user: UserDetails;
 }) {
+	const docType = useTypeOfDocument(document).typeInfo;
+	const { schema, fixup, component: Component } = docType;
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(
 		queries.patchDocument(queryClient, document.gameId, document.id),
 	);
-	const { fixup, component: Component } = scripts.typeInfo;
 	const editable = useMemo(
 		() => toEditableDetails(document, fixup),
 		[document, fixup],
 	);
-	const { t: fullTranslation } = useTranslation(scripts.translationNamespace);
-	const { t: formTranslation } = useTranslation(scripts.translationNamespace, {
-		keyPrefix: `document`,
-	});
 	const form = useForm({
 		defaultValue: editable.editable,
-		schema: documentSchema(scripts.typeInfo.schema),
-		translation: formTranslation,
+		schema: documentSchema(schema),
+		translation: useTranslationForDocument(document, {
+			keyPrefix: `document`,
+		}),
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
 	updateFormDefaultMapped(form, editable.editable);
@@ -152,16 +120,12 @@ export function DocumentDetailsForm<T = unknown>({
 			form={form}
 			onSubmit={onSubmit}
 			document={document}
-			translation={fullTranslation}
-			gameType={gameType}
-			docType={scripts}
 			readablePointers={editable.readablePointers}
 			writablePointers={editable.writablePointers}
-			user={user}
 		/>
 	);
 
-	return scripts.typeInfo.noContainer ? (
+	return docType.noContainer ? (
 		component
 	) : (
 		<div className="p-4 h-full w-full">{component}</div>
