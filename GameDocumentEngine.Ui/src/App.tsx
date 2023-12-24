@@ -46,7 +46,7 @@ const mainRoute: RouteObject[] = [
 	},
 	{ path: 'game/', Component: ListGames },
 	{ path: 'create-game/', Component: CreateGame },
-	{ path: '/', element: <Navigate to="/game" /> },
+	{ path: '/', element: <Navigate to="/game" replace={true} /> },
 ];
 
 const leftSidebarRoute: RouteObject[] = [

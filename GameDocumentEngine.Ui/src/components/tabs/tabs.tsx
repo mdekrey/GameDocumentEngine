@@ -69,7 +69,10 @@ export function Tabs({ tabs }: TabProps) {
 						/>
 					))}
 					{tabs.length > 0 && (
-						<Route path="" element={<Navigate to={tabs[0].key} />} />
+						<Route
+							path=""
+							element={<Navigate to={tabs[0].key} replace={true} />}
+						/>
 					)}
 				</Routes>
 			</div>
