@@ -1,7 +1,6 @@
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import type {
 	GameObjectWidgetDefinition,
 	IGameObjectType,
@@ -15,7 +14,12 @@ import {
 	NotSelected,
 	SelectField,
 } from '@/components/form-fields/select-input/select-field';
-import { useDocTypeTranslation } from '@/utils/api/hooks';
+import {
+	useDocTypeTranslation,
+	useDocument,
+	useDocumentType,
+	useTranslationFor,
+} from '@/utils/api/hooks';
 
 export type NewWidgetResult = {
 	id: string;
@@ -25,19 +29,20 @@ export const newWidgetSchema = z.object({
 });
 
 export function AddWidgetModal({
-	additional: { docTypeKey, document, icon: Icon, widgets },
+	additional: { gameId, documentId, widgets },
 	resolve,
 	reject,
 }: ModalContentsProps<
 	NewWidgetResult,
 	{
-		docTypeKey: string;
+		gameId: string;
+		documentId: string;
 		widgets: NonNullable<IGameObjectType['widgets']>;
-		icon: IGameObjectType['icon'];
-		document: DocumentDetails;
 	}
 >) {
-	const tDocument = useDocTypeTranslation(docTypeKey);
+	const document = useDocument(gameId, documentId);
+	const { icon: Icon } = useDocumentType(gameId, documentId).typeInfo;
+	const tDocument = useTranslationFor(gameId, documentId);
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'add-widget-modal',
 	});
@@ -75,7 +80,7 @@ export function AddWidgetModal({
 					<SelectField field={form.fields.id} items={widgetKeys}>
 						{(dt) =>
 							dt ? (
-								<WidgetName target={widgets[dt]} docTypeKey={docTypeKey} />
+								<WidgetName target={widgets[dt]} docTypeKey={document.type} />
 							) : (
 								<NotSelected>
 									{form.fields.id.translation('not-selected')}

@@ -17,10 +17,9 @@ export async function addWidget(
 	const document = await fetchDocument(queryClient, gameId, id);
 	const docType = await fetchDocumentType(queryClient, gameId, id);
 	const additional = {
-		docTypeKey: docType.key,
+		gameId,
+		documentId: id,
 		widgets: docType.typeInfo.widgets ?? {},
-		icon: docType.typeInfo.icon,
-		document,
 	};
 	const widgetKeys = Object.keys(additional.widgets);
 
@@ -31,7 +30,11 @@ export async function addWidget(
 	try {
 		const result = await launchModal({
 			ModalContents: AddWidgetModal,
-			additional,
+			additional: {
+				gameId,
+				documentId: id,
+				widgets: docType.typeInfo.widgets ?? {},
+			},
 		});
 		applyChange(result);
 	} catch (ex) {

@@ -1,5 +1,4 @@
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
-import { RenderWidgetContents } from './RenderWidgetContents';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { Widget } from './types';
 import {
@@ -18,7 +17,7 @@ export function RenderWidget({
 }) {
 	const t = useDocTypeTranslation('Dashboard');
 	const document = useDocument(gameId, widgetConfig.documentId);
-	const docWidgetDefinition = useWidgetType(
+	const { component: Component } = useWidgetType(
 		gameId,
 		widgetConfig.documentId,
 		widgetConfig.widget,
@@ -29,11 +28,11 @@ export function RenderWidget({
 			<ErrorBoundary
 				fallback={<ErrorScreen message={t('widgets.widget-runtime-error')} />}
 			>
-				<RenderWidgetContents
-					component={docWidgetDefinition.component}
+				<Component
 					document={document}
 					widgetType={widgetConfig.widget}
-					widgetConfig={widgetConfig}
+					size={widgetConfig.position}
+					widgetSettings={widgetConfig.settings}
 				/>
 			</ErrorBoundary>
 		</LimitingInset>
