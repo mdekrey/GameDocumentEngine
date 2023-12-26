@@ -1,5 +1,6 @@
 import type {
 	GameObjectFormComponent,
+	GameObjectWidgetDefinition,
 	GameObjectWidgetSettings,
 } from '@/documents/defineDocument';
 import type { Dashboard } from './types';
@@ -22,6 +23,19 @@ import {
 	useTypeOfDocument,
 	useWidgetType,
 } from '@/utils/api/hooks';
+
+function constrain(
+	size: { width: number; height: number },
+	{ min, max }: ReturnType<GameObjectWidgetDefinition['getConstraints']>,
+) {
+	return {
+		width: Math.max(min.width, Math.min(max?.width ?? size.width, size.width)),
+		height: Math.max(
+			min.height,
+			Math.min(max?.height ?? size.height, size.height),
+		),
+	};
+}
 
 export function WidgetSettings({
 	widgetId,
@@ -48,7 +62,14 @@ export function WidgetSettings({
 				navigate('../');
 				void onSubmit(
 					produce(form.get(), (v) => {
-						v.details.widgets[widgetId].settings = widgetValue;
+						const widget = v.details.widgets[widgetId];
+						widget.settings = widgetValue;
+						const { width, height } = constrain(
+							widget.position,
+							widgetDefinition.getConstraints(widgetValue),
+						);
+						widget.position.width = width;
+						widget.position.height = height;
 					}),
 				);
 			}}

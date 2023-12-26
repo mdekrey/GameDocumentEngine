@@ -61,7 +61,10 @@ export type GameObjectWidgetSettings<T, TWidget extends object> = {
 	default: WidgetSettings<TWidget>;
 };
 
-export type GameObjectWidgetDefinition<T, TWidget extends WidgetBase> = {
+export type GameObjectWidgetDefinition<
+	T = unknown,
+	TWidget extends WidgetBase = void,
+> = {
 	defaults: Size;
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
