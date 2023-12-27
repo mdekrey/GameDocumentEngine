@@ -34,9 +34,10 @@ import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { showWidgetInfo } from './info/info';
 import { atom } from 'jotai';
-import { useWidgetType } from '@/utils/api/hooks';
+import { useDocTypeTranslation, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
+import { ErrorScreen } from '@/components/errors';
 
 const positionTotalX = (p: Widget) => p.position.x + p.position.width;
 const positionTotalY = (p: Widget) => p.position.y + p.position.height;
@@ -168,6 +169,7 @@ function EditingWidget({
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
+	const t = useDocTypeTranslation('Dashboard');
 	const stopDragging = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle: (effect) => (effect.link ? 'none' : false),
@@ -195,7 +197,13 @@ function EditingWidget({
 						pointerEvents: hoverVisibility,
 					}}
 				>
-					<RenderWidget gameId={gameId} widgetConfig={config} />
+					<ErrorBoundary
+						fallback={
+							<ErrorScreen message={t('widgets.widget-runtime-error')} />
+						}
+					>
+						<RenderWidget gameId={gameId} widgetConfig={config} />
+					</ErrorBoundary>
 				</Inset>
 				<Inset
 					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"

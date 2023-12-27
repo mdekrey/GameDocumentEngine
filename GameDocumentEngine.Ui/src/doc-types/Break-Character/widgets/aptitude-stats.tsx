@@ -7,6 +7,7 @@ import type { TFunction } from 'i18next';
 import aptitudeColors from '../aptitude-colors.module.css';
 import { useId } from 'react';
 import { useTranslationForDocument } from '@/utils/api/hooks';
+import { Link } from 'react-router-dom';
 
 const AptitudeValue = elementTemplate('AptitudeValue', 'span', (T) => (
 	<T className="text-right font-bold" />
@@ -61,13 +62,16 @@ export function AptitudeStats({
 		t,
 	};
 	return (
-		<div className="grid gap-x-2 grid-cols-[auto,1fr,1fr] grid-rows-5 h-full w-full text-xs items-center">
+		<Link
+			to={`/game/${document.gameId}/document/${document.id}/aptitudes`}
+			className="grid gap-x-2 grid-cols-[auto,1fr,1fr] grid-rows-5 h-full w-full text-xs items-center"
+		>
 			<AptitudeStat {...props} name="might" />
 			<AptitudeStat {...props} name="deftness" />
 			<AptitudeStat {...props} name="grit" />
 			<AptitudeStat {...props} name="insight" />
 			<AptitudeStat {...props} name="aura" />
-		</div>
+		</Link>
 	);
 }
 

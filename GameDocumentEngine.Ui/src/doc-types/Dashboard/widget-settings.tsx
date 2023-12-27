@@ -1,5 +1,6 @@
 import type {
 	GameObjectFormComponent,
+	GameObjectWidgetDefinition,
 	GameObjectWidgetSettings,
 } from '@/documents/defineDocument';
 import type { Dashboard } from './types';
@@ -19,9 +20,21 @@ import {
 	useDocTypeTranslation,
 	useDocument,
 	useTranslationFor,
-	useTypeOfDocument,
 	useWidgetType,
 } from '@/utils/api/hooks';
+
+function constrain(
+	size: { width: number; height: number },
+	{ min, max }: ReturnType<GameObjectWidgetDefinition['getConstraints']>,
+) {
+	return {
+		width: Math.max(min.width, Math.min(max?.width ?? size.width, size.width)),
+		height: Math.max(
+			min.height,
+			Math.min(max?.height ?? size.height, size.height),
+		),
+	};
+}
 
 export function WidgetSettings({
 	widgetId,
@@ -48,7 +61,14 @@ export function WidgetSettings({
 				navigate('../');
 				void onSubmit(
 					produce(form.get(), (v) => {
-						v.details.widgets[widgetId].settings = widgetValue;
+						const widget = v.details.widgets[widgetId];
+						widget.settings = widgetValue;
+						const { width, height } = constrain(
+							widget.position,
+							widgetDefinition.getConstraints(widgetValue),
+						);
+						widget.position.width = width;
+						widget.position.height = height;
 					}),
 				);
 			}}
@@ -65,13 +85,14 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 	widget: Widget<TWidget>;
 	onSubmit: (newSettings: WidgetSettings<TWidget>) => void;
 }) {
-	const docType = useTypeOfDocument(document);
 	const widgetDefinition = useWidgetType(
 		document.gameId,
 		document.id,
 		widget.widget,
 	);
-	const t = useDocTypeTranslation(docType.key);
+	const t = useDocTypeTranslation('Dashboard', {
+		keyPrefix: 'widget-settings',
+	});
 	const translation = useTranslationFor(
 		document.gameId,
 		document.id,
@@ -90,22 +111,29 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 		schema: settings.schema,
 		translation,
 	});
-	const widgetJsx = useComputedAtom((get) => (
-		<Component
-			document={document}
-			size={widget.position}
-			widgetSettings={get(form.atom)}
-			widgetType={widget.widget}
-		/>
-	));
+	const widgetJsx = useComputedAtom((get) => {
+		const settings = get(form.atom);
+		const size = constrain(
+			widget.position,
+			widgetDefinition.getConstraints(settings),
+		);
+		return (
+			<WidgetContainer size={size}>
+				<Component
+					document={document}
+					size={widget.position}
+					widgetSettings={settings}
+					widgetType={widget.widget}
+				/>
+			</WidgetContainer>
+		);
+	});
 	return (
 		<div className="m-4">
-			<WidgetContainer size={widget.position}>
-				<AtomContents>{widgetJsx}</AtomContents>
-			</WidgetContainer>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
 				<Fieldset>
 					<Settings document={document} size={widget.position} field={form} />
+					<AtomContents>{widgetJsx}</AtomContents>
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>
 					</ButtonRow>

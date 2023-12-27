@@ -13,6 +13,7 @@ import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { z } from 'zod';
 import { useTranslationForDocument } from '@/utils/api/hooks';
+import { Link } from 'react-router-dom';
 
 const asModifier = new Intl.NumberFormat('en', {
 	signDisplay: 'always',
@@ -61,8 +62,9 @@ export function CombatStats({
 		return <ErrorScreen.NoAccess.Sized size="widget" />;
 	}
 	const { container, edge, middle } = styles[widgetSettings.mode ?? '2x2'];
+	const path = `/game/${document.gameId}/document/${document.id}/combat`;
 	return (
-		<div className={container}>
+		<Link to={path} className={container}>
 			<Section>
 				<FirstRow>
 					<LuSword />
@@ -96,7 +98,7 @@ export function CombatStats({
 				</FirstRow>
 				<SecondRow>{t('sections.speed')}</SecondRow>
 			</Section>
-		</div>
+		</Link>
 	);
 }
 
