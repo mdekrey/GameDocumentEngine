@@ -588,6 +588,64 @@ paths:
           $ref: "#/components/responses/403"
         404:
           description: Game not found
+  /game/{gameId}/export:
+    get:
+      operationId: getGameExport
+      x-dotnet-mvc-server-controller: GameExport
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: guid }
+      responses:
+        200:
+          description: Success
+          headers:
+            content-disposition:
+              schema: { type: string }
+          content:
+            application/x-zip:
+              schema:
+                type: string
+                format: binary
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Game not found
+  /game/import:
+    post:
+      operationId: importGame
+      security:
+        - AuthenticatedUser: []
+      requestBody:
+        required: true
+        content:
+          application/x-zip:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - gameId
+                properties:
+                  gameId: { type: string, format: guid }
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Game not found
+
 
   /invitations/{linkId}:
     get:

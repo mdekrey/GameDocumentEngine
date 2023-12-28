@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { HiOutlineTrash } from 'react-icons/hi2';
+import { HiMiniArrowDownTray, HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
@@ -8,10 +8,12 @@ import { useLaunchModal } from '@/utils/modal/modal-service';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
+import { constructUrl as getGameExportUrl } from '@/api/operations/getGameExport';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	deleteGame,
+	exportGame,
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
 import { useCurrentUser, useGame } from '@/utils/api/hooks';
@@ -22,9 +24,16 @@ function displayRemoveUser(gameDetails: GameDetails) {
 function displayDeleteGame(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, deleteGame);
 }
+function displayExportGame(gameDetails: GameDetails) {
+	return hasGamePermission(gameDetails, exportGame);
+}
 
 export function displayDangerZone(gameDetails: GameDetails) {
-	return displayDeleteGame(gameDetails) || displayRemoveUser(gameDetails);
+	return (
+		displayDeleteGame(gameDetails) ||
+		displayRemoveUser(gameDetails) ||
+		displayExportGame(gameDetails)
+	);
 }
 
 function useDeleteGame() {
@@ -69,6 +78,12 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 					{t('delete-game', { name: gameDetails.name })}
 				</Button.Destructive>
 			)}
+			{displayExportGame(gameDetails) && (
+				<Button.Save onClick={() => void onDownloadGame()}>
+					<HiMiniArrowDownTray />
+					{t('download-game', { name: gameDetails.name })}
+				</Button.Save>
+			)}
 		</>
 	);
 
@@ -91,5 +106,12 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 			deleteGame.mutate(gameId);
 			navigate('..');
 		}
+	}
+
+	function onDownloadGame() {
+		const dl = document.createElement('a');
+		dl.setAttribute('href', getGameExportUrl({ gameId }));
+		dl.setAttribute('download', '');
+		dl.click();
 	}
 }

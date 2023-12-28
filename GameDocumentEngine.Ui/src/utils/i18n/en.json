@@ -86,7 +86,8 @@
 		"configure-invites": "Manage invite links",
 		"danger-zone": "Danger Zone",
 		"delete-user": "Delete {{name}}",
-		"delete-game": "Delete {{name}}"
+		"delete-game": "Delete {{name}}",
+		"download-game": "Download {{name}}"
 	},
 	"game-details": {
 		"mobile-instructions": "Use the dot menu to access and create character sheets, party trackers, and more!",

@@ -10,6 +10,7 @@ public static class GameSecurity
 	public static string AnyBasicGamePermission(Guid gameId) => $"{BaseGame(gameId)}:*";
 	public static string ViewGame(Guid gameId) => $"{BaseGame(gameId)}:read";
 	public static string DeleteGame(Guid gameId) => $"{BaseGame(gameId)}:delete";
+	public static string ExportGame(Guid gameId) => $"{BaseGame(gameId)}:export";
 	public static string UpdateGame(Guid gameId) => $"{BaseGame(gameId)}:update";
 	public static string CreateDocument(Guid gameId) => $"{BaseGame(gameId)}:create-document";
 	public static string UpdateGameUserAccess(Guid gameId) => $"{BaseGame(gameId)}:change-permissions";
