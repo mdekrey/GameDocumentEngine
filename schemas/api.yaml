@@ -639,12 +639,8 @@ paths:
                   - gameId
                 properties:
                   gameId: { type: string, format: guid }
-        401:
-          $ref: "#/components/responses/401"
-        403:
-          $ref: "#/components/responses/403"
-        404:
-          description: Game not found
+        400:
+          description: Invalid zip provided
 
 
   /invitations/{linkId}:

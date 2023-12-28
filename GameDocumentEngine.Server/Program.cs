@@ -19,9 +19,12 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
@@ -39,6 +42,9 @@ services.AddHealthChecks();
 services.AddControllers(config =>
 {
 	config.Filters.Add(new MvcActionFilter());
+
+	config.InputFormatters.Add(new StreamInputFormatter());
+	config.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Stream)));
 });
 services.AddCompressedStaticFiles();
 var signalr = services.AddSignalR();

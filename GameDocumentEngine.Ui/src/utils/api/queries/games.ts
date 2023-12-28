@@ -12,6 +12,12 @@ import {
 } from './applyEventToQuery';
 import { i18n } from '@/utils/i18n/setup';
 import { getGameTypeTranslationNamespace } from '../accessors';
+import {
+	constructUrl as importGameUrl,
+	method as importGameMethod,
+	constructResponse as constructImportGameResponse,
+} from '@/api/operations/importGame';
+import { constructUrl as getGameExportUrl } from '@/api/operations/getGameExport';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -141,3 +147,34 @@ export const removeUserFromGame: UseMutationOptions<
 		else throw new Error('Could not save changes');
 	},
 };
+
+export const getGameExport = getGameExportUrl;
+
+export function importGame(
+	navigate: NavigateFunction,
+): UseMutationOptions<{ gameId: string }, unknown, { file: File }, unknown> {
+	return {
+		mutationFn: async ({ file }) => {
+			const response = await fetch(importGameUrl({}), {
+				method: importGameMethod,
+				headers: {
+					'content-type': 'application/x-zip',
+				},
+				body: file,
+			});
+			const result = constructImportGameResponse({
+				status: response.status,
+				response: await response.json(),
+				getResponseHeader(header: string) {
+					return response.headers.get(header);
+				},
+			});
+
+			if (result.statusCode === 200) return result.data;
+			throw new Error('Could not import game');
+		},
+		onSuccess: ({ gameId }) => {
+			navigate(`/game/${gameId}`);
+		},
+	};
+}

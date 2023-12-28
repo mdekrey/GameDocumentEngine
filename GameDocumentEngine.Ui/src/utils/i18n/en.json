@@ -29,7 +29,8 @@
 				}
 			}
 		},
-		"submit": "Create Game"
+		"submit": "Create Game",
+		"import": "Import Game"
 	},
 	"create-document": {
 		"fields": {

@@ -2,15 +2,24 @@
 using GameDocumentEngine.Server.Documents;
 using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace GameDocumentEngine.Server.ImportExport;
 
-public class GameArchiveVersion1
+public partial class GameArchiveVersion1
 {
 	private readonly DocumentDbContext dbContext;
 
 	private const string NewVersion = "v1.0.0";
 	private const string ManifestType = "vault-vtt-game";
+	private const string ManifestPath = "manifest.json";
+	private const string GamePath = "game.json";
+
+	private string DocumentPath(Guid documentId) => $"documents/{documentId}.json";
+	[GeneratedRegex("documents/(?<documentId>[^.]+)\\.json")] private static partial Regex DocumentPathRegex();
+	private string? IsDocumentPath(string path) => DocumentPathRegex().Match(path) is not { Success: true, Groups: var g } ? null
+		: g["documentId"].Value;
+
 	private record Manifest(string Version, DateTimeOffset CreatedAt, Guid OriginalGameId, string ManifestType);
 	private record GameInfo(string Name, string GameType)
 	{
@@ -56,7 +65,7 @@ public class GameArchiveVersion1
 		}
 	}
 
-	public GameArchiveVersion1(Data.DocumentDbContext dbContext)
+	public GameArchiveVersion1(DocumentDbContext dbContext)
 	{
 		this.dbContext = dbContext;
 	}
@@ -72,22 +81,61 @@ public class GameArchiveVersion1
 								  where doc.GameId == gameId
 								  select doc).ToArrayAsync();
 
-		using (var zipArchive = new ZipArchive(result, ZipArchiveMode.Create, true))
+		using var zipArchive = new ZipArchive(result, ZipArchiveMode.Create, true);
 		{
 			await AddManifest(zipArchive, gameId);
-			await AddJsonFile(zipArchive, "game.json", GameInfo.FromGame(game));
+			await AddJsonFile(zipArchive, GamePath, GameInfo.FromGame(game));
 
 			foreach (var doc in allDocuments)
-				await AddJsonFile(zipArchive, $"documents/{doc.Id}.json", DocumentInfo.FromDocument(doc));
+				await AddJsonFile(zipArchive, DocumentPath(doc.Id), DocumentInfo.FromDocument(doc));
 		}
 
 		result.Position = 0;
 		return result;
 	}
 
+	internal static async Task<bool> IsValid(ZipArchive zipArchive)
+	{
+		var manifest = await ReadJsonFile<Manifest>(zipArchive, ManifestPath);
+		if (manifest is not { Version: NewVersion, ManifestType: ManifestType }) return false;
+		return true;
+	}
+
+	public async Task<GameModel?> UnpackNewGame(ZipArchive zipArchive)
+	{
+		var gameInfo = await ReadJsonFile<GameInfo>(zipArchive, "game.json");
+		if (gameInfo == null) return null;
+		var game = gameInfo.ToGame();
+
+		var entries = (
+			from e in zipArchive.Entries
+			let docId = IsDocumentPath(e.FullName)
+			where docId != null
+			select (ZipEntry: e, OriginalId: docId!, NewId: Guid.NewGuid())
+		).ToArray();
+		var idMap = entries.ToDictionary(e => e.OriginalId, e => e.NewId);
+
+
+		foreach (var entry in entries)
+		{
+			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry, TransformIds);
+			if (docInfo == null) continue;
+			game.Documents.Add(docInfo.ToDocument(entry.NewId));
+		}
+
+		return game;
+
+		string TransformIds(string json)
+		{
+			foreach (var (key, value) in idMap)
+				json = json.Replace(key, value.ToString());
+			return json;
+		}
+	}
+
 	private Task AddManifest(ZipArchive zipArchive, Guid gameId)
 	{
-		return AddJsonFile(zipArchive, "manifest.json", new Manifest(
+		return AddJsonFile(zipArchive, ManifestPath, new Manifest(
 			Version: NewVersion,
 			CreatedAt: DateTimeOffset.Now,
 			OriginalGameId: gameId,
@@ -95,12 +143,25 @@ public class GameArchiveVersion1
 		));
 	}
 
-	private async Task AddJsonFile<T>(ZipArchive zipArchive, string entryName, T contents)
+	private static async Task AddJsonFile<T>(ZipArchive zipArchive, string entryName, T contents)
 	{
 		var entry = zipArchive.CreateEntry(entryName);
-		using (var manifestOutput = entry.Open())
-		{
-			await System.Text.Json.JsonSerializer.SerializeAsync(manifestOutput, contents);
-		}
+		using var manifestOutput = entry.Open();
+		await System.Text.Json.JsonSerializer.SerializeAsync(manifestOutput, contents);
+	}
+
+	private static async Task<T?> ReadJsonFile<T>(ZipArchive zipArchive, string entryName)
+	{
+		if (zipArchive.GetEntry(entryName) is not ZipArchiveEntry entry) return default;
+		using var fileStream = entry.Open();
+		return await System.Text.Json.JsonSerializer.DeserializeAsync<T>(fileStream);
+	}
+
+	private static async Task<T?> ReadJsonFile<T>(ZipArchiveEntry entry, Func<string, string> transform)
+	{
+		using var fileStream = entry.Open();
+		using var reader = new StreamReader(fileStream);
+		var originalJson = await reader.ReadToEndAsync();
+		return System.Text.Json.JsonSerializer.Deserialize<T>(transform(originalJson));
 	}
 }

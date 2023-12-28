@@ -9,6 +9,8 @@ import {
 	listGameTypes,
 	listGames,
 	removeUserFromGame,
+	getGameExport,
+	importGame,
 } from './games';
 import {
 	getDocument,
@@ -49,6 +51,8 @@ export const queries = {
 	createInvitation,
 	claimInvitation: null,
 	cancelInvitation,
+	getGameExport,
+	importGame,
 } satisfies { [K in keyof typeof operations]: unknown };
 export const extraQueries = {
 	changeDocumentFolder,

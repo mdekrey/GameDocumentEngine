@@ -8,7 +8,6 @@ import { useLaunchModal } from '@/utils/modal/modal-service';
 import { DeleteGameModal } from './delete-game-modal';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
-import { constructUrl as getGameExportUrl } from '@/api/operations/getGameExport';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
@@ -110,7 +109,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 
 	function onDownloadGame() {
 		const dl = document.createElement('a');
-		dl.setAttribute('href', getGameExportUrl({ gameId }));
+		dl.setAttribute('href', queries.getGameExport({ gameId }));
 		dl.setAttribute('download', '');
 		dl.click();
 	}

@@ -23,6 +23,11 @@ function useCreateGame() {
 	return useMutation(queries.createGame(navigate));
 }
 
+function useImportGame() {
+	const navigate = useNavigate();
+	return useMutation(queries.importGame(navigate));
+}
+
 const CreateGameDetails = z.object({
 	name: z.string().min(1),
 	type: z.string().min(1),
@@ -38,6 +43,7 @@ export function CreateGame() {
 
 	const gameTypes = useAllGameTypes();
 	const createGame = useCreateGame();
+	const importGame = useImportGame();
 
 	return (
 		<SingleColumnSections>
@@ -65,6 +71,15 @@ export function CreateGame() {
 						{/* TODO: invite users from other games? */}
 						<ButtonRow>
 							<Button type="submit">{t('submit')}</Button>
+							<div className="relative">
+								<Button.Secondary>{t('import')}</Button.Secondary>
+								<input
+									type="file"
+									className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
+									accept=".vaultvtt"
+									onChange={onFileSelected}
+								/>
+							</div>
 						</ButtonRow>
 					</Fieldset>
 				</form>
@@ -74,5 +89,12 @@ export function CreateGame() {
 
 	function onSubmit(currentValue: z.infer<typeof CreateGameDetails>) {
 		createGame.mutate(currentValue);
+	}
+
+	function onFileSelected(ev: React.ChangeEvent<HTMLInputElement>) {
+		if (ev.target.files?.length !== 1) return;
+		const file = ev.target.files[0];
+
+		importGame.mutate({ file });
 	}
 }
