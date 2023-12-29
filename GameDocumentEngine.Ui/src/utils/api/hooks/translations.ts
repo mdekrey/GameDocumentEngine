@@ -42,13 +42,13 @@ export function useTranslationFor(
 	const params: Parameters<typeof useTranslation> = widgetType
 		? [
 				widgetType.translationNamespace ??
-					getDocTypeTranslationNamespace(docType.key),
+					getDocTypeTranslationNamespace(docType?.key),
 				{
 					keyPrefix: widgetType.translationKeyPrefix,
 				},
 		  ]
 		: [
-				getDocTypeTranslationNamespace(docType.key),
+				getDocTypeTranslationNamespace(docType?.key),
 				typeof optionsOrWidgetType === 'object'
 					? optionsOrWidgetType
 					: undefined,

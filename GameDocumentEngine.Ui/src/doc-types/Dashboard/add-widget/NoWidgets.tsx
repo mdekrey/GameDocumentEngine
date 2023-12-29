@@ -10,6 +10,7 @@ import {
 	useDocumentType,
 	useTranslationFor,
 } from '@/utils/api/hooks';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 export function NoWidgetsModal({
 	additional: { gameId, documentId },
@@ -22,7 +23,8 @@ export function NoWidgetsModal({
 	}
 >) {
 	const document = useDocument(gameId, documentId);
-	const { icon: Icon } = useDocumentType(gameId, documentId).typeInfo;
+	const { icon: Icon } =
+		useDocumentType(gameId, documentId)?.typeInfo ?? missingDocumentType;
 	const tDocument = useTranslationFor(gameId, documentId);
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'adding-no-widgets',

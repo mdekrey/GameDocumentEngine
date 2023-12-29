@@ -18,7 +18,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		IApiChangeNotification<DocumentDetails> changeNotification,
 		GamePermissionSetResolverFactory permissionSetResolverFactory,
 		GameTypes gameTypes)
-		: base(apiMapper, changeNotification, du => du.UserId, du => du.Document)
+		: base(apiMapper, changeNotification, du => du.GameUser.UserId, du => du.Document)
 	{
 		this.userLoader = userLoader;
 		this.permissionSetResolverFactory = permissionSetResolverFactory;
@@ -28,8 +28,8 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 	protected override async Task<DocumentModel> LoadTargetEntity(DocumentDbContext context, DocumentUserModel userEntity)
 	{
 		if (userEntity.Document != null) return userEntity.Document;
-		return context.ChangeTracker.Entries<DocumentModel>().FirstOrDefault(d => d.Entity.Id == userEntity.DocumentId)?.Entity
-			?? await context.Documents.Include(d => d.Players).SingleAsync(d => d.Id == userEntity.DocumentId);
+		return context.ChangeTracker.Entries<DocumentModel>().FirstOrDefault(d => d.Entity.GameId == userEntity.GameId && d.Entity.Id == userEntity.DocumentId)?.Entity
+			?? await context.Documents.Include(d => d.Players).SingleAsync(d => d.GameId == userEntity.GameId && d.Id == userEntity.DocumentId);
 	}
 
 	protected override async Task<IEnumerable<PermissionSet>> GetUsersFor(DocumentDbContext context, DocumentModel entity, DbContextChangeUsage changeState)
@@ -50,7 +50,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 			throw new InvalidOperationException($"Unknown game type: {game.Type}");
 
 		var byUser = (from gameUser in gameUsers
-					  let documentUser = documentUsers.FirstOrDefault(du => du.UserId == gameUser.UserId)
+					  let documentUser = documentUsers.FirstOrDefault(du => du.GameId == gameUser.GameId && du.PlayerId == gameUser.PlayerId)
 					  // Document User may not have existed for every user, such as when creating or destroying
 					  // but may still have permission from game role
 					  select new

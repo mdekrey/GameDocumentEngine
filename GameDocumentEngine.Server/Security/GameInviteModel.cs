@@ -4,7 +4,7 @@
 
 public class GameInviteModel
 {
-	public Guid GameId { get; set; }
+	public long GameId { get; set; }
 	public string InviteId { get; set; }
 	public DateTimeOffset Expiration { get; set; }
 	public int UsesRemaining { get; set; }

@@ -6,7 +6,10 @@ import {
 } from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type {
+	IGameObjectType,
+	TypedDocumentDetails,
+} from '@/documents/defineDocument';
 import {
 	documentSchema,
 	type EditableDocumentDetails,
@@ -22,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import { ErrorScreen } from '@/components/errors/ErrorScreen';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 export function DocumentDetails({
 	gameId,
@@ -48,7 +52,9 @@ export function DocumentDetailsForm<T = unknown>({
 }: {
 	document: TypedDocumentDetails<T>;
 }) {
-	const docType = useTypeOfDocument(document).typeInfo;
+	const docType =
+		useTypeOfDocument(document)?.typeInfo ??
+		(missingDocumentType as IGameObjectType<T>);
 	const { schema, fixup, component: Component } = docType;
 	const queryClient = useQueryClient();
 	const updateDocument = useMutation(

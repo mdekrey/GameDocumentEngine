@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { HiOutlineTrash } from 'react-icons/hi2';
+import { HiMiniArrowDownTray, HiOutlineTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
@@ -12,6 +12,7 @@ import type { GameDetails } from '@/api/models/GameDetails';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	deleteGame,
+	exportGame,
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
 import { useCurrentUser, useGame } from '@/utils/api/hooks';
@@ -22,9 +23,16 @@ function displayRemoveUser(gameDetails: GameDetails) {
 function displayDeleteGame(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, deleteGame);
 }
+function displayExportGame(gameDetails: GameDetails) {
+	return hasGamePermission(gameDetails, exportGame);
+}
 
 export function displayDangerZone(gameDetails: GameDetails) {
-	return displayDeleteGame(gameDetails) || displayRemoveUser(gameDetails);
+	return (
+		displayDeleteGame(gameDetails) ||
+		displayRemoveUser(gameDetails) ||
+		displayExportGame(gameDetails)
+	);
 }
 
 function useDeleteGame() {
@@ -32,7 +40,7 @@ function useDeleteGame() {
 }
 
 function useRemoveUserFromGame() {
-	return useMutation(queries.removeUserFromGame);
+	return useMutation(queries.removePlayerFromGame);
 }
 
 export function GameDangerZone({ gameId }: { gameId: string }) {
@@ -69,16 +77,22 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 					{t('delete-game', { name: gameDetails.name })}
 				</Button.Destructive>
 			)}
+			{displayExportGame(gameDetails) && (
+				<Button.Save onClick={() => void onDownloadGame()}>
+					<HiMiniArrowDownTray />
+					{t('download-game', { name: gameDetails.name })}
+				</Button.Save>
+			)}
 		</>
 	);
 
-	async function onDeleteUser(userId: string, name: string) {
+	async function onDeleteUser(playerId: string, name: string) {
 		const shouldDelete = await launchModal({
 			ModalContents: RemoveGameUserModal,
 			additional: { name },
 		}).catch(() => false);
 		if (shouldDelete) {
-			removeUser.mutate({ gameId, userId });
+			removeUser.mutate({ gameId, playerId });
 		}
 	}
 
@@ -91,5 +105,12 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 			deleteGame.mutate(gameId);
 			navigate('..');
 		}
+	}
+
+	function onDownloadGame() {
+		const dl = document.createElement('a');
+		dl.setAttribute('href', queries.getGameExport({ gameId }));
+		dl.setAttribute('download', '');
+		dl.click();
 	}
 }

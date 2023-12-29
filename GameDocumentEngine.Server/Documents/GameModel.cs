@@ -7,7 +7,7 @@ namespace GameDocumentEngine.Server.Documents;
 
 public class GameModel : IAuditable, IOperationalTransformed
 {
-	public Guid Id { get; set; }
+	public long Id { get; set; }
 	public string Name { get; set; }
 	public string Type { get; set; }
 	public Guid Version { get; set; }

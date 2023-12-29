@@ -23,7 +23,7 @@ public class GamePermissionSetResolver
 		this.gameTypes = gameTypes;
 	}
 
-	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId)
+	public async Task<PermissionSet?> GetPermissions(Guid userId, long gameId)
 	{
 		using var activity = TracingHelper.StartActivity(nameof(GetPermissions));
 		var gameUserRecord = await (from gameUser in context.GameUsers.Include(gu => gu.Game)
@@ -35,14 +35,14 @@ public class GamePermissionSetResolver
 		return gameType.ToPermissionSet(gameUserRecord);
 	}
 
-	public async Task<PermissionSet?> GetPermissions(Guid userId, Guid gameId, Guid documentId)
+	public async Task<PermissionSet?> GetPermissions(Guid userId, long gameId, long documentId)
 	{
 		using var activity = TracingHelper.StartActivity(nameof(GetPermissions));
 		var gameUserRecord = await context.GameUsers.Include(gu => gu.Game)
-			.Include(gu => gu.Documents.Where(d => d.DocumentId == documentId)).ThenInclude(du => du.Document)
+			.Include(gu => gu.Documents.Where(d => d.GameId == gameId && d.DocumentId == documentId)).ThenInclude(du => du.Document)
 			.SingleOrDefaultAsync(gu => gu.UserId == userId && gu.GameId == gameId);
 		if (gameUserRecord == null) return null;
-		var documentUserRecord = gameUserRecord.Documents.SingleOrDefault(du => du.DocumentId == documentId);
+		var documentUserRecord = gameUserRecord.Documents.SingleOrDefault(du => du.GameId == gameId && du.DocumentId == documentId);
 
 		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
 			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
@@ -97,10 +97,10 @@ public class GamePermissionSetResolver
 
 public static class GamePermissionSetResolverExtensions
 {
-	public static Task<PermissionSet?> GetPermissionSet(this GamePermissionSetResolver permissionSetResolver, ClaimsPrincipal user, Guid gameId) =>
+	public static Task<PermissionSet?> GetPermissionSet(this GamePermissionSetResolver permissionSetResolver, ClaimsPrincipal user, long gameId) =>
 		permissionSetResolver.GetPermissions(user.GetUserIdOrThrow(), gameId);
 
-	public static Task<PermissionSet?> GetPermissionSet(this GamePermissionSetResolver permissionSetResolver, ClaimsPrincipal user, Guid gameId, Guid docId) =>
+	public static Task<PermissionSet?> GetPermissionSet(this GamePermissionSetResolver permissionSetResolver, ClaimsPrincipal user, long gameId, long docId) =>
 		permissionSetResolver.GetPermissions(user.GetUserIdOrThrow(), gameId, docId);
 
 	[return: NotNullIfNotNull(parameterName: nameof(permissionSet))]
@@ -112,7 +112,7 @@ public static class GamePermissionSetResolverExtensions
 	public static async Task<bool?> HasPermission(
 		this GamePermissionSetResolver permissionSetResolver,
 		ClaimsPrincipal user,
-		Guid gameId,
+		long gameId,
 		string permission)
 	{
 		var permissionSet = await permissionSetResolver.GetPermissionSet(user, gameId);
@@ -122,8 +122,8 @@ public static class GamePermissionSetResolverExtensions
 	public static async Task<bool?> HasPermission(
 		this GamePermissionSetResolver permissionSetResolver,
 		ClaimsPrincipal user,
-		Guid gameId,
-		Guid docId,
+		long gameId,
+		long docId,
 		string permission)
 	{
 		var permissionSet = await permissionSetResolver.GetPermissionSet(user, gameId, docId);

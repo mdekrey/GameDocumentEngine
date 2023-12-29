@@ -2,3 +2,6 @@ types:
   object:
     formats:
       patch: global::Json.Patch.JsonPatch
+  string:
+    formats:
+      id: global::GameDocumentEngine.Server.Api.Identifier

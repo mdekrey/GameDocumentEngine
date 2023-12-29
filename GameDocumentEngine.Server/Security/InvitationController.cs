@@ -18,36 +18,36 @@ public class InvitationController : Api.InvitationsControllerBase
 		this.dbContext = dbContext;
 	}
 
-	protected override async Task<ListInvitationsActionResult> ListInvitations(Guid gameId)
+	protected override async Task<ListInvitationsActionResult> ListInvitations(Identifier gameId)
 	{
 		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
-									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
+									where gameUser.GameId == gameId.Value && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return ListInvitationsActionResult.NotFound();
 		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
 			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
 
-		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.ListInvitations(gameId)))
+		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.ListInvitations(gameId.Value)))
 			return ListInvitationsActionResult.Forbidden();
 
-		var invites = await dbContext.Invites.Where(i => i.GameId == gameId).ToArrayAsync();
+		var invites = await dbContext.Invites.Where(i => i.GameId == gameId.Value).ToArrayAsync();
 
 		return ListInvitationsActionResult.Ok(invites.ToDictionary(i => i.InviteId, ToApi));
 	}
 
-	protected override async Task<CreateInvitationActionResult> CreateInvitation(Guid gameId, CreateInvitationRequest createInvitationBody)
+	protected override async Task<CreateInvitationActionResult> CreateInvitation(Identifier gameId, CreateInvitationRequest createInvitationBody)
 	{
 		if ((createInvitationBody.Uses != -1 && createInvitationBody.Uses <= 0))
 			return CreateInvitationActionResult.BadRequest();
 		var gameUserRecord = await (from gameUser in dbContext.GameUsers.Include(gu => gu.Game)
-									where gameUser.GameId == gameId && gameUser.UserId == User.GetCurrentUserId()
+									where gameUser.GameId == gameId.Value && gameUser.UserId == User.GetCurrentUserId()
 									select gameUser).SingleOrDefaultAsync();
 		if (gameUserRecord == null) return CreateInvitationActionResult.NotFound();
 		if (!gameTypes.All.TryGetValue(gameUserRecord.Game.Type, out var gameType))
 			throw new InvalidOperationException($"Unknown game type: {gameUserRecord.Game.Type}");
 		if (!gameType.Roles.Contains(createInvitationBody.Role))
 			return CreateInvitationActionResult.BadRequest();
-		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.CreateInvitation(gameId, createInvitationBody.Role)))
+		if (!gameType.ToPermissionSet(gameUserRecord).HasPermission(GameSecurity.CreateInvitation(gameId.Value, createInvitationBody.Role)))
 			return CreateInvitationActionResult.Forbidden();
 
 		var inviteId = string.Join(string.Empty,
@@ -62,7 +62,7 @@ public class InvitationController : Api.InvitationsControllerBase
 		var invite = new GameInviteModel
 		{
 			InviteId = inviteId,
-			GameId = gameId,
+			GameId = gameId.Value,
 			GameRole = createInvitationBody.Role,
 			UsesRemaining = createInvitationBody.Uses,
 			Expiration = DateTimeOffset.UtcNow.AddDays(30),
@@ -135,7 +135,7 @@ public class InvitationController : Api.InvitationsControllerBase
 	{
 		return new GameInvite(
 			Id: invite.InviteId,
-			GameId: invite.GameId,
+			GameId: (Identifier)invite.GameId,
 			Role: invite.GameRole,
 			UsesRemaining: invite.UsesRemaining,
 			Expiration: invite.Expiration

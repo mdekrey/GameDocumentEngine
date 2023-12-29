@@ -20,6 +20,7 @@ import {
 	useDocumentType,
 	useTranslationFor,
 } from '@/utils/api/hooks';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 export type NewWidgetResult = {
 	id: string;
@@ -41,7 +42,8 @@ export function AddWidgetModal({
 	}
 >) {
 	const document = useDocument(gameId, documentId);
-	const { icon: Icon } = useDocumentType(gameId, documentId).typeInfo;
+	const { icon: Icon } =
+		useDocumentType(gameId, documentId)?.typeInfo ?? missingDocumentType;
 	const tDocument = useTranslationFor(gameId, documentId);
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'add-widget-modal',

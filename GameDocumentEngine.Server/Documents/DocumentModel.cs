@@ -7,13 +7,13 @@ namespace GameDocumentEngine.Server.Documents;
 
 public class DocumentModel : IAuditable, IOperationalTransformed
 {
-	public Guid GameId { get; set; }
-	public Guid Id { get; set; }
+	public long GameId { get; set; }
+	public long Id { get; set; }
 	public string Name { get; set; }
 	public string Type { get; set; }
 	public Guid Version { get; set; }
 
-	public Guid? FolderId { get; set; }
+	public long? FolderId { get; set; }
 	public DocumentModel? Folder { get; set; }
 	public ICollection<DocumentModel> FolderContents { get; } = new List<DocumentModel>();
 

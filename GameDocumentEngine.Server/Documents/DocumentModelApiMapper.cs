@@ -41,17 +41,17 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 								select entry;
 
 		return new DocumentDetails(
-			GameId: resultDocument.GameId,
-			Id: resultDocument.Id,
+			GameId: (Identifier)resultDocument.GameId,
+			Id: (Identifier)resultDocument.Id,
 			Version: resultDocument.Version,
 			Name: resultDocument.Name,
-			FolderId: resultDocument.FolderId,
+			FolderId: (Identifier?)resultDocument.FolderId,
 			Type: resultDocument.Type,
 			Details: filtered,
 			UserRoles: permissionEntries
 				.AtState(usage)
 				.ToDictionary(
-					p => p.UserId.ToString(),
+					p => Identifier.ToString(p.PlayerId),
 					p => p.Role
 				),
 			Permissions: permissionSet.Permissions.Permissions
@@ -66,5 +66,5 @@ class DocumentModelApiMapper : IPermissionedApiMapper<DocumentModel, Api.Documen
 			.Collection(game => game.Players);
 	}
 
-	public object ToKey(DocumentModel entity) => new { entity.GameId, entity.Id };
+	public object ToKey(DocumentModel entity) => new { GameId = Identifier.ToString(entity.GameId), Id = Identifier.ToString(entity.Id) };
 }

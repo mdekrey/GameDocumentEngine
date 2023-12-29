@@ -12,6 +12,6 @@ public interface IGameObjectType
 	/// <summary>
 	/// Determines additional permissions based on user's role for the object
 	/// </summary>
-	IEnumerable<string> GetPermissions(Guid gameId, Guid documentId, string role);
+	IEnumerable<string> GetPermissions(long gameId, long documentId, string role);
 	Task<IEnumerable<string>> ResolveScripts(RollupManifestManager manifestManager);
 }

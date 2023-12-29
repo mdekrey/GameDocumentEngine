@@ -13,6 +13,7 @@ import {
 	useTranslationFor,
 	useWidgetType,
 } from '@/utils/api/hooks';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 export function InfoWidgetModal<TWidget extends WidgetBase>({
 	resolve,
@@ -25,7 +26,8 @@ export function InfoWidgetModal<TWidget extends WidgetBase>({
 	}
 >) {
 	const document = useDocument(gameId, widget.documentId);
-	const { icon: Icon } = useDocumentType(gameId, widget.documentId).typeInfo;
+	const { icon: Icon } =
+		useDocumentType(gameId, widget.documentId)?.typeInfo ?? missingDocumentType;
 	const Component = useWidgetType(
 		gameId,
 		widget.documentId,

@@ -8,12 +8,11 @@ namespace GameDocumentEngine.Server.Documents;
 
 public class DocumentUserModel : IAuditable
 {
-	public Guid GameId { get; set; }
-	public Guid DocumentId { get; set; }
-	public Guid UserId { get; set; }
+	public long GameId { get; set; }
+	public long DocumentId { get; set; }
+	public long PlayerId { get; set; }
 
 	public DocumentModel Document { get; set; }
-	public UserModel User { get; set; }
 	public GameUserModel GameUser { get; set; }
 
 	// Role name from game document type

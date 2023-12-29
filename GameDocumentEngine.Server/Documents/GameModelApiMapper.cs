@@ -60,18 +60,17 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 
 	private static GameDetails ToApi(GameModel game, GameUserModel[] gameUsers, UserModel[] users, GameTypeDetails typeInfo, PermissionSet permissionSet)
 	{
-		// "original values" game users won't have the 
 		return new GameDetails(Name: game.Name,
 					LastUpdated: game.LastModifiedDate,
 					UserRoles: gameUsers.ToDictionary(
-						p => p.UserId.ToString(),
+						p => Identifier.ToString(p.PlayerId),
 						p => p.Role
 					),
-					PlayerNames: users.ToDictionary(
-						p => p.Id.ToString(),
-						p => p.Name
+					PlayerNames: gameUsers.ToDictionary(
+						p => Identifier.ToString(p.PlayerId),
+						p => users.Single(u => u.Id == p.UserId).Name
 					),
-					Id: game.Id,
+					Id: (Identifier)game.Id,
 					Version: game.Version,
 					TypeInfo: typeInfo,
 					Permissions: permissionSet.Permissions.Permissions
