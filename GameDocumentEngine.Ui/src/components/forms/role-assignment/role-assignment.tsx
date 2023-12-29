@@ -19,7 +19,7 @@ export type RoleAssignmentProps = {
 	onSaveRoles: (
 		roles: z.infer<typeof UserRoleAssignment>,
 	) => void | Promise<void>;
-	roleTranslationsNamespace: string;
+	roleTranslationsNamespace: string | undefined;
 	translations: (key: string) => string;
 	allowUpdate: boolean;
 	allowUpdateSelf?: boolean;

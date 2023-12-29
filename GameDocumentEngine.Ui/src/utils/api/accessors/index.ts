@@ -21,9 +21,14 @@ export function getWidgetType(
 	);
 }
 
-export function getDocTypeTranslationNamespace(docType: string) {
-	return `doc-types:${docType}`;
+export function getDocTypeTranslationNamespace(docType: string): string;
+export function getDocTypeTranslationNamespace(
+	docType?: string,
+): string | undefined;
+export function getDocTypeTranslationNamespace(docType?: string) {
+	return docType && `doc-types:${docType}`;
 }
+
 export function getGameTypeTranslationNamespace(docType: string) {
 	return `game-types:${docType}`;
 }

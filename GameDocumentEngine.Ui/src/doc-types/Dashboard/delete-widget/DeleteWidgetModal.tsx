@@ -12,6 +12,7 @@ import {
 	useTranslationFor,
 	useTranslationForDocument,
 } from '@/utils/api/hooks';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 export function DeleteWidgetModal({
 	resolve,
@@ -25,7 +26,8 @@ export function DeleteWidgetModal({
 	}
 >) {
 	const document = useDocument(gameId, widget.documentId);
-	const { icon: Icon } = useDocumentType(gameId, widget.documentId).typeInfo;
+	const { icon: Icon } =
+		useDocumentType(gameId, widget.documentId)?.typeInfo ?? missingDocumentType;
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'delete-widget-modal',
 	});

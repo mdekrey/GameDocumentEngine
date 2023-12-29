@@ -8,6 +8,7 @@ import {
 } from '@/utils/api/hooks';
 import { Link } from 'react-router-dom';
 import { elementTemplate } from '../template';
+import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
 
 const NamedLink = elementTemplate('NamedLink', Link, (T) => (
 	<T className="h-full text-xl font-bold flex flex-row items-center" />
@@ -19,7 +20,8 @@ export function NamedIconWidget({
 	size,
 }: WidgetComponentProps<unknown, void>) {
 	const t = useTranslationForDocument(document, widgetType);
-	const Icon = useTypeOfDocument(document).typeInfo.icon;
+	const Icon =
+		useTypeOfDocument(document)?.typeInfo.icon ?? missingDocumentType.icon;
 	const path = `/game/${document.gameId}/document/${document.id}`;
 	if (size.width === 2) {
 		return (

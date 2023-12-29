@@ -68,6 +68,7 @@ export function DocumentSettings({
 		gameId,
 		documentId,
 	);
+	const { userRoles = [], key } = docType ?? {};
 
 	return (
 		<SingleColumnSections>
@@ -83,12 +84,10 @@ export function DocumentSettings({
 					userRoles={docData.userRoles}
 					playerNames={gameDetails.playerNames}
 					defaultRole=""
-					roles={['', ...docType.userRoles]}
+					roles={['', ...userRoles]}
 					onSaveRoles={onSaveRoles}
 					translations={t}
-					roleTranslationsNamespace={getDocTypeTranslationNamespace(
-						docType.key,
-					)}
+					roleTranslationsNamespace={getDocTypeTranslationNamespace(key)}
 					allowUpdate={displayUserPermissions(docData)}
 					allowUpdateSelf={canUpdateOwnPermissions(docData)}
 				/>

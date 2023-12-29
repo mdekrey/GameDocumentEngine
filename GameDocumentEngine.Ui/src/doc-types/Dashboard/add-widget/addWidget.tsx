@@ -16,10 +16,11 @@ export async function addWidget(
 ) {
 	const document = await fetchDocument(queryClient, gameId, id);
 	const docType = await fetchDocumentType(queryClient, gameId, id);
+	const widgets = docType?.typeInfo.widgets ?? {};
 	const additional = {
 		gameId,
 		documentId: id,
-		widgets: docType.typeInfo.widgets ?? {},
+		widgets,
 	};
 	const widgetKeys = Object.keys(additional.widgets);
 
@@ -33,7 +34,7 @@ export async function addWidget(
 			additional: {
 				gameId,
 				documentId: id,
-				widgets: docType.typeInfo.widgets ?? {},
+				widgets,
 			},
 		});
 		applyChange(result);
