@@ -12,6 +12,7 @@ public static class GameSecurity
 	public static string ViewGame(long gameId) => $"{BaseGame(gameId)}:read";
 	public static string DeleteGame(long gameId) => $"{BaseGame(gameId)}:delete";
 	public static string ExportGame(long gameId) => $"{BaseGame(gameId)}:export";
+	public static string ImportIntoGame(long gameId) => $"{BaseGame(gameId)}:import";
 	public static string UpdateGame(long gameId) => $"{BaseGame(gameId)}:update";
 	public static string CreateDocument(long gameId) => $"{BaseGame(gameId)}:create-document";
 	public static string UpdateGameUserAccess(long gameId) => $"{BaseGame(gameId)}:change-permissions";

@@ -11,6 +11,7 @@ import {
 	removePlayerFromGame,
 	getGameExport,
 	importGame,
+	importIntoExistingGame,
 } from './games';
 import {
 	getDocument,
@@ -53,6 +54,7 @@ export const queries = {
 	cancelInvitation,
 	getGameExport,
 	importGame,
+	importIntoExistingGame,
 } satisfies { [K in keyof typeof operations]: unknown };
 export const extraQueries = {
 	changeDocumentFolder,

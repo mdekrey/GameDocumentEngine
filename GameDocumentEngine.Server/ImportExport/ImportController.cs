@@ -2,6 +2,7 @@
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Users;
+using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
 using System.Security.AccessControl;
 
@@ -11,13 +12,16 @@ public class ImportController : GameImportControllerBase
 {
 	private readonly Documents.GameTypes gameTypes;
 	private readonly DocumentDbContext dbContext;
+	private readonly GamePermissionSetResolver permissionSetResolver;
 
 	public ImportController(
 		Documents.GameTypes gameTypes,
-		DocumentDbContext dbContext)
+		DocumentDbContext dbContext,
+		GamePermissionSetResolver permissionSetResolver)
 	{
 		this.gameTypes = gameTypes;
 		this.dbContext = dbContext;
+		this.permissionSetResolver = permissionSetResolver;
 	}
 
 	protected override async Task<ImportGameActionResult> ImportGame(Stream importGameBody)
@@ -44,5 +48,27 @@ public class ImportController : GameImportControllerBase
 		await dbContext.SaveChangesAsync();
 
 		return ImportGameActionResult.Ok(new ImportGameResponse((Identifier)game.Id));
+	}
+
+	protected override async Task<ImportIntoExistingGameActionResult> ImportIntoExistingGame(Identifier gameId, Stream importIntoExistingGameBody)
+	{
+		if (!ModelState.IsValid)
+			return ImportIntoExistingGameActionResult.BadRequest();
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
+		if (permissions == null) return ImportIntoExistingGameActionResult.NotFound();
+		if (!permissions.HasPermission(GameSecurity.ImportIntoGame(gameId.Value))) return ImportIntoExistingGameActionResult.Forbidden();
+		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
+
+		using var zipArchive = new ZipArchive(importIntoExistingGameBody, ZipArchiveMode.Read, false);
+
+		if (!await GameArchiveVersion1.IsValid(zipArchive))
+			return ImportIntoExistingGameActionResult.BadRequest();
+
+		var archiveFactory = new GameArchiveVersion1(dbContext);
+		if (!await archiveFactory.UnpackIntoGame(zipArchive, game))
+			return ImportIntoExistingGameActionResult.BadRequest();
+
+		await dbContext.SaveChangesAsync();
+		return ImportIntoExistingGameActionResult.Ok();
 	}
 }

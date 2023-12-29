@@ -1,5 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { HiMiniArrowDownTray, HiOutlineTrash } from 'react-icons/hi2';
+import {
+	HiMiniArrowDownTray,
+	HiMiniArrowUpTray,
+	HiOutlineTrash,
+} from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
@@ -13,6 +17,7 @@ import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	deleteGame,
 	exportGame,
+	importIntoGame,
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
 import { useCurrentUser, useGame } from '@/utils/api/hooks';
@@ -25,6 +30,9 @@ function displayDeleteGame(gameDetails: GameDetails) {
 }
 function displayExportGame(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, exportGame);
+}
+function displayImportIntoGame(gameDetails: GameDetails) {
+	return hasGamePermission(gameDetails, importIntoGame);
 }
 
 export function displayDangerZone(gameDetails: GameDetails) {
@@ -43,6 +51,11 @@ function useRemoveUserFromGame() {
 	return useMutation(queries.removePlayerFromGame);
 }
 
+function useImportIntoExistingGame() {
+	const navigate = useNavigate();
+	return useMutation(queries.importIntoExistingGame(navigate));
+}
+
 export function GameDangerZone({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
 	const launchModal = useLaunchModal();
@@ -51,6 +64,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const userDetails = useCurrentUser();
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
+	const importIntoExistingGame = useImportIntoExistingGame();
 
 	return (
 		<>
@@ -83,6 +97,20 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 					{t('download-game', { name: gameDetails.name })}
 				</Button.Save>
 			)}
+			{displayImportIntoGame(gameDetails) && (
+				<div className="relative flex flex-col">
+					<Button.Save>
+						<HiMiniArrowUpTray />
+						{t('import-into-game', { name: gameDetails.name })}
+					</Button.Save>
+					<input
+						type="file"
+						className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
+						accept=".vaultvtt"
+						onChange={onImportIntoGame}
+					/>
+				</div>
+			)}
 		</>
 	);
 
@@ -112,5 +140,14 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		dl.setAttribute('href', queries.getGameExport({ gameId }));
 		dl.setAttribute('download', '');
 		dl.click();
+	}
+
+	function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
+		if (ev.target.files?.length !== 1) return;
+		const file = ev.target.files[0];
+
+		console.log({ gameId, file });
+
+		importIntoExistingGame.mutate({ gameId, file });
 	}
 }
