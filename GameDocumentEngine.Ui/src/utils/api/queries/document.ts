@@ -190,8 +190,8 @@ export function deleteDocument(
 			else throw new Error('Could not save changes');
 		},
 		onError: async () => {
-			await queryClient.invalidateQueries(listDocuments(gameId));
-			await queryClient.invalidateQueries(getDocument(gameId, documentId));
+			await queryClient.resetQueries(listDocuments(gameId));
+			await queryClient.resetQueries(getDocument(gameId, documentId));
 		},
 	};
 }

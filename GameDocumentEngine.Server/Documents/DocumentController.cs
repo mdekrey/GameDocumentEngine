@@ -103,6 +103,7 @@ public class DocumentController : Api.DocumentControllerBase
 
 	protected override async Task<ListDocumentsActionResult> ListDocuments(Identifier gameId, Identifier? folderId, string? type, string? search, int? limit, string? cursor)
 	{
+		if (!ModelState.IsValid) return ListDocumentsActionResult.NotFound();
 		var viewAny = await permissionSetResolver.HasPermission(User, gameId.Value, SeeAnyDocument(gameId.Value));
 		if (viewAny == null) return ListDocumentsActionResult.NotFound();
 

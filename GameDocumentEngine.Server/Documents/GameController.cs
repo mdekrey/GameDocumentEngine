@@ -77,6 +77,7 @@ public class GameController : Api.GameControllerBase
 
 	protected override async Task<GetGameDetailsActionResult> GetGameDetails(Identifier gameId)
 	{
+		if (!ModelState.IsValid) return GetGameDetailsActionResult.NotFound();
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
 		if (permissions == null) return GetGameDetailsActionResult.NotFound();
 		if (!permissions.HasPermission(ViewGame(gameId.Value))) return GetGameDetailsActionResult.Forbidden();

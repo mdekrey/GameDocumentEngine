@@ -128,7 +128,7 @@ public class InvitationController : Api.InvitationsControllerBase
 		});
 		await dbContext.SaveChangesAsync();
 
-		return ClaimInvitationActionResult.Redirect($"/#/game/{gameId}?invite=true");
+		return ClaimInvitationActionResult.Redirect($"/#/game/{Identifier.ToString(gameId)}?invite=true");
 	}
 
 	private static GameInvite ToApi(GameInviteModel invite)
