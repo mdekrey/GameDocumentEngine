@@ -1,5 +1,5 @@
 import '@/utils/api/queries';
-import { useReducer } from 'react';
+import { Suspense, useReducer } from 'react';
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
@@ -90,6 +90,7 @@ export function DashboardDisplay({
 			},
 		},
 	});
+	const t = useDocTypeTranslation('Dashboard');
 
 	if (!editing) {
 		return (
@@ -100,7 +101,18 @@ export function DashboardDisplay({
 				{Object.entries(document.details.widgets).map(
 					([key, config]: [string, Widget]) => (
 						<PositionedWidgetContainer key={key} position={config.position}>
-							<RenderWidget gameId={document.gameId} widgetConfig={config} />
+							<ErrorBoundary
+								fallback={
+									<ErrorScreen message={t('widgets.widget-runtime-error')} />
+								}
+							>
+								<Suspense>
+									<RenderWidget
+										gameId={document.gameId}
+										widgetConfig={config}
+									/>
+								</Suspense>
+							</ErrorBoundary>
 						</PositionedWidgetContainer>
 					),
 				)}

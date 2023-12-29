@@ -40,7 +40,7 @@ function useDeleteGame() {
 }
 
 function useRemoveUserFromGame() {
-	return useMutation(queries.removeUserFromGame);
+	return useMutation(queries.removePlayerFromGame);
 }
 
 export function GameDangerZone({ gameId }: { gameId: string }) {
@@ -86,13 +86,13 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		</>
 	);
 
-	async function onDeleteUser(userId: string, name: string) {
+	async function onDeleteUser(playerId: string, name: string) {
 		const shouldDelete = await launchModal({
 			ModalContents: RemoveGameUserModal,
 			additional: { name },
 		}).catch(() => false);
 		if (shouldDelete) {
-			removeUser.mutate({ gameId, userId });
+			removeUser.mutate({ gameId, playerId });
 		}
 	}
 

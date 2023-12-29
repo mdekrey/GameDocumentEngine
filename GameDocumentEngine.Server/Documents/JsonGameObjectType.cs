@@ -42,7 +42,7 @@ public class JsonGameObjectType : IGameObjectType
 
 	public string CreatorPermissionLevel => Roles.Single(kvp => kvp.Value.IsCreatorDefault).Key;
 
-	public IEnumerable<string> GetPermissions(Guid gameId, Guid documentId, string role)
+	public IEnumerable<string> GetPermissions(long gameId, long documentId, string role)
 	{
 		var basePermission = GameSecurity.BaseDocument(gameId, documentId);
 		return Roles[role].Permissions.Select(permission => $"{basePermission}:{permission}");

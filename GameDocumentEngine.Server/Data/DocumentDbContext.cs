@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GameDocumentEngine.Server.Documents;
+using GameDocumentEngine.Server.Users;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.Json.Nodes;
 
 namespace GameDocumentEngine.Server.Data;
@@ -26,12 +29,12 @@ public class DocumentDbContext : DbContext
 		{
 			entity.HasKey(u => u.Id);
 			entity.HasIndex(u => u.GoogleNameId);
+
 			entity.HasMany(u => u.Games).WithOne(u => u.User).HasForeignKey(u => u.UserId);
+
 			entity.Property(d => d.Options)
 				.HasDefaultValue(emptyObject)
 				.HasConversion(JsonValueConverter.Instance);
-
-			entity.HasMany(u => u.Documents).WithOne(du => du.User).HasForeignKey(du => du.UserId).OnDelete(DeleteBehavior.NoAction);
 		});
 
 		modelBuilder.Entity<Documents.GameModel>(entity =>
@@ -46,23 +49,26 @@ public class DocumentDbContext : DbContext
 
 		modelBuilder.Entity<Documents.DocumentModel>(entity =>
 		{
-			entity.HasKey(d => d.Id);
-			entity.HasIndex(d => new { d.GameId, d.Id });
+			entity.HasKey(d => new { d.GameId, d.Id });
+			entity.Property(d => d.Id).HasValueGenerator<RandomLongValueGenerator>();
 			entity.HasIndex(d => new { d.GameId, d.FolderId, d.Name });
 			entity.HasIndex(d => new { d.GameId, d.Type, d.Name });
+
 			entity.HasMany(d => d.Players).WithOne(du => du.Document).HasPrincipalKey(d => new { d.GameId, d.Id }).HasForeignKey(du => new { du.GameId, du.DocumentId }).OnDelete(DeleteBehavior.NoAction);
 
 			entity.Property(d => d.Details)
 				.HasDefaultValue(emptyObject)
 				.HasConversion(JsonValueConverter.Instance);
-			entity.HasMany(d => d.FolderContents).WithOne(d => d.Folder).HasForeignKey(d => d.FolderId).OnDelete(DeleteBehavior.Cascade);
+			entity.HasMany(d => d.FolderContents).WithOne(d => d.Folder).HasForeignKey(d => new { d.GameId, d.FolderId }).HasPrincipalKey(d => new { d.GameId, d.Id }).OnDelete(DeleteBehavior.Cascade);
 		});
 
 		modelBuilder.Entity<Documents.GameUserModel>(entity =>
 		{
-			entity.HasKey(gu => new { gu.UserId, gu.GameId });
-			entity.HasIndex(gu => gu.GameId);
-			entity.HasMany(gu => gu.Documents).WithOne(du => du.GameUser).HasForeignKey(du => new { du.UserId, du.GameId }).HasPrincipalKey(gu => new { gu.UserId, gu.GameId });
+			entity.HasKey(d => new { d.GameId, d.PlayerId });
+			entity.HasIndex(gu => new { gu.UserId, gu.GameId }).IsUnique();
+			entity.HasMany(gu => gu.Documents).WithOne(du => du.GameUser).HasForeignKey(du => new { du.GameId, du.PlayerId }).HasPrincipalKey(gu => new { gu.GameId, gu.PlayerId });
+
+			entity.Property(d => d.PlayerId).HasValueGenerator<RandomLongValueGenerator>();
 			entity.Property(gu => gu.Role).IsRequired();
 			entity.Property(d => d.Options)
 				.HasDefaultValue(emptyObject)
@@ -71,8 +77,9 @@ public class DocumentDbContext : DbContext
 
 		modelBuilder.Entity<Documents.DocumentUserModel>(entity =>
 		{
-			entity.HasKey(du => new { du.UserId, du.DocumentId });
-			entity.HasIndex(d => new { d.DocumentId });
+			entity.HasKey(du => new { du.GameId, du.PlayerId, du.DocumentId });
+			entity.HasIndex(d => new { d.GameId, d.DocumentId });
+
 			entity.Property(gu => gu.Role).IsRequired();
 			entity.Property(d => d.Options)
 				.HasDefaultValue(emptyObject)
@@ -85,5 +92,11 @@ public class DocumentDbContext : DbContext
 			entity.HasIndex(link => new { link.GameId, link.Expiration });
 			entity.HasIndex(link => link.Expiration);
 		});
+	}
+
+	internal Task<GameUserModel> GetPlayerOrThrow(ClaimsPrincipal user, long gameId)
+	{
+		var userId = user.GetUserIdOrThrow();
+		return GameUsers.FirstAsync(gu => gu.GameId == gameId && gu.UserId == userId);
 	}
 }

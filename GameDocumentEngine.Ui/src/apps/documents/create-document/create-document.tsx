@@ -100,6 +100,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 		currentValue: Omit<CreateDocumentDetails, 'details'>,
 	) {
 		const objectInfo = getDocumentType(gameType, currentValue.type);
+		if (!objectInfo) return;
 		const initialRoles = Object.fromEntries(
 			Object.entries(currentValue.initialRoles).filter(([, role]) => !!role),
 		);

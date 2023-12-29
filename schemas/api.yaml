@@ -194,7 +194,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         200:
           description: Success
@@ -217,7 +217,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         200:
           description: Success
@@ -236,7 +236,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       requestBody:
         required: true
         content:
@@ -275,7 +275,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       requestBody:
         required: true
         content:
@@ -299,26 +299,26 @@ paths:
           $ref: "#/components/responses/403"
         404:
           description: Target game not found
-  /game/{gameId}/user/{userId}:
+  /game/{gameId}/player/{playerId}:
     delete:
       x-dotnet-mvc-server-controller: Game
-      operationId: removeUserFromGame
+      operationId: removePlayerFromGame
       security:
         - AuthenticatedUser: []
       parameters:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
-      - name: userId
+        schema: { type: string, format: id }
+      - name: playerId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         204:
           description: Success
         400:
-          description: User was not in the game
+          description: Player was not in the game
         401:
           $ref: "#/components/responses/401"
         403:
@@ -335,11 +335,11 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       - name: folderId
         in: query
         required: false
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       - name: type
         in: query
         required: false
@@ -376,7 +376,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       requestBody:
         required: true
         content:
@@ -410,11 +410,11 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       - name: id
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         200:
           description: Success
@@ -433,11 +433,11 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       - name: id
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         200:
           description: Success
@@ -454,11 +454,11 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       - name: id
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       requestBody:
         required: true
         content:
@@ -495,11 +495,11 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       - name: id
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       requestBody:
         required: true
         content:
@@ -535,7 +535,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         200:
           description: Success
@@ -560,7 +560,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       requestBody:
         required: true
         content:
@@ -598,7 +598,7 @@ paths:
       - name: gameId
         in: path
         required: true
-        schema: { type: string, format: guid }
+        schema: { type: string, format: id }
       responses:
         200:
           description: Success
@@ -638,7 +638,7 @@ paths:
                 required:
                   - gameId
                 properties:
-                  gameId: { type: string, format: guid }
+                  gameId: { type: string, format: id }
         400:
           description: Invalid zip provided
 
@@ -752,7 +752,7 @@ components:
           - id
           - version
           properties:
-            id: { type: string, format: guid }
+            id: { type: string, format: id }
             version: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
             playerNames:
@@ -770,7 +770,7 @@ components:
         - id
         - name
       properties:
-        id: { type: string, format: guid }
+        id: { type: string, format: id }
         name: { type: string }
 
     GameInvite:
@@ -784,7 +784,7 @@ components:
         - expiration
       properties:
         id: { type: string }
-        gameId: { type: string, format: guid }
+        gameId: { type: string, format: id }
         role: { type: string }
         usesRemaining:
           type: integer
@@ -803,7 +803,7 @@ components:
         name: { type: string }
         type: { type: string }
         details: { type: object, format: any }
-        folderId: { type: string, format: guid, nullable: true }
+        folderId: { type: string, format: id, nullable: true }
         initialRoles:
           type: object
           additionalProperties: { type: string }
@@ -820,8 +820,8 @@ components:
       - permissions
       - folderId
       properties:
-        gameId: { type: string, format: guid }
-        id: { type: string, format: guid }
+        gameId: { type: string, format: id }
+        id: { type: string, format: id }
         version: { type: string, format: guid }
         name: { type: string }
         type: { type: string }
@@ -830,7 +830,7 @@ components:
           type: object
           additionalProperties: { type: string }
         permissions: { type: array, items: { type: string} }
-        folderId: { type: string, format: guid, nullable: true }
+        folderId: { type: string, format: id, nullable: true }
     DocumentSummary:
       type: object
       required:
@@ -839,10 +839,10 @@ components:
         - type
         - folderId
       properties:
-        id: { type: string, format: guid }
+        id: { type: string, format: id }
         name: { type: string }
         type: { type: string }
-        folderId: { type: string, format: guid, nullable: true }
+        folderId: { type: string, format: id, nullable: true }
 
     UserDetails:
       type: object

@@ -47,7 +47,6 @@ public class JsonGameTypeBuilder
 
 #pragma warning restore
 
-	private static readonly int BaseGamePermissionLength = BaseGame(Guid.Empty).Length + 1;
 	public IGameType Build(IEnumerable<IGameObjectType> gameObjectTypes)
 	{
 		return new JsonGameType(
@@ -65,7 +64,7 @@ public class JsonGameTypeBuilder
 		IReadOnlyDictionary<string, IEnumerable<string>> Permissions) : IGameType
 	{
 		IEnumerable<string> IGameType.Roles => Permissions.Keys;
-		PermissionList IGameType.GetPermissions(Guid gameId, string role)
+		PermissionList IGameType.GetPermissions(long gameId, string role)
 		{
 			if (!Permissions.TryGetValue(role, out var permissions))
 				throw new InvalidOperationException($"Unknown role {role} for game type {Key}");

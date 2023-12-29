@@ -133,15 +133,15 @@ export const deleteGame: UseMutationOptions<
 	},
 };
 
-export const removeUserFromGame: UseMutationOptions<
+export const removePlayerFromGame: UseMutationOptions<
 	undefined,
 	unknown,
-	{ gameId: string; userId: string },
+	{ gameId: string; playerId: string },
 	unknown
 > = {
-	mutationFn: async ({ gameId, userId }) => {
-		const response = await api.removeUserFromGame({
-			params: { gameId, userId },
+	mutationFn: async ({ gameId, playerId }) => {
+		const response = await api.removePlayerFromGame({
+			params: { gameId, playerId },
 		});
 		if (response.statusCode === 204) return;
 		else throw new Error('Could not save changes');

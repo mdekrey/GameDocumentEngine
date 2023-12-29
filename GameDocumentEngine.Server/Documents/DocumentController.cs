@@ -45,19 +45,19 @@ public class DocumentController : Api.DocumentControllerBase
 		this.cursorProtector = protector.CreateProtector(nameof(cursorProtector));
 	}
 
-	protected override async Task<CreateDocumentActionResult> CreateDocument(Guid gameId, CreateDocumentDetails createDocumentBody)
+	protected override async Task<CreateDocumentActionResult> CreateDocument(Identifier gameId, CreateDocumentDetails createDocumentBody)
 	{
 		if (!ModelState.IsValid) return CreateDocumentActionResult.BadRequest("Unable to parse response");
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
 		if (permissions == null) return CreateDocumentActionResult.NotFound();
-		if (!permissions.HasPermission(GameSecurity.CreateDocument(gameId))) return CreateDocumentActionResult.Forbidden();
+		if (!permissions.HasPermission(GameSecurity.CreateDocument(gameId.Value))) return CreateDocumentActionResult.Forbidden();
 
-		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
 
 		var document = new DocumentModel
 		{
 			Game = game,
-			GameId = gameId,
+			GameId = gameId.Value,
 			Details = createDocumentBody.Details,
 			Name = createDocumentBody.Name,
 			Type = createDocumentBody.Type,
@@ -72,17 +72,17 @@ public class DocumentController : Api.DocumentControllerBase
 			document.Players.Add(new DocumentUserModel
 			{
 				GameId = game.Id,
-				UserId = Guid.Parse(entry.Key),
+				PlayerId = Identifier.FromString(entry.Key).Value,
 				Role = entry.Value,
 			});
 		}
-		var currentUser = User.GetUserIdOrThrow();
-		if (!document.Players.Any(p => p.UserId == currentUser))
+
+		if (!document.Players.Any(p => p.PlayerId == permissions.GameUser.PlayerId))
 		{
 			document.Players.Add(new DocumentUserModel
 			{
 				GameId = game.Id,
-				UserId = User.GetUserIdOrThrow(),
+				PlayerId = permissions.GameUser.PlayerId,
 				Role = docType.CreatorPermissionLevel
 			});
 		}
@@ -101,15 +101,16 @@ public class DocumentController : Api.DocumentControllerBase
 		return CreateDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
-	protected override async Task<ListDocumentsActionResult> ListDocuments(Guid gameId, Guid? folderId, string? type, string? search, int? limit, string? cursor)
+	protected override async Task<ListDocumentsActionResult> ListDocuments(Identifier gameId, Identifier? folderId, string? type, string? search, int? limit, string? cursor)
 	{
-		var viewAny = await permissionSetResolver.HasPermission(User, gameId, SeeAnyDocument(gameId));
+		var viewAny = await permissionSetResolver.HasPermission(User, gameId.Value, SeeAnyDocument(gameId.Value));
 		if (viewAny == null) return ListDocumentsActionResult.NotFound();
 
+		var playerId = (await dbContext.GetPlayerOrThrow(User, gameId.Value)).PlayerId;
 		IQueryable<DocumentModel> baseDocuments = viewAny.Value
-			? dbContext.Documents.Where(doc => doc.GameId == gameId)
+			? dbContext.Documents.Where(doc => doc.GameId == gameId.Value)
 			: from gameUser in dbContext.DocumentUsers
-			  where gameUser.UserId == User.GetCurrentUserId() && gameUser.GameId == gameId
+			  where gameUser.PlayerId == playerId && gameUser.GameId == gameId.Value
 			  select gameUser.Document;
 
 		string? afterName = null;
@@ -118,7 +119,7 @@ public class DocumentController : Api.DocumentControllerBase
 		{
 			cursorParts = HttpUtility.ParseQueryString(cursorProtector.Unprotect(cursor));
 			type = cursorParts.GetValues(nameof(type)) is [string cursorDocType] ? cursorDocType : null;
-			folderId = cursorParts.GetValues(nameof(folderId)) is [string cursorFolder] ? Guid.Parse(cursorFolder) : null;
+			folderId = cursorParts.GetValues(nameof(folderId)) is [string cursorFolder] ? Identifier.FromString(cursorFolder) : null;
 			search = cursorParts.GetValues(nameof(search)) is [string cursorSearch] ? cursorSearch : null;
 			afterName = cursorParts.GetValues(nameof(afterName)) is [string cursorAfterName] ? cursorAfterName : null;
 		}
@@ -135,11 +136,11 @@ public class DocumentController : Api.DocumentControllerBase
 
 		if (folderId != null)
 		{
-			var isEmpty = folderId == Guid.Empty;
+			var isEmpty = folderId.Value == 0;
 			baseDocuments = baseDocuments.Where(
 				isEmpty
 					? doc => doc.FolderId == null
-					: doc => doc.FolderId == folderId
+					: doc => doc.FolderId == folderId.Value
 			);
 			cursorParts.Set(nameof(folderId), folderId.ToString());
 		}
@@ -169,7 +170,10 @@ public class DocumentController : Api.DocumentControllerBase
 		}
 
 		return ListDocumentsActionResult.Ok(new ListDocumentsResponse(
-			Data: documents.ToDictionary(d => d.Id.ToString(), doc => new DocumentSummary(doc.Id, doc.Name, doc.Type, doc.FolderId)),
+			Data: documents.ToDictionary(
+				d => Identifier.ToString(d.Id),
+				doc => new DocumentSummary((Identifier)doc.Id, doc.Name, doc.Type, (Identifier?)doc.FolderId)
+			),
 			Pagination: new PaginatedDetails(
 				TotalRecords: count,
 				NextCursor: nextCursor
@@ -177,15 +181,15 @@ public class DocumentController : Api.DocumentControllerBase
 		));
 	}
 
-	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Guid gameId, Guid id)
+	protected override async Task<DeleteDocumentActionResult> DeleteDocument(Identifier gameId, Identifier id)
 	{
-		switch (await permissionSetResolver.HasPermission(User, gameId, id, GameSecurity.DeleteDocument(gameId, id)))
+		switch (await permissionSetResolver.HasPermission(User, gameId.Value, id.Value, GameSecurity.DeleteDocument(gameId.Value, id.Value)))
 		{
 			case null: return DeleteDocumentActionResult.NotFound();
 			case false: return DeleteDocumentActionResult.Forbidden();
 		}
 
-		var document = await dbContext.Documents.Include(d => d.Players).FirstOrDefaultAsync(d => d.Id == id);
+		var document = await dbContext.Documents.Include(d => d.Players).FirstOrDefaultAsync(d => d.Id == id.Value);
 		if (document == null) return DeleteDocumentActionResult.NotFound();
 
 		dbContext.RemoveRange(document.Players);
@@ -194,30 +198,30 @@ public class DocumentController : Api.DocumentControllerBase
 		return DeleteDocumentActionResult.Ok();
 	}
 
-	protected override async Task<GetDocumentActionResult> GetDocument(Guid gameId, Guid id)
+	protected override async Task<GetDocumentActionResult> GetDocument(Identifier gameId, Identifier id)
 	{
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
-		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return GetDocumentActionResult.NotFound();
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value, id.Value);
+		if (permissions?.HasPermission(SeeDocument(gameId.Value, id.Value)) is not true) return GetDocumentActionResult.NotFound();
 
-		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.GameId == gameId.Value && du.DocumentId == id.Value)?.Document
 			?? await (from doc in dbContext.Documents
-					  where doc.Id == id
+					  where doc.GameId == gameId.Value && doc.Id == id.Value
 					  select doc).SingleOrDefaultAsync();
 		if (document == null) return GetDocumentActionResult.NotFound();
 
 		return GetDocumentActionResult.Ok(await ToDocumentDetails(document, permissions));
 	}
 
-	protected override async Task<PatchDocumentActionResult> PatchDocument(Guid gameId, Guid id, JsonPatch patchDocumentBody)
+	protected override async Task<PatchDocumentActionResult> PatchDocument(Identifier gameId, Identifier id, JsonPatch patchDocumentBody)
 	{
 		if (!ModelState.IsValid) return PatchDocumentActionResult.BadRequest("Unable to parse JSON Patch");
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
-		if (permissions?.HasPermission(SeeDocument(gameId, id)) is not true) return PatchDocumentActionResult.NotFound();
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value, id.Value);
+		if (permissions?.HasPermission(SeeDocument(gameId.Value, id.Value)) is not true) return PatchDocumentActionResult.NotFound();
 
-		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document
-			?? await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id);
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.GameId == gameId.Value && du.DocumentId == id.Value)?.Document
+			?? await dbContext.Documents.Include(doc => doc.Game).FirstAsync(doc => doc.Id == id.Value);
 		// check permissions with patch to see if allowed
-		var jsonPaths = permissions.Permissions.MatchingPermissionsParams(WriteDocumentDetailsPrefix(gameId, id));
+		var jsonPaths = permissions.Permissions.MatchingPermissionsParams(WriteDocumentDetailsPrefix(gameId.Value, id.Value));
 		if (!patchDocumentBody.HasOnlyAllowedPaths(EditableDocumentModel.Create(document), jsonPaths))
 			return PatchDocumentActionResult.Forbidden();
 
@@ -254,16 +258,16 @@ public class DocumentController : Api.DocumentControllerBase
 		return gameType.ObjectTypes.FirstOrDefault(t => t.Key == document.Type);
 	}
 
-	protected override async Task<UpdateDocumentRoleAssignmentsActionResult> UpdateDocumentRoleAssignments(Guid gameId, Guid id, Dictionary<string, string?> updateDocumentRoleAssignmentsBody)
+	protected override async Task<UpdateDocumentRoleAssignmentsActionResult> UpdateDocumentRoleAssignments(Identifier gameId, Identifier id, Dictionary<string, string?> updateDocumentRoleAssignmentsBody)
 	{
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId, id);
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value, id.Value);
 		if (permissions == null) return UpdateDocumentRoleAssignmentsActionResult.NotFound();
-		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId, id))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
-		var canUpdateSelf = permissions.HasPermission(UpdateDocumentAccessForSelf(gameId, id));
+		if (!permissions.HasPermission(UpdateDocumentUserAccess(gameId.Value, id.Value))) return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
+		var canUpdateSelf = permissions.HasPermission(UpdateDocumentAccessForSelf(gameId.Value, id.Value));
 
-		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.DocumentId == id)?.Document;
+		var document = permissions.GameUser.Documents.FirstOrDefault(du => du.GameId == gameId.Value && du.DocumentId == id.Value)?.Document;
 		if (document == null)
-			document = await dbContext.Documents.Include(d => d.Game).Include(d => d.Players).Where(d => d.Id == id && d.GameId == gameId).SingleAsync();
+			document = await dbContext.Documents.Include(d => d.Game).Include(d => d.Players).Where(d => d.Id == id.Value && d.GameId == gameId.Value).SingleAsync();
 		else
 			await userLoader.EnsureDocumentUsersLoaded(dbContext, document);
 
@@ -273,15 +277,15 @@ public class DocumentController : Api.DocumentControllerBase
 
 		var gameUserRecords = document.Players
 			?? await (from documentUser in dbContext.DocumentUsers
-					  where documentUser.GameId == gameId && documentUser.DocumentId == id
+					  where documentUser.GameId == gameId.Value && documentUser.DocumentId == id.Value
 					  select documentUser).ToListAsync();
 		foreach (var kvp in updateDocumentRoleAssignmentsBody)
 		{
-			var key = Guid.Parse(kvp.Key);
-			if (key == permissions.GameUser.UserId && !canUpdateSelf)
+			var key = Identifier.FromString(kvp.Key).Value;
+			if (key == permissions.GameUser.PlayerId && !canUpdateSelf)
 				// Can't update your own permissions!
 				return UpdateDocumentRoleAssignmentsActionResult.Forbidden();
-			var modifiedUser = gameUserRecords.FirstOrDefault(u => u.UserId == key);
+			var modifiedUser = gameUserRecords.FirstOrDefault(u => u.PlayerId == key);
 			if (kvp.Value == null)
 			{
 				if (modifiedUser != null)
@@ -295,14 +299,14 @@ public class DocumentController : Api.DocumentControllerBase
 				return UpdateDocumentRoleAssignmentsActionResult.BadRequest();
 			else if (modifiedUser == null)
 			{
-				modifiedUser = new DocumentUserModel { UserId = key, GameId = gameId, DocumentId = id, Role = kvp.Value };
+				modifiedUser = new DocumentUserModel { PlayerId = key, GameId = gameId.Value, DocumentId = id.Value, Role = kvp.Value };
 				gameUserRecords.Add(modifiedUser);
 			}
 			else modifiedUser.Role = kvp.Value;
 		}
 		await dbContext.SaveChangesAsync();
 		return UpdateDocumentRoleAssignmentsActionResult.Ok(
-			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => gu.Role)
+			gameUserRecords.ToDictionary(gu => Identifier.ToString(gu.PlayerId), gu => gu.Role)
 		);
 	}
 

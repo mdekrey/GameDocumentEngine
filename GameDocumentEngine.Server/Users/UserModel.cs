@@ -13,5 +13,4 @@ public class UserModel
 	public string EmailAddress { get; set; }
 	public JsonNode Options { get; set; }
 	public ICollection<Documents.GameUserModel> Games { get; } = new List<Documents.GameUserModel>();
-	public ICollection<Documents.DocumentUserModel> Documents { get; } = new List<Documents.DocumentUserModel>();
 }

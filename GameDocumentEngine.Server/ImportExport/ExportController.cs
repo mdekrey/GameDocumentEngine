@@ -24,20 +24,15 @@ public partial class ExportController : GameExportControllerBase
 		this.permissionSetResolver = permissionSetResolver;
 	}
 
-	protected async Task<bool?> HasPermission(Guid gameId, string permission)
+	protected override async Task<GetGameExportActionResult> GetGameExport(Identifier gameId)
 	{
-		return await permissionSetResolver.HasPermission(User, gameId, permission);
-	}
-
-	protected override async Task<GetGameExportActionResult> GetGameExport(Guid gameId)
-	{
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId);
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
 		if (permissions == null) return GetGameExportActionResult.NotFound();
-		if (!permissions.HasPermission(GameSecurity.ExportGame(gameId))) return GetGameExportActionResult.Forbidden();
-		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId);
+		if (!permissions.HasPermission(GameSecurity.ExportGame(gameId.Value))) return GetGameExportActionResult.Forbidden();
+		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
 
 		var archiveFactory = new GameArchiveVersion1(dbContext);
-		var archive = await archiveFactory.CreateArchive(gameId);
+		var archive = await archiveFactory.CreateArchive(gameId.Value);
 		var headerContentDisposition = $"attachment; filename=\"Export-{CleanseName().Replace(game.Name, "")}.vaultvtt\"";
 		return GetGameExportActionResult.Ok(archive, headerContentDisposition: headerContentDisposition);
 	}

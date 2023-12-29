@@ -1,7 +1,4 @@
-import {
-	defaultMissingWidgetDefinition,
-	missingDocumentType,
-} from '@/documents/defaultMissingWidgetDefinition';
+import { defaultMissingWidgetDefinition } from '@/documents/defaultMissingWidgetDefinition';
 import type {
 	GameTypeObjectScripts,
 	GameTypeScripts,
@@ -10,17 +7,16 @@ import type {
 export function getDocumentType<T = unknown>(
 	gameType: GameTypeScripts,
 	docType: string,
-) {
-	return (gameType.objectTypes[docType] ??
-		missingDocumentType) as GameTypeObjectScripts<T>;
+): GameTypeObjectScripts<T> | undefined {
+	return gameType.objectTypes[docType] as GameTypeObjectScripts<T>;
 }
 
 export function getWidgetType(
-	documentType: GameTypeObjectScripts,
+	documentType: GameTypeObjectScripts | undefined,
 	widgetType: string,
 ) {
 	return (
-		documentType.typeInfo.widgets?.[widgetType] ??
+		documentType?.typeInfo.widgets?.[widgetType] ??
 		defaultMissingWidgetDefinition
 	);
 }

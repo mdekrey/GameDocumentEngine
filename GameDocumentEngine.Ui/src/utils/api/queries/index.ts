@@ -8,7 +8,7 @@ import {
 	getGameDetails,
 	listGameTypes,
 	listGames,
-	removeUserFromGame,
+	removePlayerFromGame,
 	getGameExport,
 	importGame,
 } from './games';
@@ -40,7 +40,7 @@ export const queries = {
 	deleteGame,
 	patchGame,
 	updateGameRoleAssignments,
-	removeUserFromGame,
+	removePlayerFromGame,
 	listDocuments,
 	createDocument,
 	getDocument,

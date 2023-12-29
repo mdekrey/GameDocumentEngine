@@ -21,7 +21,7 @@ public interface IGameType
 
 	IEnumerable<string> Roles => GameRoles;
 	string DefaultNewGameRole => "gm";
-	PermissionList GetPermissions(Guid gameId, string role)
+	PermissionList GetPermissions(long gameId, string role)
 	{
 		switch (role)
 		{

@@ -8,7 +8,8 @@ namespace GameDocumentEngine.Server.Documents;
 
 public class GameUserModel : IAuditable
 {
-	public Guid GameId { get; set; }
+	public long GameId { get; set; }
+	public long PlayerId { get; set; }
 	public Guid UserId { get; set; }
 
 	public GameModel Game { get; set; }

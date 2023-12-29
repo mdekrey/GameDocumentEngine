@@ -43,6 +43,6 @@ public class ImportController : GameImportControllerBase
 		dbContext.Add(game);
 		await dbContext.SaveChangesAsync();
 
-		return ImportGameActionResult.Ok(new ImportGameResponse(game.Id));
+		return ImportGameActionResult.Ok(new ImportGameResponse((Identifier)game.Id));
 	}
 }
