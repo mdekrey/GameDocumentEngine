@@ -125,6 +125,35 @@ public partial class GameArchiveVersion1
 		return game;
 	}
 
+	public async Task<bool> UnpackIntoGame(ZipArchive zipArchive, GameModel game)
+	{
+		var gameInfo = await ReadJsonFile<GameInfo>(zipArchive, "game.json");
+		if (gameInfo == null) return false;
+		if (gameInfo.GameType != game.Type) return false;
+		gameInfo.Apply(game);
+
+		var entries = (
+			from e in zipArchive.Entries
+			let docId = IsDocumentPath(e.FullName)
+			where docId != null
+			select (ZipEntry: e, OriginalId: docId!)
+		).ToArray();
+
+		foreach (var entry in entries)
+		{
+			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry);
+			if (docInfo == null) continue;
+			var id = Identifier.FromString(entry.OriginalId);
+			var document = await dbContext.Documents.FirstOrDefaultAsync(d => d.GameId == game.Id && d.Id == id.Value);
+			if (document == null)
+				game.Documents.Add(docInfo.ToDocument(id));
+			else
+				docInfo.Apply(document);
+		}
+
+		return true;
+	}
+
 	private Task AddManifest(ZipArchive zipArchive, Identifier gameId)
 	{
 		return AddJsonFile(zipArchive, ManifestPath, new Manifest(

@@ -2,6 +2,7 @@ export const viewGame = (gameId: string) => `game:${gameId}:read`;
 export const deleteGame = (gameId: string) => `game:${gameId}:delete`;
 export const updateGame = (gameId: string) => `game:${gameId}:update`;
 export const exportGame = (gameId: string) => `game:${gameId}:export`;
+export const importIntoGame = (gameId: string) => `game:${gameId}:import`;
 export const createDocument = (gameId: string) =>
 	`game:${gameId}:create-document`;
 export const updateGameUserAccess = (gameId: string) =>
