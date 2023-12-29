@@ -20,50 +20,65 @@ import { GameSettings } from './apps/game-settings/game-settings';
 import { DocumentSubheader } from './apps/documents/subheader/document-subheader';
 import { Suspense } from 'react';
 import { withParamsValue } from '@/components/router/withParamsValue';
+import { withErrorBoundary } from '@/components/router/withErrorBoundary';
+import { useTranslation } from 'react-i18next';
 
 const withGameId = withParamsValue('gameId');
 const withDocumentId = withParamsValue('documentId');
 
 const mainRoute: RouteObject[] = [
-	{ path: 'profile/', Component: Profile },
-	{ path: 'game/:gameId', Component: withGameId(GameDetails) },
-	{ path: 'game/:gameId/settings', Component: withGameId(GameSettings) },
+	{ path: 'profile/', Component: withErrorBoundary(Profile) },
+	{
+		path: 'game/:gameId',
+		Component: withErrorBoundary(withGameId(GameDetails)),
+	},
+	{
+		path: 'game/:gameId/settings',
+		Component: withErrorBoundary(withGameId(GameSettings)),
+	},
 	{
 		path: 'game/:gameId/invites',
-		Component: withGameId(GameInvites),
+		Component: withErrorBoundary(withGameId(GameInvites)),
 	},
 	{
 		path: 'game/:gameId/create-document',
-		Component: withGameId(CreateDocument),
+		Component: withErrorBoundary(withGameId(CreateDocument)),
 	},
 	{
 		path: 'game/:gameId/document/:documentId/*',
-		Component: withDocumentId(withGameId(DocumentDetails)),
+		Component: withErrorBoundary(withDocumentId(withGameId(DocumentDetails))),
 	},
 	{
 		path: 'game/:gameId/document/:documentId/settings',
-		Component: withDocumentId(withGameId(DocumentSettings)),
+		Component: withErrorBoundary(withDocumentId(withGameId(DocumentSettings))),
 	},
-	{ path: 'game/', Component: ListGames },
-	{ path: 'create-game/', Component: CreateGame },
+	{ path: 'game/', Component: withErrorBoundary(ListGames) },
+	{ path: 'create-game/', Component: withErrorBoundary(CreateGame) },
 	{ path: '/', element: <Navigate to="/game" replace={true} /> },
 ];
 
 const leftSidebarRoute: RouteObject[] = [
-	{ path: 'game/:gameId/*', Component: withGameId(GameObjects) },
+	{
+		path: 'game/:gameId/*',
+		Component: withErrorBoundary(withGameId(GameObjects)),
+	},
 	// while not having a matched route causes a console warning, even if the route gives a null element the `useRoutes` will not return null
 ];
 
 const subheaderRoutes: RouteObject[] = [
-	{ path: 'game/:gameId/*', Component: withGameId(GameSubheader) },
+	{
+		path: 'game/:gameId/*',
+		Component: withErrorBoundary(withGameId(GameSubheader)),
+	},
 	{
 		path: 'game/:gameId/document/:documentId/*',
-		Component: withDocumentId(withGameId(DocumentSubheader)),
+		Component: withErrorBoundary(withDocumentId(withGameId(DocumentSubheader))),
 	},
 ];
 
 function LoadingSection({ children }: { children?: React.ReactNode }) {
-	return <Suspense fallback={<>Loading...</>}>{children}</Suspense>;
+	const { t } = useTranslation(['generic']);
+	return <Suspense fallback={t('loading')}>{children}</Suspense>;
 }
 
 function App() {

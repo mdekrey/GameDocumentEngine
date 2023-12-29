@@ -2,6 +2,7 @@ import { Component } from 'react';
 
 type ErrorBoundaryProps = {
 	fallback: React.ReactNode;
+	errorKey?: React.Key;
 	children?: React.ReactNode;
 };
 
@@ -16,6 +17,11 @@ export class ErrorBoundary extends Component<
 	constructor(props: ErrorBoundaryProps) {
 		super(props);
 		this.state = { hasError: false };
+	}
+
+	componentWillReceiveProps(nextProps: Readonly<ErrorBoundaryProps>) {
+		if (nextProps.errorKey !== this.props.errorKey)
+			this.setState({ hasError: false });
 	}
 
 	static getDerivedStateFromError() {
