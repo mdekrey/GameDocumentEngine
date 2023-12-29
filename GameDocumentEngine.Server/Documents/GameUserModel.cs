@@ -10,10 +10,10 @@ public class GameUserModel : IAuditable
 {
 	public long GameId { get; set; }
 	public long PlayerId { get; set; }
-	public Guid UserId { get; set; }
+	public Guid? UserId { get; set; }
 
 	public GameModel Game { get; set; }
-	public UserModel User { get; set; }
+	public UserModel? User { get; set; }
 	public string? NameOverride { get; set; }
 
 	// Role name from global game roles

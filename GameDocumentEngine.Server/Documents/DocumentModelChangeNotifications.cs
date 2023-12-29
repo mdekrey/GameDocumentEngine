@@ -18,7 +18,7 @@ class DocumentModelChangeNotifications : PermissionedEntityChangeNotifications<D
 		IApiChangeNotification<DocumentDetails> changeNotification,
 		GamePermissionSetResolverFactory permissionSetResolverFactory,
 		GameTypes gameTypes)
-		: base(apiMapper, changeNotification, du => du.GameUser.UserId, du => du.Document)
+		: base(apiMapper, changeNotification)
 	{
 		this.userLoader = userLoader;
 		this.permissionSetResolverFactory = permissionSetResolverFactory;

@@ -70,9 +70,9 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		<>
 			{displayRemoveUser(gameDetails) && (
 				<ul className="list-disc ml-8">
-					{Object.entries(gameDetails.playerNames)
+					{Object.entries(gameDetails.players)
 						.filter(([id]) => id !== userDetails.id)
-						.map(([id, name]) => (
+						.map(([id, { name }]) => (
 							<li key={id} className="flex flex-row gap-3 my-3 items-center">
 								{name}
 								<IconButton.Destructive

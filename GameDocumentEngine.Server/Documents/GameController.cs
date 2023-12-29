@@ -146,11 +146,11 @@ public class GameController : Api.GameControllerBase
 									 select gameUser).ToArrayAsync();
 		foreach (var kvp in updateGameRoleAssignmentsBody)
 		{
-			var key = Guid.Parse(kvp.Key);
-			if (key == permissions.GameUser.UserId)
+			var key = Identifier.FromString(kvp.Key).Value;
+			if (key == permissions.GameUser.PlayerId)
 				// Can't update your own permissions!
 				return UpdateGameRoleAssignmentsActionResult.Forbidden();
-			if (gameUserRecords.FirstOrDefault(u => u.UserId == key) is not GameUserModel modifiedUser)
+			if (gameUserRecords.FirstOrDefault(u => u.PlayerId == key) is not GameUserModel modifiedUser)
 				return UpdateGameRoleAssignmentsActionResult.BadRequest();
 			if (!gameType.Roles.Contains(kvp.Value))
 				return UpdateGameRoleAssignmentsActionResult.BadRequest();
@@ -159,7 +159,7 @@ public class GameController : Api.GameControllerBase
 		}
 		await dbContext.SaveChangesAsync();
 		return UpdateGameRoleAssignmentsActionResult.Ok(
-			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => gu.Role)
+			gameUserRecords.ToDictionary(gu => Identifier.ToString(gu.PlayerId), gu => gu.Role)
 		);
 	}
 }

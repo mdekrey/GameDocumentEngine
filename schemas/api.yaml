@@ -775,8 +775,8 @@ components:
         - type: object
           required:
           - lastUpdated
-          - playerNames
-          - userRoles
+          - players
+          - currentUserPlayerId
           - permissions
           - typeInfo
           - id
@@ -785,15 +785,21 @@ components:
             id: { type: string, format: id }
             version: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
-            playerNames:
+            players:
               type: object
-              additionalProperties: { type: string }
-            userRoles:
-              type: object
-              additionalProperties: { type: string }
+              additionalProperties: { $ref: '#/components/schemas/PlayerSummary' }
+            currentUserPlayerId: { type: string, format: id }
             permissions: { type: array, items: { type: string} }
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
+    PlayerSummary:
+      type: object
+      required:
+        - name
+        - role
+      properties:
+        name: { type: string }
+        role: { type: string }
     GameSummary:
       type: object
       required:
