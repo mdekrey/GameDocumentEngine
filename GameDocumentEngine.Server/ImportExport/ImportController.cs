@@ -5,6 +5,7 @@ using GameDocumentEngine.Server.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.IO.Compression;
 using System.Security.AccessControl;
 
@@ -15,6 +16,7 @@ public partial class ImportController : GameImportControllerBase
 	private readonly Documents.GameTypes gameTypes;
 	private readonly DocumentDbContext dbContext;
 	private readonly GamePermissionSetResolver permissionSetResolver;
+	private readonly IReadOnlyList<Func<ZipArchive, Task<GameArchiveVersion1?>>> archiveVersions;
 
 	public ImportController(
 		Documents.GameTypes gameTypes,
@@ -24,6 +26,27 @@ public partial class ImportController : GameImportControllerBase
 		this.gameTypes = gameTypes;
 		this.dbContext = dbContext;
 		this.permissionSetResolver = permissionSetResolver;
+
+		this.archiveVersions = new Func<ZipArchive, Task<GameArchiveVersion1?>>[]
+		{
+			async (archive) =>
+			{
+				if (!await GameArchiveVersion1.IsValid(archive))
+					return null;
+				return new GameArchiveVersion1(dbContext);
+			}
+		};
+	}
+
+	private async Task<GameArchiveVersion1?> SelectVersion(ZipArchive zipArchive)
+	{
+		foreach (var versionFactory in archiveVersions)
+		{
+			var factory = await versionFactory(zipArchive);
+			if (factory == null) continue;
+			return factory;
+		}
+		return null;
 	}
 
 	protected override async Task<ImportGameActionResult> ImportGame(Stream importGameBody)
@@ -31,11 +54,10 @@ public partial class ImportController : GameImportControllerBase
 		if (!ModelState.IsValid)
 			return ImportGameActionResult.BadRequest();
 		using var zipArchive = new ZipArchive(importGameBody, ZipArchiveMode.Read, false);
-
-		if (!await GameArchiveVersion1.IsValid(zipArchive))
+		var archiveFactory = await SelectVersion(zipArchive);
+		if (archiveFactory == null)
 			return ImportGameActionResult.BadRequest();
 
-		var archiveFactory = new GameArchiveVersion1(dbContext);
 		var user = await dbContext.GetCurrentUserOrThrow(User);
 		var game = await archiveFactory.UnpackNewGame(zipArchive);
 		if (game == null)
@@ -61,6 +83,25 @@ public partial class ImportController : GameImportControllerBase
 		return await ImportIntoExistingGame(gameId, stream, importIntoExistingGameBody.Options);
 	}
 
+	protected override async Task<InspectGameArchiveActionResult> InspectGameArchive(Identifier gameId, Stream inspectGameArchiveBody)
+	{
+		if (!ModelState.IsValid)
+			return InspectGameArchiveActionResult.BadRequest();
+		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
+		if (permissions == null) return InspectGameArchiveActionResult.NotFound();
+		if (!permissions.HasPermission(GameSecurity.ImportIntoGame(gameId.Value))) return InspectGameArchiveActionResult.Forbidden();
+
+		using var zipArchive = new ZipArchive(inspectGameArchiveBody, ZipArchiveMode.Read, false);
+		var archiveFactory = await SelectVersion(zipArchive);
+		if (archiveFactory == null)
+			return InspectGameArchiveActionResult.BadRequest();
+
+		var details = await archiveFactory.GetArchiveDetails(zipArchive);
+		if (details == null)
+			return InspectGameArchiveActionResult.BadRequest();
+		return InspectGameArchiveActionResult.Ok(details);
+	}
+
 	private async Task<ImportIntoExistingGameActionResult> ImportIntoExistingGame(Identifier gameId, Stream stream, ImportIntoExistingGameOptions options)
 	{
 		if (!ModelState.IsValid)
@@ -68,15 +109,14 @@ public partial class ImportController : GameImportControllerBase
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
 		if (permissions == null) return ImportIntoExistingGameActionResult.NotFound();
 		if (!permissions.HasPermission(GameSecurity.ImportIntoGame(gameId.Value))) return ImportIntoExistingGameActionResult.Forbidden();
-		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
 
 		using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read, false);
-
-		if (!await GameArchiveVersion1.IsValid(zipArchive))
+		var archiveFactory = await SelectVersion(zipArchive);
+		if (archiveFactory == null)
 			return ImportIntoExistingGameActionResult.BadRequest();
 
-		var archiveFactory = new GameArchiveVersion1(dbContext);
-		if (!await archiveFactory.UnpackIntoGame(zipArchive, game))
+		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
+		if (!await archiveFactory.UnpackIntoGame(zipArchive, game, options))
 			return ImportIntoExistingGameActionResult.BadRequest();
 
 		await dbContext.SaveChangesAsync();

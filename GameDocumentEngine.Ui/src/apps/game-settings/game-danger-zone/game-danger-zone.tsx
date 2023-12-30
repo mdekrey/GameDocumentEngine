@@ -65,6 +65,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
 	const importIntoExistingGame = useImportIntoExistingGame();
+	const inspectArchive = useMutation(queries.inspectGameArchive);
 
 	return (
 		<>
@@ -107,7 +108,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 						type="file"
 						className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
 						accept=".vaultvtt"
-						onChange={onImportIntoGame}
+						onChange={(ev) => void onImportIntoGame(ev)}
 					/>
 				</div>
 			)}
@@ -142,12 +143,15 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		dl.click();
 	}
 
-	function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
+	async function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
 		if (ev.target.files?.length !== 1) return;
 		const file = ev.target.files[0];
+		ev.target.files = null;
 
-		console.log({ gameId, file });
+		const inspected = await inspectArchive.mutateAsync({ gameId, file });
+		console.log(inspected);
+		// TODO: select options
 
-		importIntoExistingGame.mutate({ gameId, file });
+		importIntoExistingGame.mutate({ gameId, file, options: { game: true } });
 	}
 }

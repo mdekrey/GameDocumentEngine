@@ -22,7 +22,14 @@ import {
 	method as importIntoExistingGameMethod,
 	constructResponse as constructImportIntoExistingGameResponse,
 } from '@/api/operations/importIntoExistingGame';
+import {
+	constructUrl as inspectGameArchiveUrl,
+	method as inspectGameArchiveMethod,
+	constructResponse as constructInspectGameArchiveResponse,
+	type StructuredResponses as InspectGameArchiveResponses,
+} from '@/api/operations/inspectGameArchive';
 import { constructUrl as getGameExportUrl } from '@/api/operations/getGameExport';
+import type { ImportIntoExistingGameOptions } from '@/api/models/ImportIntoExistingGameOptions';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -189,12 +196,11 @@ export function importIntoExistingGame(
 ): UseMutationOptions<
 	undefined,
 	unknown,
-	{ gameId: string; file: File },
+	{ gameId: string; file: File; options: ImportIntoExistingGameOptions },
 	unknown
 > {
 	return {
 		mutationFn: async ({ gameId, file }) => {
-			console.log({ gameId, file });
 			const formData = new FormData();
 			formData.append(
 				'archive',
@@ -221,3 +227,30 @@ export function importIntoExistingGame(
 		},
 	};
 }
+
+export const inspectGameArchive: UseMutationOptions<
+	InspectGameArchiveResponses['200']['application/json'],
+	unknown,
+	{ gameId: string; file: File },
+	unknown
+> = {
+	mutationFn: async ({ gameId, file }) => {
+		const response = await fetch(inspectGameArchiveUrl({ gameId }), {
+			method: inspectGameArchiveMethod,
+			headers: {
+				'content-type': 'application/x-zip',
+			},
+			body: file,
+		});
+		const result = constructInspectGameArchiveResponse({
+			status: response.status,
+			response: await response.json(),
+			getResponseHeader(header: string) {
+				return response.headers.get(header);
+			},
+		});
+
+		if (result.statusCode === 200) return result.data;
+		throw new Error('Could not import game');
+	},
+};

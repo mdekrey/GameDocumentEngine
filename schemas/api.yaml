@@ -662,6 +662,43 @@ paths:
           $ref: "#/components/responses/403"
         404:
           description: Game not found
+  /game/{gameId}/import/inspect:
+    post:
+      operationId: inspectGameArchive
+      x-dotnet-mvc-server-controller: GameImport
+      security:
+        - AuthenticatedUser: []
+      parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: id }
+      requestBody:
+        required: true
+        content:
+          application/x-zip:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - game
+                properties:
+                  game: { $ref: '#/components/schemas/GameSummary' }
+        400:
+          description: Invalid zip provided
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Game not found
   /game/import:
     post:
       operationId: importGame
@@ -688,7 +725,6 @@ paths:
                   gameId: { type: string, format: id }
         400:
           description: Invalid zip provided
-
 
   /invitations/{linkId}:
     get:

@@ -18,15 +18,15 @@ public partial class GameArchiveVersion1
 
 	private string DocumentPath(long documentId) => $"documents/{Api.Identifier.ToString(documentId)}.json";
 	[GeneratedRegex("documents/(?<documentId>[^.]+)\\.json")] private static partial Regex DocumentPathRegex();
-	private string? IsDocumentPath(string path) => DocumentPathRegex().Match(path) is not { Success: true, Groups: var g } ? null
-		: g["documentId"].Value;
+	private Identifier? IsDocumentPath(string path) => DocumentPathRegex().Match(path) is not { Success: true, Groups: var g } ? null
+		: Identifier.FromString(g["documentId"].Value);
 
 	private record Manifest(string Version, DateTimeOffset CreatedAt, Identifier OriginalGameId, string ManifestType);
-	private record GameInfo(string Name, string GameType)
+	private record GameInfo(Identifier Id, string Name, string GameType)
 	{
 		public static GameInfo FromGame(GameModel game)
 		{
-			return new GameInfo(game.Name, game.Type);
+			return new GameInfo(Identifier.FromLong(game.Id), game.Name, game.Type);
 		}
 
 		public GameModel ToGame()
@@ -71,10 +71,8 @@ public partial class GameArchiveVersion1
 		this.dbContext = dbContext;
 	}
 
-	public async Task<Stream> CreateArchive(long gameId)
+	public async Task AddToArchive(long gameId, Stream stream)
 	{
-		var result = new MemoryStream();
-
 		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId);
 
 		// TODO: paginate? something? Make this more efficieint.
@@ -82,17 +80,12 @@ public partial class GameArchiveVersion1
 								  where doc.GameId == gameId
 								  select doc).ToArrayAsync();
 
-		using (var zipArchive = new ZipArchive(result, ZipArchiveMode.Create, true))
-		{
-			await AddManifest(zipArchive, (Identifier)gameId);
-			await AddJsonFile(zipArchive, GamePath, GameInfo.FromGame(game));
+		using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Create, true);
+		await AddManifest(zipArchive, (Identifier)gameId);
+		await AddJsonFile(zipArchive, GamePath, GameInfo.FromGame(game));
 
-			foreach (var doc in allDocuments)
-				await AddJsonFile(zipArchive, DocumentPath(doc.Id), DocumentInfo.FromDocument(doc));
-		}
-
-		result.Position = 0;
-		return result;
+		foreach (var doc in allDocuments)
+			await AddJsonFile(zipArchive, DocumentPath(doc.Id), DocumentInfo.FromDocument(doc));
 	}
 
 	internal static async Task<bool> IsValid(ZipArchive zipArchive)
@@ -104,7 +97,7 @@ public partial class GameArchiveVersion1
 
 	public async Task<GameModel?> UnpackNewGame(ZipArchive zipArchive)
 	{
-		var gameInfo = await ReadJsonFile<GameInfo>(zipArchive, "game.json");
+		var gameInfo = await ReadGame(zipArchive);
 		if (gameInfo == null) return null;
 		var game = gameInfo.ToGame();
 
@@ -112,22 +105,22 @@ public partial class GameArchiveVersion1
 			from e in zipArchive.Entries
 			let docId = IsDocumentPath(e.FullName)
 			where docId != null
-			select (ZipEntry: e, OriginalId: docId!)
+			select (ZipEntry: e, OriginalId: docId)
 		).ToArray();
 
 		foreach (var entry in entries)
 		{
 			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry);
 			if (docInfo == null) continue;
-			game.Documents.Add(docInfo.ToDocument(Identifier.FromString(entry.OriginalId)));
+			game.Documents.Add(docInfo.ToDocument(entry.OriginalId));
 		}
 
 		return game;
 	}
 
-	public async Task<bool> UnpackIntoGame(ZipArchive zipArchive, GameModel game)
+	public async Task<bool> UnpackIntoGame(ZipArchive zipArchive, GameModel game, ImportIntoExistingGameOptions options)
 	{
-		var gameInfo = await ReadJsonFile<GameInfo>(zipArchive, "game.json");
+		var gameInfo = await ReadGame(zipArchive);
 		if (gameInfo == null) return false;
 		if (gameInfo.GameType != game.Type) return false;
 		gameInfo.Apply(game);
@@ -136,14 +129,14 @@ public partial class GameArchiveVersion1
 			from e in zipArchive.Entries
 			let docId = IsDocumentPath(e.FullName)
 			where docId != null
-			select (ZipEntry: e, OriginalId: docId!)
+			select (ZipEntry: e, OriginalId: docId)
 		).ToArray();
 
 		foreach (var entry in entries)
 		{
 			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry);
 			if (docInfo == null) continue;
-			var id = Identifier.FromString(entry.OriginalId);
+			var id = entry.OriginalId;
 			var document = await dbContext.Documents.FirstOrDefaultAsync(d => d.GameId == game.Id && d.Id == id.Value);
 			if (document == null)
 				game.Documents.Add(docInfo.ToDocument(id));
@@ -154,6 +147,16 @@ public partial class GameArchiveVersion1
 		return true;
 	}
 
+	public async Task<InspectGameArchiveResponse?> GetArchiveDetails(ZipArchive zipArchive)
+	{
+		var gameInfo = await ReadGame(zipArchive);
+		if (gameInfo == null) return null;
+
+		return new InspectGameArchiveResponse(
+			Game: new GameSummary(gameInfo.Id, gameInfo.Name)
+		);
+	}
+
 	private Task AddManifest(ZipArchive zipArchive, Identifier gameId)
 	{
 		return AddJsonFile(zipArchive, ManifestPath, new Manifest(
@@ -162,6 +165,11 @@ public partial class GameArchiveVersion1
 			OriginalGameId: gameId,
 			ManifestType: ManifestType
 		));
+	}
+
+	private async Task<GameInfo?> ReadGame(ZipArchive zipArchive)
+	{
+		return await ReadJsonFile<GameInfo>(zipArchive, "game.json");
 	}
 
 	private static async Task AddJsonFile<T>(ZipArchive zipArchive, string entryName, T contents)
