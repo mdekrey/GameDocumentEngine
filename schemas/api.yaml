@@ -630,6 +630,23 @@ paths:
       requestBody:
         required: true
         content:
+          # multipart/form-data:
+          #   schema:
+          #     type: object
+          #     required:
+          #     # - archive
+          #     - options
+          #     properties:
+          #       # archive:
+          #       #   type: string
+          #       #   format: binary
+          #       options:
+          #         $ref: '#/components/schemas/ImportIntoExistingGameOptions'
+          #   encoding:
+          #     options:
+          #       contentType: application/json
+          #     # archive:
+          #     #   contentType: application/x-zip
           application/x-zip:
             schema:
               type: string
@@ -926,6 +943,21 @@ components:
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
         translationNamespace: { type: string }
+
+
+    ImportIntoExistingGameOptions:
+      type: object
+      required:
+      - game
+      properties:
+        game:
+          type: boolean
+        documents:
+          type: array
+          items: { type: string, format: id }
+        players:
+          type: array
+          items: { type: string, format: id }
   responses:
     "401":
       description: User was not authenticated

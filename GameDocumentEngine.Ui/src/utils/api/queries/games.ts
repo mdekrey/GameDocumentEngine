@@ -195,12 +195,15 @@ export function importIntoExistingGame(
 	return {
 		mutationFn: async ({ gameId, file }) => {
 			console.log({ gameId, file });
+			const formData = new FormData();
+			formData.append(
+				'archive',
+				new Blob([file], { type: 'application/x-zip' }),
+			);
+			formData.append('options', JSON.stringify({ game: true }));
 			const response = await fetch(importIntoExistingGameUrl({ gameId }), {
 				method: importIntoExistingGameMethod,
-				headers: {
-					'content-type': 'application/x-zip',
-				},
-				body: file,
+				body: formData,
 			});
 			const result = constructImportIntoExistingGameResponse({
 				status: response.status,

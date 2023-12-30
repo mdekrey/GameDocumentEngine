@@ -2,13 +2,15 @@
 using GameDocumentEngine.Server.Data;
 using GameDocumentEngine.Server.Documents;
 using GameDocumentEngine.Server.Users;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Security.AccessControl;
 
 namespace GameDocumentEngine.Server.ImportExport;
 
-public class ImportController : GameImportControllerBase
+public partial class ImportController : GameImportControllerBase
 {
 	private readonly Documents.GameTypes gameTypes;
 	private readonly DocumentDbContext dbContext;
@@ -50,7 +52,16 @@ public class ImportController : GameImportControllerBase
 		return ImportGameActionResult.Ok(new ImportGameResponse((Identifier)game.Id));
 	}
 
-	protected override async Task<ImportIntoExistingGameActionResult> ImportIntoExistingGame(Identifier gameId, Stream importIntoExistingGameBody)
+	protected override Task<ImportIntoExistingGameActionResult> ImportIntoExistingGame(Identifier gameId, Stream importIntoExistingGameBody) =>
+		ImportIntoExistingGame(gameId, importIntoExistingGameBody, new ImportIntoExistingGameOptions(true, null, null));
+
+	protected async Task<ImportIntoExistingGameActionResult> ImportIntoExistingGameMultipartFormData(Identifier gameId, ImportIntoExistingGameMultipartFormDataRequest importIntoExistingGameBody)
+	{
+		using var stream = importIntoExistingGameBody.Archive.OpenReadStream();
+		return await ImportIntoExistingGame(gameId, stream, importIntoExistingGameBody.Options);
+	}
+
+	private async Task<ImportIntoExistingGameActionResult> ImportIntoExistingGame(Identifier gameId, Stream stream, ImportIntoExistingGameOptions options)
 	{
 		if (!ModelState.IsValid)
 			return ImportIntoExistingGameActionResult.BadRequest();
@@ -59,7 +70,7 @@ public class ImportController : GameImportControllerBase
 		if (!permissions.HasPermission(GameSecurity.ImportIntoGame(gameId.Value))) return ImportIntoExistingGameActionResult.Forbidden();
 		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
 
-		using var zipArchive = new ZipArchive(importIntoExistingGameBody, ZipArchiveMode.Read, false);
+		using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read, false);
 
 		if (!await GameArchiveVersion1.IsValid(zipArchive))
 			return ImportIntoExistingGameActionResult.BadRequest();
@@ -71,4 +82,32 @@ public class ImportController : GameImportControllerBase
 		await dbContext.SaveChangesAsync();
 		return ImportIntoExistingGameActionResult.Ok();
 	}
+}
+
+
+
+public partial class ImportController
+{
+
+	/// <param name="gameId"></param>
+	/// <param name="importIntoExistingGameBody"></param>
+	[global::Microsoft.AspNetCore.Mvc.HttpPost]
+	[global::Microsoft.AspNetCore.Mvc.Route("/game/{gameId}/import")]
+	[global::Microsoft.AspNetCore.Mvc.Consumes("multipart/form-data")]
+	// Success
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(200)] // 
+																 // Invalid zip provided
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(400)] // 
+																 // User was not authenticated
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(401)] // 
+																 // User did not have permissions
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(403)] // 
+																 // Game not found
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(404)] // 
+	[global::Microsoft.AspNetCore.Authorization.Authorize(Policy = "AuthenticatedUser")]
+	public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> ImportIntoExistingGamemultipartFormDataTypeSafeEntry(
+		[global::Microsoft.AspNetCore.Mvc.FromRoute(Name = "gameId"), global::System.ComponentModel.DataAnnotations.Required] global::GameDocumentEngine.Server.Api.Identifier gameId,
+		[global::Microsoft.AspNetCore.Mvc.FromForm, global::System.ComponentModel.DataAnnotations.Required] ImportIntoExistingGameMultipartFormDataRequest importIntoExistingGameBody
+	) => (await ImportIntoExistingGameMultipartFormData(gameId, importIntoExistingGameBody)).ActionResult;
+
 }
