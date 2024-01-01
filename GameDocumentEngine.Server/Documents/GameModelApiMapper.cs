@@ -47,7 +47,9 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		await userEntries.WhenAll(nav => nav.LoadWithFixupAsync());
 
 		var users = userEntries
-			.Select(e => e.TargetEntry ?? throw new InvalidOperationException("LoadWithFixup failed"))
+			// user may not be provided for all players
+			.Where(e => e.TargetEntry != null)
+			.Select(e => e.TargetEntry!)
 			.AtState(usage)
 			.ToArray();
 

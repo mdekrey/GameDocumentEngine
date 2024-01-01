@@ -146,6 +146,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	async function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
 		if (ev.target.files?.length !== 1) return;
 		const file = ev.target.files[0];
+		ev.target.value = '';
 		ev.target.files = null;
 
 		const inspected = await inspectArchive.mutateAsync({ gameId, file });

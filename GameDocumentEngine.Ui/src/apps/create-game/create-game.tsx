@@ -94,6 +94,8 @@ export function CreateGame() {
 	function onFileSelected(ev: React.ChangeEvent<HTMLInputElement>) {
 		if (ev.target.files?.length !== 1) return;
 		const file = ev.target.files[0];
+		ev.target.value = '';
+		ev.target.files = null;
 
 		importGame.mutate({ file });
 	}
