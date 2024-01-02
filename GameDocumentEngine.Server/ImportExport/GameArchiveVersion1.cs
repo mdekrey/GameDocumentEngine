@@ -269,13 +269,38 @@ public partial class GameArchiveVersion1
 		return true;
 	}
 
-	public async Task<InspectGameArchiveResponse?> GetArchiveDetails(ZipArchive zipArchive)
+	public async Task<GameImportArchiveSummary?> GetArchiveDetails(ZipArchive zipArchive)
 	{
 		var gameInfo = await ReadGame(zipArchive);
 		if (gameInfo == null) return null;
 
-		return new InspectGameArchiveResponse(
-			Game: new GameSummary(gameInfo.Id, gameInfo.Name)
+		var documents = new List<GameImportArchiveSummaryDocumentsItem>();
+		foreach (var entry in from e in zipArchive.Entries
+							  let docId = IsDocumentPath(e.FullName)
+							  where docId != null
+							  select (ZipEntry: e, OriginalId: docId))
+		{
+			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry);
+			if (docInfo == null) continue;
+			documents.Add(new(entry.OriginalId, Name: docInfo.Name, Type: docInfo.DocumentType));
+		}
+
+		var players = new List<GameImportArchiveSummaryPlayersItem>();
+		foreach (var entry in from e in zipArchive.Entries
+							  let playerId = IsPlayerPath(e.FullName)
+							  where playerId != null
+							  select (ZipEntry: e, OriginalId: playerId))
+		{
+			var playerInfo = await ReadJsonFile<PlayerInfo>(entry.ZipEntry);
+			if (playerInfo == null) continue;
+			players.Add(new(entry.OriginalId, Name: playerInfo.Name, Role: playerInfo.Role));
+		}
+
+		return new GameImportArchiveSummary(
+			Name: gameInfo.Name,
+			TypeKey: gameInfo.GameType,
+			Documents: documents,
+			Players: players
 		);
 	}
 

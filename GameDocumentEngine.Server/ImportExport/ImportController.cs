@@ -49,7 +49,15 @@ public partial class ImportController : GameImportControllerBase
 		return null;
 	}
 
-	protected override async Task<ImportGameActionResult> ImportGame(Stream importGameBody)
+	protected async Task<ImportGameActionResult> ImportGameMultipartFormData(ImportGameMultipartFormDataRequest importGameBody)
+	{
+		using var stream = importGameBody.Archive.OpenReadStream();
+		return await ImportGame(stream, importGameBody.Options);
+	}
+
+	protected override Task<ImportGameActionResult> ImportGame(Stream importGameBody) =>
+		ImportGame(importGameBody, new ImportGameOptions(Documents: null, Players: null));
+	private async Task<ImportGameActionResult> ImportGame(Stream importGameBody, ImportGameOptions options)
 	{
 		if (!ModelState.IsValid)
 			return ImportGameActionResult.BadRequest();
@@ -75,7 +83,7 @@ public partial class ImportController : GameImportControllerBase
 	}
 
 	protected override Task<ImportIntoExistingGameActionResult> ImportIntoExistingGame(Identifier gameId, Stream importIntoExistingGameBody) =>
-		ImportIntoExistingGame(gameId, importIntoExistingGameBody, new ImportIntoExistingGameOptions(true, null, null));
+		ImportIntoExistingGame(gameId, importIntoExistingGameBody, new ImportIntoExistingGameOptions(true, Documents: null, Players: null));
 
 	protected async Task<ImportIntoExistingGameActionResult> ImportIntoExistingGameMultipartFormData(Identifier gameId, ImportIntoExistingGameMultipartFormDataRequest importIntoExistingGameBody)
 	{
@@ -83,13 +91,13 @@ public partial class ImportController : GameImportControllerBase
 		return await ImportIntoExistingGame(gameId, stream, importIntoExistingGameBody.Options);
 	}
 
-	protected override async Task<InspectGameArchiveActionResult> InspectGameArchive(Identifier gameId, Stream inspectGameArchiveBody)
+	protected override async Task<InspectGameArchiveActionResult> InspectGameArchive(Stream inspectGameArchiveBody)
 	{
 		if (!ModelState.IsValid)
 			return InspectGameArchiveActionResult.BadRequest();
-		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
-		if (permissions == null) return InspectGameArchiveActionResult.NotFound();
-		if (!permissions.HasPermission(GameSecurity.ImportIntoGame(gameId.Value))) return InspectGameArchiveActionResult.Forbidden();
+		//var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
+		//if (permissions == null) return InspectGameArchiveActionResult.NotFound();
+		//if (!permissions.HasPermission(GameSecurity.ImportIntoGame(gameId.Value))) return InspectGameArchiveActionResult.Forbidden();
 
 		using var zipArchive = new ZipArchive(inspectGameArchiveBody, ZipArchiveMode.Read, false);
 		var archiveFactory = await SelectVersion(zipArchive);
@@ -128,6 +136,19 @@ public partial class ImportController : GameImportControllerBase
 
 public partial class ImportController
 {
+
+	/// <param name="importGameBody"></param>
+	[global::Microsoft.AspNetCore.Mvc.HttpPost]
+	[global::Microsoft.AspNetCore.Mvc.Route("/game/import")]
+	[global::Microsoft.AspNetCore.Mvc.Consumes("multipart/form-data")]
+	// Success
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(200)] // 
+																 // Invalid zip provided
+	[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(400)]
+	[global::Microsoft.AspNetCore.Authorization.Authorize(Policy = "AuthenticatedUser")]
+	public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> ImportGamemultipartFormDataTypeSafeEntry(
+		[global::Microsoft.AspNetCore.Mvc.FromForm, global::System.ComponentModel.DataAnnotations.Required] ImportGameMultipartFormDataRequest importGameBody
+	) => (await ImportGameMultipartFormData(importGameBody)).ActionResult;
 
 	/// <param name="gameId"></param>
 	/// <param name="importIntoExistingGameBody"></param>

@@ -59,7 +59,7 @@ public class GameController : Api.GameControllerBase
 		var games = await (from gameUser in dbContext.GameUsers
 						   where gameUser.UserId == User.GetCurrentUserId()
 						   select gameUser.Game).ToArrayAsync();
-		return ListGamesActionResult.Ok(games.ToDictionary(g => g.Id.ToString(), g => new GameSummary((Identifier)g.Id, g.Name)));
+		return ListGamesActionResult.Ok(games.ToDictionary(g => g.Id.ToString(), g => new GameSummary(Id: (Identifier)g.Id, Name: g.Name, TypeKey: g.Type)));
 	}
 
 	protected override async Task<DeleteGameActionResult> DeleteGame(Identifier gameId)

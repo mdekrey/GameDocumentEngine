@@ -30,6 +30,7 @@ import {
 } from '@/api/operations/inspectGameArchive';
 import { constructUrl as getGameExportUrl } from '@/api/operations/getGameExport';
 import type { ImportIntoExistingGameOptions } from '@/api/models/ImportIntoExistingGameOptions';
+import type { ImportGameOptions } from '@/api/models/ImportGameOptions';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],
@@ -100,6 +101,7 @@ export async function handleGameUpdateEvent(
 			list[event.key] = {
 				id: resultData.id,
 				name: resultData.name,
+				typeKey: resultData.typeInfo.key,
 			};
 		});
 	} else {
@@ -164,15 +166,23 @@ export const getGameExport = getGameExportUrl;
 
 export function importGame(
 	navigate: NavigateFunction,
-): UseMutationOptions<{ gameId: string }, unknown, { file: File }, unknown> {
+): UseMutationOptions<
+	{ gameId: string },
+	unknown,
+	{ file: File; options: ImportGameOptions },
+	unknown
+> {
 	return {
-		mutationFn: async ({ file }) => {
+		mutationFn: async ({ file, options }) => {
+			const formData = new FormData();
+			formData.append(
+				'archive',
+				new Blob([file], { type: 'application/x-zip' }),
+			);
+			formData.append('options', JSON.stringify(options));
 			const response = await fetch(importGameUrl({}), {
 				method: importGameMethod,
-				headers: {
-					'content-type': 'application/x-zip',
-				},
-				body: file,
+				body: formData,
 			});
 			const result = constructImportGameResponse({
 				status: response.status,
@@ -200,13 +210,13 @@ export function importIntoExistingGame(
 	unknown
 > {
 	return {
-		mutationFn: async ({ gameId, file }) => {
+		mutationFn: async ({ gameId, file, options }) => {
 			const formData = new FormData();
 			formData.append(
 				'archive',
 				new Blob([file], { type: 'application/x-zip' }),
 			);
-			formData.append('options', JSON.stringify({ game: true }));
+			formData.append('options', JSON.stringify(options));
 			const response = await fetch(importIntoExistingGameUrl({ gameId }), {
 				method: importIntoExistingGameMethod,
 				body: formData,
@@ -231,11 +241,11 @@ export function importIntoExistingGame(
 export const inspectGameArchive: UseMutationOptions<
 	InspectGameArchiveResponses['200']['application/json'],
 	unknown,
-	{ gameId: string; file: File },
+	{ file: File },
 	unknown
 > = {
-	mutationFn: async ({ gameId, file }) => {
-		const response = await fetch(inspectGameArchiveUrl({ gameId }), {
+	mutationFn: async ({ file }) => {
+		const response = await fetch(inspectGameArchiveUrl({}), {
 			method: inspectGameArchiveMethod,
 			headers: {
 				'content-type': 'application/x-zip',

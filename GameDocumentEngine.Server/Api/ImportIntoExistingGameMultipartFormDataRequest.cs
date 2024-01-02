@@ -4,6 +4,43 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GameDocumentEngine.Server.Api;
 
+public class ImportGameMultipartFormDataRequest
+{
+#nullable disable
+	[FromForm(Name = "archive")]
+	[Required]
+	public IFormFile Archive { get; set; }
+
+	[FromForm(Name = "options")]
+	[Required]
+	public ImportGameOptions Options { get; set; }
+#nullable restore
+}
+
+public partial record ImportGameOptions : IParsable<ImportGameOptions>
+{
+	public static ImportGameOptions Parse(string s, IFormatProvider? provider)
+	{
+		return System.Text.Json.JsonSerializer.Deserialize<ImportGameOptions>(s) ?? throw new ArgumentException("Invalid json", nameof(s));
+	}
+
+	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out ImportGameOptions result)
+	{
+		if (s == null)
+		{
+			result = null;
+			return false;
+		}
+		result = System.Text.Json.JsonSerializer.Deserialize<ImportGameOptions>(s);
+		if (result == null)
+		{
+			result = null;
+			return false;
+		}
+		return true;
+	}
+}
+
 public class ImportIntoExistingGameMultipartFormDataRequest
 {
 #nullable disable
