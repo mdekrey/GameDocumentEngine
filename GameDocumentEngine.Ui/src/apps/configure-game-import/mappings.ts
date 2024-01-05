@@ -1,6 +1,7 @@
 import type { GameImportArchiveSummary } from '@/api/models/GameImportArchiveSummary';
 import type { ImportPlayerOptions } from '@/api/models/ImportPlayerOptions';
 import type { FieldMapping } from '@principlestudios/react-jotai-forms';
+import { z } from 'zod';
 
 export type ImportDocumentFormOptions = {
 	id: string;
@@ -34,6 +35,10 @@ export function usePlayerListMapping(
 		},
 	};
 }
+export const playerOptionsSchema = z.object({
+	id: z.string(),
+	selected: z.boolean(),
+}) satisfies z.ZodType<ImportPlayerFormOptions>;
 
 export function useDocumentListMapping(
 	documents: GameImportArchiveSummary['documents'],
@@ -50,3 +55,7 @@ export function useDocumentListMapping(
 		},
 	};
 }
+export const documentOptionsSchema = z.object({
+	id: z.string(),
+	selected: z.boolean(),
+}) satisfies z.ZodType<ImportDocumentFormOptions>;

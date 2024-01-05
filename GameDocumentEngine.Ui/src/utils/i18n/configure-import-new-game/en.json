@@ -1,0 +1,11 @@
+{
+	"title": "Import Game",
+	"submit": "Import New Game",
+	"fields": {
+		"documents": {
+			"selected": {
+				"label": "Include"
+			}
+		}
+	}
+}

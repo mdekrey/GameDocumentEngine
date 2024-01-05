@@ -25,7 +25,7 @@ export function ConfigureImportIntoExistingGame({
 	ImportIntoExistingGameOptions,
 	{ inspected: GameImportArchiveSummary; gameId: string }
 >) {
-	const { t } = useTranslation(['configre-import-existing-game']);
+	const { t } = useTranslation(['configure-import-existing-game']);
 	const mapToDocumentsList = useDocumentListMapping(
 		additional.inspected.documents,
 	);
