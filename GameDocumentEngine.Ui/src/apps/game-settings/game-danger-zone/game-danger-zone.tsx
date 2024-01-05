@@ -21,6 +21,7 @@ import {
 	updateGameUserAccess,
 } from '@/utils/security/permission-strings';
 import { useCurrentUser, useGame } from '@/utils/api/hooks';
+import { ConfigureImportIntoExistingGame } from '@/apps/configure-game-import/ConfigureImportIntoExistingGame';
 
 function displayRemoveUser(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, updateGameUserAccess);
@@ -65,14 +66,15 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
 	const importIntoExistingGame = useImportIntoExistingGame();
+	const inspectArchive = useMutation(queries.inspectGameArchive);
 
 	return (
 		<>
 			{displayRemoveUser(gameDetails) && (
 				<ul className="list-disc ml-8">
-					{Object.entries(gameDetails.playerNames)
+					{Object.entries(gameDetails.players)
 						.filter(([id]) => id !== userDetails.id)
-						.map(([id, name]) => (
+						.map(([id, { name }]) => (
 							<li key={id} className="flex flex-row gap-3 my-3 items-center">
 								{name}
 								<IconButton.Destructive
@@ -107,7 +109,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 						type="file"
 						className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
 						accept=".vaultvtt"
-						onChange={onImportIntoGame}
+						onChange={(ev) => void onImportIntoGame(ev)}
 					/>
 				</div>
 			)}
@@ -142,12 +144,20 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		dl.click();
 	}
 
-	function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
+	async function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
 		if (ev.target.files?.length !== 1) return;
 		const file = ev.target.files[0];
+		ev.target.value = '';
+		ev.target.files = null;
 
-		console.log({ gameId, file });
+		const inspected = await inspectArchive.mutateAsync({ file });
+		console.log(inspected);
+		// TODO: select options
 
-		importIntoExistingGame.mutate({ gameId, file });
+		const options = await launchModal({
+			ModalContents: ConfigureImportIntoExistingGame,
+			additional: { inspected, gameId },
+		});
+		importIntoExistingGame.mutate({ gameId, file, options });
 	}
 }

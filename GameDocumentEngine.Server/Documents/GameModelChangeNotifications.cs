@@ -15,7 +15,7 @@ class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameM
 		IPermissionedApiMapper<GameModel, GameDetails> apiMapper,
 		IApiChangeNotification<GameDetails> changeNotification,
 		GameTypes gameTypes)
-		: base(apiMapper, changeNotification, du => du.UserId, du => du.Game)
+		: base(apiMapper, changeNotification)
 	{
 		this.gameTypes = gameTypes;
 	}

@@ -47,7 +47,9 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 		await userEntries.WhenAll(nav => nav.LoadWithFixupAsync());
 
 		var users = userEntries
-			.Select(e => e.TargetEntry ?? throw new InvalidOperationException("LoadWithFixup failed"))
+			// user may not be provided for all players
+			.Where(e => e.TargetEntry != null)
+			.Select(e => e.TargetEntry!)
 			.AtState(usage)
 			.ToArray();
 
@@ -62,14 +64,14 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 	{
 		return new GameDetails(Name: game.Name,
 					LastUpdated: game.LastModifiedDate,
-					UserRoles: gameUsers.ToDictionary(
+					Players: gameUsers.ToDictionary(
 						p => Identifier.ToString(p.PlayerId),
-						p => p.Role
+						p => new PlayerSummary(
+							Name: p.NameOverride ?? users.SingleOrDefault(u => u.Id == p.UserId)?.Name ?? "???",
+							Role: p.Role
+						)
 					),
-					PlayerNames: gameUsers.ToDictionary(
-						p => Identifier.ToString(p.PlayerId),
-						p => users.Single(u => u.Id == p.UserId).Name
-					),
+					CurrentUserPlayerId: (Identifier)permissionSet.GameUser.PlayerId,
 					Id: (Identifier)game.Id,
 					Version: game.Version,
 					TypeInfo: typeInfo,
@@ -77,6 +79,6 @@ class GameModelApiMapper : IPermissionedApiMapper<GameModel, Api.GameDetails>
 				);
 	}
 
-	public object ToKey(GameModel entity) => entity.Id;
+	public object ToKey(GameModel entity) => Identifier.FromLong(entity.Id);
 
 }

@@ -32,7 +32,10 @@ public partial class ExportController : GameExportControllerBase
 		var game = await dbContext.Games.FirstAsync(g => g.Id == gameId.Value);
 
 		var archiveFactory = new GameArchiveVersion1(dbContext);
-		var archive = await archiveFactory.CreateArchive(gameId.Value);
+
+		var archive = new MemoryStream();
+		await archiveFactory.AddToArchive(gameId.Value, archive);
+		archive.Position = 0;
 		var headerContentDisposition = $"attachment; filename=\"Export-{CleanseName().Replace(game.Name, "")}.vaultvtt\"";
 		return GetGameExportActionResult.Ok(archive, headerContentDisposition: headerContentDisposition);
 	}

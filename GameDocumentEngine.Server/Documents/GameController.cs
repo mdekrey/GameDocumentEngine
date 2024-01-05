@@ -59,7 +59,7 @@ public class GameController : Api.GameControllerBase
 		var games = await (from gameUser in dbContext.GameUsers
 						   where gameUser.UserId == User.GetCurrentUserId()
 						   select gameUser.Game).ToArrayAsync();
-		return ListGamesActionResult.Ok(games.ToDictionary(g => g.Id.ToString(), g => new GameSummary((Identifier)g.Id, g.Name)));
+		return ListGamesActionResult.Ok(games.ToDictionary(g => g.Id.ToString(), g => new GameSummary(Id: (Identifier)g.Id, Name: g.Name, TypeKey: g.Type)));
 	}
 
 	protected override async Task<DeleteGameActionResult> DeleteGame(Identifier gameId)
@@ -77,6 +77,7 @@ public class GameController : Api.GameControllerBase
 
 	protected override async Task<GetGameDetailsActionResult> GetGameDetails(Identifier gameId)
 	{
+		if (!ModelState.IsValid) return GetGameDetailsActionResult.NotFound();
 		var permissions = await permissionSetResolver.GetPermissionSet(User, gameId.Value);
 		if (permissions == null) return GetGameDetailsActionResult.NotFound();
 		if (!permissions.HasPermission(ViewGame(gameId.Value))) return GetGameDetailsActionResult.Forbidden();
@@ -146,11 +147,11 @@ public class GameController : Api.GameControllerBase
 									 select gameUser).ToArrayAsync();
 		foreach (var kvp in updateGameRoleAssignmentsBody)
 		{
-			var key = Guid.Parse(kvp.Key);
-			if (key == permissions.GameUser.UserId)
+			var key = Identifier.FromString(kvp.Key).Value;
+			if (key == permissions.GameUser.PlayerId)
 				// Can't update your own permissions!
 				return UpdateGameRoleAssignmentsActionResult.Forbidden();
-			if (gameUserRecords.FirstOrDefault(u => u.UserId == key) is not GameUserModel modifiedUser)
+			if (gameUserRecords.FirstOrDefault(u => u.PlayerId == key) is not GameUserModel modifiedUser)
 				return UpdateGameRoleAssignmentsActionResult.BadRequest();
 			if (!gameType.Roles.Contains(kvp.Value))
 				return UpdateGameRoleAssignmentsActionResult.BadRequest();
@@ -159,7 +160,7 @@ public class GameController : Api.GameControllerBase
 		}
 		await dbContext.SaveChangesAsync();
 		return UpdateGameRoleAssignmentsActionResult.Ok(
-			gameUserRecords.ToDictionary(gu => gu.UserId.ToString(), gu => gu.Role)
+			gameUserRecords.ToDictionary(gu => Identifier.ToString(gu.PlayerId), gu => gu.Role)
 		);
 	}
 }

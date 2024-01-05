@@ -17,6 +17,8 @@ import { z } from 'zod';
 import { Section, SingleColumnSections } from '@/components/sections';
 import { useAllGameTypes } from '@/utils/api/hooks';
 import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
+import { useLaunchModal } from '@/utils/modal/modal-service';
+import { ConfigureImportGame } from '../configure-game-import/ConfigureImportGame';
 
 function useCreateGame() {
 	const navigate = useNavigate();
@@ -41,9 +43,11 @@ export function CreateGame() {
 		translation: t,
 	});
 
+	const launchModal = useLaunchModal();
 	const gameTypes = useAllGameTypes();
 	const createGame = useCreateGame();
 	const importGame = useImportGame();
+	const inspectArchive = useMutation(queries.inspectGameArchive);
 
 	return (
 		<SingleColumnSections>
@@ -77,7 +81,7 @@ export function CreateGame() {
 									type="file"
 									className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
 									accept=".vaultvtt"
-									onChange={onFileSelected}
+									onChange={(ev) => void onFileSelected(ev)}
 								/>
 							</div>
 						</ButtonRow>
@@ -91,10 +95,18 @@ export function CreateGame() {
 		createGame.mutate(currentValue);
 	}
 
-	function onFileSelected(ev: React.ChangeEvent<HTMLInputElement>) {
+	async function onFileSelected(ev: React.ChangeEvent<HTMLInputElement>) {
 		if (ev.target.files?.length !== 1) return;
 		const file = ev.target.files[0];
+		ev.target.value = '';
+		ev.target.files = null;
 
-		importGame.mutate({ file });
+		const inspected = await inspectArchive.mutateAsync({ file });
+
+		const options = await launchModal({
+			ModalContents: ConfigureImportGame,
+			additional: { inspected, gameId: null },
+		});
+		importGame.mutate({ file, options });
 	}
 }

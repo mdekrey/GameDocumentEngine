@@ -1,4 +1,8 @@
 {
+	"generic": {
+		"loading": "Loading...",
+		"unhandled-error": "Unknown error"
+	},
 	"network": {
 		"signal-disconnected": "Cannot connect to the network",
 		"reconnecting": {

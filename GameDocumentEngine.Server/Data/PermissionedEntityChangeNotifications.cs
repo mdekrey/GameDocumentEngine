@@ -14,19 +14,13 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 {
 	protected readonly IPermissionedApiMapper<TEntity, TApi> apiMapper;
 	private readonly IApiChangeNotification<TApi> changeNotification;
-	private readonly Func<TUserEntity, Guid> toUserId;
-	private readonly Expression<Func<TUserEntity, TEntity?>> toEntity;
 
 	public PermissionedEntityChangeNotifications(
 		IPermissionedApiMapper<TEntity, TApi> apiMapper,
-		IApiChangeNotification<TApi> changeNotification,
-		Func<TUserEntity, Guid> toUserId,
-		Expression<Func<TUserEntity, TEntity?>> toEntity)
+		IApiChangeNotification<TApi> changeNotification)
 	{
 		this.apiMapper = apiMapper;
 		this.changeNotification = changeNotification;
-		this.toUserId = toUserId;
-		this.toEntity = toEntity;
 	}
 
 	public virtual bool CanHandle(EntityEntry changedEntity) => changedEntity.Entity is TEntity or TUserEntity;
@@ -60,8 +54,10 @@ abstract class PermissionedEntityChangeNotifications<TEntity, TUserEntity, TApi>
 			? Enumerable.Empty<PermissionSet>()
 			: await GetUsersFor(context, entity, DbContextChangeUsage.AfterChange);
 
-		foreach (var userId in oldUserPermissions.Select(p => p.GameUser.UserId).Union(newUserPermissions.Select(p => p.GameUser.UserId)))
+		foreach (var nullableUserId in oldUserPermissions.Select(p => p.GameUser.UserId).Union(newUserPermissions.Select(p => p.GameUser.UserId)))
 		{
+			if (nullableUserId is not Guid userId) continue;
+
 			var oldValue = oldUserPermissions.FirstOrDefault(p => p.GameUser.UserId == userId) is PermissionSet oldPermission
 			  ? Optional.Create(await apiMapper.ToApi(context, entity, oldPermission, DbContextChangeUsage.BeforeChange))
 			  : null;

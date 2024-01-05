@@ -81,8 +81,8 @@ export function DocumentSettings({
 					{t('configure-roles', { name: docData.name })}
 				</SectionHeader>
 				<RoleAssignment
-					userRoles={docData.userRoles}
-					playerNames={gameDetails.playerNames}
+					getPlayerRole={(playerId) => docData.userRoles[playerId]}
+					players={gameDetails.players}
 					defaultRole=""
 					roles={['', ...userRoles]}
 					onSaveRoles={onSaveRoles}

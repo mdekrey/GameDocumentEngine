@@ -5,7 +5,7 @@ import type { FormFieldReturnType } from '@/utils/form';
 
 type RoleAssignmentProps = {
 	fields: (userId: string) => FormFieldReturnType<string>;
-	players: { [userId: string]: string };
+	players: { [userId: string]: { name: string } };
 	roles: string[];
 	translation: (key: string) => string;
 };
@@ -16,11 +16,11 @@ export function RoleAssignmentField({
 	roles,
 	translation,
 }: RoleAssignmentProps) {
-	return Object.entries(players).map(([k, name]) => {
+	return Object.entries(players).map(([k, playerSummary]) => {
 		const field = fields(k);
 		return (
 			<Field key={k}>
-				<Field.Label>{name}</Field.Label>
+				<Field.Label>{playerSummary.name}</Field.Label>
 
 				<Field.Contents>
 					<SelectInput {...field.htmlProps.asControlled()} items={roles}>

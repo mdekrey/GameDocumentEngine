@@ -12,6 +12,7 @@ import {
 	getGameExport,
 	importGame,
 	importIntoExistingGame,
+	inspectGameArchive,
 } from './games';
 import {
 	getDocument,
@@ -55,6 +56,7 @@ export const queries = {
 	getGameExport,
 	importGame,
 	importIntoExistingGame,
+	inspectGameArchive,
 } satisfies { [K in keyof typeof operations]: unknown };
 export const extraQueries = {
 	changeDocumentFolder,

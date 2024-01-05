@@ -152,8 +152,8 @@ function DocumentRoleAssignment({
 	const currentUserId = user.id;
 
 	const otherPlayers = Object.fromEntries(
-		Object.entries(gameDetails.playerNames).filter(
-			([userId]) => userId !== currentUserId,
+		Object.entries(gameDetails.players).filter(
+			([playerId]) => playerId !== gameDetails.currentUserPlayerId,
 		),
 	);
 
@@ -162,16 +162,23 @@ function DocumentRoleAssignment({
 	useEffect(() => {
 		setRoles((prev) =>
 			Object.fromEntries(
-				Object.entries(gameDetails.playerNames)
-					.filter(([userId]) => userId !== currentUserId)
-					.map(([userId]) => [
-						userId,
-						(docType?.userRoles.includes(prev[userId]) ? prev[userId] : '') ??
-							'',
+				Object.entries(gameDetails.players)
+					.filter(([playerId]) => playerId !== gameDetails.currentUserPlayerId)
+					.map(([playerId]) => [
+						playerId,
+						(docType?.userRoles.includes(prev[playerId])
+							? prev[playerId]
+							: '') ?? '',
 					]),
 			),
 		);
-	}, [setRoles, docType?.userRoles, gameDetails.playerNames, currentUserId]);
+	}, [
+		setRoles,
+		docType?.userRoles,
+		gameDetails.players,
+		gameDetails.currentUserPlayerId,
+		currentUserId,
+	]);
 
 	return (
 		<RoleAssignmentField

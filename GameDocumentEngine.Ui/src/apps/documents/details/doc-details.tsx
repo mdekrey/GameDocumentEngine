@@ -6,10 +6,7 @@ import {
 } from '@/utils/api/hooks';
 import type { Draft } from 'immer';
 import { produceWithPatches } from 'immer';
-import type {
-	IGameObjectType,
-	TypedDocumentDetails,
-} from '@/documents/defineDocument';
+import type { IGameObjectType } from '@/documents/defineDocument';
 import {
 	documentSchema,
 	type EditableDocumentDetails,
@@ -35,23 +32,25 @@ export function DocumentDetails({
 	documentId: string;
 }) {
 	const { t } = useTranslation(['document-details']);
-	const document = useLocalDocument(gameId, documentId);
 
 	return (
 		<ErrorBoundary
-			key={`${gameId}-${documentId}`}
+			errorKey={`${gameId}-${documentId}`}
 			fallback={<ErrorScreen message={t('unhandled-error')} />}
 		>
-			<DocumentDetailsForm document={document} />
+			<DocumentDetailsForm gameId={gameId} documentId={documentId} />
 		</ErrorBoundary>
 	);
 }
 
 export function DocumentDetailsForm<T = unknown>({
-	document,
+	gameId,
+	documentId,
 }: {
-	document: TypedDocumentDetails<T>;
+	gameId: string;
+	documentId: string;
 }) {
+	const document = useLocalDocument(gameId, documentId);
 	const docType =
 		useTypeOfDocument(document)?.typeInfo ??
 		(missingDocumentType as IGameObjectType<T>);

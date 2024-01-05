@@ -102,6 +102,7 @@ export function DashboardDisplay({
 					([key, config]: [string, Widget]) => (
 						<PositionedWidgetContainer key={key} position={config.position}>
 							<ErrorBoundary
+								errorKey={JSON.stringify(config)}
 								fallback={
 									<ErrorScreen message={t('widgets.widget-runtime-error')} />
 								}
@@ -194,7 +195,7 @@ function EditingWidget({
 		config.widget,
 	);
 	return (
-		<ErrorBoundary fallback={<></>}>
+		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
 				field={widget.field(['position'])}
 				widgetDefinition={widgetDefinition}
@@ -210,6 +211,7 @@ function EditingWidget({
 					}}
 				>
 					<ErrorBoundary
+						errorKey={JSON.stringify(config)}
 						fallback={
 							<ErrorScreen message={t('widgets.widget-runtime-error')} />
 						}

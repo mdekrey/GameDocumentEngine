@@ -630,6 +630,23 @@ paths:
       requestBody:
         required: true
         content:
+          # multipart/form-data:
+          #   schema:
+          #     type: object
+          #     required:
+          #     # - archive
+          #     - options
+          #     properties:
+          #       # archive:
+          #       #   type: string
+          #       #   format: binary
+          #       options:
+          #         $ref: '#/components/schemas/ImportIntoExistingGameOptions'
+          #   encoding:
+          #     options:
+          #       contentType: application/json
+          #     # archive:
+          #     #   contentType: application/x-zip
           application/x-zip:
             schema:
               type: string
@@ -637,6 +654,39 @@ paths:
       responses:
         200:
           description: Success
+        400:
+          description: Invalid zip provided
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          description: Game not found
+  /game/import/inspect:
+    post:
+      operationId: inspectGameArchive
+      x-dotnet-mvc-server-controller: GameImport
+      security:
+        - AuthenticatedUser: []
+      # parameters:
+      # - name: gameId
+      #   in: path
+      #   required: true
+      #   schema: { type: string, format: id }
+      requestBody:
+        required: true
+        content:
+          application/x-zip:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameImportArchiveSummary'
         400:
           description: Invalid zip provided
         401:
@@ -654,6 +704,23 @@ paths:
       requestBody:
         required: true
         content:
+          # multipart/form-data:
+          #   schema:
+          #     type: object
+          #     required:
+          #     # - archive
+          #     - options
+          #     properties:
+          #       # archive:
+          #       #   type: string
+          #       #   format: binary
+          #       options:
+          #         $ref: '#/components/schemas/ImportGameOptions'
+          #   encoding:
+          #     options:
+          #       contentType: application/json
+          #     # archive:
+          #     #   contentType: application/x-zip
           application/x-zip:
             schema:
               type: string
@@ -671,7 +738,6 @@ paths:
                   gameId: { type: string, format: id }
         400:
           description: Invalid zip provided
-
 
   /invitations/{linkId}:
     get:
@@ -775,8 +841,8 @@ components:
         - type: object
           required:
           - lastUpdated
-          - playerNames
-          - userRoles
+          - players
+          - currentUserPlayerId
           - permissions
           - typeInfo
           - id
@@ -785,23 +851,31 @@ components:
             id: { type: string, format: id }
             version: { type: string, format: guid }
             lastUpdated: { type: string, format: date-time }
-            playerNames:
+            players:
               type: object
-              additionalProperties: { type: string }
-            userRoles:
-              type: object
-              additionalProperties: { type: string }
+              additionalProperties: { $ref: '#/components/schemas/PlayerSummary' }
+            currentUserPlayerId: { type: string, format: id }
             permissions: { type: array, items: { type: string} }
             typeInfo:
               $ref: '#/components/schemas/GameTypeDetails'
+    PlayerSummary:
+      type: object
+      required:
+        - name
+        - role
+      properties:
+        name: { type: string }
+        role: { type: string }
     GameSummary:
       type: object
       required:
         - id
         - name
+        - typeKey
       properties:
         id: { type: string, format: id }
         name: { type: string }
+        typeKey: { type: string }
 
     GameInvite:
       type: object
@@ -920,6 +994,72 @@ components:
         scripts: { type: array, items: { type: string } }
         userRoles: { type: array, items: { type: string } }
         translationNamespace: { type: string }
+
+    GameImportArchiveSummary:
+      type: object
+      required:
+      - name
+      - typeKey
+      - documents
+      - players
+      properties:
+        name: { type: string }
+        typeKey: { type: string }
+        documents:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+              - type
+            properties:
+              id: { type: string, format: id }
+              name: { type: string }
+              type: { type: string }
+        players:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+              - role
+            properties:
+              id: { type: string, format: id }
+              name: { type: string, nullable: true }
+              role: { type: string }
+
+    ImportGameOptions:
+      type: object
+      properties:
+        documents:
+          type: array
+          items: { type: string, format: id }
+        players:
+          type: array
+          items: { $ref: '#/components/schemas/ImportPlayerOptions' }
+    ImportIntoExistingGameOptions:
+      type: object
+      required:
+      - game
+      properties:
+        game:
+          type: boolean
+        documents:
+          type: array
+          items: { type: string, format: id }
+        players:
+          type: array
+          items: { $ref: '#/components/schemas/ImportPlayerOptions' }
+
+    ImportPlayerOptions:
+      type: object
+      required:
+        - id
+      properties:
+        id: { type: string, format: id }
+
   responses:
     "401":
       description: User was not authenticated

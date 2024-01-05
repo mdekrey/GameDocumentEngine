@@ -18,7 +18,7 @@ export async function applyEventToQuery<T>(
 ) {
 	if ('removed' in event) {
 		// Sometimes, we get the message that a doc has been deleted before saved to the database, like locally. Putting a delay on removing helps that.
-		setTimeout(() => void queryClient.invalidateQueries(target), 500);
+		setTimeout(() => void queryClient.resetQueries(target), 500);
 	} else if ('patch' in event) {
 		return await applyPatchToQuery<T>(queryClient, target, event.patch);
 	} else if ('value' in event) {

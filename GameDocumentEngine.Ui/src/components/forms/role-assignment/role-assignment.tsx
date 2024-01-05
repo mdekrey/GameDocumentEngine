@@ -8,12 +8,13 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useTranslation } from 'react-i18next';
 import { RoleAssignmentField } from './role-assignment-field';
 import { useCurrentUser } from '@/utils/api/hooks';
+import type { PlayerSummary } from '@/api/models/PlayerSummary';
 
 export const UserRoleAssignment = z.record(z.string());
 
 export type RoleAssignmentProps = {
-	userRoles: { [id: string]: string };
-	playerNames: { [id: string]: string };
+	getPlayerRole: (playerId: string) => string | undefined;
+	players: { [id: string]: PlayerSummary };
 	roles: string[];
 	defaultRole?: string;
 	onSaveRoles: (
@@ -26,8 +27,8 @@ export type RoleAssignmentProps = {
 };
 
 export function RoleAssignment({
-	userRoles,
-	playerNames,
+	getPlayerRole,
+	players,
 	roles,
 	defaultRole,
 	onSaveRoles,
@@ -39,14 +40,11 @@ export function RoleAssignment({
 	const user = useCurrentUser();
 	const { t: roleTranslations } = useTranslation(roleTranslationsNamespace);
 
-	const formData =
-		defaultRole !== undefined
-			? Object.fromEntries(
-					Object.entries(playerNames).map(
-						([key]) => [key, userRoles[key] ?? defaultRole] as const,
-					),
-			  )
-			: userRoles;
+	const formData = Object.fromEntries(
+		Object.entries(players)
+			.map(([key]) => [key, getPlayerRole(key) ?? defaultRole] as const)
+			.filter((kvp): kvp is [string, string] => kvp[1] !== undefined),
+	);
 	const form = useForm({
 		defaultValue: formData,
 		schema: UserRoleAssignment,
@@ -75,7 +73,7 @@ export function RoleAssignment({
 			<Fieldset>
 				<RoleAssignmentField
 					fields={form.fields.row}
-					players={playerNames}
+					players={players}
 					roles={roles}
 					translation={roleTranslations}
 				/>

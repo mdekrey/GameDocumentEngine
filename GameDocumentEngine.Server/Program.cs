@@ -42,8 +42,10 @@ services.AddHealthChecks();
 services.AddControllers(config =>
 {
 	config.Filters.Add(new MvcActionFilter());
-
 	config.InputFormatters.Add(new StreamInputFormatter());
+	config.ValueProviderFactories.Add(new FormValueJsonProviderFactory());
+	config.ValueProviderFactories.RemoveType<FormValueProviderFactory>();
+	config.ValueProviderFactories.RemoveType<JQueryFormValueProviderFactory>();
 	config.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Stream)));
 });
 services.AddCompressedStaticFiles();
