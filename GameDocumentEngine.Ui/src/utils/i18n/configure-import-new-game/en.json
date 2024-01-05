@@ -3,6 +3,13 @@
 	"submit": "Import New Game",
 	"fields": {
 		"documents": {
+			"label": "Documents",
+			"selected": {
+				"label": "Include"
+			}
+		},
+		"players": {
+			"label": "Players",
 			"selected": {
 				"label": "Include"
 			}

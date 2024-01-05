@@ -70,14 +70,18 @@ export function ConfigureImportGame({
 				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
 				<Fieldset>
 					<Section>
-						<SectionHeader>{t('documents')}</SectionHeader>
+						<SectionHeader>
+							{form.fields.documents.translation('label')}
+						</SectionHeader>
 						<SelectDocuments
 							field={form.fields.documents}
 							documents={inspected.documents}
 						/>
 					</Section>
 					<Section>
-						<SectionHeader>{t('players')}</SectionHeader>
+						<SectionHeader>
+							{form.fields.players.translation('label')}
+						</SectionHeader>
 						<SelectPlayers
 							field={form.fields.players}
 							players={inspected.players}
