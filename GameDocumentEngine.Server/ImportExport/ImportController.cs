@@ -67,7 +67,7 @@ public partial class ImportController : GameImportControllerBase
 			return ImportGameActionResult.BadRequest();
 
 		var user = await dbContext.GetCurrentUserOrThrow(User);
-		var game = await archiveFactory.UnpackNewGame(zipArchive);
+		var game = await archiveFactory.UnpackNewGame(zipArchive, options);
 		if (game == null)
 			return ImportGameActionResult.BadRequest();
 		if (!gameTypes.All.TryGetValue(game.Type, out var gameType))

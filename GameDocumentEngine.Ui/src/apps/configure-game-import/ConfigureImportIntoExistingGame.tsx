@@ -6,7 +6,16 @@ import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { useDocumentListMapping, usePlayerListMapping } from './mappings';
+import {
+	documentOptionsSchema,
+	playerOptionsSchema,
+	useDocumentListMapping,
+	usePlayerListMapping,
+} from './mappings';
+import { Section, SectionHeader } from '@/components/sections';
+import { SelectDocuments } from './SelectDocuments';
+import { SelectPlayers } from './SelectPlayers';
+import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
 
 const schema = z.object({
 	game: z.boolean(),
@@ -19,33 +28,36 @@ const schema = z.object({
 }) satisfies z.ZodType<ImportIntoExistingGameOptions>;
 
 export function ConfigureImportIntoExistingGame({
-	additional,
+	additional: { inspected },
 	resolve,
 }: ModalContentsProps<
 	ImportIntoExistingGameOptions,
 	{ inspected: GameImportArchiveSummary; gameId: string }
 >) {
 	const { t } = useTranslation(['configure-import-existing-game']);
-	const mapToDocumentsList = useDocumentListMapping(
-		additional.inspected.documents,
-	);
-	const mapToPlayersList = usePlayerListMapping(additional.inspected.players);
+	const mapToDocumentsList = useDocumentListMapping(inspected.documents);
+	const mapToPlayersList = usePlayerListMapping(inspected.players);
 	const form = useForm({
 		defaultValue: {
 			game: true,
-			documents: additional.inspected.documents.map((d) => d.id),
-			players: additional.inspected.players.map((p) => ({ id: p.id })),
+			documents: inspected.documents.map((d) => d.id),
+			players: inspected.players.map((p) => ({ id: p.id })),
 		},
 		schema,
 		translation: t,
 		fields: {
+			includeGameDetails: {
+				path: ['game'],
+			},
 			documents: {
 				path: ['documents'],
 				mapping: mapToDocumentsList,
+				schema: documentOptionsSchema.array(),
 			},
 			players: {
 				path: ['players'],
 				mapping: mapToPlayersList,
+				schema: playerOptionsSchema.array(),
 			},
 		},
 	});
@@ -53,9 +65,29 @@ export function ConfigureImportIntoExistingGame({
 		<form onSubmit={form.handleSubmit(resolve)}>
 			<ModalDialogLayout>
 				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
+				<CheckboxField field={form.fields.includeGameDetails} />
+
+				<Section>
+					<SectionHeader>
+						{form.fields.documents.translation('label')}
+					</SectionHeader>
+					<SelectDocuments
+						field={form.fields.documents}
+						documents={inspected.documents}
+					/>
+				</Section>
+				<Section>
+					<SectionHeader>
+						{form.fields.players.translation('label')}
+					</SectionHeader>
+					<SelectPlayers
+						field={form.fields.players}
+						players={inspected.players}
+					/>
+				</Section>
 
 				<ModalDialogLayout.Buttons>
-					<Button type="submit">{t('ok')}</Button>
+					<Button type="submit">{t('submit')}</Button>
 				</ModalDialogLayout.Buttons>
 			</ModalDialogLayout>
 		</form>

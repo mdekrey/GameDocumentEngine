@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
+using PrincipleStudios.OpenApiCodegen.Json.Extensions;
 
 namespace GameDocumentEngine.Server.ImportExport;
 
@@ -156,15 +157,22 @@ public partial class GameArchiveVersion1
 		return true;
 	}
 
-	public async Task<GameModel?> UnpackNewGame(ZipArchive zipArchive)
+	public async Task<GameModel?> UnpackNewGame(ZipArchive zipArchive, ImportGameOptions options)
 	{
 		var gameInfo = await ReadGame(zipArchive);
 		if (gameInfo == null) return null;
 		var game = gameInfo.ToGame();
 
+		Predicate<Identifier> shouldIncludeDocument = options.Documents.TryGet(out var documentIds)
+			? documentIds.Contains
+			: (docId) => true;
+		Func<Identifier, ImportPlayerOptions?> shouldIncludePlayer = options.Players.TryGet(out var playerOptions)
+			? (playerId) => playerOptions.FirstOrDefault(p => p.Id == playerId)
+			: (playerId) => new ImportPlayerOptions(playerId);
+
 		foreach (var entry in from e in zipArchive.Entries
 							  let docId = IsDocumentPath(e.FullName)
-							  where docId != null
+							  where docId != null && shouldIncludeDocument(docId)
 							  select (ZipEntry: e, OriginalId: docId))
 		{
 			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry);
@@ -175,7 +183,7 @@ public partial class GameArchiveVersion1
 		var players = new List<GameUserModel>();
 		foreach (var entry in from e in zipArchive.Entries
 							  let playerId = IsPlayerPath(e.FullName)
-							  where playerId != null
+							  where playerId != null && shouldIncludePlayer(playerId) != null
 							  select (ZipEntry: e, OriginalId: playerId))
 		{
 			var playerInfo = await ReadJsonFile<PlayerInfo>(entry.ZipEntry);
@@ -188,7 +196,7 @@ public partial class GameArchiveVersion1
 
 		foreach (var entry in from e in zipArchive.Entries
 							  let ids = IsPlayerDocumentPath(e.FullName)
-							  where ids != null
+							  where ids != null && shouldIncludeDocument(ids.Value.DocumentId) && shouldIncludePlayer(ids.Value.PlayerId) != null
 							  select (ZipEntry: e, ids.Value.PlayerId, ids.Value.DocumentId))
 		{
 			var player = players.FirstOrDefault(p => p.PlayerId == entry.PlayerId.Value);
@@ -207,11 +215,18 @@ public partial class GameArchiveVersion1
 		var gameInfo = await ReadGame(zipArchive);
 		if (gameInfo == null) return false;
 		if (gameInfo.GameType != game.Type) return false;
-		gameInfo.Apply(game);
+		if (options.Game) gameInfo.Apply(game);
+
+		Predicate<Identifier> shouldIncludeDocument = options.Documents.TryGet(out var documentIds)
+			? documentIds.Contains
+			: (docId) => true;
+		Func<Identifier, ImportPlayerOptions?> shouldIncludePlayer = options.Players.TryGet(out var playerOptions)
+			? (playerId) => playerOptions.FirstOrDefault(p => p.Id == playerId)
+			: (playerId) => new ImportPlayerOptions(playerId);
 
 		foreach (var entry in from e in zipArchive.Entries
 							  let docId = IsDocumentPath(e.FullName)
-							  where docId != null
+							  where docId != null && shouldIncludeDocument(docId)
 							  select (ZipEntry: e, OriginalId: docId))
 		{
 			var docInfo = await ReadJsonFile<DocumentInfo>(entry.ZipEntry);
@@ -230,7 +245,7 @@ public partial class GameArchiveVersion1
 		var players = new List<GameUserModel>();
 		foreach (var entry in from e in zipArchive.Entries
 							  let playerId = IsPlayerPath(e.FullName)
-							  where playerId != null
+							  where playerId != null && shouldIncludePlayer(playerId) != null
 							  select (ZipEntry: e, OriginalId: playerId))
 		{
 			var playerInfo = await ReadJsonFile<PlayerInfo>(entry.ZipEntry);
@@ -249,7 +264,7 @@ public partial class GameArchiveVersion1
 
 		foreach (var entry in from e in zipArchive.Entries
 							  let ids = IsPlayerDocumentPath(e.FullName)
-							  where ids != null
+							  where ids != null && shouldIncludeDocument(ids.Value.DocumentId) && shouldIncludePlayer(ids.Value.PlayerId) != null
 							  select (ZipEntry: e, ids.Value.PlayerId, ids.Value.DocumentId))
 		{
 			var player = players.FirstOrDefault(p => p.PlayerId == entry.PlayerId.Value);

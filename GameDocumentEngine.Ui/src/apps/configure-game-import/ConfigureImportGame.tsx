@@ -1,14 +1,9 @@
 import type { GameImportArchiveSummary } from '@/api/models/GameImportArchiveSummary';
 import type { ImportGameOptions } from '@/api/models/ImportGameOptions';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import { useForm, useFormFields } from '@principlestudios/react-jotai-forms';
+import { useForm } from '@principlestudios/react-jotai-forms';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import type {
-	ImportDocumentFormOptions,
-	ImportPlayerFormOptions,
-} from './mappings';
 import {
 	documentOptionsSchema,
 	playerOptionsSchema,
@@ -18,10 +13,9 @@ import {
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { useFieldList } from '@/doc-types/Break-Character/parts/useFieldList';
-import { CheckboxField } from '@/components/form-fields/checkbox-input/checkbox-field';
-import { Prose } from '@/components/text/common';
 import { Section, SectionHeader } from '@/components/sections';
+import { SelectDocuments } from './SelectDocuments';
+import { SelectPlayers } from './SelectPlayers';
 
 const schema = z.object({
 	documents: z.string().array(),
@@ -31,8 +25,6 @@ const schema = z.object({
 		})
 		.array(),
 }) satisfies z.ZodType<ImportGameOptions>;
-
-const docArray = documentOptionsSchema.array();
 
 export function ConfigureImportGame({
 	additional: { inspected },
@@ -55,7 +47,7 @@ export function ConfigureImportGame({
 			documents: {
 				path: ['documents'],
 				mapping: mapToDocumentsList,
-				schema: docArray,
+				schema: documentOptionsSchema.array(),
 			},
 			players: {
 				path: ['players'],
@@ -93,95 +85,5 @@ export function ConfigureImportGame({
 				</ModalDialogLayout.Buttons>
 			</ModalDialogLayout>
 		</form>
-	);
-}
-
-function SelectDocuments({
-	field,
-	documents,
-}: {
-	field: FormFieldReturnType<ImportDocumentFormOptions[]>;
-	documents: GameImportArchiveSummary['documents'];
-}) {
-	const defaultOption: ImportDocumentFormOptions = {
-		id: '',
-		selected: false,
-	};
-	const { length, item, key } = useFieldList(field, defaultOption, (v) => v.id);
-	return (
-		<>
-			{Array(length)
-				.fill(0)
-				.map((_, index) => (
-					<ConfigureDocumentOptions
-						key={key(index)}
-						field={item(index)}
-						document={documents[index]}
-					/>
-				))}
-		</>
-	);
-}
-
-function ConfigureDocumentOptions({
-	field,
-	document,
-}: {
-	field: FormFieldReturnType<ImportDocumentFormOptions>;
-	document: GameImportArchiveSummary['documents'][number];
-}) {
-	const { selected } = useFormFields(field, {
-		selected: ['selected'],
-	});
-	return (
-		<div>
-			<Prose>{document.name}</Prose>
-			<CheckboxField field={selected} />
-		</div>
-	);
-}
-
-function SelectPlayers({
-	field,
-	players,
-}: {
-	field: FormFieldReturnType<ImportPlayerFormOptions[]>;
-	players: GameImportArchiveSummary['players'];
-}) {
-	const defaultOption: ImportPlayerFormOptions = {
-		id: '',
-		selected: false,
-	};
-	const { length, item, key } = useFieldList(field, defaultOption, (v) => v.id);
-	return (
-		<>
-			{Array(length)
-				.fill(0)
-				.map((_, index) => (
-					<ConfigurePlayerOptions
-						key={key(index)}
-						field={item(index)}
-						player={players[index]}
-					/>
-				))}
-		</>
-	);
-}
-
-function ConfigurePlayerOptions({
-	field,
-	player,
-}: {
-	field: FormFieldReturnType<ImportPlayerFormOptions>;
-	player: GameImportArchiveSummary['players'][number];
-}) {
-	const { selected } = useFormFields(field, {
-		selected: ['selected'],
-	});
-	return (
-		<div>
-			<Prose>{player.name}</Prose>
-			<CheckboxField field={selected} />
-		</div>
 	);
 }
