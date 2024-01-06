@@ -56,6 +56,9 @@ class GameModelChangeNotifications : PermissionedEntityChangeNotifications<GameM
 		using var activity = TracingHelper.StartActivity($"{nameof(GameModelChangeNotifications)}.{nameof(GetUsersFor)}");
 		var players = context.Entry(entity).Collection(d => d.Players);
 		if (!players.IsLoaded) await players.LoadAsync();
+		var playerEntries = players.Entries(context);
+		foreach (var userReference in playerEntries.Select(e => e.Reference(gu => gu.User)).Where(e => !e.IsLoaded))
+			await userReference.LoadWithFixupAsync();
 		if (!gameTypes.All.TryGetValue(entity.Type, out var gameType))
 			throw new InvalidOperationException($"Unknown game type: {entity.Type}");
 
