@@ -1,4 +1,3 @@
-import { type CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';
@@ -21,6 +20,7 @@ import { Section, SingleColumnSections } from '@/components/sections';
 import { DocumentRoleAssignment } from './DocumentRoleAssignment';
 import { useDocTypeFormUpdates } from './useDocTypeFormUpdates';
 import { createDocumentDetailsSchema } from './createDocumentDetailsSchema';
+import type { z } from 'zod';
 
 function useCreateDocument(gameId: string) {
 	return useMutation(queries.createDocument(gameId));
@@ -30,7 +30,13 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	const navigate = useNavigate();
 	const { t } = useTranslation(['create-document']);
 	const form = useForm({
-		defaultValue: { name: '', type: '', folderId: null, initialRoles: {} },
+		defaultValue: {
+			name: '',
+			type: '',
+			folderId: null,
+			initialRoles: {},
+			details: {},
+		},
 		schema: createDocumentDetailsSchema,
 		translation: t,
 		fields: {
@@ -81,7 +87,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 	);
 
 	async function onSubmit(
-		currentValue: Omit<CreateDocumentDetails, 'details'>,
+		currentValue: z.infer<typeof createDocumentDetailsSchema>,
 	) {
 		const objectInfo = getDocumentType(gameType, currentValue.type);
 		if (!objectInfo) return;
@@ -93,7 +99,6 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 			document: {
 				...currentValue,
 				initialRoles,
-				details: objectInfo.typeInfo.template,
 			},
 		});
 		navigate(`/game/${gameId}/document/${document.id}`);

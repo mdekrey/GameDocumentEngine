@@ -14,17 +14,23 @@ export function useDocTypeFormUpdates(
 
 	useAtomSubscription(form.field(['type']).value, (docTypeName) => {
 		const docType = getDocumentType(gameType, docTypeName);
-		form.field(['initialRoles']).set((prev) =>
-			Object.fromEntries(
-				Object.entries(gameDetails.players)
-					.filter(([playerId]) => playerId !== gameDetails.currentUserPlayerId)
-					.map(([playerId]) => [
-						playerId,
-						(docType?.userRoles.includes(prev[playerId])
-							? prev[playerId]
-							: '') ?? '',
-					]),
-			),
-		);
+		form.set((prev) => {
+			return {
+				...prev,
+				initialRoles: Object.fromEntries(
+					Object.entries(gameDetails.players)
+						.filter(
+							([playerId]) => playerId !== gameDetails.currentUserPlayerId,
+						)
+						.map(([playerId]) => [
+							playerId,
+							(docType?.userRoles.includes(prev.initialRoles[playerId])
+								? prev.initialRoles[playerId]
+								: '') ?? '',
+						]),
+				),
+				details: (docType?.typeInfo.template ?? {}) as typeof prev.details,
+			};
+		});
 	});
 }

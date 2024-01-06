@@ -6,4 +6,5 @@ export const createDocumentDetailsSchema = z.object({
 	type: z.string().min(1),
 	folderId: z.string().nullable(),
 	initialRoles: z.record(z.string()),
+	details: z.object({}).passthrough(),
 }) satisfies z.ZodType<Omit<CreateDocumentDetails, 'details'>>;
