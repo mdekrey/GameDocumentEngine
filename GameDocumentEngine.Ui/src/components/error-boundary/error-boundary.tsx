@@ -7,6 +7,7 @@ type ErrorBoundaryProps = {
 };
 
 type ErrorBoundaryState = {
+	prevErrorKey: React.Key | undefined;
 	hasError: false;
 };
 
@@ -16,12 +17,16 @@ export class ErrorBoundary extends Component<
 > {
 	constructor(props: ErrorBoundaryProps) {
 		super(props);
-		this.state = { hasError: false };
+		this.state = { hasError: false, prevErrorKey: props.errorKey };
 	}
 
-	componentWillReceiveProps(nextProps: Readonly<ErrorBoundaryProps>) {
-		if (nextProps.errorKey !== this.props.errorKey)
-			this.setState({ hasError: false });
+	static getDerivedStateFromProps(
+		nextProps: Readonly<ErrorBoundaryProps>,
+		state: Readonly<ErrorBoundaryState>,
+	): ErrorBoundaryState {
+		if (nextProps.errorKey !== state.prevErrorKey)
+			return { hasError: false, prevErrorKey: nextProps.errorKey };
+		return state;
 	}
 
 	static getDerivedStateFromError() {
