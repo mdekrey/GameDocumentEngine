@@ -4,15 +4,8 @@ import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { Trans } from 'react-i18next';
 import type { Widget } from '../types';
-import { NamedIcon } from '@/components/named-icon/NamedIcon';
-import {
-	useDocTypeTranslation,
-	useDocument,
-	useDocumentType,
-	useTranslationFor,
-	useTranslationForDocument,
-} from '@/utils/api/hooks';
-import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
+import { useDocumentName } from '@/components/named-icon/useDocumentName';
+import { useDocTypeTranslation, useTranslationFor } from '@/utils/api/hooks';
 
 export function DeleteWidgetModal({
 	resolve,
@@ -25,13 +18,10 @@ export function DeleteWidgetModal({
 		widget: Widget;
 	}
 >) {
-	const document = useDocument(gameId, widget.documentId);
-	const { icon: Icon } =
-		useDocumentType(gameId, widget.documentId)?.typeInfo ?? missingDocumentType;
+	const DocumentName = useDocumentName(gameId, widget.documentId);
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'delete-widget-modal',
 	});
-	const tDocument = useTranslationForDocument(document);
 	const tWidget = useTranslationFor(gameId, widget.documentId, widget.widget);
 	return (
 		<ModalAlertLayout>
@@ -42,13 +32,7 @@ export function DeleteWidgetModal({
 					t={t}
 					values={{ widgetType: tWidget('name') }}
 					components={{
-						Target: (
-							<NamedIcon
-								name={document.name}
-								icon={Icon}
-								typeName={tDocument('name')}
-							/>
-						),
+						Target: <DocumentName />,
 					}}
 				/>
 			</Prose>

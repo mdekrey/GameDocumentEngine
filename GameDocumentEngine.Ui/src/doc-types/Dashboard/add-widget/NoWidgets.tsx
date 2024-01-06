@@ -2,15 +2,9 @@ import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Prose } from '@/components/text/common';
 import { Button } from '@/components/button/button';
 import { Trans } from 'react-i18next';
-import { NamedIcon } from '@/components/named-icon/NamedIcon';
+import { useDocumentName } from '@/components/named-icon/useDocumentName';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import {
-	useDocTypeTranslation,
-	useDocument,
-	useDocumentType,
-	useTranslationFor,
-} from '@/utils/api/hooks';
-import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
 
 export function NoWidgetsModal({
 	additional: { gameId, documentId },
@@ -22,10 +16,7 @@ export function NoWidgetsModal({
 		documentId: string;
 	}
 >) {
-	const document = useDocument(gameId, documentId);
-	const { icon: Icon } =
-		useDocumentType(gameId, documentId)?.typeInfo ?? missingDocumentType;
-	const tDocument = useTranslationFor(gameId, documentId);
+	const DocumentName = useDocumentName(gameId, documentId);
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'adding-no-widgets',
 	});
@@ -37,15 +28,8 @@ export function NoWidgetsModal({
 				<Trans
 					i18nKey="intro"
 					t={t}
-					values={{ name: document.name }}
 					components={{
-						Document: (
-							<NamedIcon
-								name={document.name}
-								icon={Icon}
-								typeName={tDocument('name')}
-							/>
-						),
+						Document: <DocumentName />,
 					}}
 				/>
 			</Prose>

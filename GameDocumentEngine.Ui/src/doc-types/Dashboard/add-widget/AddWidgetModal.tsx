@@ -8,19 +8,13 @@ import type {
 import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Button } from '@/components/button/button';
 import { useForm } from '@principlestudios/react-jotai-forms';
-import { NamedIcon } from '@/components/named-icon/NamedIcon';
+import { useDocumentName } from '@/components/named-icon/useDocumentName';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import {
 	NotSelected,
 	SelectField,
 } from '@/components/form-fields/select-input/select-field';
-import {
-	useDocTypeTranslation,
-	useDocument,
-	useDocumentType,
-	useTranslationFor,
-} from '@/utils/api/hooks';
-import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
+import { useDocTypeTranslation, useDocument } from '@/utils/api/hooks';
 import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
 
 export type NewWidgetResult = {
@@ -42,10 +36,8 @@ export function AddWidgetModal({
 		widgets: NonNullable<IGameObjectType['widgets']>;
 	}
 >) {
+	const DocumentName = useDocumentName(gameId, documentId);
 	const document = useDocument(gameId, documentId);
-	const { icon: Icon } =
-		useDocumentType(gameId, documentId)?.typeInfo ?? missingDocumentType;
-	const tDocument = useTranslationFor(gameId, documentId);
 	const t = useDocTypeTranslation('Dashboard', {
 		keyPrefix: 'add-widget-modal',
 	});
@@ -69,13 +61,7 @@ export function AddWidgetModal({
 						i18nKey="title"
 						t={t}
 						components={{
-							Document: (
-								<NamedIcon
-									name={document.name}
-									icon={Icon}
-									typeName={tDocument('name')}
-								/>
-							),
+							Document: <DocumentName />,
 						}}
 					/>
 				</ModalDialogLayout.Title>
