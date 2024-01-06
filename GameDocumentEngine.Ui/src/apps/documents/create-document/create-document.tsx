@@ -157,7 +157,6 @@ function DocumentRoleAssignment({
 		),
 	);
 
-	// eslint-disable-next-line @typescript-eslint/unbound-method
 	const setRoles = rolesField.setValue;
 	useEffect(() => {
 		setRoles((prev) =>
