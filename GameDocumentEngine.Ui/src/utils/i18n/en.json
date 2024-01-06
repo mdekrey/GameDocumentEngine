@@ -50,6 +50,11 @@
 				"errors": {
 					"too_small": "Please select a document type."
 				}
+			},
+			"initialRoles": {
+				"roles": {
+					"no-role": { "name": "<None>" }
+				}
 			}
 		},
 		"submit": "Create Document"
@@ -96,6 +101,7 @@
 		"import-into-game": "Import into {{name}}"
 	},
 	"game-details": {
+		"edit-game": "Game Settings",
 		"mobile-instructions": "Use the dot menu to access and create character sheets, party trackers, and more!",
 		"sidebar-instructions": "Use the sidebar to access and create character sheets, party trackers, and more!"
 	},

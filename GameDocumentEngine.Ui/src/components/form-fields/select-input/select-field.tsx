@@ -14,26 +14,30 @@ export function SelectField<T>(props: {
 	items: readonly T[];
 	children: (item: T) => React.ReactNode;
 	selectInput: React.FC<SelectInputProps<T>>;
+	labelContents?: React.ReactNode;
 }): JSX.Element;
 export function SelectField<T>(props: {
 	field: StandardField<T>;
 	items: readonly T[];
 	children: (item: T) => React.ReactNode;
+	labelContents?: React.ReactNode;
 }): JSX.Element;
 export function SelectField<T>({
 	field,
 	items,
 	children,
 	selectInput: InputComponent = SelectInput,
+	labelContents,
 }: {
 	field: StandardField<T>;
 	items: readonly T[];
 	children: (item: T) => React.ReactNode;
 	selectInput?: React.FC<SelectInputProps<T>>;
+	labelContents?: React.ReactNode;
 }) {
 	return (
 		<Field noLabel>
-			<Field.Label>{field.translation(['label'])}</Field.Label>
+			<Field.Label>{labelContents ?? field.translation(['label'])}</Field.Label>
 			<Field.Contents>
 				<InputComponent items={items} {...field.htmlProps.asControlled()}>
 					{children}

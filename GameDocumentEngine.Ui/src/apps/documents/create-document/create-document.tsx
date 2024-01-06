@@ -184,7 +184,7 @@ function DocumentRoleAssignment({
 			fields={eachRole}
 			players={otherPlayers}
 			roles={actualRoles}
-			translation={t}
+			translation={docType ? t : rolesField.translation}
 		/>
 	);
 }
