@@ -7,7 +7,6 @@ namespace GameDocumentEngine.Server.Api;
 public class FormValueJsonProvider : BindingSourceValueProvider, IEnumerableValueProvider
 {
 	private readonly IFormCollection _values;
-	private readonly HashSet<string?>? _invariantValueKeys;
 	private PrefixContainer? _prefixContainer;
 
 	/// <summary>
@@ -26,12 +25,6 @@ public class FormValueJsonProvider : BindingSourceValueProvider, IEnumerableValu
 		ArgumentNullException.ThrowIfNull(values);
 
 		_values = values;
-
-		//if (_values.TryGetValue(FormValueHelper.CultureInvariantFieldName, out var invariantKeys) && invariantKeys.Count > 0)
-		//{
-		//	_invariantValueKeys = new(invariantKeys, StringComparer.OrdinalIgnoreCase);
-		//}
-
 		Culture = culture;
 	}
 
@@ -91,8 +84,7 @@ public class FormValueJsonProvider : BindingSourceValueProvider, IEnumerableValu
 		}
 		else
 		{
-			var culture = _invariantValueKeys?.Contains(key) == true ? CultureInfo.InvariantCulture : Culture;
-			return new ValueProviderResult(values, culture);
+			return new ValueProviderResult(values, Culture);
 		}
 	}
 }
