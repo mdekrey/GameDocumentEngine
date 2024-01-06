@@ -21,6 +21,7 @@ import {
 	useTranslationFor,
 } from '@/utils/api/hooks';
 import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
+import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
 
 export type NewWidgetResult = {
 	id: string;
@@ -111,7 +112,7 @@ function WidgetName({
 	docTypeKey: string;
 }) {
 	const { t } = useTranslation(
-		target.translationNamespace ?? `doc-types:${docTypeKey}`,
+		target.translationNamespace ?? getDocTypeTranslationNamespace(docTypeKey),
 		{
 			keyPrefix: target.translationKeyPrefix,
 		},

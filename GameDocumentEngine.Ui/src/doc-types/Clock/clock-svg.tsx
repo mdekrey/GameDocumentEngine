@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { PieArcDatum } from 'd3-shape';
 import { arc, pie } from 'd3-shape';
 import { useTranslation } from 'react-i18next';
+import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
 
 export function ClockSvg({
 	className,
@@ -17,7 +18,9 @@ export function ClockSvg({
 	currentTicks: number;
 	totalTicks: number;
 } & JSX.IntrinsicElements['svg']) {
-	const { t } = useTranslation('doc-types:Clock', { keyPrefix: 'view-clock' });
+	const { t } = useTranslation(getDocTypeTranslationNamespace('Clock'), {
+		keyPrefix: 'view-clock',
+	});
 	const clockArc = useMemo(
 		() => arc<void, PieArcDatum<unknown>>().innerRadius(0).outerRadius(radius),
 		[radius],
