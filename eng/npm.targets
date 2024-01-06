@@ -47,7 +47,7 @@
         <Touch AlwaysCreate="true" ForceTouch="true" Files="$(NpmInstallRecordPath)" />
     </Target>
 
-    <Target Name="NodeBuild" BeforeTargets="Build" Inputs="@(Compile);@(CompileConfig)" Outputs="@(CompileOutputs)">
+    <Target Name="NodeBuild" BeforeTargets="Build" Inputs="@(Compile);@(CompileConfig)" Outputs="@(CompileOutputs)" Condition=" '$(SkipBuild)' != 'true' ">
         <Exec WorkingDirectory="$(ProjectDir)" Command="$(NpmBuildScript)" />
         <Touch ForceTouch="true" Files="@(CompileOutputs)" />
     </Target>

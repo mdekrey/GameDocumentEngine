@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<NpmBuildScript>node_modules/.bin/vite build</NpmBuildScript>
 		<NpmBuildScript Condition=" '$(Configuration)' == 'Debug' ">node_modules/.bin/vite build --sourcemap --mode development --minify false</NpmBuildScript>
+		<SkipBuild Condition=" '$(Configuration)' == 'Debug' ">true</SkipBuild>
 	</PropertyGroup>
 	<Import Project="$(RepositoryEngineeringDir)npm.targets" />
 
