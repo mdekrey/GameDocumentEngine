@@ -22,6 +22,7 @@ import {
 	useTranslationFor,
 	useWidgetType,
 } from '@/utils/api/hooks';
+import { useWidget } from './useWidget';
 
 function constrain(
 	size: { width: number; height: number },
@@ -104,7 +105,7 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 		TWidget
 	>;
 	const Settings = settings.component;
-	const Component = widgetDefinition.component;
+	const Widget = useWidget(document.gameId, widget);
 
 	const form = useForm<WidgetSettings<TWidget>>({
 		defaultValue: widget.settings,
@@ -119,12 +120,7 @@ function WidgetSettingsComponent<T, TWidget extends object>({
 		);
 		return (
 			<WidgetContainer size={size}>
-				<Component
-					document={document}
-					size={widget.position}
-					widgetSettings={settings}
-					widgetType={widget.widget}
-				/>
+				<Widget />
 			</WidgetContainer>
 		);
 	});

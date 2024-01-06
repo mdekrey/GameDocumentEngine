@@ -11,9 +11,9 @@ import {
 	useDocument,
 	useDocumentType,
 	useTranslationFor,
-	useWidgetType,
 } from '@/utils/api/hooks';
 import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
+import { useWidget } from '../useWidget';
 
 export function InfoWidgetModal<TWidget extends WidgetBase>({
 	resolve,
@@ -28,11 +28,7 @@ export function InfoWidgetModal<TWidget extends WidgetBase>({
 	const document = useDocument(gameId, widget.documentId);
 	const { icon: Icon } =
 		useDocumentType(gameId, widget.documentId)?.typeInfo ?? missingDocumentType;
-	const Component = useWidgetType(
-		gameId,
-		widget.documentId,
-		widget.widget,
-	).component;
+	const Widget = useWidget(gameId, widget);
 	const t = useDocTypeTranslation('Dashboard');
 	const tDocument = useTranslationFor(gameId, widget.documentId);
 	const tWidget = useTranslationFor(gameId, widget.documentId, widget.widget);
@@ -53,12 +49,7 @@ export function InfoWidgetModal<TWidget extends WidgetBase>({
 					{tWidget('name')}
 				</Prose>
 				<WidgetContainer size={widget.position}>
-					<Component
-						document={document}
-						size={widget.position}
-						widgetSettings={widget.settings}
-						widgetType={widget.widget}
-					/>
+					<Widget />
 				</WidgetContainer>
 			</div>
 			<ModalDialogLayout.Buttons>
