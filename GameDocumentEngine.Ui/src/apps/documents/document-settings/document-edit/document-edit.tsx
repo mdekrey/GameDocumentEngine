@@ -5,9 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { useForm } from '@/utils/form';
+import { useForm, useUpdatingForm } from '@/utils/form';
 import { ButtonRow } from '@/components/button/button-row';
-import { updateFormDefault } from '@/utils/form';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
@@ -47,7 +46,7 @@ export function DocumentEdit({
 	const documentData = useDocument(gameId, documentId);
 	const saveDocument = usePatchDocument(gameId, documentId);
 
-	updateFormDefault(documentForm, documentData);
+	useUpdatingForm(documentForm, documentData);
 	const canEdit = hasDocumentPermission(
 		documentData,
 		writeDocumentDetailsPrefix,

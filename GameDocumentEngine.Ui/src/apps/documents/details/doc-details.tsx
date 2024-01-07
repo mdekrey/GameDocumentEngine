@@ -14,9 +14,8 @@ import {
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { useCallback, useEffect, useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
-import { useForm } from '@/utils/form';
+import { useForm, useUpdatingForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
-import { updateFormDefaultMapped } from '@/utils/form';
 import { applyPatch, createPatch } from 'rfc6902';
 import { useTranslation } from 'react-i18next';
 import { fetchLocalDocument, useLocalDocument } from '../useLocalDocument';
@@ -71,7 +70,8 @@ export function DocumentDetailsForm<T = unknown>({
 		}),
 		readOnly: toReadOnlyFields(editable.writablePointers),
 	});
-	updateFormDefaultMapped(form, editable.editable);
+	// TODO: I think this gets replaced with operational transform...?
+	useUpdatingForm(form, editable.editable);
 	useEffect(() => {
 		form.store.set(
 			form.readOnlyFields,
