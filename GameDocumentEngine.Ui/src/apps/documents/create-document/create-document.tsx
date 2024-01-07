@@ -21,6 +21,7 @@ import { DocumentRoleAssignment } from './DocumentRoleAssignment';
 import { useDocTypeFormUpdates } from './useDocTypeFormUpdates';
 import { createDocumentDetailsSchema } from './createDocumentDetailsSchema';
 import type { z } from 'zod';
+import { CreateDocumentDetails } from './CreateDocumentDetails';
 
 function useCreateDocument(gameId: string) {
 	return useMutation(queries.createDocument(gameId));
@@ -42,6 +43,7 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 		fields: {
 			type: ['type'],
 			allRoles: ['initialRoles'],
+			details: ['details'],
 		},
 	});
 	const gameType = useGameType(gameId);
@@ -75,6 +77,11 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 							documentTypeAtom={form.fields.type.value}
 							gameId={gameId}
 							rolesField={form.fields.allRoles}
+						/>
+						<CreateDocumentDetails
+							documentTypeAtom={form.fields.type.value}
+							gameId={gameId}
+							detailsField={form.fields.details}
 						/>
 						{/* TODO: create doc wizard options? */}
 						<ButtonRow>
