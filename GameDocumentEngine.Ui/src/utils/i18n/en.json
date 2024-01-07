@@ -55,6 +55,9 @@
 				"roles": {
 					"no-role": { "name": "<None>" }
 				}
+			},
+			"details": {
+				"unhandled-error": "Unknown error"
 			}
 		},
 		"submit": "Create Document"

@@ -18,6 +18,7 @@ export function RoleAssignmentField({
 		const field = fields(k);
 		return (
 			<SelectField
+				key={k}
 				field={field}
 				labelContents={playerSummary.name}
 				items={roles}

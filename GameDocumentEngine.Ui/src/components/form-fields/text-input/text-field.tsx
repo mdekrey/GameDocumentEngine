@@ -19,7 +19,7 @@ export const undefinedAsEmptyStringMapping: FieldMapping<
 };
 
 export const integerMapping: FieldMapping<number, string> = {
-	toForm: (v: number) => v.toFixed(0),
+	toForm: (v: number) => v?.toFixed(0) ?? '',
 	fromForm: (v) => {
 		const result = Number.parseInt(v, 10);
 		return isNaN(result) ? noChange : result;
@@ -30,7 +30,7 @@ export const undefinedOrIntegerMapping: FieldMapping<
 	number | undefined,
 	string
 > = {
-	toForm: (v: number | undefined) => (v === undefined ? '' : v.toFixed(0)),
+	toForm: (v: number | undefined) => v?.toFixed(0) ?? '',
 	fromForm: (v) => {
 		if (!v) return undefined;
 		const result = Number.parseInt(v, 10);
