@@ -15,12 +15,12 @@ const widgetsTotal = (
 export function useWidgetSizes(
 	widgetsAtom: Atom<Record<string, PositionedWidget>>,
 ) {
-	const dashboardHeight = useComputedAtom((get) =>
+	const height = useComputedAtom((get) =>
 		widgetsTotal(get(widgetsAtom), positionTotalY),
 	);
-	const dashboardWidth = useComputedAtom((get) =>
+	const width = useComputedAtom((get) =>
 		widgetsTotal(get(widgetsAtom), positionTotalX),
 	);
 
-	return { dashboardHeight, dashboardWidth };
+	return { height, width };
 }

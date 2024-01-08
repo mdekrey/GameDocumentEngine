@@ -1,29 +1,35 @@
 import { Suspense } from 'react';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
-import type { Dashboard, Widget } from './types';
+import type { WidgetTemplate, Widget } from '../types';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import { DashboardContainer, PositionedWidgetContainer } from './grid-utils';
+import {
+	DashboardContainer,
+	PositionedWidgetContainer,
+} from '@/doc-types/Dashboard/grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import { useDocTypeTranslation } from '@/utils/api/hooks';
 import { ErrorScreen } from '@/components/errors';
-import { useWidgetSizes } from './useWidgetSizes';
+import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 
-export function DashboardViewMode({
+export function WidgetTemplateViewMode({
 	document,
+	previewDocument,
 	widgets,
 	canUpdateWidgets,
 	onToggleEditing,
 }: {
-	document: TypedDocumentDetails<Dashboard>;
+	document: TypedDocumentDetails<WidgetTemplate>;
+	previewDocument: DocumentDetails;
 	widgets: FormFieldReturnType<Record<string, Widget>>;
 	canUpdateWidgets: boolean;
 	onToggleEditing: () => void;
 }) {
-	const { height, width } = useWidgetSizes(widgets.atom);
+	const { height: height, width: width } = useWidgetSizes(widgets.atom);
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
@@ -39,7 +45,7 @@ export function DashboardViewMode({
 			},
 		},
 	});
-	const t = useDocTypeTranslation('Dashboard');
+	const t = useDocTypeTranslation('WidgetTemplate');
 
 	return (
 		<DashboardContainer
@@ -56,7 +62,11 @@ export function DashboardViewMode({
 							}
 						>
 							<Suspense>
-								<RenderWidget gameId={document.gameId} widgetConfig={config} />
+								<RenderWidget
+									gameId={document.gameId}
+									widgetConfig={config}
+									previewDocument={previewDocument}
+								/>
 							</Suspense>
 						</ErrorBoundary>
 					</PositionedWidgetContainer>

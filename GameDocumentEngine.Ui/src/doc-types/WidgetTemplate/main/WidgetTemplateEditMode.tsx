@@ -1,5 +1,5 @@
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
-import type { Dashboard, Widget } from './types';
+import type { WidgetTemplate, Widget } from '../types';
 import {
 	documentIdMimeType,
 	isDraggingAtom,
@@ -8,16 +8,19 @@ import {
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { addWidget } from './add-widget/addWidget';
 import { useQueryClient } from '@tanstack/react-query';
-import { DashboardContainer, toGridCoordinate } from './grid-utils';
+import {
+	DashboardContainer,
+	toGridCoordinate,
+} from '@/doc-types/Dashboard/grid-utils';
 import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
+import { addWidget } from './add-widget/addWidget';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
-import { useWidgetSizes } from './useWidgetSizes';
+import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { RenderWidget } from './RenderWidget';
-import { MoveResizeWidget } from './MoveResizeWidget';
+import { MoveResizeWidget } from '../MoveResizeWidget';
 import { HiOutlineCog6Tooth, HiOutlineTrash } from 'react-icons/hi2';
 import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
@@ -25,15 +28,17 @@ import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { atom } from 'jotai';
 import { useDocTypeTranslation, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
-import { Inset } from './Inset';
+import { Inset } from '@/doc-types/Dashboard/Inset';
 import { ErrorScreen } from '@/components/errors';
 
-export function DashboardEditMode({
+export function WidgetTemplateEditMode({
 	document,
+	previewDocument,
 	widgets,
 	onToggleEditing,
 }: {
-	document: TypedDocumentDetails<Dashboard>;
+	document: TypedDocumentDetails<WidgetTemplate>;
+	previewDocument: DocumentDetails;
 	widgets: FormFieldReturnType<Record<string, Widget>>;
 	onToggleEditing: () => void;
 }) {
@@ -55,7 +60,10 @@ export function DashboardEditMode({
 				const rect = currentTarget.getBoundingClientRect();
 				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));
 				const y = toGridCoordinate(ev.clientY - Math.round(rect.top));
-				void addWidget(queryClient, launchModal, data, widgets, { x, y });
+				void addWidget(queryClient, launchModal, previewDocument, widgets, {
+					x,
+					y,
+				});
 				return true;
 			},
 		},
@@ -72,6 +80,7 @@ export function DashboardEditMode({
 						key={key}
 						widgetId={key}
 						widget={widget(key)}
+						previewDocument={previewDocument}
 						dashboard={document}
 						config={config}
 						onDelete={onDelete(key)}
@@ -87,13 +96,21 @@ export function DashboardEditMode({
 		</DashboardContainer.Editing>
 	);
 	function onDelete(id: string) {
-		return () => void deleteWidget(launchModal, document.gameId, widgets, id);
+		return () =>
+			void deleteWidget(
+				launchModal,
+				document.gameId,
+				previewDocument,
+				widgets,
+				id,
+			);
 	}
 	function onInfo(id: string) {
 		return () =>
 			void showWidgetInfo(
 				launchModal,
 				document.gameId,
+				previewDocument,
 				document.details.widgets[id],
 			);
 	}
@@ -103,6 +120,7 @@ const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));
 export function EditingWidget({
 	widget,
 	widgetId,
+	previewDocument,
 	dashboard: { gameId },
 	config,
 	onDelete,
@@ -110,12 +128,13 @@ export function EditingWidget({
 }: {
 	widget: FormFieldReturnType<Widget>;
 	widgetId: string;
+	previewDocument: DocumentDetails;
 	dashboard: DocumentDetails;
 	config: Widget;
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
-	const t = useDocTypeTranslation('Dashboard');
+	const t = useDocTypeTranslation('WidgetTemplate');
 	const stopDragging = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle: (effect) => (effect.link ? 'none' : false),
@@ -124,7 +143,7 @@ export function EditingWidget({
 	});
 	const widgetDefinition = useWidgetType(
 		gameId,
-		config.documentId,
+		previewDocument.id,
 		config.widget,
 	);
 	return (
@@ -149,7 +168,11 @@ export function EditingWidget({
 							<ErrorScreen message={t('widgets.widget-runtime-error')} />
 						}
 					>
-						<RenderWidget gameId={gameId} widgetConfig={config} />
+						<RenderWidget
+							gameId={gameId}
+							widgetConfig={config}
+							previewDocument={previewDocument}
+						/>
 					</ErrorBoundary>
 				</Inset>
 				<Inset
