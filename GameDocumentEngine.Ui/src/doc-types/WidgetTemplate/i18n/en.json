@@ -1,0 +1,27 @@
+{
+	"name": "Widget Template",
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the widget template to customize internal widgets"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the widget template; may not be able to see all contained widgets to other permissions"
+		},
+		"no-role": { "name": "None" }
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			},
+			"details": {
+				"docType": {
+					"label": "Template for Document Type",
+					"not-selected": "Not Selected"
+				}
+			}
+		}
+	}
+}

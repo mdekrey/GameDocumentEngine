@@ -4,7 +4,9 @@
 		"Clock",
 		"MouseGuard-Character",
 		"MouseGuard-Conflict",
-		"Folder"
+		"Folder",
+		"Dashboard",
+		"WidgetTemplate"
 	],
 	"defaultNewGameRole": "gm",
 	"permissions": {

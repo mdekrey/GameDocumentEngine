@@ -31,6 +31,7 @@ export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
 };
 
 export type NewGameObjectFieldComponent<T> = {
+	gameId: string;
 	templateField: FormFieldReturnType<T>;
 };
 

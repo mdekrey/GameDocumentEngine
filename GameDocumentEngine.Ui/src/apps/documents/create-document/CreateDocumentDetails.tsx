@@ -55,9 +55,9 @@ export function CreateDocumentDetails({
 			const Component = docType.typeInfo.creationComponent;
 			if (!Component) return <></>;
 
-			return <Component templateField={field} />;
+			return <Component gameId={gameId} templateField={field} />;
 		},
-		[detailsField.atom, disabled],
+		[gameId, detailsField.atom, disabled],
 	);
 
 	if (!docType) return <></>;

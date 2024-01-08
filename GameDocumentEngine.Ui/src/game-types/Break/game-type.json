@@ -1,6 +1,12 @@
 {
 	"key": "Break",
-	"objectTypes": ["Clock", "Folder", "Break-Character", "Dashboard"],
+	"objectTypes": [
+		"Clock",
+		"Folder",
+		"Break-Character",
+		"Dashboard",
+		"WidgetTemplate"
+	],
 	"defaultNewGameRole": "gm",
 	"permissions": {
 		"gm": [

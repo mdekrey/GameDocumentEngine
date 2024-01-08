@@ -1,8 +1,9 @@
 {
-	"title": "Dashboard",
+	"title": "WidgetTemplate",
 	"type": "object",
-	"required": ["widgets"],
+	"required": ["docType", "widgets"],
 	"properties": {
+		"docType": { "type": "string" },
 		"widgets": {
 			"type": "object",
 			"additionalProperties": { "$ref": "#/$defs/Widget" }
@@ -11,9 +12,8 @@
 	"$defs": {
 		"Widget": {
 			"type": "object",
-			"required": ["documentId", "position", "widget", "settings"],
+			"required": ["position", "widget", "settings"],
 			"properties": {
-				"documentId": { "type": "string" },
 				"position": { "$ref": "#/$defs/WidgetPosition" },
 				"widget": { "type": "string" },
 				"settings": { "type": "object" }
