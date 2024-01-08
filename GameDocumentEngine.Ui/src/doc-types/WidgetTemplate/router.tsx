@@ -24,7 +24,7 @@ export function WidgetTemplateRouter(
 				element={<InternalMainDisplay {...props} />}
 			/>
 			<Route
-				path="widget/:widgetId/preview/:previewDocumentId"
+				path="/preview/:previewDocumentId/widget/:widgetId"
 				element={<InternalWidgetSettings {...props} />}
 			/>
 			<Route path="" element={<SelectPreviewItem {...props} />} />
