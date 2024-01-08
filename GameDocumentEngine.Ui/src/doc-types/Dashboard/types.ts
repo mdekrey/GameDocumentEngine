@@ -3,15 +3,16 @@ import type { WidgetBase, WidgetSettings } from '@/documents/defineDocument';
 import { documentSchema } from '@/documents/defineDocument';
 import schema from './schema';
 
+export type WidgetPosition = {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+};
 export type Dashboard = z.infer<typeof schema>;
 export type Widget<TWidget extends WidgetBase = WidgetBase> = {
 	documentId: string;
-	position: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	};
+	position: WidgetPosition;
 	widget: string;
 	settings: WidgetSettings<TWidget>;
 };

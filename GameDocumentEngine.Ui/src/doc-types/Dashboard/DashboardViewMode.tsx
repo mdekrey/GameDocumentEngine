@@ -10,7 +10,7 @@ import { HiPencil } from 'react-icons/hi2';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import { useDocTypeTranslation } from '@/utils/api/hooks';
 import { ErrorScreen } from '@/components/errors';
-import { useDashboardDetails } from './useDashboardDetails';
+import { useWidgetSizes } from './useWidgetSizes';
 
 export function DashboardViewMode({
 	document,
@@ -23,7 +23,7 @@ export function DashboardViewMode({
 	canUpdateWidgets: boolean;
 	onToggleEditing: () => void;
 }) {
-	const { dashboardHeight, dashboardWidth } = useDashboardDetails(widgets.atom);
+	const { dashboardHeight, dashboardWidth } = useWidgetSizes(widgets.atom);
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {

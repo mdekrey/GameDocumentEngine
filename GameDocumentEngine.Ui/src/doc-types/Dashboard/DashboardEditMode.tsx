@@ -15,7 +15,7 @@ import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
-import { useDashboardDetails } from './useDashboardDetails';
+import { useWidgetSizes } from './useWidgetSizes';
 import { RenderWidget } from './RenderWidget';
 import { MoveResizeWidget } from './MoveResizeWidget';
 import { HiOutlineCog6Tooth, HiOutlineTrash } from 'react-icons/hi2';
@@ -39,7 +39,7 @@ export function DashboardEditMode({
 }) {
 	const queryClient = useQueryClient();
 	const launchModal = useLaunchModal();
-	const { dashboardHeight, dashboardWidth } = useDashboardDetails(widgets.atom);
+	const { dashboardHeight, dashboardWidth } = useWidgetSizes(widgets.atom);
 	const { widget } = useFormFields(widgets, {
 		widget: (id: string) => [id],
 	});
