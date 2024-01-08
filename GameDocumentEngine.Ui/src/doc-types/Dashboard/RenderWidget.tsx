@@ -1,6 +1,6 @@
 import type { Widget } from './types';
-import { useDocument, useWidgetType } from '@/utils/api/hooks';
 import { LimitingInset } from './Inset';
+import { useWidget } from './useWidget';
 
 export function RenderWidget({
 	gameId,
@@ -9,21 +9,10 @@ export function RenderWidget({
 	gameId: string;
 	widgetConfig: Widget;
 }) {
-	const document = useDocument(gameId, widgetConfig.documentId);
-	const { component: Component } = useWidgetType(
-		gameId,
-		widgetConfig.documentId,
-		widgetConfig.widget,
-	);
-
+	const Widget = useWidget(gameId, widgetConfig);
 	return (
 		<LimitingInset>
-			<Component
-				document={document}
-				widgetType={widgetConfig.widget}
-				size={widgetConfig.position}
-				widgetSettings={widgetConfig.settings}
-			/>
+			<Widget />
 		</LimitingInset>
 	);
 }

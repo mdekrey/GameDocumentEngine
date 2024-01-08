@@ -2,6 +2,7 @@ import type { ErrorsAtom } from '@/utils/form';
 import type { FieldTranslation } from '@/utils/form';
 import { HiX } from 'react-icons/hi';
 import { useAtomValue } from 'jotai';
+import { elementTemplate } from '@/components/template';
 
 export function ErrorsList({
 	errors,
@@ -15,11 +16,32 @@ export function ErrorsList({
 	return (
 		<ul className="text-red-800 dark:text-red-500 font-bold text-xs">
 			{errorsValue.data.issues.map((issue, key) => (
-				<li key={key}>
-					<HiX className="inline-block mb-1 mr-1" />
+				<ErrorsListItem key={key}>
 					{translations(['errors', issue.code])}
-				</li>
+				</ErrorsListItem>
 			))}
 		</ul>
 	);
 }
+
+function ErrorsListItem({ children }: { children?: React.ReactNode }) {
+	return (
+		<li>
+			<HiX className="inline-block mb-1 mr-1" />
+			{children}
+		</li>
+	);
+}
+
+export const ErrorsListPresentation = Object.assign(
+	elementTemplate('ErrorsListPresentation', 'ul', (T) => (
+		<T className="text-red-800 dark:text-red-500 font-bold text-xs" />
+	)),
+	{
+		Item: elementTemplate(
+			'ErrorsListPresentation.Item',
+			ErrorsListItem,
+			(T) => <T />,
+		),
+	},
+);

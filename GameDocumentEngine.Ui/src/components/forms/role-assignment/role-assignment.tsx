@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
-import { updateFormDefault } from '@/utils/form';
-import { useForm } from '@/utils/form';
-import { defaultField } from '@/utils/form';
+import { defaultField, useForm, useUpdatingForm } from '@/utils/form';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useTranslation } from 'react-i18next';
 import { RoleAssignmentField } from './role-assignment-field';
@@ -57,7 +55,7 @@ export function RoleAssignment({
 		},
 		readOnly: !allowUpdate,
 	});
-	updateFormDefault(form, formData);
+	useUpdatingForm(form, formData);
 	form.store.set(form.readOnlyFields, (prev) => {
 		if (!allowUpdate) return true;
 		if (allowUpdateSelf) return false;

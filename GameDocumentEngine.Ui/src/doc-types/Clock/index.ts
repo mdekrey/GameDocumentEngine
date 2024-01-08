@@ -5,6 +5,7 @@ import clockSchema from './schema';
 import type { z } from 'zod';
 import { ClockDisplayWidgetDefinition } from './widgets/display';
 import { NamedIconWidgetDefinition } from '@/components/named-icon/named-icon-widget';
+import { ClockDetails } from './clock-edit';
 
 defineDocument('Clock', {
 	icon: HiOutlineClock,
@@ -13,6 +14,7 @@ defineDocument('Clock', {
 		max: 6,
 	} satisfies z.infer<typeof clockSchema>,
 	component: Clock,
+	creationComponent: ClockDetails,
 	schema: clockSchema,
 	fixup: {
 		toForm: (a) => a,

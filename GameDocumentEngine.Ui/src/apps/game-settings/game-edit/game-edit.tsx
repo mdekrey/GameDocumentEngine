@@ -5,9 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { produceWithPatches } from 'immer';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
-import { useForm } from '@/utils/form';
+import { useForm, useUpdatingForm } from '@/utils/form';
 import { ButtonRow } from '@/components/button/button-row';
-import { updateFormDefault } from '@/utils/form';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';
 import { hasGamePermission } from '@/utils/security/match-permission';
@@ -36,7 +35,7 @@ export function GameEdit({ gameId }: { gameId: string }) {
 
 	const gameData = useGame(gameId);
 	const saveGame = usePatchGame(gameId);
-	updateFormDefault(gameForm, gameData);
+	useUpdatingForm(gameForm, gameData);
 	const canEdit = hasGamePermission(gameData, updateGame);
 	gameForm.store.set(gameForm.readOnlyFields, !canEdit);
 

@@ -1,15 +1,17 @@
-import { type Objectish, produce } from 'immer';
+import { produce } from 'immer';
 import type { UseFormResult } from '@principlestudios/react-jotai-forms';
 import { applyPatch, createPatch } from 'rfc6902';
+import { useRef, type MutableRefObject } from 'react';
 
-export function updateFormDefault<T extends Objectish>(
-	form: Pick<UseFormResult<T>, 'defaultValue' | 'set' | 'get'>,
+function updateFormDefault<T>(
+	form: Pick<UseFormResult<T>, 'set' | 'get'>,
+	defaultValue: MutableRefObject<T>,
 	newValue: T,
 ) {
-	if (form.defaultValue.current !== newValue) {
-		const patch = createPatch(form.defaultValue.current, newValue);
-		const oldDefault = form.defaultValue.current;
-		form.defaultValue.current = newValue;
+	if (defaultValue.current !== newValue) {
+		const patch = createPatch(defaultValue.current, newValue);
+		const oldDefault = defaultValue.current;
+		defaultValue.current = newValue;
 
 		const prev = form.get();
 
@@ -19,10 +21,9 @@ export function updateFormDefault<T extends Objectish>(
 		// local changes, such as adding array elements. Adding array elements
 		// without this filtering creates duplicate entries. This really only
 		// matters in the delay between typing and recording the "local"
-		// mutations, so it needs to operate on the form.defaultValue.current
-		// instead of applying operational transforms. Currently we just take
-		// local user changes, since this means they're actively interacting
-		// with it.
+		// mutations, so it needs to operate on the defaultValue.current instead
+		// of applying operational transforms. Currently we just take local user
+		// changes, since this means they're actively interacting with it.
 		const filteredPatch = patch.filter(
 			(p) => !userChanges.some((userChange) => p.path === userChange.path),
 		);
@@ -39,9 +40,10 @@ export function updateFormDefault<T extends Objectish>(
 	}
 }
 
-export function updateFormDefaultMapped<TForm extends Objectish>(
-	form: Pick<UseFormResult<TForm>, 'defaultValue' | 'set' | 'get'>,
-	newValue: TForm,
+export function useUpdatingForm<T>(
+	form: Pick<UseFormResult<T>, 'set' | 'get'>,
+	value: T,
 ) {
-	updateFormDefault(form, newValue);
+	const defaultValueRef = useRef(value);
+	updateFormDefault(form, defaultValueRef, value);
 }

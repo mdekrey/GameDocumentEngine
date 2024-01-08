@@ -1,5 +1,5 @@
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import type { FieldMapping } from '@/utils/form';
+import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
 import type { Draft } from 'immer';
 import type { IconType } from 'react-icons';
@@ -28,6 +28,10 @@ export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
 	writablePointers: DocumentPointers;
 	form: UseFormResult<EditableDocumentDetails<T>>;
 	onSubmit: (document: EditableDocumentDetails<T>) => Promise<void>;
+};
+
+export type NewGameObjectFieldComponent<T> = {
+	templateField: FormFieldReturnType<T>;
 };
 
 export type Size = {
@@ -83,6 +87,7 @@ export type IGameObjectType<T = unknown> = {
 	icon: IconType;
 	template: T;
 	component: React.ComponentType<GameObjectFormComponent<T>>;
+	creationComponent?: React.ComponentType<NewGameObjectFieldComponent<T>>;
 	fixup: FieldMapping<EditableDocumentDetails<T>, EditableDocumentDetails<T>>;
 	schema: z.ZodType<T>;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
