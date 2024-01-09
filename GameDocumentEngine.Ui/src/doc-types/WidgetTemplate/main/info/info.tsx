@@ -1,5 +1,5 @@
 import type { Widget } from '../../types';
-import type { useLaunchModal } from '@/utils/modal/modal-service';
+import type { ModalLauncher } from '@/utils/modal/modal-service';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { useDocumentName } from '@/components/named-icon/useDocumentName';
 import { InfoWidgetContentsPresentation } from '@/doc-types/Dashboard/info/InfoWidgetContentsPresentation';
@@ -8,7 +8,7 @@ import { okDialog } from '@/utils/modal/layouts/ok-dialog';
 import { useWidget } from '../../useWidget';
 
 export async function showWidgetInfo(
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	gameId: string,
 	previewDocument: DocumentDetails,
 	widget: Widget,

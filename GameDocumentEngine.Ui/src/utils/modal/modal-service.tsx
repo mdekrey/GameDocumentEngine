@@ -62,8 +62,14 @@ function rejectViaBackdrop(props: Pick<ModalContentsProps<never>, 'reject'>) {
 	props.reject(BackdropRejection);
 }
 
-/** Gets a "launchModal" function to work with the atom stack */
-export function useLaunchModal() {
+export type ModalLauncher = <T, TProps = never>({
+	ModalContents,
+	onBackdropCancel,
+	additional,
+	abort,
+}: ModalOptions<T, TProps>) => Promise<T>;
+/** Gets a "ModalLauncher" function to work with the atom stack */
+export function useLaunchModal(): ModalLauncher {
 	const store = useStore();
 
 	return useCallback(

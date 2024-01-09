@@ -1,5 +1,5 @@
 import type { Widget } from '../types';
-import type { useLaunchModal } from '@/utils/modal/modal-service';
+import type { ModalLauncher } from '@/utils/modal/modal-service';
 import { okDialog } from '@/utils/modal/layouts/ok-dialog';
 import { useDocTypeTranslation } from '@/utils/api/hooks';
 import { InfoWidgetContentsPresentation } from './InfoWidgetContentsPresentation';
@@ -8,7 +8,7 @@ import { useWidget } from '../useWidget';
 import { useTranslationFor } from '@/utils/api/hooks';
 
 export async function showWidgetInfo(
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	gameId: string,
 	widget: Widget,
 ) {

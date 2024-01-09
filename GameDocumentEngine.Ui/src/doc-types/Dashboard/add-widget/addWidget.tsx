@@ -1,6 +1,6 @@
 import type { Widget } from '../types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import type { useLaunchModal } from '@/utils/modal/modal-service';
+import type { ModalLauncher } from '@/utils/modal/modal-service';
 import type { NewWidgetResult } from './AddWidgetModal';
 import { AddWidgetModal } from './AddWidgetModal';
 import type { QueryClient } from '@tanstack/react-query';
@@ -9,7 +9,7 @@ import { NoWidgetsModal } from './NoWidgets';
 
 export async function addWidget(
 	queryClient: QueryClient,
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	{ gameId, id }: { gameId: string; id: string },
 	widgetsField: FormFieldReturnType<Record<string, Widget>>,
 	coordinate: { x: number; y: number },

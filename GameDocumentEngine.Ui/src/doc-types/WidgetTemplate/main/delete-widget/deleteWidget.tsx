@@ -1,13 +1,13 @@
 import type { Widget } from '../../types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import type { useLaunchModal } from '@/utils/modal/modal-service';
+import type { ModalLauncher } from '@/utils/modal/modal-service';
 import { produce } from 'immer';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { areYouSure } from '@/utils/modal/layouts/are-you-sure-dialog';
 import { useDocTypeTranslation, useTranslationFor } from '@/utils/api/hooks';
 
 export async function deleteWidget(
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	gameId: string,
 	previewDocument: DocumentDetails,
 	widgetsField: FormFieldReturnType<Record<string, Widget>>,

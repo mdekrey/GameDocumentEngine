@@ -1,7 +1,7 @@
 import { ModalDialogLayout } from '../modal-dialog';
 import { Button } from '@/components/button/button';
 import type { TFunction } from 'i18next';
-import type { ModalContentsProps, useLaunchModal } from '../modal-service';
+import type { ModalContentsProps, ModalLauncher } from '../modal-service';
 
 export type ContentParams = {
 	t: TFunction;
@@ -45,7 +45,7 @@ function OkDialogModal({
 }
 
 export async function okDialog(
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	useParams: () => ContentParams,
 ) {
 	return await launchModal({

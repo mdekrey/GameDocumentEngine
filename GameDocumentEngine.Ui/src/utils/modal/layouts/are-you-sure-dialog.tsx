@@ -3,7 +3,7 @@ import { ModalAlertLayout } from '../alert-layout';
 import { Trans } from 'react-i18next';
 import { Button } from '@/components/button/button';
 import type { TFunction } from 'i18next';
-import type { ModalContentsProps, useLaunchModal } from '../modal-service';
+import type { ModalContentsProps, ModalLauncher } from '../modal-service';
 
 export type TranslationParams = {
 	t: TFunction;
@@ -66,7 +66,7 @@ function AreYouSureModal({
 }
 
 export async function areYouSure(
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	useTranslationParams: () => TranslationParams,
 ) {
 	return await launchModal({
