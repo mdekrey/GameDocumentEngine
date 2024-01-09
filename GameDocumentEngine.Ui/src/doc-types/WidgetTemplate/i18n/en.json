@@ -23,5 +23,38 @@
 				}
 			}
 		}
+	},
+	"add-widget-modal": {
+		"title": "Add widget for <Document/>",
+		"cancel": "Cancel",
+		"submit": "Add widget",
+		"fields": {
+			"id": {
+				"label": "Widget to add",
+				"not-selected": "Not Selected"
+			}
+		}
+	},
+	"adding-no-widgets": {
+		"title": "No widgets supported",
+		"intro": "The document you dropped, <Document/>, does not support widgets at this time. Try another document type.",
+		"cancel": "Cancel"
+	},
+	"delete-widget-modal": {
+		"title": "Remove Widget",
+		"are-you-sure": "Are you sure you want to delete the {{widgetType}} widget? This action cannot be undone.",
+		"cancel": "Cancel",
+		"submit": "Remove Widget"
+	},
+	"widgets": {
+		"widget-load-error": "Widget failed to load",
+		"widget-runtime-error": "Widget encountered an error"
+	},
+	"info-widget-modal": {
+		"title": "Widget Info",
+		"ok": "OK"
+	},
+	"widget-settings": {
+		"submit": "Sumbit"
 	}
 }

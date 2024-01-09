@@ -2,8 +2,9 @@ import type { Widget } from '../../types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import type { useLaunchModal } from '@/utils/modal/modal-service';
 import { produce } from 'immer';
-import { DeleteWidgetModal } from './DeleteWidgetModal';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import { areYouSure } from '@/utils/modal/layouts/are-you-sure-dialog';
+import { useDocTypeTranslation, useTranslationFor } from '@/utils/api/hooks';
 
 export async function deleteWidget(
 	launchModal: ReturnType<typeof useLaunchModal>,
@@ -15,17 +16,7 @@ export async function deleteWidget(
 	const widget = widgetsField.getValue()[key];
 
 	try {
-		if (
-			await launchModal({
-				ModalContents: DeleteWidgetModal,
-				additional: {
-					gameId,
-					previewDocument,
-					widget,
-				},
-			})
-		)
-			applyChange();
+		if (await areYouSure(launchModal, useTranslationParams)) applyChange();
 	} catch (ex) {
 		// On a cancel, do nothing
 	}
@@ -36,5 +27,20 @@ export async function deleteWidget(
 				delete widgets[key];
 			}),
 		);
+	}
+
+	function useTranslationParams() {
+		const t = useDocTypeTranslation('WidgetTemplate', {
+			keyPrefix: 'delete-widget-modal',
+		});
+		const tWidget = useTranslationFor(
+			gameId,
+			previewDocument.id,
+			widget.widget,
+		);
+		return {
+			t,
+			values: { widgetType: tWidget('name') },
+		};
 	}
 }
