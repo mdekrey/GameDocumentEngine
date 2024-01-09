@@ -43,7 +43,7 @@ export function AreYouSureDialogPresentation({
 	);
 }
 
-function DeleteWidgetModal({
+function AreYouSureModal({
 	resolve,
 	reject,
 	additional: { useTranslationParams },
@@ -70,7 +70,7 @@ export async function areYouSure(
 	useTranslationParams: () => TranslationParams,
 ) {
 	return await launchModal({
-		ModalContents: DeleteWidgetModal,
+		ModalContents: AreYouSureModal,
 		additional: { useTranslationParams },
 	});
 }
