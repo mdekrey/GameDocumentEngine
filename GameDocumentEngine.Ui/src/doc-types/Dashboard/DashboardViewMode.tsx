@@ -1,26 +1,34 @@
 import { useCallback } from 'react';
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type {
+	GameObjectFormComponent,
+	TypedDocumentDetails,
+} from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
-import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
+import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { DashboardContainer, PositionedWidgetContainer } from './grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
 import { useWidgetSizes } from './useWidgetSizes';
 import { useWidget } from './useWidget';
+import { useNavigate } from 'react-router-dom';
+import type { Atom } from 'jotai';
 
 export function DashboardViewMode({
 	document,
-	widgets,
-	canUpdateWidgets,
-	onToggleEditing,
-}: {
-	document: TypedDocumentDetails<Dashboard>;
-	widgets: FormFieldReturnType<Record<string, Widget>>;
-	canUpdateWidgets: boolean;
-	onToggleEditing: () => void;
-}) {
+	writablePointers,
+	form,
+}: GameObjectFormComponent<Dashboard>) {
+	const canUpdateWidgets = writablePointers.contains('details', 'widgets');
+	const { widgets } = useFormFields(form, {
+		widgets: ['details', 'widgets'],
+	});
+	const navigate = useNavigate();
+	const onToggleEditing = canUpdateWidgets
+		? () => navigate('edit')
+		: () => void 0;
+
 	const { height, width } = useWidgetSizes(widgets.atom);
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
@@ -39,6 +47,36 @@ export function DashboardViewMode({
 	});
 	const RenderWidgetConfig = useRenderWidgetConfig(document.gameId);
 
+	return (
+		<DashboardViewModePresentation
+			canUpdateWidgets={canUpdateWidgets}
+			onToggleEditing={onToggleEditing}
+			document={document}
+			height={height}
+			width={width}
+			dropTarget={dropTarget}
+			RenderWidgetConfig={RenderWidgetConfig}
+		/>
+	);
+}
+
+function DashboardViewModePresentation({
+	canUpdateWidgets,
+	document,
+	height,
+	width,
+	dropTarget,
+	RenderWidgetConfig,
+	onToggleEditing,
+}: {
+	canUpdateWidgets: boolean;
+	document: TypedDocumentDetails<Dashboard>;
+	height: Atom<string>;
+	width: Atom<string>;
+	dropTarget: ReturnType<typeof useDropTarget>;
+	RenderWidgetConfig: React.FC<{ widgetConfig: Widget }>;
+	onToggleEditing: () => void;
+}) {
 	return (
 		<DashboardContainer
 			{...dropTarget}

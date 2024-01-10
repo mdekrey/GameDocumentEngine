@@ -1,4 +1,4 @@
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import {
 	documentIdMimeType,
@@ -27,16 +27,17 @@ import { useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
 import { useWidget } from './useWidget';
+import { useNavigate } from 'react-router-dom';
 
 export function DashboardEditMode({
 	document,
-	widgets,
-	onToggleEditing,
-}: {
-	document: TypedDocumentDetails<Dashboard>;
-	widgets: FormFieldReturnType<Record<string, Widget>>;
-	onToggleEditing: () => void;
-}) {
+	form,
+}: GameObjectFormComponent<Dashboard>) {
+	const { widgets } = useFormFields(form, {
+		widgets: ['details', 'widgets'],
+	});
+	const navigate = useNavigate();
+	const onToggleEditing = () => navigate('..');
 	const queryClient = useQueryClient();
 	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
