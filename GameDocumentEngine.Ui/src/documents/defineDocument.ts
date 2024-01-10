@@ -66,6 +66,11 @@ export type GameObjectWidgetSettings<T, TWidget extends object> = {
 	default: WidgetSettings<TWidget>;
 };
 
+export type PositionConstraints = {
+	min: Size;
+	max?: Partial<Size>;
+};
+
 export type GameObjectWidgetDefinition<
 	T = unknown,
 	TWidget extends WidgetBase = void,
@@ -74,10 +79,7 @@ export type GameObjectWidgetDefinition<
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
 	translationKeyPrefix: string;
-	getConstraints(widgetSettings: WidgetSettings<TWidget>): {
-		min: Size;
-		max?: Partial<Size>;
-	};
+	getConstraints(widgetSettings: WidgetSettings<TWidget>): PositionConstraints;
 	settings: TWidget extends object
 		? GameObjectWidgetSettings<T, TWidget>
 		: null;

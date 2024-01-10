@@ -20,7 +20,7 @@ import { deleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { RenderWidget } from './RenderWidget';
-import { MoveResizeWidget } from '../MoveResizeWidget';
+import { MoveResizeWidget } from '@/doc-types/Dashboard/MoveResizeWidget';
 import { HiOutlineCog6Tooth, HiOutlineTrash } from 'react-icons/hi2';
 import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
@@ -150,8 +150,7 @@ export function EditingWidget({
 		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
 				field={widget.field(['position'])}
-				widgetDefinition={widgetDefinition}
-				widgetConfig={config}
+				constraints={widgetDefinition.getConstraints(config.settings)}
 			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"
