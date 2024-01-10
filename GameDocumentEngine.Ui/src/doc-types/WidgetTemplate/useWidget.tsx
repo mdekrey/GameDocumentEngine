@@ -4,12 +4,11 @@ import { useWidgetType } from '@/utils/api/hooks';
 import { useCallback } from 'react';
 
 export function useWidget(
-	gameId: string,
-	widgetConfig: Widget,
 	previewDocument: DocumentDetails,
+	widgetConfig: Widget,
 ) {
 	const { component: Component } = useWidgetType(
-		gameId,
+		previewDocument.gameId,
 		previewDocument.id,
 		widgetConfig.widget,
 	);

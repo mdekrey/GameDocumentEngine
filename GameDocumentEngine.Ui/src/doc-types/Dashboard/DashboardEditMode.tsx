@@ -23,10 +23,10 @@ import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { atom } from 'jotai';
-import { useDocTypeTranslation, useWidgetType } from '@/utils/api/hooks';
+import { useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
-import { ErrorScreen } from '@/components/errors';
+import { useWidget } from './useWidget';
 
 export function DashboardEditMode({
 	document,
@@ -115,7 +115,6 @@ export function EditingWidget({
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
-	const t = useDocTypeTranslation('Dashboard');
 	const stopDragging = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle: (effect) => (effect.link ? 'none' : false),
@@ -127,6 +126,8 @@ export function EditingWidget({
 		config.documentId,
 		config.widget,
 	);
+	const Widget = useWidget(gameId, config);
+
 	return (
 		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
@@ -142,14 +143,7 @@ export function EditingWidget({
 						pointerEvents: hoverVisibility,
 					}}
 				>
-					<ErrorBoundary
-						errorKey={JSON.stringify(config)}
-						fallback={
-							<ErrorScreen message={t('widgets.widget-runtime-error')} />
-						}
-					>
-						<RenderWidget gameId={gameId} widgetConfig={config} />
-					</ErrorBoundary>
+					<RenderWidget errorKey={JSON.stringify(config)} widget={<Widget />} />
 				</Inset>
 				<Inset
 					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"

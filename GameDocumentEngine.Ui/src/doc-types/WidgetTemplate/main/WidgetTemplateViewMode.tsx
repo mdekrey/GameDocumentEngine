@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
 import type { WidgetTemplate, Widget } from '../types';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
@@ -7,14 +6,13 @@ import {
 	DashboardContainer,
 	PositionedWidgetContainer,
 } from '@/doc-types/Dashboard/grid-utils';
-import { RenderWidget } from './RenderWidget';
+import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
-import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import { useDocTypeTranslation } from '@/utils/api/hooks';
-import { ErrorScreen } from '@/components/errors';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
+import { useWidget } from '../useWidget';
+import { useCallback } from 'react';
 
 export function WidgetTemplateViewMode({
 	document,
@@ -45,7 +43,7 @@ export function WidgetTemplateViewMode({
 			},
 		},
 	});
-	const t = useDocTypeTranslation('WidgetTemplate');
+	const RenderWidgetConfig = useRenderWidgetConfig(previewDocument);
 
 	return (
 		<DashboardContainer
@@ -55,20 +53,7 @@ export function WidgetTemplateViewMode({
 			{Object.entries(document.details.widgets).map(
 				([key, config]: [string, Widget]) => (
 					<PositionedWidgetContainer key={key} position={config.position}>
-						<ErrorBoundary
-							errorKey={JSON.stringify(config)}
-							fallback={
-								<ErrorScreen message={t('widgets.widget-runtime-error')} />
-							}
-						>
-							<Suspense>
-								<RenderWidget
-									gameId={document.gameId}
-									widgetConfig={config}
-									previewDocument={previewDocument}
-								/>
-							</Suspense>
-						</ErrorBoundary>
+						<RenderWidgetConfig widgetConfig={config} />
 					</PositionedWidgetContainer>
 				),
 			)}
@@ -80,5 +65,20 @@ export function WidgetTemplateViewMode({
 				)}
 			</div>
 		</DashboardContainer>
+	);
+}
+
+function useRenderWidgetConfig(previewDocument: DocumentDetails) {
+	return useCallback(
+		function RenderWidgetConfig({ widgetConfig }: { widgetConfig: Widget }) {
+			const Widget = useWidget(previewDocument, widgetConfig);
+			return (
+				<RenderWidget
+					errorKey={JSON.stringify(widgetConfig.settings)}
+					widget={<Widget />}
+				/>
+			);
+		},
+		[previewDocument],
 	);
 }

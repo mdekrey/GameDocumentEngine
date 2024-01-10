@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { useCallback } from 'react';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
@@ -7,10 +7,8 @@ import { DashboardContainer, PositionedWidgetContainer } from './grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
-import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import { useDocTypeTranslation } from '@/utils/api/hooks';
-import { ErrorScreen } from '@/components/errors';
 import { useWidgetSizes } from './useWidgetSizes';
+import { useWidget } from './useWidget';
 
 export function DashboardViewMode({
 	document,
@@ -39,7 +37,7 @@ export function DashboardViewMode({
 			},
 		},
 	});
-	const t = useDocTypeTranslation('Dashboard');
+	const RenderWidgetConfig = useRenderWidgetConfig(document.gameId);
 
 	return (
 		<DashboardContainer
@@ -49,16 +47,7 @@ export function DashboardViewMode({
 			{Object.entries(document.details.widgets).map(
 				([key, config]: [string, Widget]) => (
 					<PositionedWidgetContainer key={key} position={config.position}>
-						<ErrorBoundary
-							errorKey={JSON.stringify(config)}
-							fallback={
-								<ErrorScreen message={t('widgets.widget-runtime-error')} />
-							}
-						>
-							<Suspense>
-								<RenderWidget gameId={document.gameId} widgetConfig={config} />
-							</Suspense>
-						</ErrorBoundary>
+						<RenderWidgetConfig widgetConfig={config} />
 					</PositionedWidgetContainer>
 				),
 			)}
@@ -70,5 +59,20 @@ export function DashboardViewMode({
 				)}
 			</div>
 		</DashboardContainer>
+	);
+}
+
+function useRenderWidgetConfig(gameId: string) {
+	return useCallback(
+		function RenderWidgetConfig({ widgetConfig }: { widgetConfig: Widget }) {
+			const Widget = useWidget(gameId, widgetConfig);
+			return (
+				<RenderWidget
+					errorKey={JSON.stringify(widgetConfig.settings)}
+					widget={<Widget />}
+				/>
+			);
+		},
+		[gameId],
 	);
 }

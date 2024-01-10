@@ -19,17 +19,17 @@ import { addWidget } from './add-widget/addWidget';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
-import { RenderWidget } from './RenderWidget';
+import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
 import { MoveResizeWidget } from '@/doc-types/Dashboard/MoveResizeWidget';
 import { HiOutlineCog6Tooth, HiOutlineTrash } from 'react-icons/hi2';
 import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { atom } from 'jotai';
-import { useDocTypeTranslation, useWidgetType } from '@/utils/api/hooks';
+import { useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from '@/doc-types/Dashboard/Inset';
-import { ErrorScreen } from '@/components/errors';
+import { useWidget } from '../useWidget';
 
 export function WidgetTemplateEditMode({
 	document,
@@ -134,7 +134,6 @@ export function EditingWidget({
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
-	const t = useDocTypeTranslation('WidgetTemplate');
 	const stopDragging = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle: (effect) => (effect.link ? 'none' : false),
@@ -146,6 +145,7 @@ export function EditingWidget({
 		previewDocument.id,
 		config.widget,
 	);
+	const Widget = useWidget(previewDocument, config);
 	return (
 		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
@@ -161,18 +161,7 @@ export function EditingWidget({
 						pointerEvents: hoverVisibility,
 					}}
 				>
-					<ErrorBoundary
-						errorKey={JSON.stringify(config)}
-						fallback={
-							<ErrorScreen message={t('widgets.widget-runtime-error')} />
-						}
-					>
-						<RenderWidget
-							gameId={gameId}
-							widgetConfig={config}
-							previewDocument={previewDocument}
-						/>
-					</ErrorBoundary>
+					<RenderWidget errorKey={JSON.stringify(config)} widget={<Widget />} />
 				</Inset>
 				<Inset
 					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"

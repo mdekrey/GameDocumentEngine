@@ -15,7 +15,7 @@ export async function showWidgetInfo(
 ) {
 	await okDialog(launchModal, () => {
 		const DocumentName = useDocumentName(gameId, previewDocument.id);
-		const Widget = useWidget(gameId, widget, previewDocument);
+		const Widget = useWidget(previewDocument, widget);
 		const tWidget = useTranslationFor(
 			gameId,
 			previewDocument.id,

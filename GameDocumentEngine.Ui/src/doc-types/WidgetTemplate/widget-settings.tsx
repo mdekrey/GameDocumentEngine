@@ -38,7 +38,7 @@ export function WidgetSettings({
 		document.id,
 		widget.widget,
 	);
-	const Widget = useWidget(document.gameId, widget, document);
+	const Widget = useWidget(document, widget);
 	if (!widgetDefinition.settings) return <Navigate to="../" />;
 
 	return (
