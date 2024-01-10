@@ -143,7 +143,10 @@ export function EditingWidget({
 		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
 				field={widget.field(['position'])}
-				constraints={widgetDefinition.getConstraints(config.settings)}
+				constraints={widgetDefinition.getConstraints(
+					previewDocument,
+					config.settings,
+				)}
 			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"

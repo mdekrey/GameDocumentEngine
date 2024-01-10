@@ -79,7 +79,10 @@ export type GameObjectWidgetDefinition<
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
 	translationKeyPrefix: string;
-	getConstraints(widgetSettings: WidgetSettings<TWidget>): PositionConstraints;
+	getConstraints(
+		document: TypedDocumentDetails<T>,
+		widgetSettings: WidgetSettings<TWidget>,
+	): PositionConstraints;
 	settings: TWidget extends object
 		? GameObjectWidgetSettings<T, TWidget>
 		: null;

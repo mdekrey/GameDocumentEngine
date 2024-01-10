@@ -126,7 +126,7 @@ export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
 	component: CombatStats,
 	defaults: { width: 10, height: 5 },
 	translationKeyPrefix: 'widgets.CombatStats',
-	getConstraints(settings) {
+	getConstraints(_, settings) {
 		return settings.mode === 'horizontal'
 			? { min: { width: 17, height: 2 } }
 			: settings.mode === 'vertical'

@@ -27,7 +27,7 @@ import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { atom } from 'jotai';
-import { useWidgetType } from '@/utils/api/hooks';
+import { useDocument, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
 import { useWidget } from './useWidget';
@@ -120,6 +120,7 @@ export function EditingWidget({
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
+	const document = useDocument(gameId, widget.get().documentId);
 	const stopDragging = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle: (effect) => (effect.link ? 'none' : false),
@@ -137,7 +138,7 @@ export function EditingWidget({
 		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
 				field={widget.field(['position'])}
-				constraints={widgetDefinition.getConstraints(config.settings)}
+				constraints={widgetDefinition.getConstraints(document, config.settings)}
 			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"

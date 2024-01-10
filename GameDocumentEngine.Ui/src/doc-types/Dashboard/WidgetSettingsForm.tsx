@@ -84,7 +84,7 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 	);
 
 	function getSize(s: WidgetSettings<TWidget>) {
-		return constrain(position, widgetDefinition.getConstraints(s));
+		return constrain(position, widgetDefinition.getConstraints(document, s));
 	}
 }
 

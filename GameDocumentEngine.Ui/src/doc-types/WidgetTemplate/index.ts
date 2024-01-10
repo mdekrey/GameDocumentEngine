@@ -5,6 +5,7 @@ import type { z } from 'zod';
 import { produce } from 'immer';
 import { CreateWidgetTemplate } from './create';
 import { WidgetTemplateRouter } from './router';
+import { TemplateInstanceWidget } from './widgets/display';
 
 const template: z.infer<typeof schema> = {
 	docType: '',
@@ -26,5 +27,8 @@ defineDocument('WidgetTemplate', {
 				}
 			}),
 		fromForm: (a) => a,
+	},
+	widgets: {
+		Name: TemplateInstanceWidget,
 	},
 });
