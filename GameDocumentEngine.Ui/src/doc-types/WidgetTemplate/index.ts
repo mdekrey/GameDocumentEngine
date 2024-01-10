@@ -12,7 +12,6 @@ const template: z.infer<typeof schema> = {
 };
 
 defineDocument('WidgetTemplate', {
-	noContainer: true,
 	icon: HiOutlineTableCells,
 	template,
 	component: WidgetTemplateRouter,

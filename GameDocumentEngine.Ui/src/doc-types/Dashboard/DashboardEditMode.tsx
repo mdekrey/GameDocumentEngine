@@ -10,7 +10,11 @@ import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
 import { useQueryClient } from '@tanstack/react-query';
-import { DashboardContainer, toGridCoordinate } from './grid-utils';
+import {
+	DashboardContainer,
+	DashboardToolsContainer,
+	toGridCoordinate,
+} from './grid-utils';
 import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
 import { deleteWidget } from './delete-widget/deleteWidget';
@@ -80,11 +84,11 @@ export function DashboardEditMode({
 					/>
 				),
 			)}
-			<div className="fixed right-4 bottom-4">
+			<DashboardToolsContainer>
 				<IconButton onClick={onToggleEditing}>
 					<HiCheck />
 				</IconButton>
-			</div>
+			</DashboardToolsContainer>
 		</DashboardContainer.Editing>
 	);
 	function onDelete(id: string) {

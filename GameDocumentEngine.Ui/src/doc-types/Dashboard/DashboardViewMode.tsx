@@ -6,7 +6,11 @@ import type {
 import type { Dashboard, Widget } from './types';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
-import { DashboardContainer, PositionedWidgetContainer } from './grid-utils';
+import {
+	DashboardContainer,
+	DashboardToolsContainer,
+	PositionedWidgetContainer,
+} from './grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
@@ -89,13 +93,13 @@ function DashboardViewModePresentation({
 					</PositionedWidgetContainer>
 				),
 			)}
-			<div className="fixed right-4 bottom-4">
+			<DashboardToolsContainer>
 				{canUpdateWidgets && (
 					<IconButton onClick={onToggleEditing}>
 						<HiPencil />
 					</IconButton>
 				)}
-			</div>
+			</DashboardToolsContainer>
 		</DashboardContainer>
 	);
 }

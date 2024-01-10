@@ -1,4 +1,4 @@
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { WidgetTemplate, Widget } from '../types';
 import {
 	documentIdMimeType,
@@ -10,11 +10,10 @@ import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-	DashboardContainer,
+	WidgetGridContainer,
 	toGridCoordinate,
 } from '@/doc-types/Dashboard/grid-utils';
 import { IconButton } from '@/components/button/icon-button';
-import { HiCheck } from 'react-icons/hi2';
 import { addWidget } from './add-widget/addWidget';
 import { deleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
@@ -26,22 +25,21 @@ import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { atom } from 'jotai';
-import { useWidgetType } from '@/utils/api/hooks';
+import { useDocument, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from '@/doc-types/Dashboard/Inset';
 import { useWidget } from '../useWidget';
 
 export function WidgetTemplateEditMode({
 	document,
-	previewDocument,
-	widgets,
-	onToggleEditing,
-}: {
-	document: TypedDocumentDetails<WidgetTemplate>;
-	previewDocument: DocumentDetails;
-	widgets: FormFieldReturnType<Record<string, Widget>>;
-	onToggleEditing: () => void;
-}) {
+	previewDocumentId,
+	form,
+}: GameObjectFormComponent<WidgetTemplate> & { previewDocumentId: string }) {
+	const previewDocument = useDocument(document.gameId, previewDocumentId);
+	const { widgets } = useFormFields(form, {
+		widgets: ['details', 'widgets'],
+	});
+
 	const queryClient = useQueryClient();
 	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
@@ -70,7 +68,7 @@ export function WidgetTemplateEditMode({
 	});
 
 	return (
-		<DashboardContainer.Editing
+		<WidgetGridContainer.Editing
 			{...dropTarget}
 			style={{ ['--h']: height, ['--w']: width }}
 		>
@@ -88,12 +86,7 @@ export function WidgetTemplateEditMode({
 					/>
 				),
 			)}
-			<div className="fixed right-4 bottom-4">
-				<IconButton onClick={onToggleEditing}>
-					<HiCheck />
-				</IconButton>
-			</div>
-		</DashboardContainer.Editing>
+		</WidgetGridContainer.Editing>
 	);
 	function onDelete(id: string) {
 		return () =>

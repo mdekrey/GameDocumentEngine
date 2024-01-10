@@ -4,12 +4,14 @@ import { Route, Routes } from 'react-router-dom';
 import { SelectPreviewItem } from './select-preview-item';
 import { WidgetSettings } from './widget-settings';
 import { withParamsValue } from '@/components/router/withParamsValue';
-import { MainDisplay } from './main';
+import { WidgetTemplateEditMode, WidgetTemplateViewMode } from './main';
+import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 
 const withPreviewDocumentId = withParamsValue('previewDocumentId');
 const withWidgetId = withParamsValue('widgetId');
 
-const InternalMainDisplay = withPreviewDocumentId(MainDisplay);
+const InternalEditMode = withPreviewDocumentId(WidgetTemplateEditMode);
+const InternalViewMode = withPreviewDocumentId(WidgetTemplateViewMode);
 const InternalWidgetSettings = withPreviewDocumentId(
 	withWidgetId(WidgetSettings),
 );
@@ -17,11 +19,22 @@ const InternalWidgetSettings = withPreviewDocumentId(
 export function WidgetTemplateRouter(
 	props: GameObjectFormComponent<WidgetTemplate>,
 ) {
+	const canUpdateWidgets = props.writablePointers.contains(
+		'details',
+		'widgets',
+	);
+	useSubmitOnChange(props.form, props.onSubmit);
 	return (
 		<Routes>
 			<Route
 				path="/preview/:previewDocumentId"
-				element={<InternalMainDisplay {...props} />}
+				element={
+					canUpdateWidgets ? (
+						<InternalEditMode {...props} />
+					) : (
+						<InternalViewMode {...props} />
+					)
+				}
 			/>
 			<Route
 				path="/preview/:previewDocumentId/widget/:widgetId"

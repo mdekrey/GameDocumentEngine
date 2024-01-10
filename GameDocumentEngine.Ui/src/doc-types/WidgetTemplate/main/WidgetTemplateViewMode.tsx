@@ -1,55 +1,32 @@
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
 import type { WidgetTemplate, Widget } from '../types';
-import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
-import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
+import { useFormFields } from '@principlestudios/react-jotai-forms';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import {
-	DashboardContainer,
+	WidgetGridContainer,
 	PositionedWidgetContainer,
 } from '@/doc-types/Dashboard/grid-utils';
 import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
-import { IconButton } from '@/components/button/icon-button';
-import { HiPencil } from 'react-icons/hi2';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { useWidget } from '../useWidget';
 import { useCallback } from 'react';
+import { useDocument } from '@/utils/api/hooks';
 
 export function WidgetTemplateViewMode({
 	document,
-	previewDocument,
-	widgets,
-	canUpdateWidgets,
-	onToggleEditing,
-}: {
-	document: TypedDocumentDetails<WidgetTemplate>;
-	previewDocument: DocumentDetails;
-	widgets: FormFieldReturnType<Record<string, Widget>>;
-	canUpdateWidgets: boolean;
-	onToggleEditing: () => void;
-}) {
-	const { height: height, width: width } = useWidgetSizes(widgets.atom);
-	const dropTarget = useDropTarget({
-		[documentIdMimeType]: {
-			canHandle({ link }) {
-				if (!canUpdateWidgets) return false;
-				if (!link) return false;
-				onToggleEditing();
-				return 'link';
-			},
-			handle(ev, data) {
-				if (data.gameId !== document.gameId) return false;
-				onToggleEditing();
-				return false;
-			},
-		},
+	previewDocumentId,
+	form,
+}: GameObjectFormComponent<WidgetTemplate> & { previewDocumentId: string }) {
+	const previewDocument = useDocument(document.gameId, previewDocumentId);
+	const { widgets } = useFormFields(form, {
+		widgets: ['details', 'widgets'],
 	});
+
+	const { height: height, width: width } = useWidgetSizes(widgets.atom);
 	const RenderWidgetConfig = useRenderWidgetConfig(previewDocument);
 
 	return (
-		<DashboardContainer
-			{...dropTarget}
-			style={{ ['--h']: height, ['--w']: width }}
-		>
+		<WidgetGridContainer style={{ ['--h']: height, ['--w']: width }}>
 			{Object.entries(document.details.widgets).map(
 				([key, config]: [string, Widget]) => (
 					<PositionedWidgetContainer key={key} position={config.position}>
@@ -57,14 +34,7 @@ export function WidgetTemplateViewMode({
 					</PositionedWidgetContainer>
 				),
 			)}
-			<div className="fixed right-4 bottom-4">
-				{canUpdateWidgets && (
-					<IconButton onClick={onToggleEditing}>
-						<HiPencil />
-					</IconButton>
-				)}
-			</div>
-		</DashboardContainer>
+		</WidgetGridContainer>
 	);
 }
 
