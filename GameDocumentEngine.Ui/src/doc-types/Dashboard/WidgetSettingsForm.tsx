@@ -30,7 +30,7 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 	document: TypedDocumentDetails<T>;
 	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
 	translation: TFunction;
-	WidgetPreview: React.FC;
+	WidgetPreview: React.FC<{ settings: Atom<WidgetSettings<TWidget>> }>;
 	initialSettings: WidgetSettings<TWidget>;
 	size: Size;
 
@@ -70,7 +70,11 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 						field={form.fields.settings as SettingsField}
 					/>
 					<SizedContainer size={constrainedSize}>
-						<WidgetPreview />
+						<WidgetPreview
+							settings={
+								form.fields.settings.atom as Atom<WidgetSettings<TWidget>>
+							}
+						/>
 					</SizedContainer>
 					<ButtonRow>
 						<Button type="submit">{t('submit')}</Button>

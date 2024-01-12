@@ -9,6 +9,7 @@ import { HiHeart } from 'react-icons/hi2';
 import { GiRun } from 'react-icons/gi';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
+import type { FieldMapping } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { z } from 'zod';
@@ -102,15 +103,24 @@ export function CombatStats({
 	);
 }
 
-const modes: Array<CombatStatsSettings['mode']> = [
-	undefined,
+const undefinedToNull: FieldMapping<
+	CombatStatsSettings['mode'],
+	Exclude<CombatStatsSettings['mode'], undefined> | null
+> = {
+	toForm: (v) => v ?? null,
+	fromForm: (v) => v ?? undefined,
+};
+const modes: Array<Exclude<CombatStatsSettings['mode'], undefined> | null> = [
+	null,
 	'vertical',
 	'horizontal',
 ];
 function CombatStatsSettings({
 	field,
 }: WidgetSettingsComponentProps<Character, CombatStatsSettings>) {
-	const fields = useFormFields(field, { mode: ['mode'] as const });
+	const fields = useFormFields(field, {
+		mode: { path: ['mode'] as const, mapping: undefinedToNull },
+	});
 	return (
 		<SelectField field={fields.mode} items={modes}>
 			{(mode) => fields.mode.translation(mode ?? '2x2')}

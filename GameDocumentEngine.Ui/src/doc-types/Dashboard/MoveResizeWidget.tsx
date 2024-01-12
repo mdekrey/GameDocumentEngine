@@ -9,7 +9,10 @@ import { useStore } from 'jotai';
 import { Rnd } from 'react-rnd';
 import { useEffect, useRef } from 'react';
 import { elementTemplate } from '@/components/template';
-import type { PositionConstraints } from '@/documents/defineDocument';
+import {
+	applyConstraints,
+	type PositionConstraints,
+} from '@/documents/defineDocument';
 
 const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	<T className="border-slate-900 dark:border-slate-100 absolute inset-1" />
@@ -65,11 +68,11 @@ export function MoveResizeWidget({
 			resizeGrid={[gridSize, gridSize]}
 			minWidth={constraints.min.width * gridSize}
 			minHeight={constraints.min.height * gridSize}
-			maxWidth={constraints.max?.width && constraints.max?.width * gridSize}
-			maxHeight={constraints.max?.height && constraints.max?.height * gridSize}
+			maxWidth={constraints.max?.width && constraints.max.width * gridSize}
+			maxHeight={constraints.max?.height && constraints.max.height * gridSize}
 			onDragStop={(e, d) => {
 				positionField.onChange((prev) => ({
-					...prev,
+					...applyConstraints(constraints, prev),
 					x: toGridCoordinate(Math.round(d.x)),
 					y: toGridCoordinate(Math.round(d.y)),
 				}));

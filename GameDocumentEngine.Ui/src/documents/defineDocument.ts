@@ -94,7 +94,16 @@ export function constrain<T = unknown, TWidget extends WidgetBase = void>(
 	document: TypedDocumentDetails<T>,
 	settings: WidgetSettings<TWidget>,
 ) {
-	const { min, max } = widgetDefinition.getConstraints(document, settings);
+	return applyConstraints(
+		widgetDefinition.getConstraints(document, settings),
+		size,
+	);
+}
+
+export function applyConstraints(
+	{ min, max }: PositionConstraints,
+	size: Size,
+) {
 	return {
 		width: Math.max(min.width, Math.min(max?.width ?? size.width, size.width)),
 		height: Math.max(

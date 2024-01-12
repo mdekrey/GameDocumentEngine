@@ -50,7 +50,7 @@ export function WidgetSettings({
 			initialSettings={widget.settings}
 			size={widget.position}
 			onSubmit={(widgetValue, newSize) => {
-				navigate('../');
+				navigate(`../preview/${previewDocumentId}`);
 				void onSubmit(
 					produce(form.get(), (v) => {
 						const widget = v.details.widgets[widgetId];
