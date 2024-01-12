@@ -31,6 +31,7 @@ export type GameObjectFormComponent<T> = GameObjectComponentBase<T> & {
 };
 
 export type NewGameObjectFieldComponent<T> = {
+	gameId: string;
 	templateField: FormFieldReturnType<T>;
 };
 
@@ -56,13 +57,18 @@ export type WidgetSettingsComponentProps<
 	TWidget extends WidgetBase,
 > = GameObjectComponentBase<T> & {
 	size: Size;
-	field: UseFormResult<WidgetSettings<TWidget>>;
+	field: FormFieldReturnType<WidgetSettings<TWidget>>;
 };
 
 export type GameObjectWidgetSettings<T, TWidget extends object> = {
 	schema: z.ZodType<WidgetSettings<TWidget>>;
 	component: React.ComponentType<WidgetSettingsComponentProps<T, TWidget>>;
 	default: WidgetSettings<TWidget>;
+};
+
+export type PositionConstraints = {
+	min: Size;
+	max?: Partial<Size>;
 };
 
 export type GameObjectWidgetDefinition<
@@ -73,14 +79,39 @@ export type GameObjectWidgetDefinition<
 	component: React.ComponentType<WidgetComponentProps<T, TWidget>>;
 	translationNamespace?: string;
 	translationKeyPrefix: string;
-	getConstraints(widgetSettings: WidgetSettings<TWidget>): {
-		min: Size;
-		max?: Partial<Size>;
-	};
+	getConstraints(
+		document: TypedDocumentDetails<T>,
+		widgetSettings: WidgetSettings<TWidget>,
+	): PositionConstraints;
 	settings: TWidget extends object
 		? GameObjectWidgetSettings<T, TWidget>
 		: null;
 };
+
+export function constrain<T = unknown, TWidget extends WidgetBase = void>(
+	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>,
+	size: Size,
+	document: TypedDocumentDetails<T>,
+	settings: WidgetSettings<TWidget>,
+) {
+	return applyConstraints(
+		widgetDefinition.getConstraints(document, settings),
+		size,
+	);
+}
+
+export function applyConstraints(
+	{ min, max }: PositionConstraints,
+	size: Size,
+) {
+	return {
+		width: Math.max(min.width, Math.min(max?.width ?? size.width, size.width)),
+		height: Math.max(
+			min.height,
+			Math.min(max?.height ?? size.height, size.height),
+		),
+	};
+}
 
 export type IGameObjectType<T = unknown> = {
 	noContainer?: boolean;

@@ -10,7 +10,7 @@ class EditableDocumentModel
 {
 	[JsonPropertyName("name")] public string Name { get; set; }
 	[JsonPropertyName("version")] public Guid Version { get; set; }
-	[JsonPropertyName("folderId")] public Identifier? FolderId { get; set; }
+	[JsonPropertyName("folderId"), JsonConverter(typeof(Identifier.LongConverter))] public long? FolderId { get; set; }
 	[JsonPropertyName("details")] public JsonNode Details { get; set; }
 
 
@@ -18,7 +18,7 @@ class EditableDocumentModel
 	{
 		Name = model.Name,
 		Version = model.Version,
-		FolderId = (Identifier?)model.FolderId,
+		FolderId = model.FolderId,
 		Details = model.Details,
 	};
 }

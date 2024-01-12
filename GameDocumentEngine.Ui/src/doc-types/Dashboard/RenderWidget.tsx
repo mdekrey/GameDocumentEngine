@@ -1,18 +1,25 @@
-import type { Widget } from './types';
-import { LimitingInset } from './Inset';
-import { useWidget } from './useWidget';
+import { Suspense } from 'react';
+import { LimitingInset } from '@/doc-types/Dashboard/Inset';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
+import { ErrorScreen } from '@/components/errors';
+import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 
 export function RenderWidget({
-	gameId,
-	widgetConfig,
+	widget,
+	errorKey,
 }: {
-	gameId: string;
-	widgetConfig: Widget;
+	widget: React.ReactNode;
+	errorKey: React.Key;
 }) {
-	const Widget = useWidget(gameId, widgetConfig);
+	const t = useDocTypeTranslation('Dashboard');
 	return (
 		<LimitingInset>
-			<Widget />
+			<ErrorBoundary
+				errorKey={errorKey}
+				fallback={<ErrorScreen message={t('widgets.widget-runtime-error')} />}
+			>
+				<Suspense>{widget}</Suspense>
+			</ErrorBoundary>
 		</LimitingInset>
 	);
 }

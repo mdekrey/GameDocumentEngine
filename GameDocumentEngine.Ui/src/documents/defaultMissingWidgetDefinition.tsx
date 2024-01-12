@@ -20,7 +20,10 @@ export const missingDocumentType: IGameObjectType = {
 	template: null,
 };
 
-export const defaultMissingWidgetDefinition = {
+export const defaultMissingWidgetDefinition: GameObjectWidgetDefinition<
+	unknown,
+	void
+> = {
 	defaults: { width: 1, height: 1 },
 	component: () => <></>,
 	translationKeyPrefix: '',
@@ -29,4 +32,4 @@ export const defaultMissingWidgetDefinition = {
 	},
 	settings: null,
 	translationNamespace: undefined,
-} satisfies GameObjectWidgetDefinition<unknown, void>;
+};

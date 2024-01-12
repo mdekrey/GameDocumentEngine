@@ -1,0 +1,36 @@
+{
+	"title": "WidgetTemplate",
+	"type": "object",
+	"required": ["docType", "widgets"],
+	"properties": {
+		"docType": { "type": "string" },
+		"widgets": {
+			"type": "object",
+			"additionalProperties": { "$ref": "#/$defs/Widget" }
+		}
+	},
+	"$defs": {
+		"Widget": {
+			"type": "object",
+			"required": ["position", "widget", "settings"],
+			"properties": {
+				"position": { "$ref": "#/$defs/WidgetPosition" },
+				"widget": { "type": "string" },
+				"settings": { "type": "object" }
+			}
+		},
+		"WidgetPosition": {
+			"oneOf": [{ "$ref": "#/$defs/WidgetAbsolutePosition" }]
+		},
+		"WidgetAbsolutePosition": {
+			"type": "object",
+			"required": ["x", "y", "width", "height"],
+			"properties": {
+				"x": { "type": "integer" },
+				"y": { "type": "integer" },
+				"width": { "type": "integer" },
+				"height": { "type": "integer" }
+			}
+		}
+	}
+}

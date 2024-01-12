@@ -1,4 +1,4 @@
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import {
 	documentIdMimeType,
@@ -10,7 +10,11 @@ import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { addWidget } from './add-widget/addWidget';
 import { useQueryClient } from '@tanstack/react-query';
-import { DashboardContainer, toGridCoordinate } from './grid-utils';
+import {
+	DashboardContainer,
+	DashboardToolsContainer,
+	toGridCoordinate,
+} from './grid-utils';
 import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
 import { deleteWidget } from './delete-widget/deleteWidget';
@@ -23,23 +27,24 @@ import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
 import { atom } from 'jotai';
-import { useDocTypeTranslation, useWidgetType } from '@/utils/api/hooks';
+import { useDocument, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';
 import { Inset } from './Inset';
-import { ErrorScreen } from '@/components/errors';
+import { useWidget } from './useWidget';
+import { useNavigate } from 'react-router-dom';
 
 export function DashboardEditMode({
 	document,
-	widgets,
-	onToggleEditing,
-}: {
-	document: TypedDocumentDetails<Dashboard>;
-	widgets: FormFieldReturnType<Record<string, Widget>>;
-	onToggleEditing: () => void;
-}) {
+	form,
+}: GameObjectFormComponent<Dashboard>) {
+	const { widgets } = useFormFields(form, {
+		widgets: ['details', 'widgets'],
+	});
+	const navigate = useNavigate();
+	const onToggleEditing = () => navigate('..');
 	const queryClient = useQueryClient();
 	const launchModal = useLaunchModal();
-	const { dashboardHeight, dashboardWidth } = useWidgetSizes(widgets.atom);
+	const { height, width } = useWidgetSizes(widgets.atom);
 	const { widget } = useFormFields(widgets, {
 		widget: (id: string) => [id],
 	});
@@ -64,7 +69,7 @@ export function DashboardEditMode({
 	return (
 		<DashboardContainer.Editing
 			{...dropTarget}
-			style={{ ['--h']: dashboardHeight, ['--w']: dashboardWidth }}
+			style={{ ['--h']: height, ['--w']: width }}
 		>
 			{Object.entries(document.details.widgets).map(
 				([key, config]: [string, Widget]) => (
@@ -79,11 +84,11 @@ export function DashboardEditMode({
 					/>
 				),
 			)}
-			<div className="fixed right-4 bottom-4">
+			<DashboardToolsContainer>
 				<IconButton onClick={onToggleEditing}>
 					<HiCheck />
 				</IconButton>
-			</div>
+			</DashboardToolsContainer>
 		</DashboardContainer.Editing>
 	);
 	function onDelete(id: string) {
@@ -115,7 +120,7 @@ export function EditingWidget({
 	onDelete: () => void;
 	onInfo: () => void;
 }) {
-	const t = useDocTypeTranslation('Dashboard');
+	const document = useDocument(gameId, widget.get().documentId);
 	const stopDragging = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle: (effect) => (effect.link ? 'none' : false),
@@ -127,12 +132,13 @@ export function EditingWidget({
 		config.documentId,
 		config.widget,
 	);
+	const Widget = useWidget(gameId, config);
+
 	return (
 		<ErrorBoundary errorKey={JSON.stringify(config)} fallback={<></>}>
 			<MoveResizeWidget
 				field={widget.field(['position'])}
-				widgetDefinition={widgetDefinition}
-				widgetConfig={config}
+				constraints={widgetDefinition.getConstraints(document, config.settings)}
 			>
 				<Inset
 					className="bg-slate-50 dark:bg-slate-950 -m-0.5 border-2 border-black/50"
@@ -143,14 +149,7 @@ export function EditingWidget({
 						pointerEvents: hoverVisibility,
 					}}
 				>
-					<ErrorBoundary
-						errorKey={JSON.stringify(config)}
-						fallback={
-							<ErrorScreen message={t('widgets.widget-runtime-error')} />
-						}
-					>
-						<RenderWidget gameId={gameId} widgetConfig={config} />
-					</ErrorBoundary>
+					<RenderWidget errorKey={JSON.stringify(config)} widget={<Widget />} />
 				</Inset>
 				<Inset
 					className="bg-slate-900/75 dark:bg-slate-50/75 flex flex-row flex-wrap justify-center items-center gap-2 opacity-0 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 transition-opacity duration-300"

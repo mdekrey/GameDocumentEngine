@@ -1,0 +1,7 @@
+{
+	"name": "WidgetTemplate",
+	"script": {
+		"type": "manifest",
+		"path": "src/doc-types/WidgetTemplate/index.ts"
+	}
+}

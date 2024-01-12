@@ -10,17 +10,20 @@ const positionTotalY = (p: PositionedWidget) =>
 const widgetsTotal = (
 	widgets: Record<string, PositionedWidget>,
 	v: (p: PositionedWidget) => number,
-) => Math.max(...Object.values(widgets).map(v)).toFixed(0);
+) => Math.max(...Object.values(widgets).map(v));
+
+export function getWidgetSizes(widgets: Record<string, PositionedWidget>) {
+	const height = widgetsTotal(widgets, positionTotalY);
+	const width = widgetsTotal(widgets, positionTotalX);
+	return { height, width };
+}
 
 export function useWidgetSizes(
 	widgetsAtom: Atom<Record<string, PositionedWidget>>,
 ) {
-	const dashboardHeight = useComputedAtom((get) =>
-		widgetsTotal(get(widgetsAtom), positionTotalY),
-	);
-	const dashboardWidth = useComputedAtom((get) =>
-		widgetsTotal(get(widgetsAtom), positionTotalX),
-	);
+	const size = useComputedAtom((get) => getWidgetSizes(get(widgetsAtom)));
+	const height = useComputedAtom((get) => get(size).height.toFixed(0));
+	const width = useComputedAtom((get) => get(size).width.toFixed(0));
 
-	return { dashboardHeight, dashboardWidth };
+	return { height, width };
 }

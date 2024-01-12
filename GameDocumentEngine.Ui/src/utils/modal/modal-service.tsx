@@ -2,6 +2,7 @@ import type { Atom } from 'jotai';
 import { atom, useAtomValue, useStore } from 'jotai';
 import { Modal } from './modal';
 import { useCallback } from 'react';
+import { noop } from '../noop';
 
 /** Fully internal type; do not expose outside of modal system */
 type ModalStackEntry = {
@@ -46,11 +47,6 @@ export type ModalOptions<T, TProps = never> = {
 	abort?: AbortSignal;
 } & Additional<TProps>;
 
-/** noop is a term dating back to assembly languages - meaning "no operation", or "do nothing". This is used as a placeholder function to be overwritten. */
-function noop() {
-	// no-op is intentionally blank
-}
-
 /** Error sent via the rejected promise if the abort signal is used before the modal completes */
 export const AbortRejection: unique symbol = Symbol(
 	'Modal cancelled via abort signal',
@@ -62,8 +58,14 @@ function rejectViaBackdrop(props: Pick<ModalContentsProps<never>, 'reject'>) {
 	props.reject(BackdropRejection);
 }
 
-/** Gets a "launchModal" function to work with the atom stack */
-export function useLaunchModal() {
+export type ModalLauncher = <T, TProps = never>({
+	ModalContents,
+	onBackdropCancel,
+	additional,
+	abort,
+}: ModalOptions<T, TProps>) => Promise<T>;
+/** Gets a "ModalLauncher" function to work with the atom stack */
+export function useLaunchModal(): ModalLauncher {
 	const store = useStore();
 
 	return useCallback(

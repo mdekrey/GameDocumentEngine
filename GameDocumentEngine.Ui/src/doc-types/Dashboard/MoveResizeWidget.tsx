@@ -9,12 +9,10 @@ import { useStore } from 'jotai';
 import { Rnd } from 'react-rnd';
 import { useEffect, useRef } from 'react';
 import { elementTemplate } from '@/components/template';
-import type {
-	GameObjectWidgetDefinition,
-	WidgetBase,
-	WidgetSettings,
+import {
+	applyConstraints,
+	type PositionConstraints,
 } from '@/documents/defineDocument';
-import type { Widget } from './types';
 
 const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	<T className="border-slate-900 dark:border-slate-100 absolute inset-1" />
@@ -32,19 +30,17 @@ type Position = {
 	height: number;
 };
 
-export type MoveResizeWidgetProps<T, TWidget extends WidgetBase> = {
+export type MoveResizeWidgetProps = {
 	field: FormFieldReturnType<Position>;
 	children?: React.ReactNode;
-	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>;
-	widgetConfig: Widget<TWidget>;
+	constraints: PositionConstraints;
 };
 
-export function MoveResizeWidget<T, TWidget extends WidgetBase>({
+export function MoveResizeWidget({
 	field: positionField,
 	children,
-	widgetDefinition,
-	widgetConfig,
-}: MoveResizeWidgetProps<T, TWidget>) {
+	constraints,
+}: MoveResizeWidgetProps) {
 	const store = useStore();
 	const rndRef = useRef<Rnd>(null);
 	const initialPosition = store.get(positionField.value);
@@ -63,9 +59,6 @@ export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 			});
 		});
 	}, [store, positionAtom]);
-	const constraints = widgetDefinition.getConstraints(
-		widgetConfig.settings as WidgetSettings<TWidget>,
-	);
 	return (
 		<Rnd
 			ref={rndRef}
@@ -75,11 +68,11 @@ export function MoveResizeWidget<T, TWidget extends WidgetBase>({
 			resizeGrid={[gridSize, gridSize]}
 			minWidth={constraints.min.width * gridSize}
 			minHeight={constraints.min.height * gridSize}
-			maxWidth={constraints.max?.width && constraints.max?.width * gridSize}
-			maxHeight={constraints.max?.height && constraints.max?.height * gridSize}
+			maxWidth={constraints.max?.width && constraints.max.width * gridSize}
+			maxHeight={constraints.max?.height && constraints.max.height * gridSize}
 			onDragStop={(e, d) => {
 				positionField.onChange((prev) => ({
-					...prev,
+					...applyConstraints(constraints, prev),
 					x: toGridCoordinate(Math.round(d.x)),
 					y: toGridCoordinate(Math.round(d.y)),
 				}));

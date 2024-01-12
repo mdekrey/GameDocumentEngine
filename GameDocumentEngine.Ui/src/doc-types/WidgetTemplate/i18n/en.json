@@ -1,0 +1,79 @@
+{
+	"name": "Widget Template",
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the widget template to customize internal widgets"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can see the widget template; may not be able to see all contained widgets to other permissions"
+		},
+		"no-role": { "name": "None" }
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			},
+			"details": {
+				"docType": {
+					"label": "Template for Document Type",
+					"not-selected": "Not Selected"
+				}
+			}
+		}
+	},
+	"add-widget-modal": {
+		"title": "Add widget for <Document/>",
+		"cancel": "Cancel",
+		"submit": "Add widget",
+		"fields": {
+			"id": {
+				"label": "Widget to add",
+				"not-selected": "Not Selected"
+			}
+		}
+	},
+	"adding-no-widgets": {
+		"title": "No widgets supported",
+		"intro": "The document you dropped, <Document/>, does not support widgets at this time. Try another document type.",
+		"cancel": "Cancel"
+	},
+	"delete-widget-modal": {
+		"title": "Remove Widget",
+		"are-you-sure": "Are you sure you want to delete the {{widgetType}} widget? This action cannot be undone.",
+		"cancel": "Cancel",
+		"submit": "Remove Widget"
+	},
+	"widgets": {
+		"widget-load-error": "Widget failed to load",
+		"widget-runtime-error": "Widget encountered an error"
+	},
+	"info-widget-modal": {
+		"title": "Widget Info",
+		"ok": "OK"
+	},
+	"widget-settings": {
+		"submit": "Sumbit"
+	},
+	"select-preview-document": {
+		"fields": {
+			"label": "Preview Document",
+			"not-selected": "Not Selected",
+			"errors": {
+				"too_small": "A document must be selected"
+			}
+		},
+		"submit": "Sumbit"
+	},
+	"instance": {
+		"name": "Widget Template Instance",
+		"fields": {
+			"displayedDocumentId": {
+				"label": "Displayed Document",
+				"not-selected": "Not Selected"
+			}
+		}
+	}
+}

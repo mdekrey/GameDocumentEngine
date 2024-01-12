@@ -1,7 +1,7 @@
 import type { Widget } from '../types';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import type { useLaunchModal } from '@/utils/modal/modal-service';
-import type { NewWidgetResult } from './AddWidgetModal';
+import type { ModalLauncher } from '@/utils/modal/modal-service';
+import type { NewWidgetResult } from './NewWidgetResult';
 import { AddWidgetModal } from './AddWidgetModal';
 import type { QueryClient } from '@tanstack/react-query';
 import { fetchDocument, fetchDocumentType } from '@/utils/api/loaders';
@@ -9,7 +9,7 @@ import { NoWidgetsModal } from './NoWidgets';
 
 export async function addWidget(
 	queryClient: QueryClient,
-	launchModal: ReturnType<typeof useLaunchModal>,
+	launchModal: ModalLauncher,
 	{ gameId, id }: { gameId: string; id: string },
 	widgetsField: FormFieldReturnType<Record<string, Widget>>,
 	coordinate: { x: number; y: number },
@@ -26,7 +26,14 @@ export async function addWidget(
 
 	if (widgetKeys.length === 0)
 		return await launchModal({ ModalContents: NoWidgetsModal, additional });
-	if (widgetKeys.length === 1) return applyChange({ id: widgetKeys[0] });
+	if (widgetKeys.length === 1) {
+		const { settings, defaults } = additional.widgets[widgetKeys[0]];
+		if (
+			!settings ||
+			(await settings.schema.safeParseAsync(settings.default)).success
+		)
+			return applyChange({ id: widgetKeys[0], size: defaults });
+	}
 
 	try {
 		const result = await launchModal({
@@ -49,11 +56,14 @@ export async function addWidget(
 				documentId: document.id,
 				position: {
 					...coordinate,
-					width: additional.widgets[result.id].defaults.width,
-					height: additional.widgets[result.id].defaults.height,
+					width: result.size.width,
+					height: result.size.height,
 				},
 				widget: result.id,
-				settings: additional.widgets[result.id].settings?.default ?? {},
+				settings:
+					result.settings ??
+					additional.widgets[result.id].settings?.default ??
+					{},
 			},
 		}));
 	}

@@ -3,7 +3,11 @@ import { getGameTypeScripts } from '../queries/game-types';
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import { getDocumentType, getWidgetType } from '../accessors';
 import { useDocument, useGame } from './data';
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type {
+	GameObjectWidgetDefinition,
+	TypedDocumentDetails,
+	WidgetBase,
+} from '@/documents/defineDocument';
 
 export function useGameType(gameId: string): GameTypeScripts {
 	const queryClient = useQueryClient();
@@ -30,11 +34,15 @@ export function useDocumentType<T = unknown>(
 	return getDocumentType<T>(gameType, docType);
 }
 
-export function useWidgetType(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useWidgetType<T = unknown, TWidget extends WidgetBase = any>(
 	gameId: string,
 	documentId: string,
 	widgetType: string,
 ) {
 	const docType = useDocumentType(gameId, documentId);
-	return getWidgetType(docType, widgetType);
+	return getWidgetType(docType, widgetType) as GameObjectWidgetDefinition<
+		T,
+		TWidget
+	>;
 }

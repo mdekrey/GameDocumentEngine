@@ -3,6 +3,9 @@ import type {
 	GameTypeObjectScripts,
 	GameTypeScripts,
 } from '../queries/game-types';
+import type { Namespace, TFunction } from 'i18next';
+import { i18n } from '@/utils/i18n/setup';
+import type { GameObjectWidgetDefinition } from '@/documents/defineDocument';
 
 export function getDocumentType<T = unknown>(
 	gameType: GameTypeScripts,
@@ -31,4 +34,25 @@ export function getDocTypeTranslationNamespace(docType?: string) {
 
 export function getGameTypeTranslationNamespace(docType: string) {
 	return `game-types:${docType}`;
+}
+
+export function getWidgetTypeTranslation(
+	docType: GameTypeObjectScripts | undefined,
+	widgetType: GameObjectWidgetDefinition,
+) {
+	return {
+		namespace:
+			widgetType.translationNamespace ??
+			getDocTypeTranslationNamespace(docType?.key) ??
+			'unknown-widget',
+		keyPrefix: widgetType.translationKeyPrefix,
+	};
+}
+
+export async function loadTranslation<Ns extends Namespace>(
+	ns: Ns,
+	keyPrefix?: string,
+): Promise<TFunction<Ns>> {
+	await i18n.loadNamespaces(ns);
+	return i18n.getFixedT(i18n.languages, ns, keyPrefix);
 }

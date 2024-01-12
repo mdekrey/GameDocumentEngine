@@ -6,6 +6,7 @@ import {
 	getDocTypeTranslationNamespace,
 	getGameTypeTranslationNamespace,
 	getWidgetType,
+	getWidgetTypeTranslation,
 } from '../accessors';
 import { useGame } from './data';
 
@@ -39,20 +40,19 @@ export function useTranslationFor(
 			? getWidgetType(docType, optionsOrWidgetType)
 			: null;
 
-	const params: Parameters<typeof useTranslation> = widgetType
-		? [
-				widgetType.translationNamespace ??
-					getDocTypeTranslationNamespace(docType?.key),
-				{
-					keyPrefix: widgetType.translationKeyPrefix,
-				},
-		  ]
-		: [
-				getDocTypeTranslationNamespace(docType?.key),
-				typeof optionsOrWidgetType === 'object'
-					? optionsOrWidgetType
-					: undefined,
-		  ];
+	const params: Parameters<typeof useTranslation> = (function () {
+		if (widgetType) {
+			const { namespace, keyPrefix } = getWidgetTypeTranslation(
+				docType,
+				widgetType,
+			);
+			return [namespace, { keyPrefix }];
+		}
+		return [
+			getDocTypeTranslationNamespace(docType?.key),
+			typeof optionsOrWidgetType === 'object' ? optionsOrWidgetType : undefined,
+		];
+	})();
 
 	return useTranslation(...params).t;
 }

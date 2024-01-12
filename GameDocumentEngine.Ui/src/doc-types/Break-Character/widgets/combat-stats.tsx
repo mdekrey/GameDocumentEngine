@@ -5,10 +5,11 @@ import type {
 } from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { LuShield, LuSword } from 'react-icons/lu';
-import { HiHeart } from 'react-icons/hi2';
+import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
 import { GiRun } from 'react-icons/gi';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
+import type { FieldMapping } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { z } from 'zod';
@@ -63,20 +64,32 @@ export function CombatStats({
 	}
 	const { container, edge, middle } = styles[widgetSettings.mode ?? '2x2'];
 	const path = `/game/${document.gameId}/document/${document.id}/combat`;
+	const { hearts, attack, defense, speed } = document.details.combatValues;
+	const fullHealth = hearts.current === hearts.total;
+	console.log(hearts);
 	return (
 		<Link to={path} className={container}>
 			<Section>
 				<FirstRow>
 					<LuSword />
-					{asModifier.format(document.details.combatValues.attack.attackBonus)}
+					{asModifier.format(attack.attackBonus)}
 				</FirstRow>
 				<SecondRow>{t('sections.attack')}</SecondRow>
 			</Section>
 			<div className={edge} />
 			<Section>
 				<FirstRow>
-					<HiHeart />
-					{document.details.combatValues.hearts.total}
+					{fullHealth ? (
+						<>
+							<HiHeart />
+							{hearts.total}
+						</>
+					) : (
+						<>
+							<HiOutlineHeart />
+							{hearts.current} /{hearts.total}
+						</>
+					)}
 				</FirstRow>
 				<SecondRow>{t('sections.hearts')}</SecondRow>
 			</Section>
@@ -84,7 +97,7 @@ export function CombatStats({
 			<Section>
 				<FirstRow>
 					<LuShield />
-					{document.details.combatValues.defense.total}
+					{defense.total}
 				</FirstRow>
 				<SecondRow>{t('sections.defense')}</SecondRow>
 			</Section>
@@ -92,9 +105,7 @@ export function CombatStats({
 			<Section>
 				<FirstRow>
 					<GiRun />
-					<span className="text-xs">
-						{t(`speed.${document.details.combatValues.speed.actual}`)}
-					</span>
+					<span className="text-xs">{t(`speed.${speed.actual}`)}</span>
 				</FirstRow>
 				<SecondRow>{t('sections.speed')}</SecondRow>
 			</Section>
@@ -102,15 +113,24 @@ export function CombatStats({
 	);
 }
 
-const modes: Array<CombatStatsSettings['mode']> = [
-	undefined,
+const undefinedToNull: FieldMapping<
+	CombatStatsSettings['mode'],
+	Exclude<CombatStatsSettings['mode'], undefined> | null
+> = {
+	toForm: (v) => v ?? null,
+	fromForm: (v) => v ?? undefined,
+};
+const modes: Array<Exclude<CombatStatsSettings['mode'], undefined> | null> = [
+	null,
 	'vertical',
 	'horizontal',
 ];
 function CombatStatsSettings({
 	field,
 }: WidgetSettingsComponentProps<Character, CombatStatsSettings>) {
-	const fields = useFormFields(field, { mode: ['mode'] as const });
+	const fields = useFormFields(field, {
+		mode: { path: ['mode'] as const, mapping: undefinedToNull },
+	});
 	return (
 		<SelectField field={fields.mode} items={modes}>
 			{(mode) => fields.mode.translation(mode ?? '2x2')}
@@ -126,7 +146,7 @@ export const CombatStatsWidgetDefinition: GameObjectWidgetDefinition<
 	component: CombatStats,
 	defaults: { width: 10, height: 5 },
 	translationKeyPrefix: 'widgets.CombatStats',
-	getConstraints(settings) {
+	getConstraints(_, settings) {
 		return settings.mode === 'horizontal'
 			? { min: { width: 17, height: 2 } }
 			: settings.mode === 'vertical'

@@ -1,6 +1,6 @@
 {
 	"key": "Clocks",
-	"objectTypes": ["Clock", "Folder"],
+	"objectTypes": ["Clock", "Folder", "Dashboard", "WidgetTemplate"],
 	"defaultNewGameRole": "gm",
 	"permissions": {
 		"gm": [

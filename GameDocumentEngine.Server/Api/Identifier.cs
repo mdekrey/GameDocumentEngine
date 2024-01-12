@@ -20,7 +20,18 @@ public record Identifier(long Value) : IParsable<Identifier>
 	// Omitting implicit operator to `long` because it is not supported by EFCore
 
 	public static Identifier FromLong(long value) => new Identifier(value);
-	public static Identifier FromString(string value) => FromLong(BitConverter.ToInt64(Base64UrlEncoder.DecodeBytes(value)) ^ xorBits);
+	[return: NotNullIfNotNull(nameof(value))]
+	public static Identifier? FromLong(long? value) => value switch
+	{
+		long v => new Identifier(v),
+		_ => null
+	};
+	[return: NotNullIfNotNull(nameof(value))]
+	public static Identifier? FromString(string? value) => value switch
+	{
+		string v => FromLong(BitConverter.ToInt64(Base64UrlEncoder.DecodeBytes(v)) ^ xorBits),
+		_ => null
+	};
 	public static string ToString(long value) => Base64UrlEncoder.Encode(BitConverter.GetBytes(value ^ xorBits));
 
 	public static Identifier Parse(string s, IFormatProvider? provider)
@@ -60,6 +71,22 @@ public record Identifier(long Value) : IParsable<Identifier>
 		{
 			if (value == null) writer.WriteNullValue();
 			else writer.WriteStringValue(Identifier.ToString(value.Value));
+		}
+	}
+
+
+
+	public class LongConverter : System.Text.Json.Serialization.JsonConverter<long>
+	{
+		public override long Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+		{
+			var text = JsonSerializer.Deserialize<string?>(ref reader, options);
+			return FromString(text)!.Value;
+		}
+
+		public override void Write(Utf8JsonWriter writer, long value, JsonSerializerOptions options)
+		{
+			writer.WriteStringValue(Identifier.ToString(value));
 		}
 	}
 }

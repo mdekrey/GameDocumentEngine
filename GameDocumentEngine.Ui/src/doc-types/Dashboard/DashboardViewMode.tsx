@@ -1,29 +1,39 @@
-import { Suspense } from 'react';
-import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import { useCallback } from 'react';
+import type {
+	GameObjectFormComponent,
+	TypedDocumentDetails,
+} from '@/documents/defineDocument';
 import type { Dashboard, Widget } from './types';
 import { documentIdMimeType, useDropTarget } from '@/components/drag-drop';
-import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import { DashboardContainer, PositionedWidgetContainer } from './grid-utils';
+import { useFormFields } from '@principlestudios/react-jotai-forms';
+import {
+	DashboardContainer,
+	DashboardToolsContainer,
+	PositionedWidgetContainer,
+} from './grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
-import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import { useDocTypeTranslation } from '@/utils/api/hooks';
-import { ErrorScreen } from '@/components/errors';
 import { useWidgetSizes } from './useWidgetSizes';
+import { useWidget } from './useWidget';
+import { useNavigate } from 'react-router-dom';
+import type { Atom } from 'jotai';
 
 export function DashboardViewMode({
 	document,
-	widgets,
-	canUpdateWidgets,
-	onToggleEditing,
-}: {
-	document: TypedDocumentDetails<Dashboard>;
-	widgets: FormFieldReturnType<Record<string, Widget>>;
-	canUpdateWidgets: boolean;
-	onToggleEditing: () => void;
-}) {
-	const { dashboardHeight, dashboardWidth } = useWidgetSizes(widgets.atom);
+	writablePointers,
+	form,
+}: GameObjectFormComponent<Dashboard>) {
+	const canUpdateWidgets = writablePointers.contains('details', 'widgets');
+	const { widgets } = useFormFields(form, {
+		widgets: ['details', 'widgets'],
+	});
+	const navigate = useNavigate();
+	const onToggleEditing = canUpdateWidgets
+		? () => navigate('edit')
+		: () => void 0;
+
+	const { height, width } = useWidgetSizes(widgets.atom);
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
@@ -39,36 +49,72 @@ export function DashboardViewMode({
 			},
 		},
 	});
-	const t = useDocTypeTranslation('Dashboard');
+	const RenderWidgetConfig = useRenderWidgetConfig(document.gameId);
 
+	return (
+		<DashboardViewModePresentation
+			canUpdateWidgets={canUpdateWidgets}
+			onToggleEditing={onToggleEditing}
+			document={document}
+			height={height}
+			width={width}
+			dropTarget={dropTarget}
+			RenderWidgetConfig={RenderWidgetConfig}
+		/>
+	);
+}
+
+function DashboardViewModePresentation({
+	canUpdateWidgets,
+	document,
+	height,
+	width,
+	dropTarget,
+	RenderWidgetConfig,
+	onToggleEditing,
+}: {
+	canUpdateWidgets: boolean;
+	document: TypedDocumentDetails<Dashboard>;
+	height: Atom<string>;
+	width: Atom<string>;
+	dropTarget: ReturnType<typeof useDropTarget>;
+	RenderWidgetConfig: React.FC<{ widgetConfig: Widget }>;
+	onToggleEditing: () => void;
+}) {
 	return (
 		<DashboardContainer
 			{...dropTarget}
-			style={{ ['--h']: dashboardHeight, ['--w']: dashboardWidth }}
+			style={{ ['--h']: height, ['--w']: width }}
 		>
 			{Object.entries(document.details.widgets).map(
 				([key, config]: [string, Widget]) => (
 					<PositionedWidgetContainer key={key} position={config.position}>
-						<ErrorBoundary
-							errorKey={JSON.stringify(config)}
-							fallback={
-								<ErrorScreen message={t('widgets.widget-runtime-error')} />
-							}
-						>
-							<Suspense>
-								<RenderWidget gameId={document.gameId} widgetConfig={config} />
-							</Suspense>
-						</ErrorBoundary>
+						<RenderWidgetConfig widgetConfig={config} />
 					</PositionedWidgetContainer>
 				),
 			)}
-			<div className="fixed right-4 bottom-4">
+			<DashboardToolsContainer>
 				{canUpdateWidgets && (
 					<IconButton onClick={onToggleEditing}>
 						<HiPencil />
 					</IconButton>
 				)}
-			</div>
+			</DashboardToolsContainer>
 		</DashboardContainer>
+	);
+}
+
+function useRenderWidgetConfig(gameId: string) {
+	return useCallback(
+		function RenderWidgetConfig({ widgetConfig }: { widgetConfig: Widget }) {
+			const Widget = useWidget(gameId, widgetConfig);
+			return (
+				<RenderWidget
+					errorKey={JSON.stringify(widgetConfig.settings)}
+					widget={<Widget />}
+				/>
+			);
+		},
+		[gameId],
 	);
 }

@@ -12,15 +12,22 @@ export const fromGridCoordinate = (grid: number) => grid * gridSize;
 export const toGridCoordinate = (client: number) =>
 	Math.max(0, Math.floor(client / gridSize));
 
-export const DashboardContainer = elementTemplate(
-	'DashboardContainer',
+export const WidgetGridContainer = elementTemplate(
+	'WidgetGridContainer',
 	JotaiDiv,
 	(T) => (
 		<T
-			className={twMerge(styles.dashboardGrid, 'relative')}
+			className={twMerge(styles.widgetContainerGrid, 'relative')}
 			style={{ '--grid-size': gridSize, '--grid-offset': 0 }}
 		/>
 	),
+).themed({
+	Editing: (T) => <T className={styles.editing} />,
+});
+
+export const DashboardContainer = WidgetGridContainer.extend(
+	'DashboardContainer',
+	(T) => <T className={styles.fullscreen} />,
 ).themed({
 	Editing: (T) => <T className={styles.editing} />,
 });
@@ -73,3 +80,9 @@ export const PositionedWidgetContainer = WidgetContainer.extend<
 		};
 	},
 });
+
+export const DashboardToolsContainer = elementTemplate(
+	'DashboardToolsContainer',
+	'div',
+	(T) => <T className="fixed right-4 bottom-4" />,
+);

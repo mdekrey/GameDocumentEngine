@@ -6,11 +6,6 @@
 		"widgets": {
 			"type": "object",
 			"additionalProperties": { "$ref": "#/$defs/Widget" }
-		},
-		"max": {
-			"type": "integer",
-			"description": "The maximum value of the clock.",
-			"minimum": 1
 		}
 	},
 	"$defs": {
