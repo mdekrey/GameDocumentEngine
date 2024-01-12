@@ -5,7 +5,7 @@ import type {
 } from '@/documents/defineDocument';
 import type { Character } from '../character-types';
 import { LuShield, LuSword } from 'react-icons/lu';
-import { HiHeart } from 'react-icons/hi2';
+import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
 import { GiRun } from 'react-icons/gi';
 import { elementTemplate } from '@/components/template';
 import { ErrorScreen } from '@/components/errors';
@@ -64,20 +64,32 @@ export function CombatStats({
 	}
 	const { container, edge, middle } = styles[widgetSettings.mode ?? '2x2'];
 	const path = `/game/${document.gameId}/document/${document.id}/combat`;
+	const { hearts, attack, defense, speed } = document.details.combatValues;
+	const fullHealth = hearts.current === hearts.total;
+	console.log(hearts);
 	return (
 		<Link to={path} className={container}>
 			<Section>
 				<FirstRow>
 					<LuSword />
-					{asModifier.format(document.details.combatValues.attack.attackBonus)}
+					{asModifier.format(attack.attackBonus)}
 				</FirstRow>
 				<SecondRow>{t('sections.attack')}</SecondRow>
 			</Section>
 			<div className={edge} />
 			<Section>
 				<FirstRow>
-					<HiHeart />
-					{document.details.combatValues.hearts.total}
+					{fullHealth ? (
+						<>
+							<HiHeart />
+							{hearts.total}
+						</>
+					) : (
+						<>
+							<HiOutlineHeart />
+							{hearts.current} /{hearts.total}
+						</>
+					)}
 				</FirstRow>
 				<SecondRow>{t('sections.hearts')}</SecondRow>
 			</Section>
@@ -85,7 +97,7 @@ export function CombatStats({
 			<Section>
 				<FirstRow>
 					<LuShield />
-					{document.details.combatValues.defense.total}
+					{defense.total}
 				</FirstRow>
 				<SecondRow>{t('sections.defense')}</SecondRow>
 			</Section>
@@ -93,9 +105,7 @@ export function CombatStats({
 			<Section>
 				<FirstRow>
 					<GiRun />
-					<span className="text-xs">
-						{t(`speed.${document.details.combatValues.speed.actual}`)}
-					</span>
+					<span className="text-xs">{t(`speed.${speed.actual}`)}</span>
 				</FirstRow>
 				<SecondRow>{t('sections.speed')}</SecondRow>
 			</Section>
