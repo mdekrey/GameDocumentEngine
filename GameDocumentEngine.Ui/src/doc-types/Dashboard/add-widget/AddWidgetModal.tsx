@@ -1,26 +1,16 @@
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { Trans, useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import type {
-	GameObjectWidgetDefinition,
-	IGameObjectType,
-} from '@/documents/defineDocument';
-import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import { Button } from '@/components/button/button';
+import { type IGameObjectType } from '@/documents/defineDocument';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { useDocumentName } from '@/components/named-icon/useDocumentName';
-import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import {
-	NotSelected,
-	SelectField,
-} from '@/components/form-fields/select-input/select-field';
 import { useDocTypeTranslation, useDocument } from '@/utils/api/hooks';
-import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
+import { useAtomValue } from 'jotai';
+import type { NewWidgetResult } from './NewWidgetResult';
+import { useWidgetSettings } from './useWidgetSettings';
+import { AddWidgetModalPresentation } from './AddWidgetModalPresentation';
+import { defaultMissingWidgetDefinition } from '@/documents/defaultMissingWidgetDefinition';
+import { z } from 'zod';
 
-export type NewWidgetResult = {
-	id: string;
-};
-export const newWidgetSchema = z.object({
+const widgetTypeFormSchema = z.object({
 	id: z.string().min(1),
 });
 
@@ -42,67 +32,34 @@ export function AddWidgetModal({
 		keyPrefix: 'add-widget-modal',
 	});
 
-	const form = useForm({
-		defaultValue: { id: '' },
-		schema: newWidgetSchema,
+	const widgetTypes = Object.keys(widgets);
+	const widgetTypeForm = useForm({
+		defaultValue: { id: widgetTypes.length === 1 ? widgetTypes[0] : '' },
+		schema: widgetTypeFormSchema,
 		translation: t,
 		fields: {
 			id: ['id'],
 		},
 	});
 
-	const widgetKeys = widgets ? Object.keys(widgets) : [];
+	const widgetTypeKey = useAtomValue(widgetTypeForm.fields.id.atom);
+	const widgetType = widgets[widgetTypeKey] ?? defaultMissingWidgetDefinition;
+	const widgetSettings = useWidgetSettings({
+		document,
+		widgetTypeKey,
+		widgetType,
+	});
 
 	return (
-		<form onSubmit={form.handleSubmit(resolve)}>
-			<ModalDialogLayout>
-				<ModalDialogLayout.Title>
-					<Trans
-						i18nKey="title"
-						t={t}
-						components={{
-							Document: <DocumentName />,
-						}}
-					/>
-				</ModalDialogLayout.Title>
-				<Fieldset>
-					<SelectField field={form.fields.id} items={widgetKeys}>
-						{(dt) =>
-							dt ? (
-								<WidgetName target={widgets[dt]} docTypeKey={document.type} />
-							) : (
-								<NotSelected>
-									{form.fields.id.translation('not-selected')}
-								</NotSelected>
-							)
-						}
-					</SelectField>
-				</Fieldset>
-
-				<ModalDialogLayout.Buttons>
-					<Button.Save type="submit">{t('submit')}</Button.Save>
-					<Button.Secondary onClick={() => reject('Cancel')}>
-						{t('cancel')}
-					</Button.Secondary>
-				</ModalDialogLayout.Buttons>
-			</ModalDialogLayout>
-		</form>
+		<AddWidgetModalPresentation
+			docTypeKey={document.type}
+			widgets={widgets}
+			widgetTypeField={widgetTypeForm.fields.id}
+			DocumentName={DocumentName}
+			WidgetSettings={widgetSettings.component}
+			t={t}
+			onCancel={() => reject('Cancel')}
+			onSubmit={widgetSettings.handleSubmit(resolve)}
+		/>
 	);
-}
-
-function WidgetName({
-	target,
-	docTypeKey,
-}: {
-	target: GameObjectWidgetDefinition<unknown, void>;
-	docTypeKey: string;
-}) {
-	const { t } = useTranslation(
-		target.translationNamespace ?? getDocTypeTranslationNamespace(docTypeKey),
-		{
-			keyPrefix: target.translationKeyPrefix,
-		},
-	);
-
-	return <>{t('name')}</>;
 }

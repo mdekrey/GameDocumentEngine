@@ -1,10 +1,10 @@
-import type {
-	GameObjectWidgetDefinition,
-	GameObjectWidgetSettings,
-	Size,
-	WidgetSettings,
+import {
+	constrain,
+	type GameObjectWidgetDefinition,
+	type GameObjectWidgetSettings,
+	type Size,
+	type WidgetSettings,
 } from '@/documents/defineDocument';
-import type { WidgetPosition } from './types';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { ButtonRow } from '@/components/button/button-row';
@@ -17,26 +17,13 @@ import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { WidgetContainer } from './grid-utils';
 
-export function constrain(
-	size: { width: number; height: number },
-	{ min, max }: ReturnType<GameObjectWidgetDefinition['getConstraints']>,
-) {
-	return {
-		width: Math.max(min.width, Math.min(max?.width ?? size.width, size.width)),
-		height: Math.max(
-			min.height,
-			Math.min(max?.height ?? size.height, size.height),
-		),
-	};
-}
-
 export function WidgetSettingsForm<T, TWidget extends object>({
 	document,
 	widgetDefinition,
 	translation,
 	WidgetPreview,
 	initialSettings,
-	position,
+	size,
 	onSubmit,
 }: {
 	document: TypedDocumentDetails<T>;
@@ -44,7 +31,7 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 	translation: TFunction;
 	WidgetPreview: React.FC;
 	initialSettings: WidgetSettings<TWidget>;
-	position: WidgetPosition;
+	size: Size;
 
 	onSubmit: (newSettings: WidgetSettings<TWidget>, newSize: Size) => void;
 }) {
@@ -71,7 +58,7 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 				onSubmit={form.handleSubmit((value) => onSubmit(value, getSize(value)))}
 			>
 				<Fieldset>
-					<Settings document={document} size={position} field={form} />
+					<Settings document={document} size={size} field={form} />
 					<SizedContainer size={constrainedSize}>
 						<WidgetPreview />
 					</SizedContainer>
@@ -84,7 +71,7 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 	);
 
 	function getSize(s: WidgetSettings<TWidget>) {
-		return constrain(position, widgetDefinition.getConstraints(document, s));
+		return constrain(widgetDefinition, size, document, s);
 	}
 }
 

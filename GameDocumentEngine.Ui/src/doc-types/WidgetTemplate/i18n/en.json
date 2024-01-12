@@ -56,5 +56,24 @@
 	},
 	"widget-settings": {
 		"submit": "Sumbit"
+	},
+	"select-preview-document": {
+		"fields": {
+			"label": "Preview Document",
+			"not-selected": "Not Selected",
+			"errors": {
+				"too_small": "A document must be selected"
+			}
+		},
+		"submit": "Sumbit"
+	},
+	"instance": {
+		"name": "Widget Template Instance",
+		"fields": {
+			"displayedDocumentId": {
+				"label": "Displayed Document",
+				"not-selected": "Not Selected"
+			}
+		}
 	}
 }

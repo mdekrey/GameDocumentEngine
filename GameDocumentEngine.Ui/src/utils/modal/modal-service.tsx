@@ -2,6 +2,7 @@ import type { Atom } from 'jotai';
 import { atom, useAtomValue, useStore } from 'jotai';
 import { Modal } from './modal';
 import { useCallback } from 'react';
+import { noop } from '../noop';
 
 /** Fully internal type; do not expose outside of modal system */
 type ModalStackEntry = {
@@ -45,11 +46,6 @@ export type ModalOptions<T, TProps = never> = {
 	/** An abort signal created via an AbortController that, when signalled, can cancel the modal without having access to the resolve/reject. Results in an `AbortedRejection` error. */
 	abort?: AbortSignal;
 } & Additional<TProps>;
-
-/** noop is a term dating back to assembly languages - meaning "no operation", or "do nothing". This is used as a placeholder function to be overwritten. */
-function noop() {
-	// no-op is intentionally blank
-}
 
 /** Error sent via the rejected promise if the abort signal is used before the modal completes */
 export const AbortRejection: unique symbol = Symbol(

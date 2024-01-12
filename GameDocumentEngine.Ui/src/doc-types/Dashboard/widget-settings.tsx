@@ -40,7 +40,7 @@ export function WidgetSettingsContainer({
 			translation={translation}
 			WidgetPreview={Widget}
 			initialSettings={widget.settings}
-			position={widget.position}
+			size={widget.position}
 			onSubmit={(widgetValue, newSize) => {
 				navigate('../');
 				void onSubmit(

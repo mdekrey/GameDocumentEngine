@@ -88,6 +88,22 @@ export type GameObjectWidgetDefinition<
 		: null;
 };
 
+export function constrain<T = unknown, TWidget extends WidgetBase = void>(
+	widgetDefinition: GameObjectWidgetDefinition<T, TWidget>,
+	size: Size,
+	document: TypedDocumentDetails<T>,
+	settings: WidgetSettings<TWidget>,
+) {
+	const { min, max } = widgetDefinition.getConstraints(document, settings);
+	return {
+		width: Math.max(min.width, Math.min(max?.width ?? size.width, size.width)),
+		height: Math.max(
+			min.height,
+			Math.min(max?.height ?? size.height, size.height),
+		),
+	};
+}
+
 export type IGameObjectType<T = unknown> = {
 	noContainer?: boolean;
 	icon: IconType;

@@ -1,25 +1,48 @@
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { WidgetTemplate } from './types';
 import { useAtomValue } from 'jotai';
-import { useAllDocuments } from '@/utils/api/hooks';
-import { Link } from 'react-router-dom';
+import { useDocTypeTranslation } from '@/utils/api/hooks';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from '@principlestudios/react-jotai-forms';
+import { z } from 'zod';
+import { ButtonRow } from '@/components/button/button-row';
+import { Button } from '@/components/button/button';
+import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import { SelectDocumentByType } from './SelectDocumentByType';
 
 export function SelectPreviewItem({
 	document,
 	form,
 }: GameObjectFormComponent<WidgetTemplate>) {
-	const allDocs = useAllDocuments(document.gameId);
+	const navigate = useNavigate();
+	const t = useDocTypeTranslation('WidgetTemplate', {
+		keyPrefix: 'select-preview-document',
+	});
 	const docType = useAtomValue(form.field(['details', 'docType']).atom);
-	const previewableDocs = Array.from(allDocs.data.values()).filter(
-		(d) => d.type == docType,
-	);
+	const selectionForm = useForm({
+		defaultValue: '',
+		schema: z.string().min(1),
+		translation: t,
+		fields: {
+			selection: [],
+		},
+	});
 	return (
-		<ul>
-			{previewableDocs.map((d) => (
-				<li key={d.id}>
-					<Link to={`preview/${d.id}`}>{d.name}</Link>
-				</li>
-			))}
-		</ul>
+		<form onSubmit={selectionForm.handleSubmit(onSubmit)}>
+			<Fieldset>
+				<SelectDocumentByType
+					gameId={document.gameId}
+					docType={docType}
+					field={selectionForm.fields.selection}
+				/>
+				<ButtonRow>
+					<Button type="submit">{t('submit')}</Button>
+				</ButtonRow>
+			</Fieldset>
+		</form>
 	);
+
+	function onSubmit(previewDocumentId: string) {
+		navigate(`preview/${previewDocumentId}`);
+	}
 }
