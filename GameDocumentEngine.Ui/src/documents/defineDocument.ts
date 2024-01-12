@@ -57,7 +57,7 @@ export type WidgetSettingsComponentProps<
 	TWidget extends WidgetBase,
 > = GameObjectComponentBase<T> & {
 	size: Size;
-	field: UseFormResult<WidgetSettings<TWidget>>;
+	field: FormFieldReturnType<WidgetSettings<TWidget>>;
 };
 
 export type GameObjectWidgetSettings<T, TWidget extends object> = {

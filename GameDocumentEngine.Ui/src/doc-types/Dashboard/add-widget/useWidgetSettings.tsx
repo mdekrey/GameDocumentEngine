@@ -42,6 +42,9 @@ export function useWidgetSettings<
 					defaultValue: widgetType.settings?.default ?? {},
 					translation: t,
 					schema: widgetType.settings?.schema ?? z.object({}),
+					fields: {
+						settings: [],
+					},
 				});
 
 				const Settings =
@@ -67,7 +70,7 @@ export function useWidgetSettings<
 					<Settings
 						document={document}
 						size={widgetType.defaults}
-						field={form}
+						field={form.fields.settings}
 					/>
 				);
 			},

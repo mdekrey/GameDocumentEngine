@@ -6,6 +6,7 @@ import {
 	type WidgetSettings,
 } from '@/documents/defineDocument';
 import type { TypedDocumentDetails } from '@/documents/defineDocument';
+import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { ButtonRow } from '@/components/button/button-row';
 import { Button } from '@/components/button/button';
@@ -35,6 +36,8 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 
 	onSubmit: (newSettings: WidgetSettings<TWidget>, newSize: Size) => void;
 }) {
+	type SettingsField = FormFieldReturnType<WidgetSettings<TWidget>>;
+
 	const widgetSettings = widgetDefinition.settings as GameObjectWidgetSettings<
 		T,
 		TWidget
@@ -44,10 +47,13 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 	});
 	const Settings = widgetSettings.component;
 
-	const form = useForm<WidgetSettings<TWidget>>({
+	const form = useForm({
 		defaultValue: initialSettings,
 		schema: widgetSettings.schema,
 		translation,
+		fields: {
+			settings: [],
+		},
 	});
 	const constrainedSize = useComputedAtom((get) => {
 		return getSize(get(form.atom));
@@ -58,7 +64,11 @@ export function WidgetSettingsForm<T, TWidget extends object>({
 				onSubmit={form.handleSubmit((value) => onSubmit(value, getSize(value)))}
 			>
 				<Fieldset>
-					<Settings document={document} size={size} field={form} />
+					<Settings
+						document={document}
+						size={size}
+						field={form.fields.settings as SettingsField}
+					/>
 					<SizedContainer size={constrainedSize}>
 						<WidgetPreview />
 					</SizedContainer>
