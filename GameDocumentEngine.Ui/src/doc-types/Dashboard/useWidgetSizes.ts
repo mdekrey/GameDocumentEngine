@@ -10,7 +10,7 @@ const positionTotalY = (p: PositionedWidget) =>
 const widgetsTotal = (
 	widgets: Record<string, PositionedWidget>,
 	v: (p: PositionedWidget) => number,
-) => Math.max(...Object.values(widgets).map(v));
+) => Math.max(0, ...Object.values(widgets).map(v));
 
 export function getWidgetSizes(widgets: Record<string, PositionedWidget>) {
 	const height = widgetsTotal(widgets, positionTotalY);
