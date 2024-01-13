@@ -32,8 +32,9 @@ export function DocumentEdit({
 	documentId: string;
 }) {
 	const { t } = useTranslation(['edit-document']);
+	const documentData = useDocument(gameId, documentId);
 	const documentForm = useForm({
-		defaultValue: { name: '', folderId: null },
+		defaultValue: { name: documentData.name, folderId: documentData.folderId },
 		translation: t,
 		schema: DocumentDetailsSchema,
 		fields: {
@@ -43,7 +44,6 @@ export function DocumentEdit({
 	});
 
 	const documentsList = useAllDocuments(gameId);
-	const documentData = useDocument(gameId, documentId);
 	const saveDocument = usePatchDocument(gameId, documentId);
 
 	useUpdatingForm(documentForm, documentData);

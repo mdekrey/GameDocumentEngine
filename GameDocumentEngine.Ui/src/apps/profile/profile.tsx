@@ -37,8 +37,9 @@ const UserDetails = z.object({
 
 export function Profile() {
 	const { t } = useTranslation(['profile']);
+	const userData = useCurrentUser();
 	const userForm = useForm({
-		defaultValue: { name: '' },
+		defaultValue: { name: userData.name },
 		schema: UserDetails,
 		translation: t,
 		fields: {
@@ -46,7 +47,6 @@ export function Profile() {
 		},
 	});
 
-	const userData = useCurrentUser();
 	const saveUser = usePatchUser();
 
 	useUpdatingForm(userForm, userData);
