@@ -1,0 +1,7 @@
+{
+	"name": "Rich-Text",
+	"script": {
+		"type": "manifest",
+		"path": "src/doc-types/Rich-Text/index.ts"
+	}
+}

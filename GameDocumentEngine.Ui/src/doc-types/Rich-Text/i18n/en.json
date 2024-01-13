@@ -1,0 +1,30 @@
+{
+	"name": "Rich Text",
+	"details": {
+		"delete": "Delete rich text",
+		"edit-roles": "Edit roles"
+	},
+	"roles": {
+		"owner": {
+			"name": "Owner",
+			"description": "Owner of the document with full capabilities to change all details"
+		},
+		"observer": {
+			"name": "Observer",
+			"description": "Can read the document, but does not have any other permissions"
+		},
+		"no-role": { "name": "None" }
+	},
+	"document": {
+		"fields": {
+			"name": {
+				"label": "Name"
+			},
+			"details": {
+				"content": {
+					"label": "Content"
+				}
+			}
+		}
+	}
+}
