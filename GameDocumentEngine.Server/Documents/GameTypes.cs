@@ -61,11 +61,18 @@ public class RollupManifestManager
 		var node = assetManifest[path];
 		var entry = node.Deserialize<ManifestEntry>()
 			?? throw new InvalidOperationException($"Unknown script: {path}");
-		return (entry.CssFiles ?? Enumerable.Empty<string>()).Append(entry.Script);
+		return (entry.CssFiles ?? Enumerable.Empty<string>())
+			.Append(entry.Script)
+			.Concat(
+				(await Task.WhenAll((entry.Imports ?? Enumerable.Empty<string>())
+					.Select(ResolveScript)))
+				.SelectMany(scripts => scripts)
+			);
 	}
 
 	internal record ManifestEntry(
 		[property: JsonPropertyName("css")] IEnumerable<string> CssFiles,
-		[property: JsonPropertyName("file")] string Script
+		[property: JsonPropertyName("file")] string Script,
+		[property: JsonPropertyName("imports")] string[]? Imports
 	);
 }
