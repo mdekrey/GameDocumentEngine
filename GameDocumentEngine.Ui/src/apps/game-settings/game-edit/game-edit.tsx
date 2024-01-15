@@ -24,8 +24,9 @@ const GameDetailsSchema = z.object({
 
 export function GameEdit({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['edit-game']);
+	const gameData = useGame(gameId);
 	const gameForm = useForm({
-		defaultValue: { name: '' },
+		defaultValue: { name: gameData.name },
 		translation: t,
 		schema: GameDetailsSchema,
 		fields: {
@@ -33,7 +34,6 @@ export function GameEdit({ gameId }: { gameId: string }) {
 		},
 	});
 
-	const gameData = useGame(gameId);
 	const saveGame = usePatchGame(gameId);
 	useUpdatingForm(gameForm, gameData);
 	const canEdit = hasGamePermission(gameData, updateGame);
