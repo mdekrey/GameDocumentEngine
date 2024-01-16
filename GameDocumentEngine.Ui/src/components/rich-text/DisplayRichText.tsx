@@ -5,7 +5,7 @@ import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { EditorJSComponent } from './EditorJSComponent';
 
-export function DisplayEditorJS({
+export function DisplayRichText({
 	data: dataAtom,
 	className,
 }: {
@@ -37,7 +37,7 @@ async function updateEditor(editor: EditorJS, data: OutputData) {
 		const currentCount = editor.blocks.getBlocksCount();
 		if (currentIndex !== undefined && currentIndex < currentCount) {
 			await editor.blocks.update(block.id, block.data as object).catch(() => {
-				// this gives unnecessary errors
+				// this prevents unnecessary errors
 			});
 			if (currentIndex !== i) editor.blocks.move(i, currentIndex);
 		} else {

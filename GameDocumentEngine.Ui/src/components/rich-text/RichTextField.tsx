@@ -1,6 +1,6 @@
 import type { OutputData } from '@editorjs/editorjs';
 import type { StandardField } from '@/components/form-fields/FieldProps';
-import { DisplayEditorJS } from './DisplayEditorJS';
+import { DisplayRichText } from './DisplayRichText';
 import { Field } from '@/components/form-fields/field/field';
 import { IconButton } from '@/components/button/icon-button';
 import { HiPencil } from 'react-icons/hi2';
@@ -15,7 +15,7 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { Section } from '@/components/sections';
 import { useAtomValue } from 'jotai';
 
-export function EditorJSField({
+export function RichTextField({
 	className,
 	field,
 }: {
@@ -24,7 +24,6 @@ export function EditorJSField({
 }) {
 	const isDisabled = useAtomValue(field.disabled);
 	const isReadOnly = useAtomValue(field.readOnly);
-	console.log({ isDisabled, isReadOnly });
 	const launchModal = useLaunchModal();
 	return (
 		<Field className={className}>
@@ -37,7 +36,7 @@ export function EditorJSField({
 				{field.translation('label')}
 			</Field.Label>
 			<Field.Contents>
-				<DisplayEditorJS data={field.value} className={className} />
+				<DisplayRichText data={field.value} className={className} />
 			</Field.Contents>
 		</Field>
 	);
