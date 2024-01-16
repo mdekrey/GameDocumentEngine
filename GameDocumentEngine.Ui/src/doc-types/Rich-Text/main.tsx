@@ -1,41 +1,32 @@
 import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { RichText } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
-import EditorJS from '@editorjs/editorjs';
-import { useCallback, useRef } from 'react';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import Header from '@editorjs/header';
-import List from '@editorjs/list';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
+import { EditorJSField } from './EditorJSField';
+import { Section, SingleColumnSections } from '@/components/sections';
+import { useFormFields } from '@principlestudios/react-jotai-forms';
 
 export function RichTextMain(props: GameObjectFormComponent<RichText>) {
 	useSubmitOnChange(props.form, props.onSubmit);
 
+	const { contentField } = useFormFields(props.form, {
+		contentField: {
+			path: ['details', 'content'],
+			// disabled: () => props.writablePointers.contains('details', 'content'),
+		},
+	});
+
 	return (
 		<>
-			<Fieldset>
-				<TextField field={props.form.field(['name'])} />
-			</Fieldset>
-			<EditorJSContainer />
+			<SingleColumnSections>
+				<Section>
+					<Fieldset>
+						<TextField field={props.form.field(['name'])} />
+						<EditorJSField field={contentField} />
+					</Fieldset>
+				</Section>
+			</SingleColumnSections>
 		</>
 	);
-}
-
-function EditorJSContainer({ className }: { className?: string }) {
-	const editorRef = useRef<EditorJS>();
-	const attachEditor = useCallback((element: HTMLElement | null) => {
-		if (!element) return;
-		editorRef.current = new EditorJS({
-			holder: element,
-			autofocus: true,
-			onChange(api, event) {
-				console.log(event);
-			},
-			tools: {
-				header: Header,
-				list: List,
-			},
-		});
-	}, []);
-	return <div className={className} ref={attachEditor} />;
 }

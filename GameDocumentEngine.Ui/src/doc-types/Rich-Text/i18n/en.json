@@ -22,7 +22,10 @@
 			},
 			"details": {
 				"content": {
-					"label": "Content"
+					"label": "Content",
+					"title": "Content",
+					"submit": "Submit",
+					"cancel": "Cancel"
 				}
 			}
 		}
