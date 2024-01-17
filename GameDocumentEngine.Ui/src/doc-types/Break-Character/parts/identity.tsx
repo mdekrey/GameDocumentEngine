@@ -8,6 +8,10 @@ import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import { TextareaField } from '@/components/form-fields/textarea-input/textarea-field';
 import { SelectField } from '@/components/form-fields/select-input/select-field';
 import { BasicList, BasicListItem } from './BasicList';
+import {
+	RichTextField,
+	upgradingRichTextMapping,
+} from '@/components/rich-text';
 
 const sizes = [
 	undefined,
@@ -42,7 +46,10 @@ export function Identity({ form }: GameObjectFormComponent<Character>) {
 		},
 		history: ['details', 'identity', 'history'],
 		purviews: ['details', 'identity', 'purviews'],
-		description: ['details', 'identity', 'description'],
+		description: {
+			path: ['details', 'identity', 'description'],
+			mapping: upgradingRichTextMapping,
+		},
 		currentXp: ['details', 'xp', 'current'],
 		nextRank: ['details', 'xp', 'nextRank'],
 	});
@@ -68,7 +75,7 @@ export function Identity({ form }: GameObjectFormComponent<Character>) {
 				</section>
 				<TextField.AllowUndefined field={fields.history} />
 				<TextareaField.AllowUndefined field={fields.purviews} />
-				<TextareaField.AllowUndefined field={fields.description} />
+				<RichTextField field={fields.description} />
 				<NumberField.Integer field={fields.currentXp} />
 				<NumberField.Integer field={fields.nextRank} />
 			</Fieldset>

@@ -43,7 +43,7 @@
 				"languages": { "type": "array", "items": { "type": "string" } },
 				"history": { "type": "string" },
 				"purviews": { "type": "string" },
-				"description": { "type": "string" }
+				"description": {}
 			}
 		},
 		"aptitudes": {
