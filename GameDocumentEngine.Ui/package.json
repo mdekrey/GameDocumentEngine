@@ -19,6 +19,9 @@
 		"build-storybook": "storybook build"
 	},
 	"dependencies": {
+		"@editorjs/editorjs": "^2.28.2",
+		"@editorjs/header": "^2.8.1",
+		"@editorjs/list": "^1.9.0",
 		"@headlessui/react": "^1.7.16",
 		"@microsoft/signalr": "^7.0.9",
 		"@principlestudios/jotai-react-signals": "^0.5.1",

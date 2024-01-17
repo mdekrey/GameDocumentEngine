@@ -1,0 +1,8 @@
+{
+	"placeholder": "Add content here",
+	"modal": {
+		"title": "Edit '{{target}}'",
+		"submit": "Submit",
+		"cancel": "Cancel"
+	}
+}
