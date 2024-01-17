@@ -66,7 +66,6 @@ export function CombatStats({
 	const path = `/game/${document.gameId}/document/${document.id}/combat`;
 	const { hearts, attack, defense, speed } = document.details.combatValues;
 	const fullHealth = hearts.current === hearts.total;
-	console.log(hearts);
 	return (
 		<Link to={path} className={container}>
 			<Section>
