@@ -8,7 +8,12 @@ export function Fieldset({
 	className?: string;
 }) {
 	return (
-		<div className={twMerge('max-w-screen-sm flex flex-col gap-2', className)}>
+		<div
+			className={twMerge(
+				'max-w-screen-sm flex flex-col gap-2 text-left',
+				className,
+			)}
+		>
 			{children}
 		</div>
 	);
