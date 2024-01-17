@@ -3,8 +3,8 @@ import type { EditorConfig } from '@editorjs/editorjs';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';
 import { useRef } from 'react';
-import { twMerge } from 'tailwind-merge';
 import styles from './EditorJSComponent.module.css';
+import { useTranslation } from 'react-i18next';
 
 type EditorJSComponentProps = Omit<
 	EditorConfig,
@@ -19,12 +19,14 @@ export function EditorJSComponent({
 	className,
 	...config
 }: EditorJSComponentProps) {
+	const { t } = useTranslation('rich-text-editor');
 	const attachEditor = useRef((element: HTMLElement | null) => {
-		console.log('attachEditor', element);
 		if (editorRef.current) editorRef.current.destroy();
 		if (!element) return;
 		const editor = new EditorJS({
 			holder: element,
+			minHeight: 30,
+			placeholder: t('placeholder'),
 			// inlineToolbar causes a crash right now
 			// inlineToolbar: ['text', 'header'],
 			...config,
@@ -44,7 +46,11 @@ export function EditorJSComponent({
 	});
 	return (
 		<div
-			className={twMerge(styles.editorJsContainer, className)}
+			className={
+				className
+					? `${styles.editorJsContainer} ${className}`
+					: styles.editorJsContainer
+			}
 			ref={attachEditor.current}
 		/>
 	);

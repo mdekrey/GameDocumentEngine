@@ -9,7 +9,6 @@ const template: z.infer<typeof schema> = {
 };
 
 defineDocument('Rich-Text', {
-	noContainer: true,
 	icon: HiOutlineDocumentText,
 	template,
 	component: RichTextMain,

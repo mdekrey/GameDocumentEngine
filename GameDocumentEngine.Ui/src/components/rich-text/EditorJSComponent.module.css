@@ -1,9 +1,25 @@
-.editorJsContainer :global(.ce-block__content), .editorJsContainer :global(.ce-toolbar__content) {
+.editorJsContainer :global .codex-editor .ce-block__content,
+.editorJsContainer :global .codex-editor .ce-toolbar__content {
 	max-width: calc(100% - 65px);
 	margin-left: 65px;
 }
-.editorJsContainer :global .codex-editor--narrow .ce-block__content, .editorJsContainer :global .codex-editor--narrow .ce-block__content {
+.editorJsContainer :global .codex-editor.codex-editor--narrow .ce-block__content,
+.editorJsContainer :global .codex-editor.codex-editor--narrow .ce-toolbar__content {
 	max-width: calc(100%);
+	margin-left: 0px;
+}
+
+.editorJsContainer.readOnly :global .codex-editor .ce-block__content,
+.editorJsContainer.readOnly :global .codex-editor .ce-toolbar__content {
+	max-width: 100%;
+	margin-left: 0px;
+}
+.editorJsContainer.readOnly :global .codex-editor__redactor {
+	margin-right: 0px;
+}
+.editorJsContainer.readOnly :global .codex-editor.codex-editor--narrow .ce-block__content,
+.editorJsContainer.readOnly :global .codex-editor.codex-editor--narrow .ce-toolbar__content {
+	max-width: 100%;
 	margin-left: 0px;
 }
 

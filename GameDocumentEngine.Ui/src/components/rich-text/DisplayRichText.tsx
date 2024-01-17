@@ -1,15 +1,16 @@
-import type { OutputData } from '@editorjs/editorjs';
 import type EditorJS from '@editorjs/editorjs';
 import { useRef } from 'react';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
+import type { RichTextData } from './type';
 import { EditorJSComponent } from './EditorJSComponent';
+import styles from './EditorJSComponent.module.css';
 
 export function DisplayRichText({
 	data: dataAtom,
 	className,
 }: {
-	data: Atom<OutputData | undefined>;
+	data: Atom<RichTextData> | Atom<RichTextData | undefined>;
 	className?: string;
 }) {
 	const data = useAtomValue(dataAtom);
@@ -19,15 +20,18 @@ export function DisplayRichText({
 
 	return (
 		<EditorJSComponent
-			className={className}
+			className={
+				className ? `${styles.readOnly} ${className}` : styles.readOnly
+			}
 			editorRef={editorRef}
 			data={data}
 			readOnly={true}
+			minHeight={0}
 		/>
 	);
 }
 
-async function updateEditor(editor: EditorJS, data: OutputData) {
+async function updateEditor(editor: EditorJS, data: RichTextData) {
 	for (let i = 0; i < data.blocks.length; i++) {
 		const block = data.blocks[i];
 		if (!block.id) throw new Error(`all blocks must have an id; ${i} did not`);
@@ -36,7 +40,7 @@ async function updateEditor(editor: EditorJS, data: OutputData) {
 		);
 		const currentCount = editor.blocks.getBlocksCount();
 		if (currentIndex !== undefined && currentIndex < currentCount) {
-			await editor.blocks.update(block.id, block.data as object).catch(() => {
+			await editor.blocks.update(block.id, block.data).catch(() => {
 				// this prevents unnecessary errors
 			});
 			if (currentIndex !== i) editor.blocks.move(i, currentIndex);

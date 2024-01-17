@@ -1,4 +1,4 @@
-import type { OutputData } from '@editorjs/editorjs';
+import type { RichTextData } from './type';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { DisplayRichText } from './DisplayRichText';
 import { Field } from '@/components/form-fields/field/field';
@@ -14,13 +14,15 @@ import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { Section } from '@/components/sections';
 import { useAtomValue } from 'jotai';
+import type { OutputBlockData } from '@editorjs/editorjs';
+import { Trans, useTranslation } from 'react-i18next';
 
 export function RichTextField({
 	className,
 	field,
 }: {
 	className?: string;
-	field: StandardField<OutputData | undefined>;
+	field: StandardField<RichTextData | undefined>;
 }) {
 	const isDisabled = useAtomValue(field.disabled);
 	const isReadOnly = useAtomValue(field.readOnly);
@@ -35,7 +37,7 @@ export function RichTextField({
 				)}
 				{field.translation('label')}
 			</Field.Label>
-			<Field.Contents>
+			<Field.Contents className="border border-slate-500 px-2 mt-2">
 				<DisplayRichText data={field.value} className={className} />
 			</Field.Contents>
 		</Field>
@@ -57,9 +59,14 @@ function EditorJSModal({
 	reject,
 	additional: { field },
 }: ModalContentsProps<
-	OutputData,
-	{ field: StandardField<OutputData | undefined> }
+	RichTextData,
+	{
+		field:
+			| StandardField<RichTextData>
+			| StandardField<RichTextData | undefined>;
+	}
 >) {
+	const { t } = useTranslation('rich-text-editor', { keyPrefix: 'modal' });
 	const initialValue = useRef(field.getValue());
 	const editorJsRef = useRef<EditorJS>();
 
@@ -67,7 +74,11 @@ function EditorJSModal({
 		<form onSubmit={(ev) => void onSubmit(ev)}>
 			<ModalDialogLayout>
 				<ModalDialogLayout.Title>
-					{field.translation('title')}
+					<Trans
+						i18nKey="title"
+						t={t}
+						values={{ target: field.translation('label') }}
+					/>
 				</ModalDialogLayout.Title>
 				<Fieldset>
 					<Section>
@@ -78,9 +89,9 @@ function EditorJSModal({
 					</Section>
 				</Fieldset>
 				<ModalDialogLayout.Buttons>
-					<Button type="submit">{field.translation('submit')}</Button>
+					<Button type="submit">{t('submit')}</Button>
 					<Button.DestructiveSecondary onClick={() => reject('Cancel')}>
-						{field.translation('cancel')}
+						{t('cancel')}
 					</Button.DestructiveSecondary>
 				</ModalDialogLayout.Buttons>
 			</ModalDialogLayout>
@@ -92,6 +103,16 @@ function EditorJSModal({
 		if (!editorJsRef.current) return;
 		await editorJsRef.current.isReady;
 		const outputData = await editorJsRef.current.save();
-		resolve(outputData);
+		if (verifyValidBlocks(outputData.blocks))
+			resolve({ blocks: outputData.blocks });
+		else throw new Error('Could not save editor; not all blocks have an id');
 	}
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type EditorBlocks = OutputBlockData<string, any>[];
+function verifyValidBlocks(
+	blocks: EditorBlocks,
+): blocks is RichTextData['blocks'] {
+	return !blocks.some((block) => !block.id);
 }
