@@ -85,6 +85,7 @@ function EditorJSModal({
 						<EditorJSComponent
 							editorRef={editorJsRef}
 							data={initialValue.current}
+							autofocus={true}
 						/>
 					</Section>
 				</Fieldset>
