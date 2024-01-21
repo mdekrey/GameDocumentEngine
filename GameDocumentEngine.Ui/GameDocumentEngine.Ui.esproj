@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.Build.NoTargets/3.7.0">
 	<PropertyGroup>
-		<NpmBuildScript>node_modules/.bin/vite build</NpmBuildScript>
-		<NpmBuildScript Condition=" '$(Configuration)' == 'Debug' ">node_modules/.bin/vite build --sourcemap --mode development --minify false</NpmBuildScript>
+		<PnpmBuildScript>pnpm vite build</PnpmBuildScript>
+		<PnpmBuildScript Condition=" '$(Configuration)' == 'Debug' ">pnpm vite build --sourcemap --mode development --minify false</PnpmBuildScript>
 		<SkipBuild Condition=" '$(Configuration)' == 'Debug' ">true</SkipBuild>
 	</PropertyGroup>
-	<Import Project="$(RepositoryEngineeringDir)npm.targets" />
+	<Import Project="$(RepositoryEngineeringDir)pnpm.targets" />
 
 	<ItemGroup>
 		<Compile Include="vite.config.ts" />
@@ -18,19 +18,38 @@
 		<CompileOutputs Include="$(SolutionRoot)/GameDocumentEngine.Server/wwwroot/index.html" />
 	</ItemGroup>
 
+    <Target Name="_ComputeCompileOutputs" BeforeTargets="NodeBuild;_PrepareClean">
+        <ItemGroup>
+            <CompileOutputs Include="../GameDocumentEngine.Server/wwwroot/manifest.json" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="_PrepareClean" BeforeTargets="CoreClean">
+        <ItemGroup>
+            <CompileOutputs Include="$(SolutionRoot)GameDocumentEngine.Server/wwwroot/**/*" Exclude="$(SolutionRoot)GameDocumentEngine.Server/wwwroot/.gitkeep" />
+            <CompileOutputs Include="src/api/**/*" />
+            <CompileOutputs Include="@(ZodInput->'%(OutputPath)')" />
+            <Clean Include="@(CompileOutputs)" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="Ensure gitkeep" AfterTargets="Build">
+        <Touch AlwaysCreate="true" ForceTouch="true" Files="$(SolutionRoot)GameDocumentEngine.Server/wwwroot/.gitkeep" />
+    </Target>
+
 	<Target Name="GenerateApi" BeforeTargets="Generation" Inputs="$(SolutionRoot)schemas\api.yaml" Outputs="src/api/.gitignore">
-		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml"/>
+		<Exec WorkingDirectory="$(ProjectDir)" Command="pnpm openapi-codegen-typescript ../schemas/api.yaml src/api/ -c -o codegen.config.yaml"/>
 	</Target>
 
 	<Target Name="GenerateZod" BeforeTargets="Generation" Inputs="@(ZodInput)" Outputs="@(ZodInput->'%(OutputPath)')">
-		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts"/>
+		<Exec WorkingDirectory="$(ProjectDir)" Command="pnpm ts-node --esm --project tsconfig.node.json ./scripts/schemas-to-zod.ts"/>
 	</Target>
 
 	<Target Name="Generation" BeforeTargets="NodeBuild">
 	</Target>
 
 	<Target Name="TypeCheck" BeforeTargets="NodeBuild" DependsOnTargets="Generation" Condition=" $(Configuration) == 'Release' ">
-		<Exec WorkingDirectory="$(ProjectDir)" Command="node_modules/.bin/tsc"/>
+		<Exec WorkingDirectory="$(ProjectDir)" Command="pnpm tsc"/>
 	</Target>
 
 	<Target Name="_ComputeNodeOutputs" BeforeTargets="NodeBuild">

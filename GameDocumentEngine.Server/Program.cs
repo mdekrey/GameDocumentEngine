@@ -319,7 +319,7 @@ app.MapWhen(context => context.Request.Method == "GET" || context.Request.Method
 		{
 			spa.Options.SourcePath = "../GameDocumentEngine.Ui";
 
-			spa.UseViteDevelopmentServer(Path.Combine(Directory.GetCurrentDirectory(), "../GameDocumentEngine.Ui/node_modules/.bin/vite"), "--port {port}");
+			spa.UseViteDevelopmentServer("pnpm", "vite --port {port}");
 		}
 #endif
 	});

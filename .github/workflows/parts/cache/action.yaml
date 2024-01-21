@@ -5,20 +5,31 @@ outputs: {}
 runs:
   using: 'composite'
   steps:
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
     - uses: actions/cache@v3
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
         restore-keys: |
           ${{ runner.os }}-nuget-
-    - name: Get npm cache directory
-      id: npm-cache-dir
+    - name: Get pnpm store directory
+      id: pnpm-cache-dir
       shell: pwsh
-      run: echo "dir=$(npm config get cache)" >> ${env:GITHUB_OUTPUT}
+      run: echo "dir=$(pnpm store path --silent)" >> ${env:GITHUB_OUTPUT}
     - uses: actions/cache@v3
-      id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+      name: Setup pnpm cache
+      id: pnpm-cache # use this to check for `cache-hit` ==> if: steps.pnpm-cache.outputs.cache-hit != 'true'
       with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        path: ${{ steps.pnpm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
-          ${{ runner.os }}-node-
+          ${{ runner.os }}-pnpm-store-

@@ -72,7 +72,7 @@ export function CreateDocumentDetails({
 				errorKey={docType.key}
 				fallback={detailsField.translation('unhandled-error')}
 			>
-				<CreateDetails docType={docType} />
+				<CreateDetails key={docType.key} docType={docType} />
 			</ErrorBoundary>
 		</Suspense>
 	);

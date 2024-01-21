@@ -21,18 +21,54 @@ COPY .editorconfig .editorconfig
 RUN cd ./GameDocumentEngine.Server/ && dotnet build -c Release --no-restore --use-current-runtime --self-contained
 RUN cd ./GameDocumentEngine.Server/ && dotnet publish -c Release -p:PublishReadyToRun=true --use-current-runtime --self-contained
 
-FROM node:18.17-alpine AS build-ui
-WORKDIR /src
 # brotli is added for the `brotli` compression below
 # OpenAPI Codegeneration is using dotnet7-runtime
-RUN apk add --no-cache brotli dotnet7-sdk
+# git is used in left-hook
+# curl is to install pnpm
+# FROM node:18.16.1-alpine AS build-ui
+# WORKDIR /src
+# RUN apk add --no-cache brotli dotnet7-sdk curl git gcompat
+FROM ubuntu:focal AS build-ui
+WORKDIR /src
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       wget \
+       ca-certificates \
+    \
+    # Install Microsoft package feed
+    && wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb \
+    \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+	brotli \
+	dotnet-sdk-7.0 \
+	git \
+	curl \
+	cpio
+	#  \
+	# && rm -rf /var/lib/apt/lists/*
+
+# DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends dotnet-runtime-7.0
+# RUN npm install -g pnpm@8.3.1
+
+ENV PNPM_HOME=/root/.local/share/pnpm
+ENV PNPM_VERSION=v8.3.1
+ENV PATH=$PATH:$PNPM_HOME
+RUN curl -fsSL "https://github.com/pnpm/pnpm/releases/download/${PNPM_VERSION}/pnpm-linuxstatic-x64" -o /bin/pnpm && chmod +x /bin/pnpm
 
 COPY ./eng/ ./eng/
 COPY ["./GameDocumentEngine.Ui/package.json", "./GameDocumentEngine.Ui/"]
-COPY ["./GameDocumentEngine.Ui/package-lock.json", "./GameDocumentEngine.Ui/"]
+COPY ["./package.json", "./package.json"]
+COPY ["./pnpm-lock.yaml", "./"]
+COPY ["./pnpm-workspace.yaml", "./"]
+COPY ["./.npmrc", "./"]
 COPY ["./GameDocumentEngine.Ui/GameDocumentEngine.Ui.esproj", "./GameDocumentEngine.Ui/"]
 COPY ["./Directory.Build.props", "./"]
-RUN cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
+COPY ["./eng/pnpm/", "./eng/pnpm/"]
+RUN pnpm install --frozen-lockfile && cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
 
 COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/
