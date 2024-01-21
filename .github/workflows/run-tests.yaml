@@ -17,9 +17,9 @@ jobs:
     - uses: actions/setup-dotnet@v3
       with:
         global-json-file: global.json
-    - uses: actions/setup-node@v3
+    - uses: pnpm/action-setup@v2
       with:
-        node-version-file: ./GameDocumentEngine.Ui/.nvmrc
+        version: 8
     - uses: ./.github/workflows/parts/cache/
     - name: 'Run tests'
       run: |
