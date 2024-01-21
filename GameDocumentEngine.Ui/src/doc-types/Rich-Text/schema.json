@@ -4,6 +4,7 @@
 	"type": "object",
 	"required": ["content"],
 	"properties": {
-		"content": {}
+		"content": {},
+		"mdx": { "type": "string" }
 	}
 }
