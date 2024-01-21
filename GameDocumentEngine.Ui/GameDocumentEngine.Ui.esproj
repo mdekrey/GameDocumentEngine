@@ -29,6 +29,7 @@
             <CompileOutputs Include="$(SolutionRoot)GameDocumentEngine.Server/wwwroot/**/*" Exclude="$(SolutionRoot)GameDocumentEngine.Server/wwwroot/.gitkeep" />
             <CompileOutputs Include="src/api/**/*" />
             <CompileOutputs Include="@(ZodInput->'%(OutputPath)')" />
+            <Clean Include="@(CompileOutputs)" />
         </ItemGroup>
     </Target>
 
