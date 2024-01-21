@@ -25,14 +25,23 @@ FROM node:18.17-alpine AS build-ui
 WORKDIR /src
 # brotli is added for the `brotli` compression below
 # OpenAPI Codegeneration is using dotnet7-runtime
-RUN apk add --no-cache brotli dotnet7-sdk
+RUN apk add --no-cache brotli dotnet7-sdk curl git
+
+ENV PNPM_HOME=/root/.local/share/pnpm
+ENV PNPM_VERSION=v8.3.1
+ENV PATH=$PATH:$PNPM_HOME
+RUN curl -fsSL "https://github.com/pnpm/pnpm/releases/download/${PNPM_VERSION}/pnpm-linuxstatic-x64" -o /bin/pnpm && chmod +x /bin/pnpm
 
 COPY ./eng/ ./eng/
 COPY ["./GameDocumentEngine.Ui/package.json", "./GameDocumentEngine.Ui/"]
-COPY ["./GameDocumentEngine.Ui/package-lock.json", "./GameDocumentEngine.Ui/"]
+COPY ["./package.json", "./package.json"]
+COPY ["./pnpm-lock.yaml", "./"]
+COPY ["./pnpm-workspace.yaml", "./"]
+COPY ["./.npmrc", "./"]
 COPY ["./GameDocumentEngine.Ui/GameDocumentEngine.Ui.esproj", "./GameDocumentEngine.Ui/"]
 COPY ["./Directory.Build.props", "./"]
-RUN cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
+COPY ["./eng/pnpm/", "./eng/pnpm/"]
+RUN pnpm install --frozen-lockfile && cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
 
 COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/

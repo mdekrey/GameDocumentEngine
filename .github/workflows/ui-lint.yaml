@@ -10,13 +10,11 @@ jobs:
     - uses: actions/checkout@v3
       with:
         lfs: true
-    - uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '6.0.x'
-    - uses: actions/setup-node@v3
-      with:
-        node-version-file: ./GameDocumentEngine.Ui/.nvmrc
     - uses: ./.github/workflows/parts/cache/
+    - name: 'Check Node Version'
+      working-directory: ./GameDocumentEngine.Ui
+      run: |
+        pnpm node --version
     - name: 'Prepare UI for linting'
       working-directory: ./GameDocumentEngine.Ui
       run: |
