@@ -8,7 +8,7 @@ import { lexicalTheme } from './lexicalTheme';
 import { useEffect, useRef } from 'react';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
 
-export function DisplayMdx({
+export function DisplayRichText({
 	data,
 }: {
 	data: string | Atom<string> | Atom<string | undefined>;

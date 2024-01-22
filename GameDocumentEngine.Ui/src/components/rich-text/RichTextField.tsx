@@ -8,7 +8,7 @@ import { allPlugins, readonlyPlugins } from './allPlugins';
 import styles from './mdx.module.css';
 import { lexicalTheme } from './lexicalTheme';
 
-export function MdxField({
+export function RichTextField({
 	className,
 	field,
 }: {

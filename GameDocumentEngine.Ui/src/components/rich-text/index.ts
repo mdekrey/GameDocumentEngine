@@ -1,2 +1,2 @@
-export * from './DisplayMdx';
-export * from './MdxField';
+export * from './DisplayRichText';
+export * from './RichTextField';
