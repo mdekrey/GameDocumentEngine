@@ -22,7 +22,9 @@ export function MdxField({
 	const fieldAtom = field.value;
 	useEffect(() => {
 		return store.sub(fieldAtom, () => {
-			mdxEditorRef.current?.setMarkdown(store.get(fieldAtom) ?? '');
+			const newMarkdown = store.get(fieldAtom) ?? '';
+			if (mdxEditorRef.current?.getMarkdown() === newMarkdown) return;
+			mdxEditorRef.current?.setMarkdown(newMarkdown);
 		});
 	}, [fieldAtom, store]);
 	return (
