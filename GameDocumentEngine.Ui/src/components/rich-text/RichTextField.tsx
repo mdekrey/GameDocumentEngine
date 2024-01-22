@@ -1,6 +1,6 @@
 import { useAtomValue, useStore } from 'jotai';
 import type { MDXEditorMethods } from '@mdxeditor/editor';
-import { MDXEditor } from '@mdxeditor/editor';
+import { MDXEditor, diffSourcePlugin } from '@mdxeditor/editor';
 import { Field } from '@/components/form-fields/field/field';
 import type { StandardField } from '@/components/form-fields/FieldProps';
 import { useEffect, useRef } from 'react';
@@ -38,7 +38,17 @@ export function RichTextField({
 					contentEditableClassName={styles.content}
 					readOnly={isDisabled || isReadOnly}
 					key={isDisabled || isReadOnly ? 'readonly' : 'writable'}
-					plugins={isDisabled || isReadOnly ? readonlyPlugins : allPlugins}
+					plugins={
+						isDisabled || isReadOnly
+							? readonlyPlugins
+							: [
+									...allPlugins,
+									diffSourcePlugin({
+										viewMode: 'rich-text',
+										diffMarkdown: field.getValue() ?? '',
+									}),
+							  ]
+					}
 					ref={mdxEditorRef}
 					onChange={field.onChange}
 				/>

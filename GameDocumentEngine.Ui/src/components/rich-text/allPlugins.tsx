@@ -11,7 +11,6 @@ import {
 	thematicBreakPlugin,
 	codeBlockPlugin,
 	markdownShortcutPlugin,
-	diffSourcePlugin,
 	codeMirrorPlugin,
 } from '@mdxeditor/editor';
 import { Toolbar } from './toolbar';
@@ -33,11 +32,10 @@ export const readonlyPlugins: RealmPlugin[] = [
 		codeBlockLanguages: {
 			js: 'JavaScript',
 			css: 'CSS',
-			txt: 'text',
+			txt: 'Text',
 			tsx: 'TypeScript',
 		},
 	}),
-	diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
 	markdownShortcutPlugin(),
 ];
 
