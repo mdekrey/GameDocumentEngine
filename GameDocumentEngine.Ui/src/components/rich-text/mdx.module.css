@@ -1,0 +1,159 @@
+.root {
+    --accentBase: theme(colors.blue.50);
+    --accentBgSubtle: theme(colors.blue.100);
+    --accentBg: theme(colors.blue.200);
+    --accentBgHover: theme(colors.blue.300);
+    --accentBgActive: theme(colors.blue.400);
+    --accentLine: theme(colors.blue.500);
+    --accentBorder: theme(colors.blue.500);
+    --accentBorderHover: theme(colors.blue.600);
+    --accentSolid: theme(colors.blue.700);
+    --accentSolidHover: theme(colors.blue.800);
+    --accentText: theme(colors.blue.900);
+    --accentTextContrast: theme(colors.blue.950);
+    --basePageBg: theme(colors.white);
+    --baseBase: theme(colors.slate.50);
+    --baseBgSubtle: theme(colors.slate.100);
+    --baseBg: theme(colors.slate.200);
+    --baseBgHover: theme(colors.slate.300);
+    --baseBgActive: theme(colors.slate.400);
+    --baseLine: theme(colors.slate.500);
+    --baseBorder: theme(colors.slate.600);
+    --baseBorderHover: theme(colors.slate.700);
+    --baseSolid: theme(colors.slate.800);
+    --baseSolidHover: theme(colors.slate.900);
+    --baseText: theme(colors.slate.950);
+    --baseTextContrast: theme(colors.black);
+    --error-color: theme(colors.red.500);
+
+    --tw-prose-lead: var(--baseBorder);
+    --tw-prose-links: var(--baseSolidHover);
+    --tw-prose-bold: var(--baseSolidHover);
+    --tw-prose-counters: theme(colors.slate.500);
+    --tw-prose-bullets: var(--baseBgHover);
+    --tw-prose-hr: var(--baseBg);
+    --tw-prose-quotes: var(--baseSolidHover);
+    --tw-prose-quote-borders: var(--baseBg);
+    --tw-prose-headings: var(--baseSolidHover);
+    --tw-prose-captions: theme(colors.slate.500);
+    --tw-prose-code: var(--baseSolidHover);
+    --tw-prose-pre-code: var(--baseBg);
+    --tw-prose-pre-bg: var(--baseSolid);
+    --tw-prose-th-borders: var(--baseBgHover);
+    --tw-prose-td-borders: var(--baseBg);
+
+    font-family: var(--font-body);
+    color: var(--baseText);
+}
+
+:global(.dark) .root {
+    --accentBase: theme(colors.blue.950);
+    --accentBgSubtle: theme(colors.blue.900);
+    --accentBg: theme(colors.blue.800);
+    --accentBgHover: theme(colors.blue.700);
+    --accentBgActive: theme(colors.blue.600);
+    --accentLine: theme(colors.blue.500);
+    --accentBorder: theme(colors.blue.500);
+    --accentBorderHover: theme(colors.blue.400);
+    --accentSolid: theme(colors.blue.300);
+    --accentSolidHover: theme(colors.blue.200);
+    --accentText: theme(colors.blue.100);
+    --accentTextContrast: theme(colors.blue.50);
+    --basePageBg: theme(colors.black);
+    --baseBase: theme(colors.slate.950);
+    --baseBgSubtle: theme(colors.slate.900);
+    --baseBg: theme(colors.slate.800);
+    --baseBgHover: theme(colors.slate.700);
+    --baseBgActive: theme(colors.slate.600);
+    --baseLine: theme(colors.slate.500);
+    --baseBorder: theme(colors.slate.400);
+    --baseBorderHover: theme(colors.slate.300);
+    --baseSolid: theme(colors.slate.200);
+    --baseSolidHover: theme(colors.slate.100);
+    --baseText: theme(colors.slate.50);
+    --baseTextContrast: theme(colors.white);
+    --error-color: theme(colors.red.500);
+}
+
+.nestedListItem {
+    list-style: none;
+    list-style-type: none;
+}
+
+.nestedListItem:before,
+.nestedListItem:after {
+    display: none;
+}
+
+.listItemChecked,
+.listItemUnchecked {
+    position: relative;
+    margin-left: 0;
+    margin-right: 0;
+    margin-inline-start: -1rem;
+    padding-left: var(--spacing-6);
+    padding-right: var(--spacing-6);
+    list-style-type: none;
+    outline: none;
+}
+
+.listItemChecked {
+    text-decoration: line-through;
+}
+
+.listItemUnchecked:before,
+.listItemChecked:before {
+    content: '';
+    width: var(--spacing-4);
+    height: var(--spacing-4);
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    display: block;
+    background-size: cover;
+    position: absolute;
+}
+
+.listItemUnchecked[dir='rtl']:before,
+.listItemChecked[dir='rtl']:before {
+    left: auto;
+    right: 0;
+}
+
+.listItemUnchecked:focus:before,
+.listItemChecked:focus:before {
+    box-shadow: 0 0 0 2px var(--accentBgActive);
+    border-radius: var(--radius-small);
+}
+
+.listItemUnchecked:before {
+    border: 1px solid var(--baseBorder);
+    border-radius: var(--radius-small);
+}
+
+.listItemChecked:before {
+    border: 1px solid var(--accentBorder);
+    border-radius: var(--radius-small);
+    background-color: var(--accentSolid);
+    background-repeat: no-repeat;
+}
+
+.listItemChecked:after {
+    content: '';
+    cursor: pointer;
+    border-color: var(--baseBase);
+    border-style: solid;
+    position: absolute;
+    display: block;
+    top: var(--spacing-0_5);
+    width: var(--spacing-1);
+    left: var(--spacing-1_5);
+    right: var(--spacing-1_5);
+    height: var(--spacing-2);
+    transform: rotate(45deg);
+    border-width: 0 var(--spacing-0_5) var(--spacing-0_5) 0;
+}
+
+.root hr {
+    @apply m-12 border-t-2 border-slate-500;
+}

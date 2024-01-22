@@ -1,64 +1,37 @@
-import type EditorJS from '@editorjs/editorjs';
-import { useRef } from 'react';
 import type { Atom } from 'jotai';
-import { useAtomValue } from 'jotai';
-import type { RichTextData } from './type';
-import { EditorJSComponent } from './EditorJSComponent';
-import styles from './EditorJSComponent.module.css';
+import { useStore } from 'jotai';
+import type { MDXEditorMethods } from '@mdxeditor/editor';
+import { MDXEditor } from '@mdxeditor/editor';
+import { readonlyPlugins } from './allPlugins';
+import styles from './mdx.module.css';
+import { lexicalTheme } from './lexicalTheme';
+import { useEffect, useRef } from 'react';
+import { useAsAtom } from '@principlestudios/jotai-react-signals';
 
 export function DisplayRichText({
-	data: dataAtom,
-	className,
+	data,
 }: {
-	data: Atom<RichTextData> | Atom<RichTextData | undefined>;
-	className?: string;
+	data: string | Atom<string> | Atom<string | undefined>;
 }) {
-	const data = useAtomValue(dataAtom);
-	const editorRef = useRef<EditorJS>();
-	if (editorRef.current?.render && data)
-		void updateEditor(editorRef.current, data);
+	const dataAtom = useAsAtom(data);
+	const store = useStore();
+	const mdxEditorRef = useRef<MDXEditorMethods>(null);
+	useEffect(() => {
+		mdxEditorRef.current?.setMarkdown(store.get(dataAtom) ?? '');
+		return store.sub(dataAtom, () => {
+			mdxEditorRef.current?.setMarkdown(store.get(dataAtom) ?? '');
+		});
+	}, [dataAtom, store]);
 
 	return (
-		<EditorJSComponent
-			className={
-				className ? `${styles.readOnly} ${className}` : styles.readOnly
-			}
-			editorRef={editorRef}
-			data={data}
+		<MDXEditor
+			ref={mdxEditorRef}
+			markdown={store.get(dataAtom) ?? ''}
+			className={styles.root}
+			lexicalTheme={lexicalTheme}
+			contentEditableClassName={styles.content}
 			readOnly={true}
-			minHeight={0}
+			plugins={readonlyPlugins}
 		/>
 	);
-}
-
-async function updateEditor(editor: EditorJS, data: RichTextData) {
-	for (let i = 0; i < data.blocks.length; i++) {
-		const block = data.blocks[i];
-		if (!block.id) throw new Error(`all blocks must have an id; ${i} did not`);
-		const currentIndex: number | undefined = editor.blocks.getBlockIndex(
-			block.id,
-		);
-		const currentCount = editor.blocks.getBlocksCount();
-		if (currentIndex !== undefined && currentIndex < currentCount) {
-			await editor.blocks.update(block.id, block.data).catch(() => {
-				// this prevents unnecessary errors
-			});
-			if (currentIndex !== i) editor.blocks.move(i, currentIndex);
-		} else {
-			editor.blocks.insert(
-				block.type,
-				block.data,
-				undefined,
-				i >= currentCount ? undefined : i,
-				false,
-				false,
-				block.id,
-			);
-		}
-	}
-
-	const blocksCount = editor.blocks.getBlocksCount();
-	for (let i = data.blocks.length; i < blocksCount; i++) {
-		editor.blocks.delete(data.blocks.length);
-	}
 }
