@@ -19,7 +19,6 @@ export function DisplayMdx({
 	useEffect(() => {
 		mdxEditorRef.current?.setMarkdown(store.get(dataAtom) ?? '');
 		return store.sub(dataAtom, () => {
-			console.log('update');
 			mdxEditorRef.current?.setMarkdown(store.get(dataAtom) ?? '');
 		});
 	}, [dataAtom, store]);
