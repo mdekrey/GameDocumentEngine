@@ -1,7 +1,6 @@
 import '@mdxeditor/editor/style.css';
 import type { RealmPlugin } from '@mdxeditor/editor';
 import {
-	KitchenSinkToolbar,
 	headingsPlugin,
 	toolbarPlugin,
 	listsPlugin,
@@ -15,6 +14,7 @@ import {
 	diffSourcePlugin,
 	codeMirrorPlugin,
 } from '@mdxeditor/editor';
+import { Toolbar } from './toolbar';
 
 export const readonlyPlugins: RealmPlugin[] = [
 	listsPlugin(),
@@ -42,6 +42,6 @@ export const readonlyPlugins: RealmPlugin[] = [
 ];
 
 export const allPlugins: RealmPlugin[] = [
-	toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+	toolbarPlugin({ toolbarContents: () => <Toolbar /> }),
 	...readonlyPlugins,
 ];
