@@ -13,6 +13,7 @@ import {
 	codeBlockPlugin,
 	markdownShortcutPlugin,
 	diffSourcePlugin,
+	codeMirrorPlugin,
 } from '@mdxeditor/editor';
 
 export const readonlyPlugins: RealmPlugin[] = [
@@ -28,6 +29,14 @@ export const readonlyPlugins: RealmPlugin[] = [
 	tablePlugin(),
 	thematicBreakPlugin(),
 	codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+	codeMirrorPlugin({
+		codeBlockLanguages: {
+			js: 'JavaScript',
+			css: 'CSS',
+			txt: 'text',
+			tsx: 'TypeScript',
+		},
+	}),
 	diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
 	markdownShortcutPlugin(),
 ];

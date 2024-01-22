@@ -2,9 +2,7 @@ import type { GameObjectFormComponent } from '@/documents/defineDocument';
 import type { RichText } from './types';
 import { useSubmitOnChange } from '@/documents/useSubmitOnChange';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { RichTextField } from '@/components/rich-text/RichTextField';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
-import { DisplayMdx } from '@/components/rich-text/mdx/DisplayMdx';
 import { MdxField } from '@/components/rich-text/mdx/MdxField';
 
 export function RichTextMain(props: GameObjectFormComponent<RichText>) {
@@ -14,13 +12,11 @@ export function RichTextMain(props: GameObjectFormComponent<RichText>) {
 		contentField: ['details', 'content'],
 		mdxField: ['details', 'mdx'],
 	});
+	contentField.set(undefined);
 
 	return (
 		<>
 			<TextField field={props.form.field(['name'])} />
-			<RichTextField field={contentField} />
-
-			<DisplayMdx data={mdxField.value} />
 
 			<MdxField field={mdxField} />
 		</>

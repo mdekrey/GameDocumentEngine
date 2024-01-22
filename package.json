@@ -1,9 +1,10 @@
 {
-	"scripts": {
-	},
+	"scripts": {},
 	"pnpm": {
-		"requiredScripts": [
-		]
+		"requiredScripts": [],
+		"patchedDependencies": {
+			"@mdxeditor/editor@2.3.5": "patches/@mdxeditor__editor@2.3.5.patch"
+		}
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^8.0.2",
