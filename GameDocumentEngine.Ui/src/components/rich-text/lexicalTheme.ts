@@ -5,12 +5,12 @@ export const lexicalTheme: EditorThemeClasses = {
 	paragraph: 'my-2',
 	link: 'text-blue-800 dark:text-blue-300 underline',
 	heading: {
-		h1: 'text-5xl font-bold',
-		h2: 'text-4xl font-bold',
-		h3: 'text-3xl font-bold',
-		h4: 'text-2xl font-bold',
-		h5: 'text-xl font-bold',
-		h6: 'text-lg font-bold',
+		h1: 'mt-8 mb-2 text-5xl font-bold',
+		h2: 'mt-7 mb-2 text-4xl font-bold',
+		h3: 'mt-6 mb-2 text-3xl font-bold',
+		h4: 'mt-5 mb-2 text-2xl font-bold',
+		h5: 'mt-4 mb-2 text-xl font-bold',
+		h6: 'mt-4 mb-2 text-lg font-bold',
 	},
 
 	text: {

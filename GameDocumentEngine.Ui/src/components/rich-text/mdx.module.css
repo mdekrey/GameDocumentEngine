@@ -154,6 +154,10 @@
     border-width: 0 var(--spacing-0_5) var(--spacing-0_5) 0;
 }
 
+.root :first-child {
+    @apply mt-0;
+}
+
 .root hr {
     @apply m-12 border-t-2 border-slate-500;
 }

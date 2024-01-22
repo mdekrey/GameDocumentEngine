@@ -30,7 +30,7 @@ export function RichTextField({
 	return (
 		<Field noLabel className={className}>
 			<Field.Label>{field.translation('label')}</Field.Label>
-			<Field.Contents className="border border-slate-500 px-2 mt-2">
+			<Field.Contents className="border border-slate-500 mt-2">
 				<MDXEditor
 					markdown={field.getValue() ?? ''}
 					className={styles.root}
