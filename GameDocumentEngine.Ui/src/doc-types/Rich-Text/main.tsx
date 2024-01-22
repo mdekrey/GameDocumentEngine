@@ -8,7 +8,8 @@ import { MdxField } from '@/components/rich-text';
 export function RichTextMain(props: GameObjectFormComponent<RichText>) {
 	useSubmitOnChange(props.form, props.onSubmit);
 
-	const { contentField, mdxField } = useFormFields(props.form, {
+	const { name, contentField, mdxField } = useFormFields(props.form, {
+		name: ['name'],
 		contentField: ['details', 'content'],
 		mdxField: ['details', 'mdx'],
 	});
@@ -16,8 +17,7 @@ export function RichTextMain(props: GameObjectFormComponent<RichText>) {
 
 	return (
 		<>
-			<TextField field={props.form.field(['name'])} />
-
+			<TextField field={name} />
 			<MdxField field={mdxField} />
 		</>
 	);
