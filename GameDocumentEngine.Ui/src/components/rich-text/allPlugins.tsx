@@ -12,6 +12,7 @@ import {
 	codeBlockPlugin,
 	markdownShortcutPlugin,
 	codeMirrorPlugin,
+	imagePlugin,
 } from '@mdxeditor/editor';
 import { Toolbar } from './toolbar';
 
@@ -21,10 +22,17 @@ export const readonlyPlugins: RealmPlugin[] = [
 	headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4, 5, 6] }),
 	linkPlugin(),
 	linkDialogPlugin(),
-	// imagePlugin({
-	//   imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/150'],
-	//   imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300')
-	// }),
+	// ![test-image](https://via.placeholder.com/150)
+	imagePlugin({
+		imageUploadHandler: (data) => {
+			return new Promise<string>((resolve, reject) => {
+				const reader = new FileReader();
+				reader.addEventListener('error', reject);
+				reader.addEventListener('load', () => resolve(reader.result as string));
+				reader.readAsDataURL(data);
+			});
+		},
+	}),
 	tablePlugin(),
 	thematicBreakPlugin(),
 	codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
