@@ -1,7 +1,7 @@
 import type { Atom } from 'jotai';
 import { atom, useAtomValue, useStore } from 'jotai';
 import { Modal } from './modal';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { noop } from '../noop';
 
 /** Fully internal type; do not expose outside of modal system */
@@ -18,6 +18,8 @@ type ModalStackEntry = {
 	onAbortModal(): void;
 	/** Called by the backdrop component to reject the promise */
 	onBackdropCancel(): void;
+	/** Called by escape keydown to reject the promise */
+	onEscapePressed(): void;
 	/** Called by the closing animation to actually remove the modal from the stack; this allows the modal system to animate closing the modal */
 	onReadyToUnmount(): void;
 };
@@ -46,6 +48,8 @@ export type ModalOptions<T, TProps = never> = {
 	ModalContents: (args: ModalContentsProps<T, TProps>) => React.ReactNode;
 	/** If provided, clicking the backdrop does not abort by default; reject must be called via the args manually */
 	onBackdropCancel?: (args: ModalContentsProps<T, TProps>) => void;
+	/** If provided, pressing escape does not abort by default; reject must be called via the args manually */
+	onEscapePressed?: (args: ModalContentsProps<T, TProps>) => void;
 	/** An abort signal created via an AbortController that, when signalled, can cancel the modal without having access to the resolve/reject. Results in an `AbortedRejection` error. */
 	abort?: AbortSignal;
 
@@ -65,9 +69,17 @@ function rejectViaBackdrop(props: Pick<ModalContentsProps<never>, 'reject'>) {
 	props.reject(BackdropRejection);
 }
 
+/** Error sent via the rejected promise if the user presses escape and no `onEscapePressed` override was provided */
+export const EscapeRejection: unique symbol = Symbol('Modal cancelled');
+
+function rejectViaEscape(props: Pick<ModalContentsProps<never>, 'reject'>) {
+	props.reject(EscapeRejection);
+}
+
 export type ModalLauncher = <T, TProps = never>({
 	ModalContents,
 	onBackdropCancel,
+	onEscapePressed,
 	additional,
 	abort,
 }: ModalOptions<T, TProps>) => Promise<T>;
@@ -79,6 +91,7 @@ export function useLaunchModal(): ModalLauncher {
 		function activate<T, TProps = never>({
 			ModalContents,
 			onBackdropCancel,
+			onEscapePressed,
 			label,
 			additional,
 			abort,
@@ -96,6 +109,7 @@ export function useLaunchModal(): ModalLauncher {
 				onAbortModal: noop,
 				onReadyToUnmount: noop,
 				onBackdropCancel: noop,
+				onEscapePressed: noop,
 			};
 			const modalFinished = new Promise<void>((resolve) => {
 				modalStackEntry.onReadyToUnmount = resolve;
@@ -114,6 +128,8 @@ export function useLaunchModal(): ModalLauncher {
 				modalStackEntry.onAbortModal = () => reject(AbortRejection);
 				modalStackEntry.onBackdropCancel = () =>
 					(onBackdropCancel ?? rejectViaBackdrop)(allProps);
+				modalStackEntry.onEscapePressed = () =>
+					(onEscapePressed ?? rejectViaEscape)(allProps);
 				modalStackEntry.contents = <ModalContents {...allProps} />;
 
 				// Add new modal to the stack so it displays
@@ -139,6 +155,23 @@ export function useLaunchModal(): ModalLauncher {
 
 export function Modals() {
 	const modals = useAtomValue(activeModalStack);
+	const lastModal = modals[modals.length - 1];
+	useEffect(() => {
+		if (!lastModal) return;
+
+		globalThis.document.addEventListener('keydown', checkDocumentKeyDown);
+		return () =>
+			globalThis.document.removeEventListener('keydown', checkDocumentKeyDown);
+		function checkDocumentKeyDown(event: KeyboardEvent) {
+			if (
+				event.key === 'Escape' ||
+				event.key === 'Esc' ||
+				event.keyCode === 27
+			) {
+				lastModal.onEscapePressed();
+			}
+		}
+	}, [lastModal]);
 
 	return (
 		<>
