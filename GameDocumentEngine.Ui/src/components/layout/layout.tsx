@@ -43,79 +43,80 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 		return () => document.querySelector('main')?.focus();
 	}, [location]);
 	return (
-		<div
-			className={styles.layout}
-			data-left-drawer={slotProps.LeftSidebar ? true : false}
-			data-right-drawer={slotProps.RightSidebar ? true : false}
-		>
-			<Header
-				menuItems={menuItems}
-				user={user}
-				connectionState={connectionState}
-				onReconnect={onReconnect}
-				className={styles.header}
+		<>
+			<div
+				className={styles.layout}
+				data-left-drawer={slotProps.LeftSidebar ? true : false}
+				data-right-drawer={slotProps.RightSidebar ? true : false}
 			>
+				<Header
+					menuItems={menuItems}
+					user={user}
+					connectionState={connectionState}
+					onReconnect={onReconnect}
+					className={styles.header}
+				>
+					{slotProps.Subheader && (
+						<nav className="hidden lg:block max-w-screen-md flex-1 px-4 py-1 bg-slate-100 dark:bg-slate-900 rounded-sm shadow-inner">
+							{slotProps.Subheader?.children}
+						</nav>
+					)}
+				</Header>
+
 				{slotProps.Subheader && (
-					<nav className="hidden lg:block max-w-screen-md flex-1 px-4 py-1 bg-slate-100 dark:bg-slate-900 rounded-sm shadow-inner">
-						{slotProps.Subheader?.children}
+					<nav
+						className={twMerge(
+							styles.subheader,
+							'lg:hidden bg-slate w-full bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-sm flex flex-row items-center gap-2 h-12 p-1',
+						)}
+					>
+						{slotProps.LeftSidebar && (
+							<IconButton.Secondary
+								className="lg:hidden"
+								onClick={() => leftSidebar?.current?.focus()}
+							>
+								<HiOutlineEllipsisVertical className="h-8 w-8" />
+							</IconButton.Secondary>
+						)}
+						<div className="flex-1">{slotProps.Subheader?.children}</div>
 					</nav>
 				)}
-			</Header>
 
-			{slotProps.Subheader && (
-				<nav
+				<section
+					ref={leftSidebar}
+					tabIndex={0}
 					className={twMerge(
-						styles.subheader,
-						'lg:hidden bg-slate w-full bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-sm flex flex-row items-center gap-2 h-12 p-1',
+						styles['sidebar-left'],
+						'overflow-auto bg-slate-200 text-slate-950 dark:bg-slate-700 dark:text-white',
 					)}
 				>
-					{slotProps.LeftSidebar && (
-						<IconButton.Secondary
-							className="lg:hidden"
-							onClick={() => leftSidebar?.current?.focus()}
-						>
-							<HiOutlineEllipsisVertical className="h-8 w-8" />
-						</IconButton.Secondary>
+					{slotProps.LeftSidebar?.children}
+				</section>
+				<main
+					tabIndex={-1}
+					className={twMerge(
+						styles.main,
+						'overflow-auto',
+						'bg-white text-slate-950',
+						'dark:bg-slate-950 dark:text-white',
 					)}
-					<div className="flex-1">{slotProps.Subheader?.children}</div>
-				</nav>
-			)}
+				>
+					{children}
+				</main>
+				<section
+					ref={rightSidebar}
+					tabIndex={0}
+					className={twMerge(
+						styles['sidebar-right'],
+						'overflow-auto bg-slate-200 text-slate-950 dark:bg-slate-700 dark:text-white',
+					)}
+				>
+					{slotProps.RightSidebar?.children}
+				</section>
 
-			<section
-				ref={leftSidebar}
-				tabIndex={0}
-				className={twMerge(
-					styles['sidebar-left'],
-					'overflow-auto bg-slate-200 text-slate-950 dark:bg-slate-700 dark:text-white',
-				)}
-			>
-				{slotProps.LeftSidebar?.children}
-			</section>
-			<main
-				tabIndex={-1}
-				className={twMerge(
-					styles.main,
-					'overflow-auto',
-					'bg-white text-slate-950',
-					'dark:bg-slate-950 dark:text-white',
-				)}
-			>
-				{children}
-			</main>
-			<section
-				ref={rightSidebar}
-				tabIndex={0}
-				className={twMerge(
-					styles['sidebar-right'],
-					'overflow-auto bg-slate-200 text-slate-950 dark:bg-slate-700 dark:text-white',
-				)}
-			>
-				{slotProps.RightSidebar?.children}
-			</section>
-
-			<div className={styles.backdrop}></div>
-
+				<div className={styles.backdrop}></div>
+			</div>
 			<Modals />
-		</div>
+		</>
 	);
 });

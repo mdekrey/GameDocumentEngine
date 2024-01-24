@@ -12,6 +12,8 @@ type ModalStackEntry = {
 	id: React.Key;
 	/** A boolean atom indicating whether the modal should be displayed. When false, will modal should animate to closed. */
 	shouldShow: Atom<boolean>;
+	/** Modal's "aria-label" */
+	label: string;
 	/** Called by the abort signal to cancel the modal */
 	onAbortModal(): void;
 	/** Called by the backdrop component to reject the promise */
@@ -45,6 +47,10 @@ export type ModalOptions<T, TProps = never> = {
 	onBackdropCancel?: (args: ModalContentsProps<T, TProps>) => void;
 	/** An abort signal created via an AbortController that, when signalled, can cancel the modal without having access to the resolve/reject. Results in an `AbortedRejection` error. */
 	abort?: AbortSignal;
+
+	// TODO: require label
+	/** Modal's "aria-label" */
+	label?: string;
 } & Additional<TProps>;
 
 /** Error sent via the rejected promise if the abort signal is used before the modal completes */
@@ -72,6 +78,7 @@ export function useLaunchModal(): ModalLauncher {
 		function activate<T, TProps = never>({
 			ModalContents,
 			onBackdropCancel,
+			label,
 			additional,
 			abort,
 		}: ModalOptions<T, TProps>): Promise<T> {
@@ -84,6 +91,7 @@ export function useLaunchModal(): ModalLauncher {
 				contents: null,
 				id: Math.random(),
 				shouldShow,
+				label: label ?? '',
 				onAbortModal: noop,
 				onReadyToUnmount: noop,
 				onBackdropCancel: noop,
@@ -134,9 +142,17 @@ export function Modals() {
 	return (
 		<>
 			{modals.map(
-				({ contents, id, shouldShow, onBackdropCancel, onReadyToUnmount }) => (
+				({
+					contents,
+					id,
+					shouldShow,
+					label,
+					onBackdropCancel,
+					onReadyToUnmount,
+				}) => (
 					<Modal
 						key={id}
+						label={label}
 						onBackdropCancel={onBackdropCancel}
 						show={shouldShow}
 						onReadyToUnmount={onReadyToUnmount}
