@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Layout } from './layout';
+import { LayoutPresentation } from './layout';
 import { getHeaderMenuItems } from '../header/useHeaderMenuItems';
 import { HubConnectionState } from '@microsoft/signalr';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
@@ -8,6 +8,8 @@ import { useCallback, useMemo } from 'react';
 import { randomUser } from '@/utils/stories/sample-data';
 import { useTranslation } from 'react-i18next';
 import { LoremBlock } from '@/utils/stories/sample-components';
+import type { HeaderPresentationProps } from '../header/useHeaderPresentation';
+import { Header } from '../header/header';
 
 type HeaderProps = {
 	hasUser: boolean;
@@ -16,6 +18,38 @@ type HeaderProps = {
 	connectionState: HubConnectionState;
 	onReconnect?: () => void;
 };
+
+function useStorybookHeaderPresentation({
+	hasUser,
+	connectionState,
+	onReconnect,
+}: {
+	hasUser: boolean;
+	connectionState: HubConnectionState;
+	onReconnect?: () => void;
+}): React.FC<HeaderPresentationProps> {
+	const user = useMemo(() => (hasUser ? randomUser() : undefined), [hasUser]);
+	const { t } = useTranslation(['layout']);
+	const connectionState$ = useAsAtom(connectionState);
+	const reconnect = useCallback(async () => {
+		onReconnect?.();
+		await new Promise((resolve) => setTimeout(resolve, 5000));
+	}, [onReconnect]);
+	return useCallback(
+		({ className, children }) => (
+			<Header
+				connectionState={connectionState$}
+				onReconnect={reconnect}
+				menuItems={getHeaderMenuItems(t, user, false, () => void 0)}
+				user={user}
+				className={className}
+			>
+				{children}
+			</Header>
+		),
+		[connectionState$, reconnect, t, user],
+	);
+}
 
 const meta = {
 	title: 'Layout/Layout',
@@ -48,39 +82,34 @@ const meta = {
 		hasRightSidebar,
 		...props
 	}) {
-		const user = useMemo(() => (hasUser ? randomUser() : undefined), [hasUser]);
-		const { t } = useTranslation(['layout']);
-		const connectionState$ = useAsAtom(connectionState);
-		const reconnect = useCallback(async () => {
-			onReconnect?.();
-			await new Promise((resolve) => setTimeout(resolve, 5000));
-		}, [onReconnect]);
+		const header = useStorybookHeaderPresentation({
+			hasUser,
+			connectionState,
+			onReconnect,
+		});
 		return (
-			<Layout
-				connectionState={connectionState$}
-				onReconnect={reconnect}
-				menuItems={getHeaderMenuItems(t, user, false, () => void 0)}
-				user={user}
+			<LayoutPresentation
+				header={header}
+				leftSidebar={
+					hasLeftSidebar ? (
+						<div className="m-4">
+							<LoremBlock />
+						</div>
+					) : null
+				}
+				rightSidebar={
+					hasRightSidebar ? (
+						<div className="m-4">
+							<LoremBlock />
+						</div>
+					) : null
+				}
 				{...props}
 			>
-				{hasLeftSidebar ? (
-					<Layout.LeftSidebar>
-						<div className="m-4">
-							<LoremBlock />
-						</div>
-					</Layout.LeftSidebar>
-				) : null}
-				{hasRightSidebar ? (
-					<Layout.RightSidebar>
-						<div className="m-4">
-							<LoremBlock />
-						</div>
-					</Layout.RightSidebar>
-				) : null}
 				<div className="m-4">
 					<LoremBlock sentenceCount={8} paragraphCount={10} />
 				</div>
-			</Layout>
+			</LayoutPresentation>
 		);
 	},
 } satisfies Meta<HeaderProps>;

@@ -1,7 +1,4 @@
-import { withSlots } from 'react-slot-component';
 import { Modals, hasOpenModal } from '@/utils/modal/modal-service';
-import type { HeaderProps } from '../header/header';
-import { Header } from '../header/header';
 import styles from './layout.module.css';
 import { twMerge } from 'tailwind-merge';
 import { HiOutlineEllipsisVertical } from 'react-icons/hi2';
@@ -10,19 +7,15 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useStore } from 'jotai';
 import { elementTemplate } from '../template';
+import type { HeaderPresentationProps } from '../header/useHeaderPresentation';
+import { LoadingSection } from './LoadingSection';
 
-export type LayoutProps = { children?: React.ReactNode } & HeaderProps;
-
-export type LayoutSlots = {
-	Subheader: {
-		children?: React.ReactNode;
-	};
-	LeftSidebar: {
-		children: React.ReactNode;
-	};
-	RightSidebar: {
-		children: React.ReactNode;
-	};
+export type LayoutProps = {
+	children?: React.ReactNode;
+	subheader?: React.ReactNode;
+	leftSidebar?: React.ReactNode;
+	rightSidebar?: React.ReactNode;
+	header: React.FC<HeaderPresentationProps>;
 };
 
 function useInert<TElem extends HTMLElement>() {
@@ -54,17 +47,13 @@ const Main = base.extend('Main', () => (
 	<main tabIndex={-1} className="bg-white dark:bg-slate-950" />
 ));
 
-export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
+export function Layout({
 	children,
-	menuItems,
-	user,
-	connectionState,
-	onReconnect,
-	slotProps,
-}) {
-	const leftSidebar = useRef<HTMLElement>(null);
-	const rightSidebar = useRef<HTMLElement>(null);
-
+	subheader,
+	leftSidebar,
+	rightSidebar,
+	header,
+}: LayoutProps) {
 	const location = useLocation();
 	useEffect(() => {
 		// This feels like a hack, but it works. This may not be good for
@@ -75,84 +64,77 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 	return (
 		<>
 			<LayoutPresentation
-				slotProps={slotProps}
 				rootRef={rootRef}
-				menuItems={menuItems}
-				user={user}
-				connectionState={connectionState}
-				onReconnect={onReconnect}
+				subheader={subheader}
 				leftSidebar={leftSidebar}
-				children={children}
 				rightSidebar={rightSidebar}
+				header={header}
+				children={children}
 			/>
 			<Modals />
 		</>
 	);
-});
+}
 
-function LayoutPresentation({
-	slotProps,
-	menuItems,
-	user,
-	connectionState,
-	onReconnect,
-	children,
-	rootRef,
+export function LayoutPresentation({
 	leftSidebar,
 	rightSidebar,
+	subheader,
+	children,
+	rootRef,
+	header: Header,
 }: {
-	slotProps: Partial<LayoutSlots>;
+	leftSidebar?: React.ReactNode;
+	rightSidebar?: React.ReactNode;
+	subheader?: React.ReactNode;
 	children?: React.ReactNode;
-	rootRef: React.RefObject<HTMLDivElement>;
-	leftSidebar: React.RefObject<HTMLElement>;
-	rightSidebar: React.RefObject<HTMLElement>;
-} & HeaderProps) {
+	rootRef?: React.RefObject<HTMLDivElement>;
+	header: React.FC<HeaderPresentationProps>;
+}) {
+	const leftSidebarRef = useRef<HTMLElement>(null);
+	const rightSidebarRef = useRef<HTMLElement>(null);
 	return (
 		<div
 			className={styles.layout}
-			data-left-drawer={slotProps.LeftSidebar ? true : false}
-			data-right-drawer={slotProps.RightSidebar ? true : false}
+			data-left-drawer={leftSidebar ? true : false}
+			data-right-drawer={rightSidebar ? true : false}
 			ref={rootRef}
 		>
-			<Header
-				menuItems={menuItems}
-				user={user}
-				connectionState={connectionState}
-				onReconnect={onReconnect}
-				className={styles.header}
-			>
-				{slotProps.Subheader && (
+			<Header className={styles.header}>
+				{subheader && (
 					<nav className="hidden lg:block max-w-screen-md flex-1 px-4 py-1 bg-slate-100 dark:bg-slate-900 rounded-sm shadow-inner">
-						{slotProps.Subheader?.children}
+						<LoadingSection>{subheader}</LoadingSection>
 					</nav>
 				)}
 			</Header>
 
-			{slotProps.Subheader && (
+			{subheader && (
 				<nav
 					className={twMerge(
 						styles.subheader,
 						'lg:hidden bg-slate w-full bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-sm flex flex-row items-center gap-2 h-12 p-1',
 					)}
 				>
-					{slotProps.LeftSidebar && (
+					{leftSidebar && (
 						<IconButton.Secondary
 							className="lg:hidden"
-							onClick={() => leftSidebar?.current?.focus()}
+							onClick={() => leftSidebarRef?.current?.focus()}
 						>
 							<HiOutlineEllipsisVertical className="h-8 w-8" />
 						</IconButton.Secondary>
 					)}
-					<div className="flex-1">{slotProps.Subheader?.children}</div>
+					<div className="flex-1">
+						<LoadingSection>{subheader}</LoadingSection>
+					</div>
 				</nav>
 			)}
 
-			<Sidebar.Left ref={leftSidebar}>
-				{slotProps.LeftSidebar?.children}
+			<Sidebar.Left ref={leftSidebarRef}>
+				<LoadingSection>{leftSidebar}</LoadingSection>
 			</Sidebar.Left>
 			<Main className={styles.main}>{children}</Main>
-			<Sidebar.Right ref={rightSidebar}>
-				{slotProps.RightSidebar?.children}
+			<Sidebar.Right ref={rightSidebarRef}>
+				<LoadingSection>{rightSidebar}</LoadingSection>
 			</Sidebar.Right>
 
 			<div className={styles.backdrop}></div>
