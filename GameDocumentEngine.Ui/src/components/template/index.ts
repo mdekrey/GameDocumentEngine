@@ -185,13 +185,15 @@ export function elementTemplate<
 			const result = Object.assign(
 				this,
 				Object.fromEntries(
-					Object.entries<TemplateResolver<TBaseProps>>(themes).map(
-						([name, example]) =>
-							[
-								name as TKeys,
-								this.extend(`${this.displayName}.${name}`, example),
-							] as const,
-					),
+					Object.entries<TemplateResolver<TBaseProps>>(themes)
+						.filter(([, example]) => typeof example === 'function')
+						.map(
+							([name, example]) =>
+								[
+									name as TKeys,
+									this.extend(`${this.displayName}.${name}`, example),
+								] as const,
+						),
 				) as Record<TKeys, ElementTemplate<TBaseProps>>,
 			);
 			return result;
