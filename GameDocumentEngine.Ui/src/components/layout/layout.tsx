@@ -1,5 +1,5 @@
 import { withSlots } from 'react-slot-component';
-import { Modals } from '@/utils/modal/modal-service';
+import { Modals, hasOpenModal } from '@/utils/modal/modal-service';
 import type { HeaderProps } from '../header/header';
 import { Header } from '../header/header';
 import type { NetworkIndicatorProps } from '../network/network-indicator';
@@ -9,6 +9,7 @@ import { HiOutlineEllipsisVertical } from 'react-icons/hi2';
 import { IconButton } from '../button/icon-button';
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useStore } from 'jotai';
 
 export type LayoutProps = { children?: React.ReactNode } & HeaderProps &
 	NetworkIndicatorProps;
@@ -24,6 +25,20 @@ export type LayoutSlots = {
 		children: React.ReactNode;
 	};
 };
+
+function useInert<TElem extends HTMLElement>() {
+	const ref = useRef<TElem>(null);
+	const store = useStore();
+	useEffect(() => {
+		store.sub(hasOpenModal, updateInert);
+		updateInert();
+		function updateInert() {
+			if (store.get(hasOpenModal)) ref.current?.setAttribute('inert', 'inert');
+			else ref.current?.removeAttribute('inert');
+		}
+	}, [store]);
+	return ref;
+}
 
 export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 	children,
@@ -42,12 +57,14 @@ export const Layout = withSlots<LayoutSlots, LayoutProps>(function Layout({
 		// accessibility, however. Need to check with an expert.
 		return () => document.querySelector('main')?.focus();
 	}, [location]);
+	const rootRef = useInert<HTMLDivElement>();
 	return (
 		<>
 			<div
 				className={styles.layout}
 				data-left-drawer={slotProps.LeftSidebar ? true : false}
 				data-right-drawer={slotProps.RightSidebar ? true : false}
+				ref={rootRef}
 			>
 				<Header
 					menuItems={menuItems}

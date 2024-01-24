@@ -23,6 +23,7 @@ type ModalStackEntry = {
 };
 
 const activeModalStack = atom<ModalStackEntry[]>([]);
+export const hasOpenModal = atom((get) => get(activeModalStack).length > 0);
 
 /** Special type to not require `additional` to be provided if no props are needed */
 export type Additional<TProps> = [TProps] extends [never]
