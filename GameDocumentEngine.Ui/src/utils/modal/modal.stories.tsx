@@ -5,10 +5,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Prose } from '@/components/text/common';
 import { ModalDialogLayout } from './modal-dialog';
 
-function SampleModal({ children }: React.ComponentProps<typeof Modal>) {
+function SampleModal({
+	children,
+	...props
+}: React.ComponentProps<typeof Modal>) {
 	return (
 		<div className="h-64">
-			<Modal>{children}</Modal>
+			<Modal {...props}>{children}</Modal>
 		</div>
 	);
 }
@@ -30,6 +33,7 @@ export default meta;
 
 export const BasicModal: Story = {
 	args: {
+		label: 'Details',
 		children: (
 			<ModalDialogLayout>
 				<ModalDialogLayout.Title>Details</ModalDialogLayout.Title>
@@ -48,6 +52,7 @@ export const BasicModal: Story = {
 
 export const ModalAlert: Story = {
 	args: {
+		label: 'Deactivate account',
 		children: (
 			<ModalAlertLayout>
 				<ModalAlertLayout.Title>Deactivate account</ModalAlertLayout.Title>

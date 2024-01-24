@@ -2,14 +2,17 @@ import { Transition } from '@headlessui/react';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
-import { Fragment, useState } from 'react';
+import { Fragment, forwardRef, useState } from 'react';
+import * as FocusTrap from 'focus-trap-react';
 
 function FullPageModalContainer({
 	children,
+	label,
 	show,
 	onReadyToUnmount,
 }: {
 	children: React.ReactNode;
+	label: string;
 	show?: Atom<boolean>;
 	onReadyToUnmount?: () => void;
 }) {
@@ -26,7 +29,7 @@ function FullPageModalContainer({
 		>
 			<div
 				className="relative z-modalBackground"
-				aria-labelledby="modal-title"
+				aria-label={label}
 				role="dialog"
 				aria-modal="true"
 			>
@@ -52,15 +55,18 @@ function ModalBackdrop() {
 	);
 }
 
-function ModalPanel({
-	children,
-	onCancel,
-}: {
-	children: React.ReactNode;
-	onCancel?: () => void;
-}) {
+const ModalPanel = forwardRef(function ModalPanel(
+	{
+		children,
+		onCancel,
+	}: {
+		children: React.ReactNode;
+		onCancel?: () => void;
+	},
+	ref: React.ForwardedRef<HTMLDivElement>,
+) {
 	return (
-		<div className="fixed inset-0 z-modalForeground overflow-y-auto">
+		<div className="fixed inset-0 z-modalForeground overflow-y-auto" ref={ref}>
 			<div
 				className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
 				onClick={(ev) => {
@@ -91,24 +97,32 @@ function ModalPanel({
 			</div>
 		</div>
 	);
-}
+});
 
 export function Modal({
 	children,
 	show,
+	label,
 	onBackdropCancel,
 	onReadyToUnmount,
 }: {
 	children: React.ReactNode;
 	show?: Atom<boolean>;
+	label: string;
 	onReadyToUnmount?: () => void;
 	onBackdropCancel?: () => void;
 }) {
 	return (
-		<FullPageModalContainer show={show} onReadyToUnmount={onReadyToUnmount}>
+		<FullPageModalContainer
+			label={label}
+			show={show}
+			onReadyToUnmount={onReadyToUnmount}
+		>
 			<ModalBackdrop />
 
-			<ModalPanel onCancel={onBackdropCancel}>{children}</ModalPanel>
+			<FocusTrap>
+				<ModalPanel onCancel={onBackdropCancel}>{children}</ModalPanel>
+			</FocusTrap>
 		</FullPageModalContainer>
 	);
 }
