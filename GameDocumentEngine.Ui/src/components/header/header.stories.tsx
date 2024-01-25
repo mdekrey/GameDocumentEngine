@@ -1,16 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Header } from './header';
-import { getHeaderMenuItems } from './useHeaderMenuItems';
 import { HubConnectionState } from '@microsoft/signalr';
-import { useAsAtom } from '@principlestudios/jotai-react-signals';
-import { useCallback } from 'react';
-import type { UserDetails } from '@/api/models/UserDetails';
-import { sampleUser } from '@/utils/stories/sample-data';
-import { useTranslation } from 'react-i18next';
+import { useStorybookHeaderPresentation } from './useStorybookHeaderPresentation';
 
 type HeaderProps = {
-	user?: UserDetails;
+	hasUser: boolean;
 	connectionState: HubConnectionState;
 	onReconnect?: () => void;
 };
@@ -35,25 +29,9 @@ const meta = {
 	args: {
 		connectionState: HubConnectionState.Connected,
 	},
-	render: function RenderNetworkIndicatorStory({
-		connectionState,
-		onReconnect,
-		...props
-	}) {
-		const { t } = useTranslation(['layout']);
-		const connectionState$ = useAsAtom(connectionState);
-		const reconnect = useCallback(async () => {
-			onReconnect?.();
-			await new Promise((resolve) => setTimeout(resolve, 5000));
-		}, [onReconnect]);
-		return (
-			<Header
-				connectionState={connectionState$}
-				onReconnect={reconnect}
-				menuItems={getHeaderMenuItems(t, props.user, false, () => void 0)}
-				{...props}
-			/>
-		);
+	render: function RenderNetworkIndicatorStory(props) {
+		const Header = useStorybookHeaderPresentation(props);
+		return <Header />;
 	},
 } satisfies Meta<HeaderProps>;
 type Story = StoryObj<typeof meta>;
@@ -62,10 +40,12 @@ export default meta;
 
 export const Default: Story = {
 	args: {
-		user: sampleUser,
+		hasUser: true,
 	},
 };
 
 export const NoUser: Story = {
-	args: {},
+	args: {
+		hasUser: false,
+	},
 };
