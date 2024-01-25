@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type {
 	GameObjectFormComponent,
 	TypedDocumentDetails,
@@ -13,7 +13,7 @@ import {
 } from './grid-utils';
 import { RenderWidget } from './RenderWidget';
 import { IconButton } from '@/components/button/icon-button';
-import { HiPencil } from 'react-icons/hi2';
+import { HiPencil, HiOutlineArrowsPointingOut } from 'react-icons/hi2';
 import { useWidgetSizes } from './useWidgetSizes';
 import { useWidget } from './useWidget';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,7 @@ export function DashboardViewMode({
 	writablePointers,
 	form,
 }: GameObjectFormComponent<Dashboard>) {
+	const dashboardRef = useRef<HTMLDivElement>(null);
 	const canUpdateWidgets = writablePointers.contains('details', 'widgets');
 	const { widgets } = useFormFields(form, {
 		widgets: ['details', 'widgets'],
@@ -53,8 +54,10 @@ export function DashboardViewMode({
 
 	return (
 		<DashboardViewModePresentation
+			dashbordRef={dashboardRef}
 			canUpdateWidgets={canUpdateWidgets}
 			onToggleEditing={onToggleEditing}
+			onToggleFullscreen={onToggleFullscreen}
 			document={document}
 			height={height}
 			width={width}
@@ -62,9 +65,14 @@ export function DashboardViewMode({
 			RenderWidgetConfig={RenderWidgetConfig}
 		/>
 	);
+
+	function onToggleFullscreen() {
+		void dashboardRef.current?.parentElement?.requestFullscreen();
+	}
 }
 
 function DashboardViewModePresentation({
+	dashbordRef,
 	canUpdateWidgets,
 	document,
 	height,
@@ -72,7 +80,9 @@ function DashboardViewModePresentation({
 	dropTarget,
 	RenderWidgetConfig,
 	onToggleEditing,
+	onToggleFullscreen,
 }: {
+	dashbordRef: React.MutableRefObject<HTMLDivElement | null>;
 	canUpdateWidgets: boolean;
 	document: TypedDocumentDetails<Dashboard>;
 	height: Atom<string>;
@@ -80,11 +90,13 @@ function DashboardViewModePresentation({
 	dropTarget: ReturnType<typeof useDropTarget>;
 	RenderWidgetConfig: React.FC<{ widgetConfig: Widget }>;
 	onToggleEditing: () => void;
+	onToggleFullscreen: () => void;
 }) {
 	return (
 		<DashboardContainer
 			{...dropTarget}
 			style={{ ['--h']: height, ['--w']: width }}
+			ref={dashbordRef}
 		>
 			{Object.entries(document.details.widgets).map(
 				([key, config]: [string, Widget]) => (
@@ -99,6 +111,9 @@ function DashboardViewModePresentation({
 						<HiPencil />
 					</IconButton>
 				)}
+				<IconButton onClick={onToggleFullscreen}>
+					<HiOutlineArrowsPointingOut />
+				</IconButton>
 			</DashboardToolsContainer>
 		</DashboardContainer>
 	);
