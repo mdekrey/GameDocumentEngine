@@ -3,7 +3,6 @@ import { useAsAtom } from '@principlestudios/jotai-react-signals';
 import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { Fragment, forwardRef, useState } from 'react';
-import * as FocusTrap from 'focus-trap-react';
 
 function FullPageModalContainer({
 	children,
@@ -120,9 +119,7 @@ export function Modal({
 		>
 			<ModalBackdrop />
 
-			<FocusTrap>
-				<ModalPanel onCancel={onBackdropCancel}>{children}</ModalPanel>
-			</FocusTrap>
+			<ModalPanel onCancel={onBackdropCancel}>{children}</ModalPanel>
 		</FullPageModalContainer>
 	);
 }
