@@ -84,5 +84,5 @@ export const PositionedWidgetContainer = WidgetContainer.extend<
 export const DashboardToolsContainer = elementTemplate(
 	'DashboardToolsContainer',
 	'div',
-	(T) => <T className="fixed right-4 bottom-4" />,
+	(T) => <T className="fixed right-4 bottom-4 gap-4 flex flex-col-reverse" />,
 );
