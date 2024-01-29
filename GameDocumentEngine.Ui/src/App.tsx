@@ -19,6 +19,7 @@ import { DocumentSubheader } from './apps/documents/subheader/document-subheader
 import { withParamsValue } from '@/components/router/withParamsValue';
 import { withErrorBoundary } from '@/components/router/withErrorBoundary';
 import { useHeaderPresentation } from './components/header/useHeaderPresentation';
+import { useReconnectOnLoad } from './components/network/useReconnectOnLoad';
 
 const withGameId = withParamsValue('gameId');
 const withDocumentId = withParamsValue('documentId');
@@ -74,6 +75,7 @@ const subheaderRoutes: RouteObject[] = [
 ];
 
 function App() {
+	useReconnectOnLoad();
 	const header = useHeaderPresentation();
 	const subheaderRoute = useRoutes(subheaderRoutes);
 	const leftSidebar = useRoutes(leftSidebarRoute);
