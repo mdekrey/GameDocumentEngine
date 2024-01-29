@@ -10,12 +10,11 @@ import {
 	useDocumentListMapping,
 	usePlayerListMapping,
 } from './mappings';
-import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { Section, SectionHeader } from '@/components/sections';
 import { SelectDocuments } from './SelectDocuments';
 import { SelectPlayers } from './SelectPlayers';
+import { ModalForm } from '@/utils/modal/modal-form';
 
 const schema = z.object({
 	documents: z.string().array(),
@@ -57,33 +56,27 @@ export function ConfigureImportGame({
 		},
 	});
 	return (
-		<form onSubmit={form.handleSubmit(resolve)}>
-			<ModalDialogLayout>
-				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
-				<Fieldset>
-					<Section>
-						<SectionHeader>
-							{form.fields.documents.translation('label')}
-						</SectionHeader>
-						<SelectDocuments
-							field={form.fields.documents}
-							documents={inspected.documents}
-						/>
-					</Section>
-					<Section>
-						<SectionHeader>
-							{form.fields.players.translation('label')}
-						</SectionHeader>
-						<SelectPlayers
-							field={form.fields.players}
-							players={inspected.players}
-						/>
-					</Section>
-				</Fieldset>
-				<ModalDialogLayout.Buttons>
-					<Button type="submit">{t('submit')}</Button>
-				</ModalDialogLayout.Buttons>
-			</ModalDialogLayout>
-		</form>
+		<ModalForm onSubmit={form.handleSubmit(resolve)} translation={t}>
+			<Fieldset>
+				<Section>
+					<SectionHeader>
+						{form.fields.documents.translation('label')}
+					</SectionHeader>
+					<SelectDocuments
+						field={form.fields.documents}
+						documents={inspected.documents}
+					/>
+				</Section>
+				<Section>
+					<SectionHeader>
+						{form.fields.players.translation('label')}
+					</SectionHeader>
+					<SelectPlayers
+						field={form.fields.players}
+						players={inspected.players}
+					/>
+				</Section>
+			</Fieldset>
+		</ModalForm>
 	);
 }

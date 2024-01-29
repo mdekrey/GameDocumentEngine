@@ -1,11 +1,10 @@
 import type { GameObjectWidgetDefinition } from '@/documents/defineDocument';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
-import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Trans } from 'react-i18next';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
-import { Button } from '@/components/button/button';
 import { SelectWidgetTypeField } from './SelectWidgetTypeField';
 import type { TFunction } from 'i18next';
+import { ModalForm } from '@/utils/modal/modal-form';
 
 export function AddWidgetModalPresentation({
 	docTypeKey,
@@ -26,32 +25,24 @@ export function AddWidgetModalPresentation({
 	onCancel: () => void;
 	onSubmit: () => void;
 }) {
+	const title = (
+		<Trans i18nKey="title" t={t} components={{ Document: <DocumentName /> }} />
+	);
 	return (
-		<form onSubmit={() => onSubmit()}>
-			<ModalDialogLayout>
-				<ModalDialogLayout.Title>
-					<Trans
-						i18nKey="title"
-						t={t}
-						components={{
-							Document: <DocumentName />,
-						}}
-					/>
-				</ModalDialogLayout.Title>
-				<Fieldset>
-					<SelectWidgetTypeField
-						field={widgetTypeField}
-						widgets={widgets}
-						docTypeKey={docTypeKey}
-					/>
-					<WidgetSettings />
-				</Fieldset>
-
-				<ModalDialogLayout.Buttons>
-					<Button.Save type="submit">{t('submit')}</Button.Save>
-					<Button.Secondary onClick={onCancel}>{t('cancel')}</Button.Secondary>
-				</ModalDialogLayout.Buttons>
-			</ModalDialogLayout>
-		</form>
+		<ModalForm
+			title={title}
+			onSubmit={() => onSubmit()}
+			onCancel={onCancel}
+			translation={t}
+		>
+			<Fieldset>
+				<SelectWidgetTypeField
+					field={widgetTypeField}
+					widgets={widgets}
+					docTypeKey={docTypeKey}
+				/>
+				<WidgetSettings />
+			</Fieldset>
+		</ModalForm>
 	);
 }
