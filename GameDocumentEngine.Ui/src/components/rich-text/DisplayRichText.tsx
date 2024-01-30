@@ -5,8 +5,9 @@ import { MDXEditor } from '@mdxeditor/editor';
 import { readonlyPlugins } from './allPlugins';
 import styles from './mdx.module.css';
 import { lexicalTheme } from './lexicalTheme';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useAsAtom } from '@principlestudios/jotai-react-signals';
+import { useAtomSubscription } from '@/utils/useAtomSubscription';
 
 export function DisplayRichText({
 	data,
@@ -16,12 +17,13 @@ export function DisplayRichText({
 	const dataAtom = useAsAtom(data);
 	const store = useStore();
 	const mdxEditorRef = useRef<MDXEditorMethods>(null);
-	useEffect(() => {
-		mdxEditorRef.current?.setMarkdown(store.get(dataAtom) ?? '');
-		return store.sub(dataAtom, () => {
-			mdxEditorRef.current?.setMarkdown(store.get(dataAtom) ?? '');
-		});
-	}, [dataAtom, store]);
+	useAtomSubscription(
+		dataAtom,
+		(md) => {
+			mdxEditorRef.current?.setMarkdown(md ?? '');
+		},
+		true,
+	);
 
 	return (
 		<MDXEditor

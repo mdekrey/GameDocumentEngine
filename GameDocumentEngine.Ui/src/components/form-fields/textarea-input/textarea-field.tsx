@@ -11,8 +11,8 @@ import {
 	undefinedAsEmptyStringMapping,
 	undefinedOrIntegerMapping,
 } from '../text-input/text-field';
-import { useEffect, useMemo, useRef } from 'react';
-import { useStore } from 'jotai';
+import { useMemo, useRef } from 'react';
+import { useAtomSubscription } from '@/utils/useAtomSubscription';
 
 export type TextareaFieldPersistentProps = {
 	description?: boolean;
@@ -38,13 +38,8 @@ export function TextareaField(props: TextareaFieldProps) {
 		useComputedAtom((get) => (get(htmlProps.disabled) ? 'text-slate-500' : '')),
 		labelClassName,
 	);
-	const store = useStore();
-	useEffect(() => {
-		adjustHeight();
-		return store.sub(props.field.value, () => {
-			adjustHeight();
-		});
-
+	useAtomSubscription(
+		props.field.value,
 		function adjustHeight() {
 			const textarea = textareaRef.current;
 			if (!textarea) return;
@@ -52,8 +47,9 @@ export function TextareaField(props: TextareaFieldProps) {
 				textarea.offsetHeight - textarea.clientHeight + textarea.scrollHeight;
 			if (expectedHeight > textarea.offsetHeight)
 				textarea.style.height = `${expectedHeight + 1}px`;
-		}
-	}, [store, props.field.value]);
+		},
+		true,
+	);
 	return (
 		<Field {...fieldProps}>
 			<Field.Label className={disabledLabelClassName}>
