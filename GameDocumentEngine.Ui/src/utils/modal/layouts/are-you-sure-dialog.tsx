@@ -1,9 +1,13 @@
 import { Prose } from '@/components/text/common';
 import { ModalAlertLayout } from '../alert-layout';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@/components/button/button';
 import type { TFunction } from 'i18next';
-import type { ModalContentsProps, ModalLauncher } from '../modal-service';
+import {
+	useLaunchModal,
+	type ModalContentsProps,
+	type ModalLauncher,
+} from '../modal-service';
 
 export type TranslationParams = {
 	t: TFunction;
@@ -73,4 +77,21 @@ export async function areYouSure(
 		ModalContents: AreYouSureModal,
 		additional: { useTranslationParams },
 	});
+}
+
+export function useAreYouSure(
+	translationParams: Parameters<typeof useTranslation>,
+) {
+	const launchModal = useLaunchModal();
+	return (
+		useTranslationParams: () => Pick<
+			TranslationParams,
+			'values' | 'components'
+		> = () => ({}),
+	) =>
+		areYouSure(launchModal, function useAreYouSureParams() {
+			const { t } = useTranslation(...translationParams);
+			const { values, components } = useTranslationParams();
+			return { t, values, components };
+		});
 }

@@ -175,7 +175,7 @@
 	},
 	"delete-invite": {
 		"title": "Delete invite",
-		"are-you-sure": "Are you sure you want to delete the invite with the url <0>{{url}}</0>? This action cannot be undone.",
+		"are-you-sure": "Are you sure you want to delete the invite with the url <Target />? This action cannot be undone.",
 		"submit": "Delete",
 		"cancel": "Cancel"
 	},
