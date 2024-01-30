@@ -1,39 +1,26 @@
-import { type FormFieldReturnType, useFormAtom } from '@/utils/form';
+import { Fragment, useCallback } from 'react';
 import type { Atom } from 'jotai';
-import { useCreateDocumentDetails } from './useCreateDocumentDetails';
-import { Suspense } from 'react';
-import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import { useCallback } from 'react';
-import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
+import { type FormFieldReturnType, useFormAtom } from '@/utils/form';
 import { useDocTypeTranslation } from '@/utils/api/hooks';
-import type { StandardWritableAtom } from '@principlestudios/react-jotai-forms/internals/StandardWritableAtom';
+import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
+import { LoadingSection } from '@/components/layout/LoadingSection';
+import { useCreateDocumentDetails } from './useCreateDocumentDetails';
 
-export function CreateDocumentDetails({
-	documentTypeAtom,
-	gameId,
-	detailsField,
-}: {
-	documentTypeAtom: Atom<string>;
-	gameId: string;
-	detailsField: FormFieldReturnType<{
-		[k: string]: unknown;
-	}>;
-}) {
-	const { disabled, docType } = useCreateDocumentDetails(
+function useCreateDetails<T>(
+	gameId: string,
+	detailsField: FormFieldReturnType<T>,
+	documentTypeAtom: Atom<string>,
+) {
+	const { disabled, docType } = useCreateDocumentDetails<T>(
 		documentTypeAtom,
 		gameId,
 	);
-
-	const CreateDetails = useCallback(
-		function CreateDetails<T>({
-			docType,
-		}: {
-			docType: GameTypeObjectScripts<T>;
-		}) {
+	const fullResult = useCallback(
+		function CreateDetails() {
 			if (!docType) throw new Error('Doc type is required');
 
 			const field = useFormAtom(
-				Object.assign(detailsField.atom as unknown as StandardWritableAtom<T>, {
+				Object.assign(detailsField.atom, {
 					init: docType.typeInfo.template,
 				}),
 				{
@@ -55,25 +42,35 @@ export function CreateDocumentDetails({
 			const Component = docType.typeInfo.creationComponent;
 			if (!Component) return <></>;
 
-			return <Component gameId={gameId} templateField={field} />;
+			return (
+				<ErrorBoundary fallback={detailsField.translation('unhandled-error')}>
+					<Component gameId={gameId} templateField={field} />
+				</ErrorBoundary>
+			);
 		},
-		[gameId, detailsField.atom, disabled],
+		[gameId, detailsField, disabled, docType],
+	);
+	return docType ? fullResult : Fragment;
+}
+
+export function CreateDocumentDetails<T>({
+	documentTypeAtom,
+	gameId,
+	detailsField,
+}: {
+	documentTypeAtom: Atom<string>;
+	gameId: string;
+	detailsField: FormFieldReturnType<T>;
+}) {
+	const CreateDetails = useCreateDetails<T>(
+		gameId,
+		detailsField,
+		documentTypeAtom,
 	);
 
-	if (!docType) return <></>;
-
-	const Component = docType.typeInfo.creationComponent;
-
-	if (!Component) return <></>;
-
 	return (
-		<Suspense>
-			<ErrorBoundary
-				errorKey={docType.key}
-				fallback={detailsField.translation('unhandled-error')}
-			>
-				<CreateDetails key={docType.key} docType={docType} />
-			</ErrorBoundary>
-		</Suspense>
+		<LoadingSection>
+			<CreateDetails />
+		</LoadingSection>
 	);
 }

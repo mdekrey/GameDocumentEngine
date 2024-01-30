@@ -4,7 +4,7 @@ import type { Atom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { useComputedAtom } from '@principlestudios/jotai-react-signals';
 
-export function useCreateDocumentDetails(
+export function useCreateDocumentDetails<T>(
 	documentTypeAtom: Atom<string>,
 	gameId: string,
 ) {
@@ -12,7 +12,7 @@ export function useCreateDocumentDetails(
 	const documentTypeName = useAtomValue(documentTypeAtom);
 	const gameDetails = useGame(gameId);
 	const gameType = useGameType(gameId);
-	const docType = getDocumentType(gameType, documentTypeName);
+	const docType = getDocumentType<T>(gameType, documentTypeName);
 
 	return { disabled, gameDetails, docType };
 }
