@@ -138,7 +138,7 @@
 	},
 	"remove-game-user": {
 		"title": "Remove user",
-		"are-you-sure": "Are you sure you want to remove <0>{{name}}</0> from the game? All of their permissions within this game will be removed.",
+		"are-you-sure": "Are you sure you want to remove <Target /> from the game? All of their permissions within this game will be removed.",
 		"submit": "Remove",
 		"cancel": "Cancel"
 	},

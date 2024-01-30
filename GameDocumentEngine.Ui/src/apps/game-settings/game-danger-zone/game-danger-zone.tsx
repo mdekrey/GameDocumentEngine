@@ -11,7 +11,7 @@ import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { DeleteConfirmNameModal } from '@/utils/modal/layouts/delete-confirm-name-dialog';
 import { IconButton } from '@/components/button/icon-button';
-import { RemoveGameUserModal } from './remove-game-user-modal';
+import { useDeleteGameUser } from './remove-game-user-modal';
 import type { GameDetails } from '@/api/models/GameDetails';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
@@ -65,10 +65,6 @@ function useDeleteGameWithConfirm(
 	};
 }
 
-function useRemoveUserFromGame() {
-	return useMutation(queries.removePlayerFromGame);
-}
-
 function useImportIntoExistingGame() {
 	const navigate = useNavigate();
 	return useMutation(queries.importIntoExistingGame(navigate));
@@ -80,9 +76,9 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-settings');
 	const gameDetails = useGame(gameId);
 	const userDetails = useCurrentUser();
-	const removeUser = useRemoveUserFromGame();
 	const importIntoExistingGame = useImportIntoExistingGame();
 	const inspectArchive = useMutation(queries.inspectGameArchive);
+	const onDeleteUser = useDeleteGameUser(gameId);
 	const onDeleteGame = useDeleteGameWithConfirm(gameId, () => navigate('..'));
 
 	return (
@@ -124,16 +120,6 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 			)}
 		</>
 	);
-
-	async function onDeleteUser(playerId: string, name: string) {
-		const shouldDelete = await launchModal({
-			ModalContents: RemoveGameUserModal,
-			additional: { name },
-		}).catch(() => false);
-		if (shouldDelete) {
-			removeUser.mutate({ gameId, playerId });
-		}
-	}
 
 	function onDownloadGame() {
 		const dl = document.createElement('a');

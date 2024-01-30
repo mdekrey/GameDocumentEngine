@@ -8,6 +8,7 @@ import {
 	type ModalContentsProps,
 	type ModalLauncher,
 } from '../modal-service';
+import React from 'react';
 
 export type TranslationParams = {
 	t: TFunction;
@@ -79,19 +80,14 @@ export async function areYouSure(
 	});
 }
 
-export function useAreYouSure(
+export function useAreYouSure<T extends object>(
 	translationParams: Parameters<typeof useTranslation>,
+	Target: React.FC<T>,
 ) {
 	const launchModal = useLaunchModal();
-	return (
-		useTranslationParams: () => Pick<
-			TranslationParams,
-			'values' | 'components'
-		> = () => ({}),
-	) =>
+	return (params: T) =>
 		areYouSure(launchModal, function useAreYouSureParams() {
 			const { t } = useTranslation(...translationParams);
-			const { values, components } = useTranslationParams();
-			return { t, values, components };
+			return { t, components: { Target: <Target {...params} /> } };
 		});
 }
