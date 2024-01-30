@@ -91,6 +91,7 @@ public class InvitationController : Api.InvitationsControllerBase
 			return CancelInvitationActionResult.Forbidden();
 
 		dbContext.Invites.Remove(invite);
+		await dbContext.SaveChangesAsync();
 		return CancelInvitationActionResult.NoContent();
 	}
 
@@ -106,7 +107,7 @@ public class InvitationController : Api.InvitationsControllerBase
 		var gameUserRecord = await (from gameUser in dbContext.GameUsers
 									where gameUser.GameId == gameId && gameUser.UserId == userId
 									select gameUser).SingleOrDefaultAsync();
-		if (gameUserRecord != null) return ClaimInvitationActionResult.Redirect($"/#/game/{gameId}?invite=repeat");
+		if (gameUserRecord != null) return ClaimInvitationActionResult.Redirect($"/#/game/{Identifier.ToString(gameId)}?invite=repeat");
 		if (invite == null) return ClaimInvitationActionResult.NotFound();
 
 		if (invite.Expiration < DateTimeOffset.Now)
