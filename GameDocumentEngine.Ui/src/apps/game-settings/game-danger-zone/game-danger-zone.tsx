@@ -9,7 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { DeleteGameModal } from './delete-game-modal';
+import { DeleteConfirmNameModal } from '@/utils/modal/layouts/delete-confirm-name-dialog';
 import { IconButton } from '@/components/button/icon-button';
 import { RemoveGameUserModal } from './remove-game-user-modal';
 import type { GameDetails } from '@/api/models/GameDetails';
@@ -45,8 +45,24 @@ export function displayDangerZone(gameDetails: GameDetails) {
 	);
 }
 
-function useDeleteGame() {
-	return useMutation(queries.deleteGame);
+function useDeleteGameWithConfirm(
+	gameId: string,
+	onSuccess: () => void | Promise<void>,
+) {
+	const { name } = useGame(gameId);
+	const launchModal = useLaunchModal();
+	const deleteGame = useMutation(queries.deleteGame);
+	const { t } = useTranslation(['delete-game']);
+	return async function onDeleteGame() {
+		const shouldDelete = await launchModal({
+			ModalContents: DeleteConfirmNameModal,
+			additional: { name, translation: t },
+		}).catch(() => false);
+		if (shouldDelete) {
+			await deleteGame.mutateAsync(gameId);
+			await onSuccess();
+		}
+	};
 }
 
 function useRemoveUserFromGame() {
@@ -64,10 +80,10 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const { t } = useTranslation('game-settings');
 	const gameDetails = useGame(gameId);
 	const userDetails = useCurrentUser();
-	const deleteGame = useDeleteGame();
 	const removeUser = useRemoveUserFromGame();
 	const importIntoExistingGame = useImportIntoExistingGame();
 	const inspectArchive = useMutation(queries.inspectGameArchive);
+	const onDeleteGame = useDeleteGameWithConfirm(gameId, () => navigate('..'));
 
 	return (
 		<>
@@ -116,17 +132,6 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		}).catch(() => false);
 		if (shouldDelete) {
 			removeUser.mutate({ gameId, playerId });
-		}
-	}
-
-	async function onDeleteGame() {
-		const shouldDelete = await launchModal({
-			ModalContents: DeleteGameModal,
-			additional: { name: gameDetails.name },
-		}).catch(() => false);
-		if (shouldDelete) {
-			deleteGame.mutate(gameId);
-			navigate('..');
 		}
 	}
 

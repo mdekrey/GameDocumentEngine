@@ -64,7 +64,7 @@
 	},
 	"delete-document": {
 		"title": "Delete document",
-		"are-you-sure": "Are you sure you want to delete the document called <0>{{name}}</0>? This action cannot be undone.",
+		"are-you-sure": "Are you sure you want to delete the document called <Target />? This action cannot be undone.",
 		"please-type-name-to-confirm": "Please type the name of the document below to confirm deletion.",
 		"fields": {
 			"name": {
@@ -123,7 +123,7 @@
 	},
 	"delete-game": {
 		"title": "Delete game",
-		"are-you-sure": "Are you sure you want to delete the game called <0>{{name}}</0>? This action cannot be undone.",
+		"are-you-sure": "Are you sure you want to delete the game called <Target />? This action cannot be undone.",
 		"please-type-name-to-confirm": "Please type the name of the game below to confirm deletion.",
 		"fields": {
 			"name": {
