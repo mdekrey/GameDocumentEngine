@@ -5,10 +5,10 @@ import { HiOutlineEllipsisVertical } from 'react-icons/hi2';
 import { IconButton } from '../button/icon-button';
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useStore } from 'jotai';
 import { elementTemplate } from '../template';
 import type { HeaderPresentationProps } from '../header/useHeaderPresentation';
 import { LoadingSection } from './LoadingSection';
+import { useAtomSubscription } from '@/utils/useAtomSubscription';
 
 export type LayoutProps = {
 	children?: React.ReactNode;
@@ -20,15 +20,14 @@ export type LayoutProps = {
 
 function useInert<TElem extends HTMLElement>() {
 	const ref = useRef<TElem>(null);
-	const store = useStore();
-	useEffect(() => {
-		store.sub(hasOpenModal, updateInert);
-		updateInert();
-		function updateInert() {
-			if (store.get(hasOpenModal)) ref.current?.setAttribute('inert', 'inert');
+	useAtomSubscription(
+		hasOpenModal,
+		(isOpen) => {
+			if (isOpen) ref.current?.setAttribute('inert', 'inert');
 			else ref.current?.removeAttribute('inert');
-		}
-	}, [store]);
+		},
+		true,
+	);
 	return ref;
 }
 

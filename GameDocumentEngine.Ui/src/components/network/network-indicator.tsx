@@ -6,11 +6,12 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { JotaiDiv } from '@/components/jotai/div';
 import { IconButton } from '../button/icon-button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useRef, useEffect, useCallback, memo } from 'react';
+import { useRef, useCallback, memo } from 'react';
 import type { Atom } from 'jotai';
 import { useStore } from 'jotai';
 import { DisconnectedModal } from './modal/disconnected';
 import { ReconnectingModal } from './modal/reconnecting';
+import { useAtomSubscription } from '@/utils/useAtomSubscription';
 
 export type NetworkIndicatorProps = {
 	connectionState: Atom<HubConnectionState>;
@@ -36,23 +37,21 @@ export const NetworkIndicator = memo(function NetworkIndicator({
 		},
 		[launchModal, reconnect],
 	);
-	useEffect(() => {
-		return store.sub(connectionState, () => {
-			const state = store.get(connectionState);
-			if (state === HubConnectionState.Disconnected) {
-				abortModal.current?.abort();
-				abortModal.current = new AbortController();
+	useAtomSubscription(connectionState, () => {
+		const state = store.get(connectionState);
+		if (state === HubConnectionState.Disconnected) {
+			abortModal.current?.abort();
+			abortModal.current = new AbortController();
 
-				void launchModal({
-					ModalContents: DisconnectedModal,
-					additional: { onReconnect },
-					abort: abortModal.current.signal,
-				});
-			} else if (state === HubConnectionState.Connected) {
-				abortModal.current?.abort();
-			}
-		});
-	}, [store, connectionState, launchModal, onReconnect]);
+			void launchModal({
+				ModalContents: DisconnectedModal,
+				additional: { onReconnect },
+				abort: abortModal.current.signal,
+			});
+		} else if (state === HubConnectionState.Connected) {
+			abortModal.current?.abort();
+		}
+	});
 
 	const { t } = useTranslation(['network']);
 	const disconnectedClass = useComputedAtom<string>((get) =>

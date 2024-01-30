@@ -5,8 +5,6 @@ import type {
 	GameObjectWidgetDefinition,
 	IGameObjectType,
 } from '@/documents/defineDocument';
-import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
-import { Button } from '@/components/button/button';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { useDocumentName } from '@/components/named-icon/useDocumentName';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
@@ -16,6 +14,7 @@ import {
 } from '@/components/form-fields/select-input/select-field';
 import { useDocTypeTranslation, useDocument } from '@/utils/api/hooks';
 import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
+import { ModalForm } from '@/utils/modal/modal-form';
 
 export type NewWidgetResult = {
 	id: string;
@@ -53,40 +52,30 @@ export function AddWidgetModal({
 
 	const widgetKeys = widgets ? Object.keys(widgets) : [];
 
+	const title = (
+		<Trans i18nKey="title" t={t} components={{ Document: <DocumentName /> }} />
+	);
 	return (
-		<form onSubmit={form.handleSubmit(resolve)}>
-			<ModalDialogLayout>
-				<ModalDialogLayout.Title>
-					<Trans
-						i18nKey="title"
-						t={t}
-						components={{
-							Document: <DocumentName />,
-						}}
-					/>
-				</ModalDialogLayout.Title>
-				<Fieldset>
-					<SelectField field={form.fields.id} items={widgetKeys}>
-						{(dt) =>
-							dt ? (
-								<WidgetName target={widgets[dt]} docTypeKey={document.type} />
-							) : (
-								<NotSelected>
-									{form.fields.id.translation('not-selected')}
-								</NotSelected>
-							)
-						}
-					</SelectField>
-				</Fieldset>
-
-				<ModalDialogLayout.Buttons>
-					<Button.Save type="submit">{t('submit')}</Button.Save>
-					<Button.Secondary onClick={() => reject('Cancel')}>
-						{t('cancel')}
-					</Button.Secondary>
-				</ModalDialogLayout.Buttons>
-			</ModalDialogLayout>
-		</form>
+		<ModalForm
+			title={title}
+			onSubmit={form.handleSubmit(resolve)}
+			onCancel={() => reject('Cancel')}
+			translation={t}
+		>
+			<Fieldset>
+				<SelectField field={form.fields.id} items={widgetKeys}>
+					{(dt) =>
+						dt ? (
+							<WidgetName target={widgets[dt]} docTypeKey={document.type} />
+						) : (
+							<NotSelected>
+								{form.fields.id.translation('not-selected')}
+							</NotSelected>
+						)
+					}
+				</SelectField>
+			</Fieldset>
+		</ModalForm>
 	);
 }
 

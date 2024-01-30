@@ -1,10 +1,9 @@
-import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import { Prose } from '@/components/text/common';
-import { Button } from '@/components/button/button';
 import { Trans } from 'react-i18next';
 import { useDocumentName } from '@/components/named-icon/useDocumentName';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useDocTypeTranslation } from '@/utils/api/hooks';
+import { OkModalDialogPresentation } from '@/utils/modal/layouts/ok-dialog';
 
 export function NoWidgetsModal({
 	additional: { gameId, documentId },
@@ -22,8 +21,7 @@ export function NoWidgetsModal({
 	});
 
 	return (
-		<ModalDialogLayout>
-			<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
+		<OkModalDialogPresentation t={t} onOkClicked={() => reject('Cancel')}>
 			<Prose>
 				<Trans
 					i18nKey="intro"
@@ -33,11 +31,6 @@ export function NoWidgetsModal({
 					}}
 				/>
 			</Prose>
-			<ModalDialogLayout.Buttons>
-				<Button.Secondary onClick={() => reject('Cancel')}>
-					{t('cancel')}
-				</Button.Secondary>
-			</ModalDialogLayout.Buttons>
-		</ModalDialogLayout>
+		</OkModalDialogPresentation>
 	);
 }

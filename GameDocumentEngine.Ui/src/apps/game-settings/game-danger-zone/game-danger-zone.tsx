@@ -22,6 +22,7 @@ import {
 } from '@/utils/security/permission-strings';
 import { useCurrentUser, useGame } from '@/utils/api/hooks';
 import { ConfigureImportIntoExistingGame } from '@/apps/configure-game-import/ConfigureImportIntoExistingGame';
+import { launchFilePicker } from '@/components/file-picker/file-picker';
 
 function displayRemoveUser(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, updateGameUserAccess);
@@ -100,18 +101,10 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 				</Button.Save>
 			)}
 			{displayImportIntoGame(gameDetails) && (
-				<div className="relative flex flex-col">
-					<Button.Save>
-						<HiMiniArrowUpTray />
-						{t('import-into-game', { name: gameDetails.name })}
-					</Button.Save>
-					<input
-						type="file"
-						className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
-						accept=".vaultvtt"
-						onChange={(ev) => void onImportIntoGame(ev)}
-					/>
-				</div>
+				<Button.Save onClick={() => void onImportIntoGame()}>
+					<HiMiniArrowUpTray />
+					{t('import-into-game', { name: gameDetails.name })}
+				</Button.Save>
 			)}
 		</>
 	);
@@ -144,16 +137,10 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 		dl.click();
 	}
 
-	async function onImportIntoGame(ev: React.ChangeEvent<HTMLInputElement>) {
-		if (ev.target.files?.length !== 1) return;
-		const file = ev.target.files[0];
-		ev.target.value = '';
-		ev.target.files = null;
-
+	async function onImportIntoGame() {
+		const files = await launchFilePicker({ accept: '.vaultvtt' });
+		const file = files[0];
 		const inspected = await inspectArchive.mutateAsync({ file });
-		console.log(inspected);
-		// TODO: select options
-
 		const options = await launchModal({
 			ModalContents: ConfigureImportIntoExistingGame,
 			additional: { inspected, gameId },

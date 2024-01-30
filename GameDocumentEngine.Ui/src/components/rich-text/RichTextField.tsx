@@ -1,13 +1,14 @@
-import { useAtomValue, useStore } from 'jotai';
+import { useAtomValue } from 'jotai';
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import { MDXEditor, diffSourcePlugin } from '@mdxeditor/editor';
 import { Field } from '@/components/form-fields/field/field';
 import type { StandardField } from '@/components/form-fields/FieldProps';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { allPlugins, readonlyPlugins } from './allPlugins';
 import styles from './mdx.module.css';
 import { lexicalTheme } from './lexicalTheme';
 import { twMerge } from 'tailwind-merge';
+import { useAtomSubscription } from '@/utils/useAtomSubscription';
 
 export function RichTextField({
 	className,
@@ -19,15 +20,12 @@ export function RichTextField({
 	const isDisabled = useAtomValue(field.disabled);
 	const isReadOnly = useAtomValue(field.readOnly);
 	const mdxEditorRef = useRef<MDXEditorMethods>(null);
-	const store = useStore();
 	const fieldAtom = field.value;
-	useEffect(() => {
-		return store.sub(fieldAtom, () => {
-			const newMarkdown = store.get(fieldAtom) ?? '';
-			if (mdxEditorRef.current?.getMarkdown() === newMarkdown) return;
-			mdxEditorRef.current?.setMarkdown(newMarkdown);
-		});
-	}, [fieldAtom, store]);
+	useAtomSubscription(fieldAtom, (md) => {
+		const newMarkdown = md ?? '';
+		if (mdxEditorRef.current?.getMarkdown() === newMarkdown) return;
+		mdxEditorRef.current?.setMarkdown(newMarkdown);
+	});
 	return (
 		<Field noLabel className={className}>
 			<Field.Label>{field.translation('label')}</Field.Label>

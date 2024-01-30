@@ -7,12 +7,13 @@ import {
 } from './grid-utils';
 import { useStore } from 'jotai';
 import { Rnd } from 'react-rnd';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { elementTemplate } from '@/components/template';
 import {
 	applyConstraints,
 	type PositionConstraints,
 } from '@/documents/defineDocument';
+import { useAtomSubscription } from '@/utils/useAtomSubscription';
 
 const DragHandle = elementTemplate('DragHandle', 'div', (T) => (
 	<T className="border-slate-900 dark:border-slate-100 absolute inset-1" />
@@ -46,19 +47,17 @@ export function MoveResizeWidget({
 	const initialPosition = store.get(positionField.value);
 	const positionAtom = positionField.value;
 
-	useEffect(() => {
-		return store.sub(positionAtom, () => {
-			const currentPosition = applyGridScale(store.get(positionAtom));
-			rndRef.current?.updatePosition({
-				x: currentPosition.x,
-				y: currentPosition.y,
-			});
-			rndRef.current?.updateSize({
-				width: currentPosition.width,
-				height: currentPosition.height,
-			});
+	useAtomSubscription(positionAtom, (position) => {
+		const currentPosition = applyGridScale(position);
+		rndRef.current?.updatePosition({
+			x: currentPosition.x,
+			y: currentPosition.y,
 		});
-	}, [store, positionAtom]);
+		rndRef.current?.updateSize({
+			width: currentPosition.width,
+			height: currentPosition.height,
+		});
+	});
 	return (
 		<Rnd
 			ref={rndRef}

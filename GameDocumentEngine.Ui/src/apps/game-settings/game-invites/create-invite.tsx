@@ -1,7 +1,5 @@
 import { z } from 'zod';
 import { useForm } from '@/utils/form';
-import { Button } from '@/components/button/button';
-import { ModalDialogLayout } from '@/utils/modal/modal-dialog';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
@@ -19,6 +17,7 @@ import { createInvitation } from '@/utils/security/permission-strings';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import type { FieldsConfig } from '@/utils/form';
 import { useGame, useTranslationForGame } from '@/utils/api/hooks';
+import { ModalForm } from '@/utils/modal/modal-form';
 
 const CreateInviteForm = z.object({
 	uses: z.number(),
@@ -87,34 +86,27 @@ export function CreateInvite({
 	);
 
 	return (
-		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
-			<ModalDialogLayout>
-				<ModalDialogLayout.Title>{t('title')}</ModalDialogLayout.Title>
-
-				<Fieldset>
-					<SelectField field={form.fields.role} items={allowedRoles}>
-						{(dt) =>
-							dt ? (
-								<>{roleTranslations(`roles.${dt}.name`)}</>
-							) : (
-								<NotSelected>
-									{form.fields.role.translation('not-selected')}
-								</NotSelected>
-							)
-						}
-					</SelectField>
-					<CheckboxField field={form.fields.isUnlimited} />
-					<NumberField field={form.fields.uses} />
-				</Fieldset>
-
-				<ModalDialogLayout.Buttons>
-					<Button.Save type="submit">{t('submit')}</Button.Save>
-					<Button.Secondary onClick={() => reject('Cancel')}>
-						{t('cancel')}
-					</Button.Secondary>
-				</ModalDialogLayout.Buttons>
-			</ModalDialogLayout>
-		</form>
+		<ModalForm
+			onSubmit={form.handleSubmit(onSubmit)}
+			translation={t}
+			onCancel={() => reject('Cancel')}
+		>
+			<Fieldset>
+				<SelectField field={form.fields.role} items={allowedRoles}>
+					{(dt) =>
+						dt ? (
+							<>{roleTranslations(`roles.${dt}.name`)}</>
+						) : (
+							<NotSelected>
+								{form.fields.role.translation('not-selected')}
+							</NotSelected>
+						)
+					}
+				</SelectField>
+				<CheckboxField field={form.fields.isUnlimited} />
+				<NumberField field={form.fields.uses} />
+			</Fieldset>
+		</ModalForm>
 	);
 
 	async function onSubmit(data: FormType) {
