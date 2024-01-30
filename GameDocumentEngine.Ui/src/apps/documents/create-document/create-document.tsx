@@ -83,7 +83,6 @@ export function CreateDocument({ gameId }: { gameId: string }) {
 							gameId={gameId}
 							detailsField={form.fields.details}
 						/>
-						{/* TODO: create doc wizard options? */}
 						<ButtonRow>
 							<Button type="submit">{t('submit')}</Button>
 						</ButtonRow>
