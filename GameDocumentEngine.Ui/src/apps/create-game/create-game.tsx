@@ -19,6 +19,7 @@ import { useAllGameTypes } from '@/utils/api/hooks';
 import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { ConfigureImportGame } from '../configure-game-import/ConfigureImportGame';
+import { launchFilePicker } from '@/components/file-picker/file-picker';
 
 function useCreateGame() {
 	const navigate = useNavigate();
@@ -75,15 +76,9 @@ export function CreateGame() {
 						{/* TODO: invite users from other games? */}
 						<ButtonRow>
 							<Button type="submit">{t('submit')}</Button>
-							<div className="relative">
-								<Button.Secondary>{t('import')}</Button.Secondary>
-								<input
-									type="file"
-									className="absolute inset-0 opacity-0 cursor-pointer text-[0px]"
-									accept=".vaultvtt"
-									onChange={(ev) => void onFileSelected(ev)}
-								/>
-							</div>
+							<Button.Secondary onClick={() => void onImport()}>
+								{t('import')}
+							</Button.Secondary>
 						</ButtonRow>
 					</Fieldset>
 				</form>
@@ -95,14 +90,10 @@ export function CreateGame() {
 		createGame.mutate(currentValue);
 	}
 
-	async function onFileSelected(ev: React.ChangeEvent<HTMLInputElement>) {
-		if (ev.target.files?.length !== 1) return;
-		const file = ev.target.files[0];
-		ev.target.value = '';
-		ev.target.files = null;
-
+	async function onImport() {
+		const files = await launchFilePicker({ accept: '.vaultvtt' });
+		const file = files[0];
 		const inspected = await inspectArchive.mutateAsync({ file });
-
 		const options = await launchModal({
 			ModalContents: ConfigureImportGame,
 			additional: { inspected, gameId: null },
