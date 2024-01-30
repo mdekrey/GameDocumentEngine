@@ -36,7 +36,7 @@
 	"adding-no-widgets": {
 		"title": "No widgets supported",
 		"intro": "The document you dropped, <Document/>, does not support widgets at this time. Try another document type.",
-		"cancel": "Cancel"
+		"ok": "Cancel"
 	},
 	"delete-widget-modal": {
 		"title": "Remove Widget",
