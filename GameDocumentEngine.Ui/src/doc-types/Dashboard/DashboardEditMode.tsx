@@ -7,9 +7,7 @@ import {
 } from '@/components/drag-drop';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
-import { useLaunchModal } from '@/utils/modal/modal-service';
-import { addWidget } from './add-widget/addWidget';
-import { useQueryClient } from '@tanstack/react-query';
+import { useAddWidget } from './add-widget/addWidget';
 import {
 	DashboardContainer,
 	DashboardToolsContainer,
@@ -43,10 +41,9 @@ export function DashboardEditMode({
 	});
 	const navigate = useNavigate();
 	const onToggleEditing = () => navigate('..');
-	const queryClient = useQueryClient();
-	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
-	const dropTarget = useDropTarget({
+	const addWidget = useAddWidget(widgets);
+	const dropTarget = useDropTarget<HTMLElement>({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
 				if (!link) return false;
@@ -54,11 +51,10 @@ export function DashboardEditMode({
 			},
 			handle(ev, data) {
 				if (data.gameId !== document.gameId) return false;
-				const currentTarget = ev.currentTarget as HTMLDivElement;
-				const rect = currentTarget.getBoundingClientRect();
+				const rect = ev.currentTarget.getBoundingClientRect();
 				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));
 				const y = toGridCoordinate(ev.clientY - Math.round(rect.top));
-				void addWidget(queryClient, launchModal, data, widgets, { x, y });
+				void addWidget(data, { x, y });
 				return true;
 			},
 		},

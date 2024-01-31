@@ -57,29 +57,33 @@ export function useDraggable<T extends keyof DraggingMimeTypes>(
 	};
 }
 
-type DropHandler<T extends keyof DraggingMimeTypes = keyof DraggingMimeTypes> =
-	{
-		canHandle: (
-			this: void,
-			effectAllowed: AllowedDragEffect,
-			data?: DraggingMimeTypes[T],
-		) => false | DropEffect;
-		handle: (
-			this: void,
-			ev: React.DragEvent<unknown>,
-			data: DraggingMimeTypes[T],
-		) => boolean;
-	};
+type DropHandler<
+	T extends keyof DraggingMimeTypes = keyof DraggingMimeTypes,
+	TElem = Element,
+> = {
+	canHandle: (
+		this: void,
+		effectAllowed: AllowedDragEffect,
+		data?: DraggingMimeTypes[T],
+	) => false | DropEffect;
+	handle: (
+		this: void,
+		ev: React.DragEvent<TElem>,
+		data: DraggingMimeTypes[T],
+	) => boolean;
+};
 
-type MimeTypeHandlers = {
-	[T in keyof DraggingMimeTypes]: DropHandler<T>;
+type MimeTypeHandlers<TElem = Element> = {
+	[T in keyof DraggingMimeTypes]: DropHandler<T, TElem>;
 };
 
 function isMimeType(mimeType: string): mimeType is keyof DraggingMimeTypes {
 	return allMimeTypes.includes(mimeType as keyof DraggingMimeTypes);
 }
 
-export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
+export function useDropTarget<T = Element>(
+	handlers: Partial<MimeTypeHandlers<T>>,
+) {
 	const store = useStore();
 	return {
 		onDragOver: handleDragOver,
@@ -87,7 +91,7 @@ export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 		onDrop: handleDrop,
 	};
 
-	function handleDragOver(ev: React.DragEvent<unknown>) {
+	function handleDragOver(ev: React.DragEvent<T>) {
 		const currentWindowDragging = store.get(draggingGameObject);
 		if (currentWindowDragging) {
 			if (!(currentWindowDragging.mimeType in handlers)) return;
@@ -103,7 +107,7 @@ export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 		}
 	}
 
-	function handleDrop(ev: React.DragEvent<unknown>) {
+	function handleDrop(ev: React.DragEvent<T>) {
 		for (const mimeType of ev.dataTransfer.types) {
 			if (!isMimeType(mimeType) || !(mimeType in handlers)) continue;
 			const handler = handlers[mimeType];
@@ -124,7 +128,7 @@ export function useDropTarget(handlers: Partial<MimeTypeHandlers>) {
 	}
 
 	function checkHandling(
-		ev: React.DragEvent<unknown>,
+		ev: React.DragEvent<T>,
 		handler: DropHandler,
 		data?: DraggingMimeTypes[keyof DraggingMimeTypes],
 	) {
