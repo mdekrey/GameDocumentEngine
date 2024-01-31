@@ -9,7 +9,6 @@ import { useMutation } from '@tanstack/react-query';
 import { queries } from '@/utils/api/queries';
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { DeleteConfirmNameModal } from '@/utils/modal/layouts/delete-confirm-name-dialog';
 import { IconButton } from '@/components/button/icon-button';
 import { useDeleteGameUser } from './remove-game-user-modal';
 import type { GameDetails } from '@/api/models/GameDetails';
@@ -23,6 +22,7 @@ import {
 import { useCurrentUser, useGame } from '@/utils/api/hooks';
 import { ConfigureImportIntoExistingGame } from '@/apps/configure-game-import/ConfigureImportIntoExistingGame';
 import { launchFilePicker } from '@/components/file-picker/file-picker';
+import { useDeleteGameWithConfirm } from './useDeleteGameWithConfirm';
 
 function displayRemoveUser(gameDetails: GameDetails) {
 	return hasGamePermission(gameDetails, updateGameUserAccess);
@@ -45,26 +45,6 @@ export function displayDangerZone(gameDetails: GameDetails) {
 	);
 }
 
-function useDeleteGameWithConfirm(
-	gameId: string,
-	onSuccess: () => void | Promise<void>,
-) {
-	const { name } = useGame(gameId);
-	const launchModal = useLaunchModal();
-	const deleteGame = useMutation(queries.deleteGame);
-	const { t } = useTranslation(['delete-game']);
-	return async function onDeleteGame() {
-		const shouldDelete = await launchModal({
-			ModalContents: DeleteConfirmNameModal,
-			additional: { name, translation: t },
-		}).catch(() => false);
-		if (shouldDelete) {
-			await deleteGame.mutateAsync(gameId);
-			await onSuccess();
-		}
-	};
-}
-
 function useImportIntoExistingGame() {
 	const navigate = useNavigate();
 	return useMutation(queries.importIntoExistingGame(navigate));
@@ -80,6 +60,7 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 	const inspectArchive = useMutation(queries.inspectGameArchive);
 	const onDeleteUser = useDeleteGameUser(gameId);
 	const onDeleteGame = useDeleteGameWithConfirm(gameId, () => navigate('..'));
+	const { name } = gameDetails;
 
 	return (
 		<>
@@ -103,19 +84,19 @@ export function GameDangerZone({ gameId }: { gameId: string }) {
 			{displayDeleteGame(gameDetails) && (
 				<Button.Destructive onClick={() => void onDeleteGame()}>
 					<HiOutlineTrash />
-					{t('delete-game', { name: gameDetails.name })}
+					{t('delete-game', { name })}
 				</Button.Destructive>
 			)}
 			{displayExportGame(gameDetails) && (
-				<Button.Save onClick={() => void onDownloadGame()}>
+				<Button.Save onClick={onDownloadGame}>
 					<HiMiniArrowDownTray />
-					{t('download-game', { name: gameDetails.name })}
+					{t('download-game', { name })}
 				</Button.Save>
 			)}
 			{displayImportIntoGame(gameDetails) && (
 				<Button.Save onClick={() => void onImportIntoGame()}>
 					<HiMiniArrowUpTray />
-					{t('import-into-game', { name: gameDetails.name })}
+					{t('import-into-game', { name })}
 				</Button.Save>
 			)}
 		</>
