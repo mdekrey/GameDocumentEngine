@@ -15,7 +15,7 @@ import {
 } from '@/doc-types/Dashboard/grid-utils';
 import { IconButton } from '@/components/button/icon-button';
 import { addWidget } from './add-widget/addWidget';
-import { deleteWidget } from './delete-widget/deleteWidget';
+import { useDeleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
@@ -36,16 +36,14 @@ export function WidgetTemplateEditMode({
 	form,
 }: GameObjectFormComponent<WidgetTemplate> & { previewDocumentId: string }) {
 	const previewDocument = useDocument(document.gameId, previewDocumentId);
-	const { widgets } = useFormFields(form, {
+	const { widgets, widget } = useFormFields(form, {
 		widgets: ['details', 'widgets'],
+		widget: (id: string) => ['details', 'widgets', id],
 	});
 
 	const queryClient = useQueryClient();
 	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
-	const { widget } = useFormFields(widgets, {
-		widget: (id: string) => [id],
-	});
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
@@ -66,6 +64,7 @@ export function WidgetTemplateEditMode({
 			},
 		},
 	});
+	const onDelete = useDeleteWidget(document.gameId, previewDocumentId, widgets);
 
 	return (
 		<WidgetGridContainer.Editing
@@ -88,16 +87,6 @@ export function WidgetTemplateEditMode({
 			)}
 		</WidgetGridContainer.Editing>
 	);
-	function onDelete(id: string) {
-		return () =>
-			void deleteWidget(
-				launchModal,
-				document.gameId,
-				previewDocument,
-				widgets,
-				id,
-			);
-	}
 	function onInfo(id: string) {
 		return () =>
 			void showWidgetInfo(
