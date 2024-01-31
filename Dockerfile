@@ -71,6 +71,7 @@ COPY ["./Directory.Build.props", "./"]
 COPY ["./eng/pnpm/", "./eng/pnpm/"]
 RUN pnpm install --frozen-lockfile && cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
 
+COPY ./tsconfig*.json ./
 COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/
 

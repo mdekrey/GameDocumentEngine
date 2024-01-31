@@ -1,5 +1,7 @@
 {
-	"scripts": {},
+	"scripts": {
+		"typecheck": "tsc -b"
+	},
 	"pnpm": {
 		"requiredScripts": [],
 		"patchedDependencies": {

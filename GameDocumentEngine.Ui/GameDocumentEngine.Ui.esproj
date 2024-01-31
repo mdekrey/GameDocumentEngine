@@ -49,7 +49,7 @@
 	</Target>
 
 	<Target Name="TypeCheck" BeforeTargets="NodeBuild" DependsOnTargets="Generation" Condition=" $(Configuration) == 'Release' ">
-		<Exec WorkingDirectory="$(ProjectDir)" Command="pnpm tsc"/>
+		<Exec WorkingDirectory="$(ProjectDir)" Command="pnpm tsc -b"/>
 	</Target>
 
 	<Target Name="_ComputeNodeOutputs" BeforeTargets="NodeBuild">

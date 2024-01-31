@@ -56,5 +56,8 @@
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
-	"dotnet.defaultSolution": "GameDocumentEngine.sln"
+	"dotnet.defaultSolution": "GameDocumentEngine.sln",
+	"files.associations": {
+		"*.esproj": "xml"
+	}
 }

@@ -4,6 +4,7 @@ Dockerfile
 /.vs
 /.git
 /eng/**/secrets.ps1
+/**/*.tsbuildinfo
 /GameDocumentEngine.Ui/node_modules
 /GameDocumentEngine.Ui/dist
 /GameDocumentEngine.Ui/dev-dist
