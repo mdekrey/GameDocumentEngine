@@ -1,6 +1,4 @@
 import { IconLinkButton } from '@/components/button/icon-link-button';
-import { extraQueries } from '@/utils/api/queries';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HiPlus, HiChevronRight } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { useAllDocuments, useGame, useGameType } from '@/utils/api/hooks';
@@ -11,19 +9,16 @@ import type { DocumentSummary } from '@/api/models/DocumentSummary';
 import type { FolderNode } from '@/utils/api/queries/document';
 import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import { Prose } from '@/components/text/common';
-import {
-	documentIdMimeType,
-	useDraggable,
-	useDropTarget,
-} from '@/components/drag-drop';
+import { documentIdMimeType, useDraggable } from '@/components/drag-drop';
 import { missingDocumentType } from '@/documents/defaultMissingWidgetDefinition';
+import { useFolderDragTarget } from './useFolderDragTarget';
 
-export function GameObjects({ gameId }: { gameId: string }) {
+export function GameObjectsSidebar({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-objects']);
 	const docsResult = useAllDocuments(gameId);
 	const gameDetails = useGame(gameId);
 	const gameType = useGameType(gameId);
-	const docMoveToRootEvents = useDragTarget(gameId);
+	const docMoveToRootEvents = useFolderDragTarget(gameId);
 
 	const canCreate = hasGamePermission(gameDetails, createDocument);
 
@@ -192,7 +187,7 @@ function DocumentLink({
 }) {
 	const Icon = (objectTypes[document.type]?.typeInfo ?? missingDocumentType)
 		.icon;
-	const dragTarget = useDragTarget(gameId, folderPath, document.id);
+	const dragTarget = useFolderDragTarget(gameId, folderPath, document.id);
 	const draggable = useDraggable(
 		documentIdMimeType,
 		{ gameId, id: document.id },
@@ -210,26 +205,4 @@ function DocumentLink({
 			{document.name}
 		</Link>
 	);
-}
-
-function useDragTarget(
-	gameId: string,
-	folderPath?: (string | null)[],
-	folderId?: string,
-) {
-	const reordering = useMutation(
-		extraQueries.changeDocumentFolder(useQueryClient(), gameId),
-	);
-	return useDropTarget({
-		[documentIdMimeType]: {
-			canHandle: ({ move }) => (move ? 'move' : false),
-			handle: (ev, current) => {
-				if (current.gameId !== gameId) return false;
-				if (folderPath && folderPath.includes(current.id)) return false;
-
-				reordering.mutate({ id: current.id, folderId });
-				return true;
-			},
-		},
-	});
 }

@@ -12,7 +12,7 @@ import { GameInvites } from './apps/game-settings/game-invites/game-invites';
 import { DocumentSettings } from './apps/documents/document-settings/document-settings';
 
 import '@/utils/i18n/setup';
-import { GameObjects } from './apps/game-details/game-objects';
+import { GameObjectsSidebar } from './apps/game-details/game-objects';
 import { GameSubheader } from './apps/game-details/game-subheader';
 import { GameSettings } from './apps/game-settings/game-settings';
 import { DocumentSubheader } from './apps/documents/subheader/document-subheader';
@@ -58,7 +58,7 @@ const mainRoute: RouteObject[] = [
 const leftSidebarRoute: RouteObject[] = [
 	{
 		path: 'game/:gameId/*',
-		Component: withErrorBoundary(withGameId(GameObjects)),
+		Component: withErrorBoundary(withGameId(GameObjectsSidebar)),
 	},
 	// while not having a matched route causes a console warning, even if the route gives a null element the `useRoutes` will not return null
 ];
