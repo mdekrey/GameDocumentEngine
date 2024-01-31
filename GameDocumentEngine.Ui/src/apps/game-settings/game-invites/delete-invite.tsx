@@ -3,13 +3,14 @@ import { queries } from '@/utils/api/queries';
 import { useAreYouSure } from '@/utils/modal/layouts/are-you-sure-dialog';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { getInviteUrl } from './getInviteUrl';
+import { elementTemplate } from '@/components/template';
+
+const UrlDisplay = elementTemplate('UrlDisplay', 'span', (T) => (
+	<T className="font-mono text-blue-700 dark:text-blue-300" />
+));
 
 function DeleteInviteTarget({ invite }: { invite: GameInvite }) {
-	return (
-		<span className="font-mono text-blue-950 dark:text-blue-50">
-			{getInviteUrl(invite)}
-		</span>
-	);
+	return <UrlDisplay>{getInviteUrl(invite)}</UrlDisplay>;
 }
 
 export function useDeleteInvite(gameId: string) {

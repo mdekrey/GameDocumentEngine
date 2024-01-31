@@ -15,6 +15,11 @@ import {
 import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
 import { getInviteUrl } from './getInviteUrl';
 import { useDeleteInvite } from './delete-invite';
+import { elementTemplate } from '@/components/template';
+
+const PillBar = elementTemplate('PillBar', 'div', (T) => (
+	<T className="bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center" />
+));
 
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
@@ -44,13 +49,13 @@ export function GameInvites({ gameId }: { gameId: string }) {
 					</IconButton.Save>
 				)}
 			</div>
-			<table className="gap-3 items-center justify-items-center w-full">
+			<table className="w-full">
 				<thead>
 					<tr>
 						<th className="text-left">{t('table.role')}</th>
 						<th>{t('table.uses')}</th>
 						<th>{t('table.expires')}</th>
-						<th className="sr-only">{/* Actions */}</th>
+						<th className="sr-only">{t('table.actions')}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -59,7 +64,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 							<tr key={invite.id}>
 								{copyLink.isSuccess && copyLink.variables?.id === invite.id ? (
 									<td colSpan={4}>
-										<div className="bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center">
+										<PillBar>
 											{t('copied-to-clipboard')}
 											<IconButton.Save
 												title={t('cancel-copied-notice')}
@@ -67,7 +72,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 											>
 												<HiXMark />
 											</IconButton.Save>
-										</div>
+										</PillBar>
 									</td>
 								) : (
 									<>
