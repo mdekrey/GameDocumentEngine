@@ -18,7 +18,7 @@ import {
 import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
 import { useDeleteWidget } from './delete-widget/deleteWidget';
-import { showWidgetInfo } from './info/info';
+import { useShowWidgetInfo } from './info/info';
 import { useWidgetSizes } from './useWidgetSizes';
 import { RenderWidget } from './RenderWidget';
 import { MoveResizeWidget } from './MoveResizeWidget';
@@ -64,6 +64,9 @@ export function DashboardEditMode({
 		},
 	});
 	const onDelete = useDeleteWidget(document.gameId, widgets);
+	const showWidgetInfo = useShowWidgetInfo(document.gameId);
+	const onInfo = (id: string) => () =>
+		void showWidgetInfo(document.details.widgets[id]);
 
 	return (
 		<DashboardContainer.Editing
@@ -90,14 +93,6 @@ export function DashboardEditMode({
 			</DashboardToolsContainer>
 		</DashboardContainer.Editing>
 	);
-	function onInfo(id: string) {
-		return () =>
-			void showWidgetInfo(
-				launchModal,
-				document.gameId,
-				document.details.widgets[id],
-			);
-	}
 }
 
 const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));

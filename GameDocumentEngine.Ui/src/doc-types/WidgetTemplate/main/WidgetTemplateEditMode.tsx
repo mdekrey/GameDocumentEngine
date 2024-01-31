@@ -16,7 +16,7 @@ import {
 import { IconButton } from '@/components/button/icon-button';
 import { addWidget } from './add-widget/addWidget';
 import { useDeleteWidget } from './delete-widget/deleteWidget';
-import { showWidgetInfo } from './info/info';
+import { useShowWidgetInfo } from './info/info';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
 import { MoveResizeWidget } from '@/doc-types/Dashboard/MoveResizeWidget';
@@ -65,6 +65,7 @@ export function WidgetTemplateEditMode({
 		},
 	});
 	const onDelete = useDeleteWidget(document.gameId, previewDocumentId, widgets);
+	const showWidgetInfo = useShowWidgetInfo(previewDocument);
 
 	return (
 		<WidgetGridContainer.Editing
@@ -88,13 +89,7 @@ export function WidgetTemplateEditMode({
 		</WidgetGridContainer.Editing>
 	);
 	function onInfo(id: string) {
-		return () =>
-			void showWidgetInfo(
-				launchModal,
-				document.gameId,
-				previewDocument,
-				document.details.widgets[id],
-			);
+		return () => void showWidgetInfo(document.details.widgets[id]);
 	}
 }
 

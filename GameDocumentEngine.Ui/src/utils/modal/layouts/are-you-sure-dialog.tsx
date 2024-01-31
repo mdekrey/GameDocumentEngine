@@ -61,7 +61,8 @@ function AreYouSureModal({
 	);
 }
 
-export function useAreYouSure<T extends object>(
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function useAreYouSure<T extends {}>(
 	translationParams: Parameters<typeof useTranslation>,
 	Target: React.FC<T>,
 ) {
