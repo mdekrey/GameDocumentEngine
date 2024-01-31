@@ -17,7 +17,7 @@ import {
 } from './grid-utils';
 import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
-import { deleteWidget } from './delete-widget/deleteWidget';
+import { useDeleteWidget } from './delete-widget/deleteWidget';
 import { showWidgetInfo } from './info/info';
 import { useWidgetSizes } from './useWidgetSizes';
 import { RenderWidget } from './RenderWidget';
@@ -37,17 +37,15 @@ export function DashboardEditMode({
 	document,
 	form,
 }: GameObjectFormComponent<Dashboard>) {
-	const { widgets } = useFormFields(form, {
+	const { widgets, widget } = useFormFields(form, {
 		widgets: ['details', 'widgets'],
+		widget: (id: string) => ['details', 'widgets', id],
 	});
 	const navigate = useNavigate();
 	const onToggleEditing = () => navigate('..');
 	const queryClient = useQueryClient();
 	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
-	const { widget } = useFormFields(widgets, {
-		widget: (id: string) => [id],
-	});
 	const dropTarget = useDropTarget({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
@@ -65,6 +63,7 @@ export function DashboardEditMode({
 			},
 		},
 	});
+	const onDelete = useDeleteWidget(document.gameId, widgets);
 
 	return (
 		<DashboardContainer.Editing
@@ -91,9 +90,6 @@ export function DashboardEditMode({
 			</DashboardToolsContainer>
 		</DashboardContainer.Editing>
 	);
-	function onDelete(id: string) {
-		return () => void deleteWidget(launchModal, document.gameId, widgets, id);
-	}
 	function onInfo(id: string) {
 		return () =>
 			void showWidgetInfo(
