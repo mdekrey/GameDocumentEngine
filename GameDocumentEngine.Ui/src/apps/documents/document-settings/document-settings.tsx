@@ -7,8 +7,6 @@ import { RoleAssignment } from '@/components/forms/role-assignment/role-assignme
 import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { useDocument, useDocumentType, useGame } from '@/utils/api/hooks';
-import { DeleteDocumentModal } from '../document-settings/delete-document-modal';
-import { Prose } from '@/components/text/common';
 import {
 	deleteDocument,
 	updateDocumentAccessForSelf,
@@ -16,9 +14,14 @@ import {
 } from '@/utils/security/permission-strings';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
 import type { DocumentDetails } from '@/api/models/DocumentDetails';
-import { Section, SingleColumnSections } from '@/components/sections';
+import {
+	Section,
+	SectionHeader,
+	SingleColumnSections,
+} from '@/components/sections';
 import { DocumentEdit } from './document-edit/document-edit';
 import { getDocTypeTranslationNamespace } from '@/utils/api/accessors';
+import { DeleteConfirmNameModal } from '@/utils/modal/layouts/delete-confirm-name-dialog';
 
 function displayUserPermissions(documentDetails: DocumentDetails) {
 	return hasDocumentPermission(documentDetails, updateDocumentUserAccess);
@@ -42,9 +45,29 @@ function useUpdateDocumentRoleAssignments(gameId: string, documentId: string) {
 	return useMutation(queries.updateDocumentRoleAssignments(gameId, documentId));
 }
 
-const SectionHeader = Prose.extend('SectionHeader', () => (
-	<h2 className="text-xl font-bold my-4" />
-));
+function useDeleteDocumentWithConfirm(
+	gameId: string,
+	documentId: string,
+	onSuccess: () => void | Promise<void>,
+) {
+	const { t } = useTranslation(['delete-document']);
+	const { name } = useDocument(gameId, documentId);
+	const queryClient = useQueryClient();
+	const launchModal = useLaunchModal();
+	const deleteDocument = useMutation(
+		queries.deleteDocument(queryClient, gameId, documentId),
+	);
+	return async function handleDelete() {
+		const shouldDelete = await launchModal({
+			ModalContents: DeleteConfirmNameModal,
+			additional: { name, translation: t },
+		}).catch(() => false);
+		if (shouldDelete) {
+			await deleteDocument.mutateAsync();
+			await onSuccess();
+		}
+	};
+}
 
 export function DocumentSettings({
 	gameId,
@@ -58,17 +81,15 @@ export function DocumentSettings({
 	const docType = useDocumentType(gameId, documentId);
 	const { t } = useTranslation('document-settings');
 	const displayDelete = displayDeleteDocument(docData);
-	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-	const launchModal = useLaunchModal();
-	const deleteDocument = useMutation(
-		queries.deleteDocument(queryClient, gameId, documentId),
-	);
 	const updateDocumentRoleAssignments = useUpdateDocumentRoleAssignments(
 		gameId,
 		documentId,
 	);
 	const { userRoles = [], key } = docType ?? {};
+	const onDelete = useDeleteDocumentWithConfirm(gameId, documentId, () =>
+		navigate(`/game/${gameId}`),
+	);
 
 	return (
 		<SingleColumnSections>
@@ -95,7 +116,7 @@ export function DocumentSettings({
 			{displayDelete && (
 				<Section className="flex flex-col gap-2">
 					<SectionHeader>{t('danger-zone')}</SectionHeader>
-					<Button.Destructive onClick={() => void handleDelete()}>
+					<Button.Destructive onClick={() => void onDelete()}>
 						<HiOutlineTrash />
 						{t('delete-document', { name: docData.name })}
 					</Button.Destructive>
@@ -116,16 +137,5 @@ export function DocumentSettings({
 				),
 		);
 		updateDocumentRoleAssignments.mutate(changed);
-	}
-
-	async function handleDelete() {
-		const shouldDelete = await launchModal({
-			ModalContents: DeleteDocumentModal,
-			additional: { name: docData.name },
-		}).catch(() => false);
-		if (shouldDelete) {
-			deleteDocument.mutate();
-			navigate(`/game/${gameId}`);
-		}
 	}
 }

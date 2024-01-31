@@ -1,9 +1,10 @@
 import { Prose } from '@/components/text/common';
 import { ModalAlertLayout } from '../alert-layout';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@/components/button/button';
 import type { TFunction } from 'i18next';
-import type { ModalContentsProps, ModalLauncher } from '../modal-service';
+import { useLaunchModal, type ModalContentsProps } from '../modal-service';
+import React from 'react';
 
 export type TranslationParams = {
 	t: TFunction;
@@ -46,13 +47,8 @@ export function AreYouSureDialogPresentation({
 function AreYouSureModal({
 	resolve,
 	reject,
-	additional: { useTranslationParams },
-}: ModalContentsProps<
-	boolean,
-	{
-		useTranslationParams: () => TranslationParams;
-	}
->) {
+	additional: useTranslationParams,
+}: ModalContentsProps<boolean, () => TranslationParams>) {
 	const { t, values, components } = useTranslationParams();
 	return (
 		<AreYouSureDialogPresentation
@@ -65,12 +61,18 @@ function AreYouSureModal({
 	);
 }
 
-export async function areYouSure(
-	launchModal: ModalLauncher,
-	useTranslationParams: () => TranslationParams,
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function useAreYouSure<T extends {}>(
+	translationParams: Parameters<typeof useTranslation>,
+	Target: React.FC<T>,
 ) {
-	return await launchModal({
-		ModalContents: AreYouSureModal,
-		additional: { useTranslationParams },
-	});
+	const launchModal = useLaunchModal();
+	return (params: T) =>
+		launchModal({
+			ModalContents: AreYouSureModal,
+			additional: function useAreYouSureParams() {
+				const { t } = useTranslation(...translationParams);
+				return { t, components: { Target: <Target {...params} /> } };
+			},
+		});
 }

@@ -15,5 +15,5 @@ export const Section = elementTemplate('Section', 'section', (T) => (
 ));
 
 export const SectionHeader = Prose.extend('SectionHeader', () => (
-	<h2 className="text-xl font-bold mb-4 border-slate-700 dark:border-slate-300" />
+	<h2 className="text-xl font-bold mb-4" />
 ));

@@ -87,7 +87,7 @@ function DashboardViewModePresentation({
 	document: TypedDocumentDetails<Dashboard>;
 	height: Atom<string>;
 	width: Atom<string>;
-	dropTarget: ReturnType<typeof useDropTarget>;
+	dropTarget: ReturnType<typeof useDropTarget<HTMLDivElement>>;
 	RenderWidgetConfig: React.FC<{ widgetConfig: Widget }>;
 	onToggleEditing: () => void;
 	onToggleFullscreen: () => void;

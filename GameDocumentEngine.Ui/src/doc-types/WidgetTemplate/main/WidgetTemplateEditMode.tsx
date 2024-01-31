@@ -7,16 +7,14 @@ import {
 } from '@/components/drag-drop';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
-import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useQueryClient } from '@tanstack/react-query';
 import {
 	WidgetGridContainer,
 	toGridCoordinate,
 } from '@/doc-types/Dashboard/grid-utils';
 import { IconButton } from '@/components/button/icon-button';
-import { addWidget } from './add-widget/addWidget';
-import { deleteWidget } from './delete-widget/deleteWidget';
-import { showWidgetInfo } from './info/info';
+import { useAddWidget } from './add-widget/addWidget';
+import { useDeleteWidget } from './delete-widget/deleteWidget';
+import { useShowWidgetInfo } from './info/info';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
 import { MoveResizeWidget } from '@/doc-types/Dashboard/MoveResizeWidget';
@@ -36,17 +34,13 @@ export function WidgetTemplateEditMode({
 	form,
 }: GameObjectFormComponent<WidgetTemplate> & { previewDocumentId: string }) {
 	const previewDocument = useDocument(document.gameId, previewDocumentId);
-	const { widgets } = useFormFields(form, {
+	const { widgets, widget } = useFormFields(form, {
 		widgets: ['details', 'widgets'],
+		widget: (id: string) => ['details', 'widgets', id],
 	});
-
-	const queryClient = useQueryClient();
-	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
-	const { widget } = useFormFields(widgets, {
-		widget: (id: string) => [id],
-	});
-	const dropTarget = useDropTarget({
+	const addWidget = useAddWidget(previewDocument, widgets);
+	const dropTarget = useDropTarget<HTMLElement>({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
 				if (!link) return false;
@@ -54,18 +48,16 @@ export function WidgetTemplateEditMode({
 			},
 			handle(ev, data) {
 				if (data.gameId !== document.gameId) return false;
-				const currentTarget = ev.currentTarget as HTMLDivElement;
-				const rect = currentTarget.getBoundingClientRect();
+				const rect = ev.currentTarget.getBoundingClientRect();
 				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));
 				const y = toGridCoordinate(ev.clientY - Math.round(rect.top));
-				void addWidget(queryClient, launchModal, previewDocument, widgets, {
-					x,
-					y,
-				});
+				void addWidget({ x, y });
 				return true;
 			},
 		},
 	});
+	const onDelete = useDeleteWidget(document.gameId, previewDocumentId, widgets);
+	const showWidgetInfo = useShowWidgetInfo(previewDocument);
 
 	return (
 		<WidgetGridContainer.Editing
@@ -88,24 +80,8 @@ export function WidgetTemplateEditMode({
 			)}
 		</WidgetGridContainer.Editing>
 	);
-	function onDelete(id: string) {
-		return () =>
-			void deleteWidget(
-				launchModal,
-				document.gameId,
-				previewDocument,
-				widgets,
-				id,
-			);
-	}
 	function onInfo(id: string) {
-		return () =>
-			void showWidgetInfo(
-				launchModal,
-				document.gameId,
-				previewDocument,
-				document.details.widgets[id],
-			);
+		return () => void showWidgetInfo(document.details.widgets[id]);
 	}
 }
 

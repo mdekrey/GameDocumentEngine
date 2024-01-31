@@ -1,34 +1,28 @@
-import { Button } from '@/components/button/button';
-import { Prose } from '@/components/text/common';
-import { ModalAlertLayout } from '@/utils/modal/alert-layout';
-import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { Trans, useTranslation } from 'react-i18next';
+import type { GameInvite } from '@/api/models/GameInvite';
+import { queries } from '@/utils/api/queries';
+import { useAreYouSure } from '@/utils/modal/layouts/are-you-sure-dialog';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { getInviteUrl } from './getInviteUrl';
+import { elementTemplate } from '@/components/template';
 
-export function DeleteInviteModal({
-	resolve,
-	reject,
-	additional: { url },
-}: ModalContentsProps<boolean, { url: string }>) {
-	const { t } = useTranslation(['delete-invite']);
-	return (
-		<ModalAlertLayout>
-			<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
-			<Prose>
-				<Trans
-					i18nKey="are-you-sure"
-					t={t}
-					values={{ url }}
-					components={[<span className="font-mono text-blue-950" />]}
-				/>
-			</Prose>
-			<ModalAlertLayout.Buttons>
-				<Button.Destructive onClick={() => resolve(true)}>
-					{t('submit')}
-				</Button.Destructive>
-				<Button.Secondary onClick={() => reject('Cancel')}>
-					{t('cancel')}
-				</Button.Secondary>
-			</ModalAlertLayout.Buttons>
-		</ModalAlertLayout>
+const UrlDisplay = elementTemplate('UrlDisplay', 'span', (T) => (
+	<T className="font-mono text-blue-700 dark:text-blue-300" />
+));
+
+function DeleteInviteTarget({ invite }: { invite: GameInvite }) {
+	return <UrlDisplay>{getInviteUrl(invite)}</UrlDisplay>;
+}
+
+export function useDeleteInvite(gameId: string) {
+	const queryClient = useQueryClient();
+	const deleteInvite = useMutation(
+		queries.cancelInvitation(queryClient, gameId),
 	);
+	const areYouSure = useAreYouSure(['delete-invite'], DeleteInviteTarget);
+	return async function showDeleteInviteModal(invite: GameInvite) {
+		const result = await areYouSure({ invite }).catch(() => false);
+		if (result) {
+			deleteInvite.mutate({ invite: invite.id });
+		}
+	};
 }

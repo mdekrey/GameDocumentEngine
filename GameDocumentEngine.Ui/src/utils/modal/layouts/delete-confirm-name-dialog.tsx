@@ -1,21 +1,21 @@
 import { Button } from '@/components/button/button';
 import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { TextField } from '@/components/form-fields/text-input/text-field';
-import { Prose } from '@/components/text/common';
 import { useForm } from '@/utils/form';
 import { ModalAlertLayout } from '@/utils/modal/alert-layout';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
-import { useMemo } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useCallback, useMemo } from 'react';
+import { type TFunction } from 'i18next';
+import { Trans } from 'react-i18next';
 import { z } from 'zod';
+import { Prose } from '@/components/text/common';
 
-export function DeleteDocumentModal({
+export function DeleteConfirmNameModal({
 	resolve,
 	reject,
-	additional: { name: originalName },
-}: ModalContentsProps<boolean, { name: string }>) {
-	const { t } = useTranslation(['delete-document']);
-	const DeleteDocument = useMemo(
+	additional: { name: originalName, translation: t },
+}: ModalContentsProps<boolean, { name: string; translation: TFunction }>) {
+	const nameMatchSchema = useMemo(
 		() =>
 			z.object({
 				name: z
@@ -25,26 +25,33 @@ export function DeleteDocumentModal({
 		[originalName],
 	);
 	const form = useForm({
-		schema: DeleteDocument,
-		translation: t,
+		schema: nameMatchSchema,
 		defaultValue: { name: '' },
 		fields: { name: ['name'] },
+		translation: t,
 	});
+	const NameComponent = useCallback(
+		function Name() {
+			return <span className="font-bold">{originalName}</span>;
+		},
+		[originalName],
+	);
 
 	return (
-		<form className="w-full h-full" onSubmit={form.handleSubmit(onSubmit)}>
+		<form onSubmit={form.handleSubmit(onSubmit)}>
 			<ModalAlertLayout>
 				<ModalAlertLayout.Title>{t('title')}</ModalAlertLayout.Title>
 				<Prose>
 					<Trans
 						i18nKey="are-you-sure"
 						t={t}
-						values={{ name: originalName }}
-						components={[<span className="font-bold" />]}
+						components={{
+							Target: <NameComponent />,
+						}}
 					/>
 				</Prose>
 				<Prose>{t('please-type-name-to-confirm')}</Prose>
-				<Fieldset className="m-0">
+				<Fieldset>
 					<TextField field={form.fields.name} />
 				</Fieldset>
 				<ModalAlertLayout.Buttons>

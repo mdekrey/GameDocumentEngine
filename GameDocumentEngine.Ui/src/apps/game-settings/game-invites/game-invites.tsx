@@ -1,13 +1,10 @@
 import { IconButton } from '@/components/button/icon-button';
-import { queries } from '@/utils/api/queries';
 import { useLaunchModal } from '@/utils/modal/modal-service';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
 import type { GameInvite } from '@/api/models/GameInvite';
-import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
-import { DeleteInviteModal } from './delete-invite';
 import { Trans, useTranslation } from 'react-i18next';
 import { useGame, useInvitations } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';
@@ -16,6 +13,13 @@ import {
 	cancelInvitation,
 } from '@/utils/security/permission-strings';
 import { getGameTypeTranslationNamespace } from '@/utils/api/accessors';
+import { getInviteUrl } from './getInviteUrl';
+import { useDeleteInvite } from './delete-invite';
+import { elementTemplate } from '@/components/template';
+
+const PillBar = elementTemplate('PillBar', 'div', (T) => (
+	<T className="bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center" />
+));
 
 export function GameInvites({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['list-invites']);
@@ -28,15 +32,12 @@ export function GameInvites({ gameId }: { gameId: string }) {
 			await navigator.clipboard.writeText(getInviteUrl(invitation));
 		},
 	});
-	const queryClient = useQueryClient();
-	const deleteInvite = useMutation(
-		queries.cancelInvitation(queryClient, gameId),
-	);
 
 	const allowCreate = gameDetails.typeInfo.userRoles.some((role) =>
 		hasGamePermission(gameDetails, (id) => createInvitation(id, role)),
 	);
 	const allowCancel = hasGamePermission(gameDetails, cancelInvitation);
+	const onDeleteInvite = useDeleteInvite(gameId);
 
 	return (
 		<>
@@ -48,13 +49,13 @@ export function GameInvites({ gameId }: { gameId: string }) {
 					</IconButton.Save>
 				)}
 			</div>
-			<table className="gap-3 items-center justify-items-center w-full">
+			<table className="w-full">
 				<thead>
 					<tr>
 						<th className="text-left">{t('table.role')}</th>
 						<th>{t('table.uses')}</th>
 						<th>{t('table.expires')}</th>
-						<th className="sr-only">{/* Actions */}</th>
+						<th className="sr-only">{t('table.actions')}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -63,7 +64,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 							<tr key={invite.id}>
 								{copyLink.isSuccess && copyLink.variables?.id === invite.id ? (
 									<td colSpan={4}>
-										<div className="bg-green-200 border-green-400 rounded-full text-green-800 text-center p-1 pl-3 flex gap-3 justify-between items-center">
+										<PillBar>
 											{t('copied-to-clipboard')}
 											<IconButton.Save
 												title={t('cancel-copied-notice')}
@@ -71,7 +72,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 											>
 												<HiXMark />
 											</IconButton.Save>
-										</div>
+										</PillBar>
 									</td>
 								) : (
 									<>
@@ -105,7 +106,7 @@ export function GameInvites({ gameId }: { gameId: string }) {
 											{allowCancel && (
 												<IconButton.Destructive
 													title={t('delete')}
-													onClick={() => void showDeleteInviteModal(invite)}
+													onClick={() => void onDeleteInvite(invite)}
 												>
 													<HiOutlineTrash />
 												</IconButton.Destructive>
@@ -130,21 +131,5 @@ export function GameInvites({ gameId }: { gameId: string }) {
 			additional: { gameId },
 			ModalContents: CreateInvite,
 		});
-	}
-
-	async function showDeleteInviteModal(invite: GameInvite) {
-		const result = await launchModal({
-			additional: { url: getInviteUrl(invite) },
-			ModalContents: DeleteInviteModal,
-		});
-		if (result) {
-			deleteInvite.mutate({ invite: invite.id });
-		}
-	}
-
-	function getInviteUrl(invitation: GameInvite) {
-		const url = constructClaimInvitation({ linkId: invitation.id });
-		const finalUrl = new URL(url, window.location.href);
-		return finalUrl.toString();
 	}
 }

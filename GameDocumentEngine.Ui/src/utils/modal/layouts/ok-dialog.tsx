@@ -1,7 +1,7 @@
 import { ModalDialogLayout } from '../modal-dialog';
 import { Button } from '@/components/button/button';
 import type { TFunction } from 'i18next';
-import type { ModalContentsProps, ModalLauncher } from '../modal-service';
+import { useLaunchModal, type ModalContentsProps } from '../modal-service';
 
 export type ContentParams = {
 	t: TFunction;
@@ -28,13 +28,8 @@ export function OkModalDialogPresentation({
 
 function OkDialogModal({
 	resolve,
-	additional: { useParams },
-}: ModalContentsProps<
-	void,
-	{
-		useParams: () => ContentParams;
-	}
->) {
+	additional: useParams,
+}: ModalContentsProps<void, () => ContentParams>) {
 	const { t, children } = useParams();
 
 	return (
@@ -44,12 +39,16 @@ function OkDialogModal({
 	);
 }
 
-export async function okDialog(
-	launchModal: ModalLauncher,
-	useParams: () => ContentParams,
+export function useOkDialog<T extends readonly unknown[]>(
+	useParams: (...params: T) => ContentParams,
 ) {
-	return await launchModal({
-		ModalContents: OkDialogModal,
-		additional: { useParams },
-	});
+	const launchModal = useLaunchModal();
+	return function launchOkDialog(...params: T) {
+		return launchModal({
+			ModalContents: OkDialogModal,
+			additional: function useContent() {
+				return useParams(...params);
+			},
+		});
+	};
 }

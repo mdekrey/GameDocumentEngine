@@ -42,7 +42,7 @@
 	},
 	"delete-widget-modal": {
 		"title": "Remove Widget",
-		"are-you-sure": "Are you sure you want to delete the {{widgetType}} widget? This action cannot be undone.",
+		"are-you-sure": "Are you sure you want to delete the <Target /> widget? This action cannot be undone.",
 		"cancel": "Cancel",
 		"submit": "Remove Widget"
 	},

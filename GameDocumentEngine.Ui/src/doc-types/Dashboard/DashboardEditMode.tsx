@@ -7,9 +7,7 @@ import {
 } from '@/components/drag-drop';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
-import { useLaunchModal } from '@/utils/modal/modal-service';
-import { addWidget } from './add-widget/addWidget';
-import { useQueryClient } from '@tanstack/react-query';
+import { useAddWidget } from './add-widget/addWidget';
 import {
 	DashboardContainer,
 	DashboardToolsContainer,
@@ -17,8 +15,8 @@ import {
 } from './grid-utils';
 import { IconButton } from '@/components/button/icon-button';
 import { HiCheck } from 'react-icons/hi2';
-import { deleteWidget } from './delete-widget/deleteWidget';
-import { showWidgetInfo } from './info/info';
+import { useDeleteWidget } from './delete-widget/deleteWidget';
+import { useShowWidgetInfo } from './info/info';
 import { useWidgetSizes } from './useWidgetSizes';
 import { RenderWidget } from './RenderWidget';
 import { MoveResizeWidget } from './MoveResizeWidget';
@@ -37,18 +35,15 @@ export function DashboardEditMode({
 	document,
 	form,
 }: GameObjectFormComponent<Dashboard>) {
-	const { widgets } = useFormFields(form, {
+	const { widgets, widget } = useFormFields(form, {
 		widgets: ['details', 'widgets'],
+		widget: (id: string) => ['details', 'widgets', id],
 	});
 	const navigate = useNavigate();
 	const onToggleEditing = () => navigate('..');
-	const queryClient = useQueryClient();
-	const launchModal = useLaunchModal();
 	const { height, width } = useWidgetSizes(widgets.atom);
-	const { widget } = useFormFields(widgets, {
-		widget: (id: string) => [id],
-	});
-	const dropTarget = useDropTarget({
+	const addWidget = useAddWidget(widgets);
+	const dropTarget = useDropTarget<HTMLElement>({
 		[documentIdMimeType]: {
 			canHandle({ link }) {
 				if (!link) return false;
@@ -56,15 +51,18 @@ export function DashboardEditMode({
 			},
 			handle(ev, data) {
 				if (data.gameId !== document.gameId) return false;
-				const currentTarget = ev.currentTarget as HTMLDivElement;
-				const rect = currentTarget.getBoundingClientRect();
+				const rect = ev.currentTarget.getBoundingClientRect();
 				const x = toGridCoordinate(ev.clientX - Math.round(rect.left));
 				const y = toGridCoordinate(ev.clientY - Math.round(rect.top));
-				void addWidget(queryClient, launchModal, data, widgets, { x, y });
+				void addWidget(data, { x, y });
 				return true;
 			},
 		},
 	});
+	const onDelete = useDeleteWidget(document.gameId, widgets);
+	const showWidgetInfo = useShowWidgetInfo(document.gameId);
+	const onInfo = (id: string) => () =>
+		void showWidgetInfo(document.details.widgets[id]);
 
 	return (
 		<DashboardContainer.Editing
@@ -91,17 +89,6 @@ export function DashboardEditMode({
 			</DashboardToolsContainer>
 		</DashboardContainer.Editing>
 	);
-	function onDelete(id: string) {
-		return () => void deleteWidget(launchModal, document.gameId, widgets, id);
-	}
-	function onInfo(id: string) {
-		return () =>
-			void showWidgetInfo(
-				launchModal,
-				document.gameId,
-				document.details.widgets[id],
-			);
-	}
 }
 
 const hoverVisibility = atom((get) => (get(isDraggingAtom) ? 'none' : null));

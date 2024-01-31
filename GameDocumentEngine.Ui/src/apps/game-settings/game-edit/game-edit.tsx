@@ -12,6 +12,9 @@ import { TextField } from '@/components/form-fields/text-input/text-field';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import { updateGame } from '@/utils/security/permission-strings';
 import { useGame } from '@/utils/api/hooks';
+import { useComputedAtom } from '@principlestudios/jotai-react-signals';
+import type { StandardField } from '@/components/form-fields/FieldProps';
+import type { TFunction } from 'i18next';
 
 function usePatchGame(gameId: string) {
 	const queryClient = useQueryClient();
@@ -25,33 +28,34 @@ const GameDetailsSchema = z.object({
 export function GameEdit({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['edit-game']);
 	const gameData = useGame(gameId);
-	const gameForm = useForm({
+	const canEdit = hasGamePermission(gameData, updateGame);
+	const readOnlyAtom = useComputedAtom(() => !canEdit);
+	const {
+		handleSubmit,
+		fields: { name },
+		...gameForm
+	} = useForm({
 		defaultValue: { name: gameData.name },
 		translation: t,
 		schema: GameDetailsSchema,
 		fields: {
-			name: ['name'],
+			name: {
+				path: ['name'],
+				readOnly: readOnlyAtom,
+			},
 		},
 	});
 
 	const saveGame = usePatchGame(gameId);
 	useUpdatingForm(gameForm, gameData);
-	const canEdit = hasGamePermission(gameData, updateGame);
-	gameForm.store.set(gameForm.readOnlyFields, !canEdit);
 
 	return (
-		<>
-			<form onSubmit={gameForm.handleSubmit(onSubmit)}>
-				<Fieldset>
-					<TextField field={gameForm.fields.name} />
-					{canEdit && (
-						<ButtonRow>
-							<Button type="submit">{t('submit')}</Button>
-						</ButtonRow>
-					)}
-				</Fieldset>
-			</form>
-		</>
+		<GameEditPresentation
+			nameField={name}
+			canEdit={canEdit}
+			t={t}
+			onSubmit={handleSubmit(onSubmit)}
+		/>
 	);
 
 	function onSubmit(currentValue: z.infer<typeof GameDetailsSchema>) {
@@ -60,4 +64,29 @@ export function GameEdit({ gameId }: { gameId: string }) {
 		})[1];
 		if (patches.length > 0) saveGame.mutate(patches.map(immerPatchToStandard));
 	}
+}
+
+export function GameEditPresentation({
+	nameField,
+	canEdit,
+	t,
+	onSubmit,
+}: {
+	nameField: StandardField<string>;
+	canEdit: boolean;
+	t: TFunction;
+	onSubmit?: React.FormEventHandler<HTMLFormElement>;
+}) {
+	return (
+		<form onSubmit={onSubmit}>
+			<Fieldset>
+				<TextField field={nameField} />
+				{canEdit && (
+					<ButtonRow>
+						<Button type="submit">{t('submit')}</Button>
+					</ButtonRow>
+				)}
+			</Fieldset>
+		</form>
+	);
 }
