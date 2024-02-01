@@ -3,6 +3,9 @@
 	"references": [
 		{
 			"path": "./GameDocumentEngine.Ui"
+		},
+		{
+			"path": "./GameDocumentEngine.Ui.Api"
 		}
 	]
 }

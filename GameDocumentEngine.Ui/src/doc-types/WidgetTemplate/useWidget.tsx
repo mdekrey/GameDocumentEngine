@@ -1,4 +1,4 @@
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import type { Widget } from './types';
 import { useWidgetType } from '@/utils/api/hooks';
 import { useCallback } from 'react';

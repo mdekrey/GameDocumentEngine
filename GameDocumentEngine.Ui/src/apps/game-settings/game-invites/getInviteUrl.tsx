@@ -1,5 +1,5 @@
-import type { GameInvite } from '@/api/models/GameInvite';
-import { constructUrl as constructClaimInvitation } from '@/api/operations/claimInvitation';
+import type { GameInvite } from '@vaultvtt/api/openapi/models/GameInvite';
+import { constructUrl as constructClaimInvitation } from '@vaultvtt/api/openapi/operations/claimInvitation';
 
 export function getInviteUrl(invitation: GameInvite) {
 	const url = constructClaimInvitation({ linkId: invitation.id });

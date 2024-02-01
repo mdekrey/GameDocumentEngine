@@ -13,7 +13,7 @@ import {
 	updateDocumentUserAccess,
 } from '@/utils/security/permission-strings';
 import { hasDocumentPermission } from '@/utils/security/match-permission';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import {
 	Section,
 	SectionHeader,

@@ -150,6 +150,9 @@ importers:
       '@types/json-schema':
         specifier: ^7.0.15
         version: 7.0.15
+      '@vaultvtt/api':
+        specifier: workspace:*
+        version: link:../GameDocumentEngine.Ui.Api
       d3-shape:
         specifier: ^3.2.0
         version: 3.2.0
@@ -328,6 +331,18 @@ importers:
       workbox-precaching:
         specifier: ^7.0.0
         version: 7.0.0
+
+  GameDocumentEngine.Ui.Api:
+    dependencies:
+      '@principlestudios/openapi-codegen-typescript':
+        specifier: ^0.6.3
+        version: 0.6.3
+      '@principlestudios/openapi-codegen-typescript-fetch':
+        specifier: ^0.7.1
+        version: 0.7.1(@principlestudios/openapi-codegen-typescript@0.6.3)
+      rfc6902:
+        specifier: ^5.0.1
+        version: 5.0.1
 
 packages:
 

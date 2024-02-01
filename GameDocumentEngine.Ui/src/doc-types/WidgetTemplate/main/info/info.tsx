@@ -1,5 +1,5 @@
 import type { Widget } from '../../types';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { useDocumentName } from '@/components/named-icon/useDocumentName';
 import { InfoWidgetContentsPresentation } from '@/doc-types/Dashboard/info/InfoWidgetContentsPresentation';
 import { useTranslationFor, useDocTypeTranslation } from '@/utils/api/hooks';

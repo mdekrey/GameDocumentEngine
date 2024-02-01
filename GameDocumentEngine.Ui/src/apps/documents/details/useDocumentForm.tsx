@@ -11,7 +11,7 @@ import { useForm, useUpdatingForm } from '@/utils/form';
 import { toReadOnlyFields } from '@/documents/toReadOnlyFields';
 import { applyPatch, createPatch } from 'rfc6902';
 import { fetchLocalDocument } from '../useLocalDocument';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { useEditableDocument } from './useEditableDocument';
 
 export function useDocumentForm<T>(

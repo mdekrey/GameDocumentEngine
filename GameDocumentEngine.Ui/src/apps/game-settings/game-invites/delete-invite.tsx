@@ -1,4 +1,4 @@
-import type { GameInvite } from '@/api/models/GameInvite';
+import type { GameInvite } from '@vaultvtt/api/openapi/models/GameInvite';
 import { queries } from '@/utils/api/queries';
 import { useAreYouSure } from '@/utils/modal/layouts/are-you-sure-dialog';
 import { useQueryClient, useMutation } from '@tanstack/react-query';

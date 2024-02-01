@@ -1,6 +1,6 @@
 import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
-import type { GameInvite } from '@/api/models/GameInvite';
+import type { GameInvite } from '@vaultvtt/api/openapi/models/GameInvite';
 import { produce } from 'immer';
 
 export const listInvitations = (gameId: string) => ({

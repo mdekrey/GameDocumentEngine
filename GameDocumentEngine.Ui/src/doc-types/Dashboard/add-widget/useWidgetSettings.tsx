@@ -9,7 +9,7 @@ import { useTranslationFor } from '@/utils/api/hooks';
 import type { UseFormResult } from '@principlestudios/react-jotai-forms';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { z } from 'zod';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { noop } from '@/utils/noop';
 import type { NewWidgetResult } from './NewWidgetResult';
 

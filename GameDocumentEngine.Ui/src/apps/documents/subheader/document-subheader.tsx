@@ -5,7 +5,7 @@ import { displayDocumentSettings } from '../document-settings/document-settings'
 import { useDocument } from '@/utils/api/hooks';
 import { Subheader } from '@/components/subheader/subheader';
 import type { TFunction } from 'i18next';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 
 export function DocumentSubheader({
 	gameId,

@@ -1,5 +1,5 @@
-import type { GameImportArchiveSummary } from '@/api/models/GameImportArchiveSummary';
-import type { ImportPlayerOptions } from '@/api/models/ImportPlayerOptions';
+import type { GameImportArchiveSummary } from '@vaultvtt/api/openapi/models/GameImportArchiveSummary';
+import type { ImportPlayerOptions } from '@vaultvtt/api/openapi/models/ImportPlayerOptions';
 import type { FieldMapping } from '@principlestudios/react-jotai-forms';
 import { z } from 'zod';
 

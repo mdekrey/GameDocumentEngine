@@ -6,7 +6,7 @@ import {
 	PositionedWidgetContainer,
 } from '@/doc-types/Dashboard/grid-utils';
 import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { useWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
 import { useWidget } from '../useWidget';
 import { useCallback } from 'react';

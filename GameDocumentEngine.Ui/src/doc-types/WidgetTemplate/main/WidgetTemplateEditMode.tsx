@@ -21,7 +21,7 @@ import { MoveResizeWidget } from '@/doc-types/Dashboard/MoveResizeWidget';
 import { HiOutlineCog6Tooth, HiOutlineTrash } from 'react-icons/hi2';
 import { BsInfoLg } from 'react-icons/bs';
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { atom } from 'jotai';
 import { useDocument, useWidgetType } from '@/utils/api/hooks';
 import { IconLinkButton } from '@/components/button/icon-link-button';

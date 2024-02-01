@@ -61,12 +61,14 @@ RUN curl -fsSL "https://github.com/pnpm/pnpm/releases/download/${PNPM_VERSION}/p
 
 COPY ./eng/ ./eng/
 COPY ["./GameDocumentEngine.Ui/package.json", "./GameDocumentEngine.Ui/"]
+COPY ["./GameDocumentEngine.Ui.Api/package.json", "./GameDocumentEngine.Ui.Api/"]
 COPY ["./package.json", "./package.json"]
 COPY ["./pnpm-lock.yaml", "./"]
 COPY ["./pnpm-workspace.yaml", "./"]
 COPY ["./.npmrc", "./"]
 COPY ["./patches/", "./patches/"]
 COPY ["./GameDocumentEngine.Ui/GameDocumentEngine.Ui.esproj", "./GameDocumentEngine.Ui/"]
+COPY ["./GameDocumentEngine.Ui.Api/GameDocumentEngine.Ui.Api.esproj", "./GameDocumentEngine.Ui.Api/"]
 COPY ["./Directory.Build.props", "./"]
 COPY ["./eng/pnpm/", "./eng/pnpm/"]
 RUN pnpm install --frozen-lockfile && cd ./GameDocumentEngine.Ui/ && dotnet restore -p:Configuration=Release
@@ -74,6 +76,7 @@ RUN pnpm install --frozen-lockfile && cd ./GameDocumentEngine.Ui/ && dotnet rest
 COPY ./tsconfig*.json ./
 COPY ./schemas/ ./schemas/
 COPY ./GameDocumentEngine.Ui/ ./GameDocumentEngine.Ui/
+COPY ./GameDocumentEngine.Ui.Api/ ./GameDocumentEngine.Ui.Api/
 
 ARG GITHASH
 ENV VITE_GITHASH=${GITHASH}

@@ -11,7 +11,7 @@ import { Button } from '@/components/button/button';
 import { useLaunchModal } from '@/utils/modal/modal-service';
 import { IconButton } from '@/components/button/icon-button';
 import { useDeleteGameUser } from './remove-game-user-modal';
-import type { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@vaultvtt/api/openapi/models/GameDetails';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import {
 	deleteGame,

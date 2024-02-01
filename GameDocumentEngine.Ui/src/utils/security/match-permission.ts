@@ -1,6 +1,6 @@
-import type { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@vaultvtt/api/openapi/models/GameDetails';
 import { toPermissionPatternRegex } from './to-permission-pattern-regex';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 
 export function matchPermission(
 	permissionPattern: string,

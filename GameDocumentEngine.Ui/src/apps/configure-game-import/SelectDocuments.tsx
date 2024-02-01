@@ -1,4 +1,4 @@
-import type { GameImportArchiveSummary } from '@/api/models/GameImportArchiveSummary';
+import type { GameImportArchiveSummary } from '@vaultvtt/api/openapi/models/GameImportArchiveSummary';
 import type { FormFieldReturnType } from '@principlestudios/react-jotai-forms';
 import { useFormFields } from '@principlestudios/react-jotai-forms';
 import type { ImportDocumentFormOptions } from './mappings';

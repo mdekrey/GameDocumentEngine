@@ -8,7 +8,7 @@ Dockerfile
 /GameDocumentEngine.Ui/node_modules
 /GameDocumentEngine.Ui/dist
 /GameDocumentEngine.Ui/dev-dist
-/GameDocumentEngine.Ui/src/api
+/GameDocumentEngine.Ui.Api/src/api
 /GameDocumentEngine.Ui/src/doc-types/*/schema.ts
 /GameDocumentEngine.Server/obj
 /GameDocumentEngine.Server/wwwroot

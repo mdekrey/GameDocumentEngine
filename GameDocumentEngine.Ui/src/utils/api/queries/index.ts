@@ -1,6 +1,6 @@
 import { getInfo } from './environment';
 import { getCurrentUser, patchUser } from './user';
-import type operations from '@/api/operations';
+import type operations from '@vaultvtt/api/openapi/operations/index';
 import {
 	createGame,
 	deleteGame,

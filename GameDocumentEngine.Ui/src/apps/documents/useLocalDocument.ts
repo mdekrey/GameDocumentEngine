@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { produce } from 'immer';
 import type { Patch } from 'rfc6902';
 import { applyPatch } from 'rfc6902';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { fetchDocument } from '@/utils/api/loaders';
 
 function combinePendingActions(pendingActions: Patch) {

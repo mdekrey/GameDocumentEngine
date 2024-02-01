@@ -4,7 +4,7 @@ import type { MenuItemsConfiguration } from '../menu-items/menu-items';
 import { useTranslation } from 'react-i18next';
 import { HiPencil, HiSun, HiMoon } from 'react-icons/hi2';
 import type { TFunction } from 'i18next';
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@vaultvtt/api/openapi/models/UserDetails';
 import { useEffect } from 'react';
 import { useCurrentUser } from '@/utils/api/hooks';
 

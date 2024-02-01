@@ -8,7 +8,7 @@ import type {
 import type { Widget, WidgetTemplate } from '../types';
 import { useDocument } from '@/utils/api/hooks';
 import { getWidgetSizes } from '@/doc-types/Dashboard/useWidgetSizes';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import { RenderWidget } from '@/doc-types/Dashboard/RenderWidget';
 import { useWidget } from '../useWidget';
 import { z } from 'zod';

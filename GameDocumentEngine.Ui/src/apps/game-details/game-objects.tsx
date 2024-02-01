@@ -5,7 +5,7 @@ import { useAllDocuments, useGame, useGameType } from '@/utils/api/hooks';
 import { useTranslation } from 'react-i18next';
 import { hasGamePermission } from '@/utils/security/match-permission';
 import { createDocument } from '@/utils/security/permission-strings';
-import type { DocumentSummary } from '@/api/models/DocumentSummary';
+import type { DocumentSummary } from '@vaultvtt/api/openapi/models/DocumentSummary';
 import type { FolderNode } from '@/utils/api/queries/document';
 import type { GameTypeObjectScripts } from '@/utils/api/queries/game-types';
 import { Prose } from '@/components/text/common';

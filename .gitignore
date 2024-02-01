@@ -484,7 +484,7 @@ $RECYCLE.BIN/
 
 GameDocumentEngine.Server/wwwroot/**/*
 !GameDocumentEngine.Server/wwwroot/.gitkeep
-GameDocumentEngine.Ui/src/api/
+GameDocumentEngine.Ui.Api/src/api/
 GameDocumentEngine.Server/setup.ps1
 GameDocumentEngine.Ui/.env
 GameDocumentEngine.Ui/src/doc-types/*/schema.ts

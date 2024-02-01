@@ -1,8 +1,8 @@
 import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 import type { NavigateFunction } from 'react-router-dom';
-import type { GameDetails } from '@/api/models/GameDetails';
-import type { CreateGameDetails } from '@/api/models/CreateGameDetails';
+import type { GameDetails } from '@vaultvtt/api/openapi/models/GameDetails';
+import type { CreateGameDetails } from '@vaultvtt/api/openapi/models/CreateGameDetails';
 import type { Patch } from 'rfc6902';
 import type { EntityChangedProps } from '../EntityChangedProps';
 import {
@@ -16,21 +16,21 @@ import {
 	constructUrl as importGameUrl,
 	method as importGameMethod,
 	constructResponse as constructImportGameResponse,
-} from '@/api/operations/importGame';
+} from '@vaultvtt/api/openapi/operations/importGame';
 import {
 	constructUrl as importIntoExistingGameUrl,
 	method as importIntoExistingGameMethod,
 	constructResponse as constructImportIntoExistingGameResponse,
-} from '@/api/operations/importIntoExistingGame';
+} from '@vaultvtt/api/openapi/operations/importIntoExistingGame';
 import {
 	constructUrl as inspectGameArchiveUrl,
 	method as inspectGameArchiveMethod,
 	constructResponse as constructInspectGameArchiveResponse,
 	type StructuredResponses as InspectGameArchiveResponses,
-} from '@/api/operations/inspectGameArchive';
-import { constructUrl as getGameExportUrl } from '@/api/operations/getGameExport';
-import type { ImportIntoExistingGameOptions } from '@/api/models/ImportIntoExistingGameOptions';
-import type { ImportGameOptions } from '@/api/models/ImportGameOptions';
+} from '@vaultvtt/api/openapi/operations/inspectGameArchive';
+import { constructUrl as getGameExportUrl } from '@vaultvtt/api/openapi/operations/getGameExport';
+import type { ImportIntoExistingGameOptions } from '@vaultvtt/api/openapi/models/ImportIntoExistingGameOptions';
+import type { ImportGameOptions } from '@vaultvtt/api/openapi/models/ImportGameOptions';
 
 export const listGameTypes = () => ({
 	queryKey: ['gameTypes'],

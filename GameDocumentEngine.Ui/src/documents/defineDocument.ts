@@ -1,4 +1,4 @@
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import type { FieldMapping, FormFieldReturnType } from '@/utils/form';
 import type { UseFormResult } from '@/utils/form';
 import type { Draft } from 'immer';

@@ -7,7 +7,7 @@ import type { StandardField } from '@/components/form-fields/FieldProps';
 import { immerPatchToStandard } from '@/utils/api/immerPatchToStandard';
 import { z } from 'zod';
 import { useForm, useUpdatingForm } from '@/utils/form';
-import { type UserDetails } from '@/api/models/UserDetails';
+import { type UserDetails } from '@vaultvtt/api/openapi/models/UserDetails';
 import { ButtonRow } from '@/components/button/button-row';
 import { useTranslation } from 'react-i18next';
 import { TextField } from '@/components/form-fields/text-input/text-field';

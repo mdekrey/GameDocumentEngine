@@ -10,10 +10,11 @@
         <PnpmPrebuildChecksRecordPath Condition=" '$(PnpmPrebuildChecksRecordPath)' == '' ">$(PnpmStepRecordDir)_.prebuild.$(Configuration)._</PnpmPrebuildChecksRecordPath>
         <PnpmLintRecordPath Condition=" '$(PnpmLintRecordPath)' == '' ">$(PnpmStepRecordDir)_.lint.$(Configuration)._</PnpmLintRecordPath>
 
-        <PnpmInstallScript Condition=" '$(PnpmInstallScript)' == '' and $(Configuration) != 'Release' ">pnpm install</PnpmInstallScript>
-        <PnpmInstallScript Condition=" '$(PnpmInstallScript)' == '' and $(Configuration) == 'Release' ">pnpm install --frozen-lockfile</PnpmInstallScript>
+        <!--
         <PnpmBuildScript Condition=" '$(PnpmBuildScript)' == '' ">pnpm build</PnpmBuildScript>
+        <PnpmLintScript Condition=" '$(PnpmLintScript)' == '' ">pnpm lint</PnpmLintScript>
         <PnpmTestScript Condition=" '$(PnpmTestScript)' == '' ">pnpm test</PnpmTestScript>
+        -->
     </PropertyGroup>
 
     <ItemGroup>
@@ -55,7 +56,7 @@
             BuildInParallel="false" />
     </Target>
 
-    <Target Name="NodeBuild" BeforeTargets="Build" Inputs="@(Compile);@(RestoreConfig);@(CompileConfig)" Outputs="@(CompileOutputs)">
+    <Target Name="NodeBuild" Condition="'$(PnpmBuildScript)' != ''" BeforeTargets="Build" Inputs="@(Compile);@(RestoreConfig);@(CompileConfig)" Outputs="@(CompileOutputs)">
         <ItemGroup>
             <OutputCleanup Include="dist/**/*" />
         </ItemGroup>
@@ -64,8 +65,8 @@
         <Touch ForceTouch="true" Files="@(CompileOutputs)" />
     </Target>
 
-    <Target Name="Lint" Inputs="@(Compile);@(RestoreConfig);@(CompileConfig)" Outputs="@(PnpmLintRecordPath)">
-        <Exec WorkingDirectory="$(ProjectDir)" Command="$(PnpmBuildScript)" />
+    <Target Name="Lint" Condition="'$(PnpmLintScript)' != ''" Inputs="@(Compile);@(RestoreConfig);@(CompileConfig)" Outputs="@(PnpmLintRecordPath)">
+        <Exec WorkingDirectory="$(ProjectDir)" Command="$(PnpmLintScript)" />
         <Touch ForceTouch="true" Files="@(PnpmLintRecordPath)" />
     </Target>
 

@@ -2,7 +2,7 @@ import { type EditableDocumentDetails } from '@/documents/defineDocument';
 import { useMemo } from 'react';
 import { toEditableDetails } from '@/documents/get-document-pointers';
 import type { FieldMapping } from '@/utils/form';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 
 export function useEditableDocument<T>(
 	document: DocumentDetails,

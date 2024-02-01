@@ -5,7 +5,7 @@ import { displayGameSettings } from '../game-settings/game-settings';
 import { useGame } from '@/utils/api/hooks';
 import { Subheader } from '@/components/subheader/subheader';
 import type { TFunction } from 'i18next';
-import type { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@vaultvtt/api/openapi/models/GameDetails';
 
 export function GameSubheader({ gameId }: { gameId: string }) {
 	const { t } = useTranslation(['game-details']);

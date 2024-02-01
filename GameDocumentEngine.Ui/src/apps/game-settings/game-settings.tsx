@@ -17,7 +17,7 @@ import {
 	displayDangerZone,
 	GameDangerZone,
 } from './game-danger-zone/game-danger-zone';
-import type { GameDetails } from '@/api/models/GameDetails';
+import type { GameDetails } from '@vaultvtt/api/openapi/models/GameDetails';
 import { Suspense } from 'react';
 import { useGame } from '@/utils/api/hooks';
 

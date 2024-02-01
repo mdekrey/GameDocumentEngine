@@ -1,4 +1,4 @@
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@vaultvtt/api/openapi/models/UserDetails';
 import { useTranslation } from 'react-i18next';
 import { twMerge } from 'tailwind-merge';
 import { Avatar } from './avatar';

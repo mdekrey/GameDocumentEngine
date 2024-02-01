@@ -1,4 +1,4 @@
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@vaultvtt/api/openapi/models/UserDetails';
 
 export function Avatar({ user }: { user?: UserDetails }) {
 	return (

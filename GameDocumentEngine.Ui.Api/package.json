@@ -1,0 +1,27 @@
+{
+	"name": "@vaultvtt/api",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"exports": {
+		"./*": "./src/*.ts"
+	},
+	"scripts": {
+		"build": "dotnet build",
+		"lint": "npm run typecheck && npm run eslint && npm run prettier",
+		"lint:fix": "npm run typecheck && npm run eslint:fix && npm run prettier:fix",
+		"eslint": "eslint \"**/*.{cjs,mjs,js,ts,tsx}\"",
+		"eslint:fix": "eslint \"**/*.{cjs,mjs,js,ts,tsx}\" --fix",
+		"prettier": "prettier --list-different \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
+		"prettier:fix": "prettier --write \"**/*.{cjs,mjs,js,ts,tsx,md,json}\"",
+		"typecheck": "tsc -b",
+		"test": "echo 'TODO'"
+	},
+	"dependencies": {
+		"@principlestudios/openapi-codegen-typescript": "^0.6.3",
+		"@principlestudios/openapi-codegen-typescript-fetch": "^0.7.1",
+		"rfc6902": "^5.0.1"
+	},
+	"devDependencies": {
+	}
+}

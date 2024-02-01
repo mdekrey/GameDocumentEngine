@@ -1,7 +1,7 @@
 import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { type Patch } from 'rfc6902';
 import { api } from '../fetch-api';
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@vaultvtt/api/openapi/models/UserDetails';
 import { type EntityChangedProps } from '../EntityChangedProps';
 import { applyEventToQuery } from './applyEventToQuery';
 import type { RealtimeApi } from '../realtime-api';

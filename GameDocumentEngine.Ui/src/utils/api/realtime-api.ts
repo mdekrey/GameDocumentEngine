@@ -2,16 +2,16 @@ import { registerSW } from 'virtual:pwa-register';
 import type {
 	MessageFromServiceWorker,
 	MessageFromWindow,
-} from '@/service-worker/messages.ts';
+} from '@/service-worker/messages';
 import { HubConnectionState } from '@microsoft/signalr';
-import { handleEntityChanged } from '@/utils/api/handleEntityChanged.tsx';
-import { neverEver } from '@/utils/never-ever.ts';
+import { handleEntityChanged } from '@/utils/api/handleEntityChanged';
+import { neverEver } from '@/utils/never-ever';
 import type { QueryClient } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 import type { Atom } from 'jotai';
 import { atom, getDefaultStore } from 'jotai';
 import { queries } from './queries';
-import type { UserDetails } from '@/api/models/UserDetails';
+import type { UserDetails } from '@vaultvtt/api/openapi/models/UserDetails';
 
 const reconnectStates = [
 	HubConnectionState.Connecting,

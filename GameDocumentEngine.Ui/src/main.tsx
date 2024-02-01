@@ -3,14 +3,14 @@
 
 import { StrictMode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import App from './App.tsx';
+import App from './App';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './main.css';
 import { enablePatches } from 'immer';
 import {
 	RealtimeApiProvider,
 	createRealtimeApi,
-} from './utils/api/realtime-api.ts';
+} from './utils/api/realtime-api';
 import { setupRuntimeApi } from './runtime-api';
 
 declare global {

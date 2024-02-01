@@ -1,4 +1,4 @@
-import { type CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
+import { type CreateDocumentDetails } from '@vaultvtt/api/openapi/models/CreateDocumentDetails';
 import { z } from 'zod';
 
 export const createDocumentDetailsSchema = z.object({

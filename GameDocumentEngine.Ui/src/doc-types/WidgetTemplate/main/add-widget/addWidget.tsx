@@ -6,7 +6,7 @@ import { AddWidgetModal } from './AddWidgetModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchDocumentType } from '@/utils/api/loaders';
 import { NoWidgetsModal } from './NoWidgets';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 
 export function useAddWidget(
 	document: DocumentDetails,

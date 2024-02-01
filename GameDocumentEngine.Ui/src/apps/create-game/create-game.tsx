@@ -1,4 +1,4 @@
-import { type CreateGameDetails } from '@/api/models/CreateGameDetails';
+import { type CreateGameDetails } from '@vaultvtt/api/openapi/models/CreateGameDetails';
 import { Button } from '@/components/button/button';
 import { ButtonRow } from '@/components/button/button-row';
 import { queries } from '@/utils/api/queries';

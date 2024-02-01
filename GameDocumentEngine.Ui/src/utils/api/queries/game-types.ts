@@ -1,8 +1,8 @@
-import type { GameTypeDetails } from '@/api/models/GameTypeDetails';
+import type { GameTypeDetails } from '@vaultvtt/api/openapi/models/GameTypeDetails';
 import type { QueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { api } from '../fetch-api';
 import type { IGameObjectType } from '@/documents/defineDocument';
-import type { GameObjectTypeDetails } from '@/api/models/GameObjectTypeDetails';
+import type { GameObjectTypeDetails } from '@vaultvtt/api/openapi/models/GameObjectTypeDetails';
 import { i18n } from '@/utils/i18n/setup';
 import { getDocTypeTranslationNamespace } from '../accessors';
 

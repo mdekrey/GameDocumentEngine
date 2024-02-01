@@ -6,7 +6,7 @@ import { Fieldset } from '@/components/form-fields/fieldset/fieldset';
 import { useTranslation } from 'react-i18next';
 import { RoleAssignmentField } from './role-assignment-field';
 import { useCurrentUser } from '@/utils/api/hooks';
-import type { PlayerSummary } from '@/api/models/PlayerSummary';
+import type { PlayerSummary } from '@vaultvtt/api/openapi/models/PlayerSummary';
 
 export const UserRoleAssignment = z.record(z.string());
 

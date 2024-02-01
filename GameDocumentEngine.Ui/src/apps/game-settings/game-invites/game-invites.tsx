@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { HiPlus, HiLink, HiOutlineTrash, HiXMark } from 'react-icons/hi2';
 import { CreateInvite } from './create-invite';
 import { formatDistanceToNow } from 'date-fns';
-import type { GameInvite } from '@/api/models/GameInvite';
+import type { GameInvite } from '@vaultvtt/api/openapi/models/GameInvite';
 import { Trans, useTranslation } from 'react-i18next';
 import { useGame, useInvitations } from '@/utils/api/hooks';
 import { hasGamePermission } from '@/utils/security/match-permission';

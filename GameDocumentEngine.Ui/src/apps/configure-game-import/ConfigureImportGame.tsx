@@ -1,5 +1,5 @@
-import type { GameImportArchiveSummary } from '@/api/models/GameImportArchiveSummary';
-import type { ImportGameOptions } from '@/api/models/ImportGameOptions';
+import type { GameImportArchiveSummary } from '@vaultvtt/api/openapi/models/GameImportArchiveSummary';
+import type { ImportGameOptions } from '@vaultvtt/api/openapi/models/ImportGameOptions';
 import type { ModalContentsProps } from '@/utils/modal/modal-service';
 import { useForm } from '@principlestudios/react-jotai-forms';
 import { useTranslation } from 'react-i18next';

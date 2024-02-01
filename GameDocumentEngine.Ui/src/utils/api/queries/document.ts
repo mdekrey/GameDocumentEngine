@@ -1,11 +1,11 @@
 import type { QueryClient, UseMutationOptions } from '@tanstack/react-query';
-import type { CreateDocumentDetails } from '@/api/models/CreateDocumentDetails';
+import type { CreateDocumentDetails } from '@vaultvtt/api/openapi/models/CreateDocumentDetails';
 import { api } from '../fetch-api';
-import type { DocumentDetails } from '@/api/models/DocumentDetails';
+import type { DocumentDetails } from '@vaultvtt/api/openapi/models/DocumentDetails';
 import type { EntityChangedProps } from '../EntityChangedProps';
 import type { MapQueryConfig } from './applyEventToQuery';
 import { applyEventToQuery, applyChangeToMapQuery } from './applyEventToQuery';
-import type { DocumentSummary } from '@/api/models/DocumentSummary';
+import type { DocumentSummary } from '@vaultvtt/api/openapi/models/DocumentSummary';
 import type { OperationTransformMutation } from './operational-transform';
 import {
 	conflict,

@@ -31,6 +31,7 @@
 		"@tanstack/react-query": "^5.14.0",
 		"@tanstack/react-query-devtools": "^5.14.0",
 		"@types/json-schema": "^7.0.15",
+		"@vaultvtt/api": "workspace:*",
 		"d3-shape": "^3.2.0",
 		"date-fns": "^2.30.0",
 		"focus-trap-react": "^10.2.3",

@@ -5,7 +5,7 @@ import MultiloadAdapter, {
 } from 'i18next-multiload-backend-adapter';
 import HttpApi, { type HttpBackendOptions } from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { constructUrl as toLocalizationUrl } from '@/api/operations/getTranslationData';
+import { constructUrl as toLocalizationUrl } from '@vaultvtt/api/openapi/operations/getTranslationData';
 
 const reportedKeys = new Set<string>();
 
