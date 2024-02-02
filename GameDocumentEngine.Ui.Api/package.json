@@ -4,7 +4,10 @@
 	"version": "0.0.0",
 	"type": "module",
 	"exports": {
-		"./*": "./src/*.ts"
+		"./*": {
+			"default": "./src/*.js",
+			"types": "./src/*.d.ts"
+		}
 	},
 	"scripts": {
 		"build": "dotnet build",
